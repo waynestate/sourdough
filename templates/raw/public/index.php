@@ -28,7 +28,7 @@ session_start();
 
 // Local development signs in with SESAME's fake driver. It refuses to boot
 // when the environment is production, so this is the only place a dev
-// identity can exist. The cas driver arrives in SESAME 0.2.
+// identity can exist. In production, wire up the cas driver instead.
 $user = null;
 if ($appEnv !== 'production') {
     $sesame = new Sesame(
