@@ -50,7 +50,7 @@ From the repo root:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2 composer install --no-interaction
-docker run --rm -v "${PWD}:/app" -w /app php:8.2-cli vendor/bin/phpunit
+docker run --rm -v "${PWD}:/app" -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli vendor/bin/phpunit
 docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
