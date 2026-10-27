@@ -139,7 +139,7 @@ final class RawGeneratorTest extends TestCase
 
         // The hard-coded empty list and its Citadel comment are gone.
         self::assertStringNotContainsString("'trusted_proxies' => []", $index);
-        self::assertStringNotContainsString('HA-Proxy address goes here', $index);
+        self::assertStringNotContainsString('HA-Proxy', $index);
 
         // HELMET_PROXIES is comma-separated, trimmed, empty entries dropped.
         self::assertStringContainsString("getenv('HELMET_PROXIES')", $index);
