@@ -1,0 +1,19 @@
+{
+    "name": "wsu/{{app_slug}}",
+    "description": "{{app_name}}",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wayne State University, Enterprise Applications"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "waynestate/helmet": "^0.1",
+        "waynestate/sesame": "^0.1"
+    },
+    "require-dev": {
+        "waynestate/proctor": "^0.1"
+    }
+}

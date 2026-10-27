@@ -1,0 +1,13 @@
+# PREFLIGHT components. @0.1.0 is the first tag and is not cut yet; until it
+# is, pin a full commit SHA instead.
+include:
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.1.0
+    inputs:
+      proctor_command: vendor/bin/proctor check --format=codequality
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.1.0
+    inputs:
+      php_versions: ["8.3", "8.4", "8.5"]
+      test_command: vendor/bin/phpunit
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.1.0
+    inputs:
+      working_dir: .
