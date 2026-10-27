@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sourdough">
+<title>Sourdough</title>
+<rect width="512" height="512" rx="112" fill="#0C5449"/>
+<g transform="translate(0 -2)">
+<path d="M91 241 L91 118 A22 22 0 0 1 135 118 L135 241 Z" fill="#FFFFFF"/>
+<path d="M377 241 L377 118 A22 22 0 0 1 421 118 L421 241 Z" fill="#FFFFFF"/>
+<path d="M91 323 L91 334 A86 86 0 0 0 177 420 L335 420 A86 86 0 0 0 421 334 L421 323 L377 323 L377 334 A42 42 0 0 1 335 376 L177 376 A42 42 0 0 1 135 334 L135 323 Z" fill="#FFFFFF"/>
+<path d="M161 241 L161 196 A95 78 0 0 1 351 196 L351 241 Z" fill="#FFFFFF"/>
+<path d="M161 323 L161 334 A16 16 0 0 0 177 350 L335 350 A16 16 0 0 0 351 334 L351 323 Z" fill="#FFFFFF"/>
+<rect x="73" y="257" width="366" height="50" rx="25" fill="#FFCC33"/>
+</g>
+</svg>
