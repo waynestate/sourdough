@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Waynestate\Sourdough\Command\NewCommand;
+
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (!is_file($autoload)) {
+    fwrite(STDERR, "vendor/autoload.php not found. Run `composer install` first.\n");
+    exit(2);
+}
+
+require $autoload;
+
+$application = new class ('Sourdough', '0.1.0') extends Application {
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        $name = $this->getCommandName($input);
+        if (null !== $name && '' !== $name && !$this->has($name)) {
+            $output->getErrorOutput()->writeln(sprintf('Command "%s" is not defined.', $name));
+            return 2;
+        }
+
+        return parent::doRun($input, $output);
+    }
+};
+
+$application->addCommand(new NewCommand());
+
+exit($application->run());
