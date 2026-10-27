@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 use function Waynestate\Helmet\helmet_boot;
-use Waynestate\Sesame\Drivers\FakeDriver;
+use Waynestate\Sesame\Config;
+use Waynestate\Sesame\DriverFactory;
 use Waynestate\Sesame\Identity;
 use Waynestate\Sesame\Sesame;
 use Waynestate\Sesame\Session\NativeSession;
@@ -31,8 +32,26 @@ session_start();
 // identity can exist. In production, wire up the cas driver instead.
 $user = null;
 if ($appEnv !== 'production') {
+    $sesameConfig = [
+        'driver' => 'fake',
+        'environment' => $appEnv,
+        'fake.username' => 'jdoe',
+        'fake.attributes' => ['cn' => ['John Doe']],
+    ];
+    // Optional session limits, in minutes. Unset keeps the SESAME defaults.
+    $idleMinutes = getenv('SESAME_IDLE_MINUTES');
+    if ('' !== $idleMinutes) {
+        $sesameConfig['session.idle_minutes'] = (int) $idleMinutes;
+    }
+    $absoluteMinutes = getenv('SESAME_ABSOLUTE_MINUTES');
+    if ('' !== $absoluteMinutes) {
+        $sesameConfig['session.absolute_minutes'] = (int) $absoluteMinutes;
+    }
+
+    $config = Config::fromArray($sesameConfig);
+
     $sesame = new Sesame(
-        new FakeDriver($appEnv, 'jdoe', ['cn' => ['John Doe']]),
+        DriverFactory::make($config),
         new class implements UserResolver {
             public function findOrImportUser(Identity $identity): mixed
             {
@@ -40,6 +59,7 @@ if ($appEnv !== 'production') {
             }
         },
         new NativeSession(),
+        $config,
     );
     sesame($sesame);
     sesame_login();

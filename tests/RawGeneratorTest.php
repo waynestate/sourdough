@@ -99,6 +99,39 @@ final class RawGeneratorTest extends TestCase
         (new RawGenerator($this->fixtureTemplateDir()))->generate($target, '!!!');
     }
 
+    public function testGeneratedIndexUsesNewSesameConstructor(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        // The config is built from an array with the fake driver's keys.
+        self::assertStringContainsString("'driver' => 'fake'", $index);
+        self::assertStringContainsString("'environment' => \$appEnv", $index);
+        self::assertStringContainsString("'fake.username' => 'jdoe'", $index);
+        self::assertStringContainsString("'fake.attributes' => ['cn' => ['John Doe']]", $index);
+        self::assertStringContainsString('Config::fromArray(', $index);
+
+        // The driver comes from the factory, not a direct FakeDriver.
+        self::assertStringContainsString('DriverFactory::make($config)', $index);
+        self::assertStringNotContainsString('new FakeDriver(', $index);
+
+        // new Sesame(driver, resolver, session, config) — four arguments.
+        self::assertMatchesRegularExpression(
+            '/new Sesame\(\s*DriverFactory::make\(\$config\),\s*new class implements UserResolver \{[\s\S]*?\},\s*new NativeSession\(\),\s*\$config,\s*\);/',
+            $index
+        );
+
+        // The optional session limits come from the environment, cast to int.
+        self::assertStringContainsString("getenv('SESAME_IDLE_MINUTES')", $index);
+        self::assertStringContainsString("getenv('SESAME_ABSOLUTE_MINUTES')", $index);
+        self::assertStringContainsString("'session.idle_minutes'] = (int)", $index);
+        self::assertStringContainsString("'session.absolute_minutes'] = (int)", $index);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('# SESAME_IDLE_MINUTES=', $env);
+        self::assertStringContainsString('# SESAME_ABSOLUTE_MINUTES=', $env);
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */
@@ -125,6 +158,17 @@ final class RawGeneratorTest extends TestCase
     private function fixtureTemplateDir(): string
     {
         return __DIR__ . '/fixtures/template';
+    }
+
+    /**
+     * Generate an app from the real templates/raw dir and return the target.
+     */
+    private function generateFromRealTemplate(): string
+    {
+        $target = $this->makeTempDir();
+        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App');
+
+        return $target;
     }
 
     private function makeTempDir(): string
