@@ -14,6 +14,12 @@ use Waynestate\Sesame\UserResolver;
 // .env.example sets APP_ENV=local; production sets APP_ENV=production.
 $appEnv = getenv('APP_ENV') ?: 'production';
 
+// PHP errors go to stderr (stdout is the app's output) unless LOG_FILE
+// points at a file. In production, errors are logged, never displayed.
+ini_set('log_errors', '1');
+ini_set('display_errors', $appEnv === 'production' ? '0' : '1');
+ini_set('error_log', getenv('LOG_FILE') ?: 'php://stderr');
+
 require __DIR__ . '/../vendor/autoload.php';
 
 // HELMET sends the security headers, hardens the session, and answers the

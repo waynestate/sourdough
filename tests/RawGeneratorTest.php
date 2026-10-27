@@ -152,6 +152,19 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('172.18.0.1', $env);
     }
 
+    public function testGeneratedIndexLogsToStderrByDefault(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        self::assertStringContainsString("ini_set('log_errors', '1')", $index);
+        self::assertStringContainsString("ini_set('error_log', getenv('LOG_FILE') ?: 'php://stderr')", $index);
+        self::assertStringContainsString("ini_set('display_errors', \$appEnv === 'production' ? '0' : '1')", $index);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('# LOG_FILE=', $env);
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */
