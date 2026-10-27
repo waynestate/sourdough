@@ -188,6 +188,19 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('shared store', $env);
     }
 
+    public function testGeneratedReadmeHasOffCitadelSection(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $readme = (string) file_get_contents($target . '/README.md');
+
+        self::assertStringContainsString('## Running off Citadel', $readme);
+        foreach (['APP_ENV', 'HELMET_PROXIES', 'LOG_FILE', 'SESSION_SAVE_HANDLER', 'SESSION_SAVE_PATH', 'SESAME_IDLE_MINUTES', 'SESAME_ABSOLUTE_MINUTES'] as $var) {
+            self::assertStringContainsString('`' . $var . '`', $readme);
+        }
+        self::assertStringContainsString('deployments/', $readme);
+        self::assertStringContainsString('Dockerfile comes later', $readme);
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */
