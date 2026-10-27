@@ -18,10 +18,21 @@ require __DIR__ . '/../vendor/autoload.php';
 
 // HELMET sends the security headers, hardens the session, and answers the
 // load balancer's /up ping before any of this runs.
+//
+// HELMET_PROXIES is a comma-separated list of proxy addresses to trust:
+// on Citadel the value is 172.18.0.1; on other hosts, the address of the
+// proxy in front of the app; empty (the default) trusts nothing, which is
+// what a local machine wants.
+$trustedProxies = [];
+foreach (explode(',', getenv('HELMET_PROXIES') ?: '') as $proxy) {
+    $proxy = trim($proxy);
+    if ('' !== $proxy) {
+        $trustedProxies[] = $proxy;
+    }
+}
+
 $helmet = helmet_boot([
-    // Citadel's HA-Proxy address goes here. An empty list trusts nothing,
-    // which is what a local machine wants.
-    'trusted_proxies' => [],
+    'trusted_proxies' => $trustedProxies,
 ]);
 
 // The app owns the session. HELMET set the cookie flags; start it here.

@@ -132,6 +132,26 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('# SESAME_ABSOLUTE_MINUTES=', $env);
     }
 
+    public function testGeneratedIndexReadsTrustedProxiesFromEnv(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        // The hard-coded empty list and its Citadel comment are gone.
+        self::assertStringNotContainsString("'trusted_proxies' => []", $index);
+        self::assertStringNotContainsString('HA-Proxy address goes here', $index);
+
+        // HELMET_PROXIES is comma-separated, trimmed, empty entries dropped.
+        self::assertStringContainsString("getenv('HELMET_PROXIES')", $index);
+        self::assertStringContainsString("explode(',',", $index);
+        self::assertStringContainsString('trim($proxy)', $index);
+        self::assertStringContainsString("'trusted_proxies' => \$trustedProxies", $index);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('# HELMET_PROXIES=', $env);
+        self::assertStringContainsString('172.18.0.1', $env);
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */
