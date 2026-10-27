@@ -1,0 +1,1 @@
+Slug file for {{app_name}}.
