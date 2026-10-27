@@ -165,6 +165,29 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('# LOG_FILE=', $env);
     }
 
+    public function testGeneratedIndexAppliesSessionStoreFromEnv(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        self::assertStringContainsString("getenv('SESSION_SAVE_HANDLER')", $index);
+        self::assertStringContainsString("getenv('SESSION_SAVE_PATH')", $index);
+        self::assertStringContainsString("ini_set('session.save_handler', \$sessionSaveHandler)", $index);
+        self::assertStringContainsString("ini_set('session.save_path', \$sessionSavePath)", $index);
+
+        // The ini_set calls must come before session_start().
+        $iniPos = strpos($index, "ini_set('session.save_handler'");
+        $startPos = strpos($index, 'session_start()');
+        self::assertIsInt($iniPos);
+        self::assertIsInt($startPos);
+        self::assertLessThan($startPos, $iniPos);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('# SESSION_SAVE_HANDLER=', $env);
+        self::assertStringContainsString('# SESSION_SAVE_PATH=', $env);
+        self::assertStringContainsString('shared store', $env);
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */

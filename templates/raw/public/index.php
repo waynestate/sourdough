@@ -41,6 +41,18 @@ $helmet = helmet_boot([
     'trusted_proxies' => $trustedProxies,
 ]);
 
+// The session store comes from the environment so more than one replica can
+// share it (for example SESSION_SAVE_HANDLER=redis and
+// SESSION_SAVE_PATH=tcp://redis:6379). Unset keeps PHP's default.
+$sessionSaveHandler = getenv('SESSION_SAVE_HANDLER');
+if ('' !== $sessionSaveHandler) {
+    ini_set('session.save_handler', $sessionSaveHandler);
+}
+$sessionSavePath = getenv('SESSION_SAVE_PATH');
+if ('' !== $sessionSavePath) {
+    ini_set('session.save_path', $sessionSavePath);
+}
+
 // The app owns the session. HELMET set the cookie flags; start it here.
 session_start();
 
