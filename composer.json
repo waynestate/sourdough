@@ -1,0 +1,42 @@
+{
+    "name": "waynestate/sourdough",
+    "description": "A starter that makes a Wayne State app with the stack already wired in.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wayne State University, Enterprise Applications"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "symfony/console": "^7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        },
+        "sort-packages": true
+    },
+    "bin": [
+        "bin/sourdough"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Waynestate\\Sourdough\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waynestate\\Sourdough\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
