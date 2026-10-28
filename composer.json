@@ -10,7 +10,10 @@
     ],
     "require": {
         "php": "^8.3",
-        "symfony/console": "^7.4"
+        "justinrainbow/json-schema": "^6.0",
+        "openai-php/client": "^0.21",
+        "symfony/console": "^7.4",
+        "symfony/http-client": "^7.4"
     },
     "require-dev": {
         "laravel/pint": "^1.32",

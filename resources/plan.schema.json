@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Sourdough app plan",
+    "description": "The plan `sourdough new --describe` asks a model for, and `--plan=<file>` reads back. The model does the work but never gates: a plan that fails this schema means write it yourself.",
+    "type": "object",
+    "properties": {
+        "permutation": {
+            "type": "string",
+            "enum": [
+                "raw",
+                "raw-vue",
+                "laravel-blade",
+                "laravel-blade-vue",
+                "laravel-inertia"
+            ]
+        },
+        "parts": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "sesame",
+                    "helmet",
+                    "proctor",
+                    "preflight"
+                ]
+            },
+            "uniqueItems": true
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "models": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "minLength": 1
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "minLength": 1
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "type"
+                            ],
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "fields"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "pages": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength": 1
+            }
+        }
+    },
+    "required": [
+        "permutation",
+        "parts",
+        "name"
+    ],
+    "additionalProperties": false
+}

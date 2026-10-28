@@ -25,8 +25,10 @@ Or scaffold without installing, with `composer create-project waynestate/sourdou
 ## Usage
 
 ```
-sourdough new <dir> [options]
+sourdough new [dir] [options]
 ```
+
+`dir` is the directory to create the app in. It is required unless you use `--describe`.
 
 Options:
 
@@ -39,8 +41,12 @@ Options:
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
 - `--no-input` never prompt (Sourdough 0.1 has no prompts)
+- `--json` with `--dry-run`, print the plan as JSON
+- `--describe "<sentence>"` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
+- `--plan-only` with `--describe`, print the plan as JSON and write nothing
+- `--plan <file>` a ready-made plan file (JSON matching `resources/plan.schema.json`)
 
-Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available), `2` tool error.
+Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
 
 ## Permutations
 
@@ -53,6 +59,62 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 | `--laravel --inertia` | Laravel + Inertia/Vue |
 
 Only `--raw` generates in 0.1. The other permutations print the plan and exit `1` with "not available in this release"; later steps add them.
+
+## Describe a plan
+
+Instead of choosing flags, describe what the app does and let a model plan it:
+
+```
+sourdough new --describe "A blog with posts and comments"
+```
+
+Sourdough asks an OpenAI-compatible model for a plan, validates it against `resources/plan.schema.json`, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to `--plan=<file>` (exit `1`). You write the plan yourself and pass it in.
+
+To see the plan as JSON without writing anything:
+
+```
+sourdough new --describe "A blog with posts and comments" --plan-only
+```
+
+Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with `--plan`:
+
+```
+sourdough new my-app --plan plan.json
+```
+
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+
+### Model configuration
+
+`--describe` needs three environment variables (no defaults, no key in code):
+
+- `SOURDOUGH_LLM_BASE_URL` the OpenAI-compatible endpoint, including the API path (usually `/v1`)
+- `SOURDOUGH_LLM_API_KEY` the API key
+- `SOURDOUGH_LLM_MODEL` the model name
+
+Any OpenAI-compatible endpoint works — a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.
+
+A plan is a small JSON object:
+
+```json
+{
+    "permutation": "raw",
+    "parts": ["sesame", "helmet"],
+    "name": "my-app",
+    "models": [
+        {
+            "name": "Post",
+            "fields": [
+                { "name": "title", "type": "string" },
+                { "name": "body", "type": "text" }
+            ]
+        }
+    ],
+    "pages": ["/", "/posts"]
+}
+```
+
+`permutation`, `parts`, and `name` are required; `models` and `pages` are optional. `parts` is a subset of `sesame`, `helmet`, `proctor`, and `preflight`.
 
 ## The manifest
 

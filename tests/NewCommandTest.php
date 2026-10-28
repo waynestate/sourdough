@@ -4,15 +4,32 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Tests;
 
+use OpenAI\Responses\Chat\CreateResponse;
+use OpenAI\Responses\Meta\MetaInformation;
+use OpenAI\Testing\ClientFake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Waynestate\Sourdough\Command\NewCommand;
+use Waynestate\Sourdough\Describe;
 
 final class NewCommandTest extends TestCase
 {
     /** @var list<string> */
     private array $tempDirs = [];
+
+    /** @var list<string> */
+    private array $tempFiles = [];
+
+    /** @var array<string, string|false> */
+    private array $savedLlmEnv = [];
+
+    protected function setUp(): void
+    {
+        foreach (['SOURDOUGH_LLM_BASE_URL', 'SOURDOUGH_LLM_API_KEY', 'SOURDOUGH_LLM_MODEL'] as $name) {
+            $this->savedLlmEnv[$name] = getenv($name);
+        }
+    }
 
     protected function tearDown(): void
     {
@@ -20,6 +37,22 @@ final class NewCommandTest extends TestCase
             $this->removeDir($dir);
         }
         $this->tempDirs = [];
+
+        foreach ($this->tempFiles as $path) {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+        $this->tempFiles = [];
+
+        foreach ($this->savedLlmEnv as $name => $value) {
+            if ($value === false) {
+                putenv($name);
+            } else {
+                putenv($name . '=' . $value);
+            }
+        }
+        $this->savedLlmEnv = [];
     }
 
     public function testDryRunWritesNothingAndExitsZero(): void
@@ -165,6 +198,160 @@ final class NewCommandTest extends TestCase
         self::assertSame(['name' => 'demo', 'raw' => true], $manifest['answers']);
     }
 
+    public function testDescribeAndPlanAreMutuallyExclusive(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $planFile = $this->writePlanFile($this->validPlanJson());
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--describe' => 'A blog.',
+            '--plan' => $planFile,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertStringContainsString('--describe and --plan are mutually exclusive', $tester->getDisplay());
+    }
+
+    public function testPlanOnlyWithoutDescribeExitsOne(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--plan-only' => true,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertStringContainsString('--plan-only is only available with --describe', $tester->getDisplay());
+    }
+
+    public function testDirRequiredWithoutDescribe(): void
+    {
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            '--dry-run' => true,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertStringContainsString('The dir argument is required unless you use --describe', $tester->getDisplay());
+    }
+
+    public function testDescribePlanOnlyPrintsJsonAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $this->setLlmEnv();
+
+        $describe = $this->describeWithResponse($this->validPlanJson());
+        $tester = new CommandTester($this->createCommand($describe));
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--describe' => 'A blog with posts.',
+            '--plan-only' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        $data = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('raw', $data['permutation']);
+        self::assertSame('demo-app', $data['name']);
+    }
+
+    public function testDescribePrintsHumanPlanAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $this->setLlmEnv();
+
+        $describe = $this->describeWithResponse($this->validPlanJson());
+        $tester = new CommandTester($this->createCommand($describe));
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--describe' => 'A blog with posts.',
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('Permutation: Raw PHP with WayneUI', $tester->getDisplay());
+        self::assertStringContainsString('Name:        demo-app', $tester->getDisplay());
+        self::assertStringContainsString('Generation from a plan is not built yet', $tester->getDisplay());
+    }
+
+    public function testDescribeMissingEnvExitsOne(): void
+    {
+        $this->unsetLlmEnv();
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--describe' => 'A blog with posts.',
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertStringContainsString('SOURDOUGH_LLM_BASE_URL', $tester->getDisplay());
+    }
+
+    public function testPlanFileGeneratesApp(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $planFile = $this->writePlanFile($this->validPlanJson());
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--plan' => $planFile,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/.sourdough/manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        // The plan's name wins over the dir basename.
+        self::assertSame('demo-app', $manifest['answers']['name']);
+        self::assertTrue($manifest['answers']['raw']);
+    }
+
+    public function testPlanFileInvalidExitsOne(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $planFile = $this->writePlanFile((string) json_encode(['permutation' => 'raw', 'name' => 'demo-app']));
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--plan' => $planFile,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('not a valid plan', $tester->getDisplay());
+    }
+
+    public function testPlanFileMissingExitsOne(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--plan' => $parent . '/nope.json',
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('does not exist', $tester->getDisplay());
+    }
+
     public function testNoColorIsHonored(): void
     {
         // The CLI renders through Symfony Console output, whose decoration is
@@ -190,9 +377,66 @@ final class NewCommandTest extends TestCase
         });
     }
 
-    private function createCommand(): NewCommand
+    private function createCommand(?Describe $describe = null): NewCommand
     {
-        return new NewCommand();
+        return new NewCommand($describe);
+    }
+
+    private function describeWithResponse(string $content): Describe
+    {
+        $fake = new ClientFake([
+            CreateResponse::from([
+                'id' => 'chatcmpl-123',
+                'object' => 'chat.completion',
+                'created' => 1_677_652_288,
+                'model' => 'test-model',
+                'choices' => [
+                    [
+                        'index' => 0,
+                        'message' => [
+                            'role' => 'assistant',
+                            'content' => $content,
+                        ],
+                        'logprobs' => null,
+                        'finish_reason' => 'stop',
+                    ],
+                ],
+            ], MetaInformation::from([])),
+        ]);
+
+        return new Describe($fake);
+    }
+
+    private function validPlanJson(): string
+    {
+        return (string) json_encode([
+            'permutation' => 'raw',
+            'parts' => ['sesame', 'helmet'],
+            'name' => 'demo-app',
+        ], JSON_UNESCAPED_SLASHES);
+    }
+
+    private function writePlanFile(string $content): string
+    {
+        $path = sys_get_temp_dir() . '/sourdough-plan-' . bin2hex(random_bytes(8)) . '.json';
+        file_put_contents($path, $content);
+        $this->tempFiles[] = $path;
+
+        return $path;
+    }
+
+    private function setLlmEnv(): void
+    {
+        putenv('SOURDOUGH_LLM_BASE_URL=https://example.test/v1');
+        putenv('SOURDOUGH_LLM_API_KEY=test-key');
+        putenv('SOURDOUGH_LLM_MODEL=test-model');
+    }
+
+    private function unsetLlmEnv(): void
+    {
+        putenv('SOURDOUGH_LLM_BASE_URL');
+        putenv('SOURDOUGH_LLM_API_KEY');
+        putenv('SOURDOUGH_LLM_MODEL');
     }
 
     private function withColorEnv(?string $noColor, ?string $forceColor, callable $fn): void
