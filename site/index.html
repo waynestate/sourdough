@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en" data-theme="wsu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sourdough — Feed it and it grows.</title>
+<meta name="description" content="Sourdough makes a new Wayne State app with the stack already wired in: SESAME sign-in, HELMET runtime baseline, PROCTOR checks, WayneUI and a Citadel release script. One PHP command, every operating system.">
+<meta name="theme-color" content="#0c5449">
+<link rel="icon" href="brand/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
+<link rel="apple-touch-icon" href="brand/sourdough-avatar-256.png">
+<meta property="og:image" content="brand/sourdough-avatar-512.png">
+<!--
+  WayneUI 2.0.8, copied from its documented static path
+  (wayne-ui/apps/site/public/v2) so this page works offline: tokens, Lato,
+  container, skip link, tabs and the a11y floor. sourdough.css sits on top,
+  unlayered, so the bakery wins without !important.
+-->
+<link rel="preload" href="assets/fonts/caprasimo-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/wayne-ui/wayne-ui.css">
+<link rel="stylesheet" href="assets/sourdough.css">
+<script>
+  /* Let the dough rise only for people who are happy with motion. Everyone
+     else walks into the bakery after the bake: every loaf out, every word on
+     the page, nothing moving. */
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+    document.documentElement.classList.add("motion");
+  }
+</script>
+</head>
+<body>
+<a class="wsu-skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wsu-container site-header__inner">
+    <a class="brand" href="#main">
+      <img src="brand/sourdough-avatar-256.png" width="36" height="36" alt="">
+      <span class="brand__name">Sourdough</span>
+    </a>
+    <nav class="site-nav" aria-label="On this page">
+      <a href="#proof-title">The proof</a>
+      <a href="#loaves-title">Loaves</a>
+      <a href="#feeding-title">Feeding</a>
+      <a href="#start-title">Quick start</a>
+    </nav>
+    <span class="ticket" title="Sourdough version">No. 0.1</span>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================================================================ hero -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="flour" aria-hidden="true"></div>
+    <div class="wsu-container hero__grid">
+
+      <div class="hero__copy">
+        <p class="eyebrow">Wayne State's app starters</p>
+        <h1 class="hero__title" id="hero-title">
+          <span class="wsu-sr-only">Sourdough</span>
+          <span class="hero__letters" aria-hidden="true"><span style="--i:0">S</span><span style="--i:1">o</span><span style="--i:2">u</span><span style="--i:3">r</span><span style="--i:4">d</span><span style="--i:5">o</span><span style="--i:6">u</span><span style="--i:7">g</span><span style="--i:8">h</span></span>
+        </h1>
+        <p class="hero__tagline">Feed it and it grows.</p>
+        <p class="hero__blurb">One command makes a new Wayne State app with the stack already wired in. SESAME signs people in, HELMET sets the runtime baseline, PROCTOR checks the code, WayneUI draws the page, and a Citadel release script ships it. One PHP command, so it bakes the same on Windows, macOS and Linux.</p>
+
+        <div class="recipe-cmd">
+          <p class="recipe-cmd__label">The whole recipe</p>
+          <pre class="recipe-cmd__code" id="hero-cmd"><span class="p" aria-hidden="true">$ </span>composer global require waynestate/sourdough
+<span class="p" aria-hidden="true">$ </span>sourdough new my-app</pre>
+          <button class="copy-btn" type="button" data-copy="composer global require waynestate/sourdough&#10;sourdough new my-app">Copy</button>
+        </div>
+
+        <p class="hero__cta">
+          <a class="btn btn--gold" href="#start-title">Start baking</a>
+          <a class="hero__link" href="#loaves-title">See the five loaves</a>
+        </p>
+      </div>
+
+      <div class="hero__art">
+        <div class="jar">
+          <div class="board" aria-hidden="true"></div>
+          <span class="jar__bubbles" aria-hidden="true">
+            <i style="--x:22%;--d:0s;--s:10px"></i><i style="--x:38%;--d:1.4s;--s:7px"></i><i style="--x:55%;--d:.6s;--s:12px"></i>
+            <i style="--x:68%;--d:2.1s;--s:8px"></i><i style="--x:47%;--d:3s;--s:6px"></i><i style="--x:30%;--d:2.6s;--s:9px"></i>
+            <i style="--x:76%;--d:1s;--s:6px"></i>
+          </span>
+          <img class="jar__mark" src="brand/sourdough-avatar-512.png" width="512" height="512" alt="Sourdough mark: a starter jar whose starter has risen into a dome, well above the gold band that marks where it began">
+          <!-- Chalk notes a baker scribbles beside the jar: hand-drawn arrows
+               that stop at the tile's edge. Not the mark, and never on it. -->
+          <svg class="notes" viewBox="-40 -20 180 140" aria-hidden="true" focusable="false">
+            <path class="notes__arrow" d="M118 -2 C126 8 120 18 104 22" />
+            <path class="notes__arrow" d="M104 22 l6 -4.5 M104 22 l5 4" />
+            <path class="notes__arrow" d="M-22 82 C-28 72 -20 62 -5 60" />
+            <path class="notes__arrow" d="M-5 60 l-6 -3.5 M-5 60 l-5 4.5" />
+          </svg>
+          <p class="note note--risen" aria-hidden="true">risen ×2!</p>
+          <p class="note note--fed" aria-hidden="true">fed at 9</p>
+        </div>
+
+        <div class="feed">
+          <button class="btn btn--feed" type="button" data-feed>
+            <span class="btn--feed__icon" aria-hidden="true"></span>Feed the starter
+          </button>
+          <p class="feed__count" data-feed-count aria-live="polite">Hungry. It has not been fed yet today.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================== the proof -->
+  <!-- The magic moment. With motion on, scrolling is the clock: the dough
+       rises past its gold band, the ingredients go in one by one, and at the
+       end it is turned out and divided into the five loaves below. With
+       reduced motion (or no script) this is the finished picture: five loaves
+       on the bench and the whole log written out. -->
+  <section class="proof" data-proof aria-labelledby="proof-title">
+    <div class="proof__pin">
+      <div class="wsu-container proof__grid">
+
+        <div class="proof__head">
+          <p class="eyebrow">Proofing log</p>
+          <h2 id="proof-title">The proof</h2>
+          <p class="proof__lede">What goes into the tub when you run <code>sourdough new</code>.</p>
+        </div>
+
+        <div class="proof__stage">
+          <svg class="stage" viewBox="0 270 640 170" role="img" aria-labelledby="stage-title" focusable="false">
+            <title id="stage-title">A tub of dough rises past its gold starting band, then is turned out and divided into five loaves: raw PHP, raw PHP with Vue, Laravel with Blade, Laravel with Blade and Vue islands, and Laravel with Inertia and Vue.</title>
+            <defs>
+              <linearGradient id="g-dough" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fbefd6"/>
+                <stop offset="1" stop-color="#e2c690"/>
+              </linearGradient>
+              <radialGradient id="g-crust" cx="50%" cy="35%" r="70%">
+                <stop offset="0" stop-color="#e4b673"/>
+                <stop offset=".55" stop-color="#bf7c36"/>
+                <stop offset="1" stop-color="#8a4f1f"/>
+              </radialGradient>
+              <clipPath id="c-tub"><rect x="208" y="48" width="224" height="314" rx="20"/></clipPath>
+            </defs>
+
+            <!-- the bench, floured -->
+            <rect class="bench" x="10" y="380" width="620" height="22" rx="6"/>
+            <g class="bench__flour">
+              <ellipse cx="160" cy="382" rx="70" ry="4"/><ellipse cx="420" cy="383" rx="110" ry="4"/>
+            </g>
+
+            <g class="tub" data-tub>
+              <rect class="tub__back" x="200" y="40" width="240" height="330" rx="26"/>
+              <g clip-path="url(#c-tub)">
+                <path class="dough" data-dough d="M208 362 L208 288 Q320 256 432 288 L432 362 Z" fill="url(#g-dough)"/>
+                <g data-bubbles></g>
+              </g>
+              <rect class="tub__glass" x="200" y="40" width="240" height="330" rx="26"/>
+              <rect class="tub__shine" x="214" y="62" width="10" height="250" rx="5"/>
+              <!-- the gold band: where it started -->
+              <rect class="band" x="194" y="266" width="252" height="12" rx="4"/>
+              <g class="ticks">
+                <line x1="446" y1="272" x2="462" y2="272"/><text x="468" y="279">1×</text>
+                <line x1="446" y1="180" x2="462" y2="180"/><text x="468" y="187">2×</text>
+              </g>
+              <text class="pinch" data-pinch x="320" y="26" text-anchor="middle"></text>
+            </g>
+
+            <!-- the dough, turned out onto the bench before it is cut -->
+            <path class="turned" data-turned d="M170 378 C170 330 470 330 470 378 Z" fill="url(#g-dough)"/>
+
+            <!-- the bench knife, mid-cut -->
+            <g class="scraper" data-scraper>
+              <rect x="-8" y="250" width="16" height="64" rx="3"/>
+              <rect class="scraper__grip" x="-14" y="228" width="28" height="26" rx="8"/>
+            </g>
+
+            <!-- the five loaves. Positions here are the finished bench; the
+                 script gathers them under the dough and spreads them out. -->
+            <g class="loaves">
+              <g class="sloaf" data-sloaf style="--tx:64px">
+                <g transform="translate(64 334)">
+                  <path d="M-46 4 C-46 -30 46 -30 46 4 C46 18 26 24 0 24 C-26 24 -46 18 -46 4Z" fill="url(#g-crust)"/>
+                  <path class="score" pathLength="1" d="M-18 -14 L16 10 M16 -14 L-18 10"/>
+                </g>
+                <text x="64" y="424" text-anchor="middle">raw</text>
+              </g>
+              <g class="sloaf" data-sloaf>
+                <g transform="translate(192 336)">
+                  <path d="M-54 2 C-54 -22 54 -22 54 2 C54 16 34 22 0 22 C-34 22 -54 16 -54 2Z" fill="url(#g-crust)"/>
+                  <path class="score" pathLength="1" d="M-36 2 C-14 -12 12 -12 38 -4"/>
+                </g>
+                <text x="192" y="424" text-anchor="middle">raw + vue</text>
+              </g>
+              <g class="sloaf" data-sloaf>
+                <g transform="translate(320 340)">
+                  <path d="M-58 2 C-58 -10 58 -16 58 -6 C58 6 52 12 0 14 C-50 16 -58 12 -58 2Z" fill="url(#g-crust)"/>
+                  <path class="score" pathLength="1" d="M-42 4 L-30 -6 M-18 2 L-6 -8 M6 0 L18 -10 M30 -2 L42 -12"/>
+                </g>
+                <text x="320" y="424" text-anchor="middle">blade</text>
+              </g>
+              <g class="sloaf" data-sloaf>
+                <g transform="translate(448 334)">
+                  <path d="M-46 4 C-46 -30 46 -30 46 4 C46 18 26 24 0 24 C-26 24 -46 18 -46 4Z" fill="url(#g-crust)"/>
+                  <path class="score" pathLength="1" d="M0 -18 L0 14 M0 -10 L-12 -18 M0 -10 L12 -18 M0 0 L-14 -8 M0 0 L14 -8"/>
+                  <g class="seeds"><ellipse cx="-26" cy="-2" rx="3" ry="1.6"/><ellipse cx="24" cy="4" rx="3" ry="1.6"/><ellipse cx="-16" cy="12" rx="3" ry="1.6"/><ellipse cx="18" cy="-12" rx="3" ry="1.6"/><ellipse cx="30" cy="-4" rx="3" ry="1.6"/><ellipse cx="-30" cy="8" rx="3" ry="1.6"/></g>
+                </g>
+                <text x="448" y="424" text-anchor="middle">blade + islands</text>
+              </g>
+              <g class="sloaf" data-sloaf>
+                <g transform="translate(576 330)">
+                  <rect class="tin" x="-44" y="-2" width="88" height="30" rx="4"/>
+                  <path d="M-42 2 C-42 -30 42 -30 42 2Z" fill="url(#g-crust)"/>
+                  <path class="score" pathLength="1" d="M-26 -10 Q0 -22 26 -10"/>
+                </g>
+                <text x="576" y="424" text-anchor="middle">inertia</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <ol class="log" data-log>
+          <li class="log__entry" data-at="0.00"><span class="log__time">08:00</span> <span class="log__what"><strong>Mix.</strong> <code>sourdough new</code> picks the shape: raw PHP, or Laravel, with or without Vue.</span></li>
+          <li class="log__entry" data-at="0.14"><span class="log__time">08:20</span> <span class="log__what"><strong>Flour: WayneUI.</strong> The interface, from WayneUI's standalone PHP path.</span></li>
+          <li class="log__entry" data-at="0.28"><span class="log__time">08:40</span> <span class="log__what"><strong>Water: SESAME.</strong> Sign-in. A fake driver locally, CAS in production.</span></li>
+          <li class="log__entry" data-at="0.40"><span class="log__time">09:00</span> <span class="log__what"><strong>Salt: HELMET.</strong> Security headers, a hardened session, and <code>/up</code> for the load balancer.</span></li>
+          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The checks, with PREFLIGHT's CI components and a Citadel release script that runs them.</span></li>
+          <li class="log__entry" data-at="0.66"><span class="log__time">13:00</span> <span class="log__what"><strong>Doubled.</strong> Well past the gold band. A label goes on: <code>.sourdough/manifest.json</code>.</span></li>
+          <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> One starter, five loaves.</span></li>
+        </ol>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== loaves -->
+  <section class="section loaves-section" id="loaves" aria-labelledby="loaves-title">
+    <div class="wsu-container">
+      <div class="section__head">
+        <p class="eyebrow">On the cooling rack</p>
+        <h2 id="loaves-title">Five loaves, one starter</h2>
+        <p>Every shape a Wayne State app can take. The raw PHP boule is out of the oven in 0.1; the other four are still proofing. Score a loaf to see what's baked in.</p>
+      </div>
+
+      <div class="rack">
+
+        <!-- Commands as documented in README.md and src/Command/NewCommand.php.
+             Only the raw permutation generates in 0.1; the other four print
+             their plan and exit 1, so they say "coming soon" and show no
+             command. -->
+        <article class="loaf loaf--baked">
+          <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-raw" aria-label="Score the Raw PHP loaf: show what's baked in" data-score>
+            <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
+              <ellipse class="loaf__shadow" cx="70" cy="80" rx="54" ry="5"/>
+              <path d="M16 54 C16 14 124 14 124 54 C124 70 100 78 70 78 C40 78 16 70 16 54Z" fill="url(#g-crust)"/>
+              <path class="dust" d="M40 30 q30 -14 60 0"/>
+              <path class="score" pathLength="1" d="M48 30 L92 62 M92 30 L48 62"/>
+            </svg>
+            <span class="loaf__hint">Score it</span>
+          </button>
+          <div class="loaf__body">
+            <p class="loaf__kind">Country boule</p>
+            <h3>Raw PHP</h3>
+            <p class="loaf__label">Raw PHP with WayneUI's standalone path. No framework, no build.</p>
+            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <div class="cmd">
+              <code id="cmd-raw">sourdough new my-app --raw</code>
+              <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --raw">Copy</button>
+            </div>
+            <div class="crumb" id="crumb-raw">
+              <p class="crumb__title">The crumb</p>
+              <ul class="crumb__list">
+                <li><code>public/index.php</code> HELMET boots first, then SESAME signs you in</li>
+                <li><code>composer.json</code> helmet and sesame, with proctor for dev</li>
+                <li><code>.gitlab-ci.yml</code> PREFLIGHT components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
+                <li><code>deployments/release.sh</code> and <code>release.ps1</code> the Citadel release script</li>
+                <li><code>.env.example</code> and <code>README.md</code> seeded: yours from day one</li>
+                <li><code>.sourdough/manifest.json</code> the label on the jar</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="loaf">
+          <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-rawvue" aria-label="Score the Raw PHP + Vue loaf: show what's baked in" data-score>
+            <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
+              <ellipse class="loaf__shadow" cx="70" cy="80" rx="60" ry="5"/>
+              <path d="M8 56 C8 26 132 26 132 56 C132 70 108 76 70 76 C32 76 8 70 8 56Z" fill="url(#g-crust)"/>
+              <path class="score" pathLength="1" d="M26 54 C50 38 82 36 114 46"/>
+            </svg>
+            <span class="loaf__hint">Score it</span>
+          </button>
+          <div class="loaf__body">
+            <p class="loaf__kind">Bâtard</p>
+            <h3>Raw PHP + Vue</h3>
+            <p class="loaf__label">A Vue single-page app over JSON, on raw PHP.</p>
+            <p><span class="tag tag--soon">Coming soon</span></p>
+            <div class="crumb" id="crumb-rawvue">
+              <p class="crumb__title">The crumb</p>
+              <p>Cut too early: still dough in the middle. The bake lands in a later release.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="loaf">
+          <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-blade" aria-label="Score the Laravel + Blade loaf: show what's baked in" data-score>
+            <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
+              <ellipse class="loaf__shadow" cx="70" cy="76" rx="64" ry="4"/>
+              <path d="M4 58 C4 42 136 34 136 46 C136 60 128 68 70 70 C14 72 4 68 4 58Z" fill="url(#g-crust)"/>
+              <path class="score" pathLength="1" d="M20 58 L34 46 M44 56 L58 44 M68 54 L82 42 M92 52 L106 40 M114 50 L126 40"/>
+            </svg>
+            <span class="loaf__hint">Score it</span>
+          </button>
+          <div class="loaf__body">
+            <p class="loaf__kind">Baguette</p>
+            <h3>Laravel + Blade</h3>
+            <p class="loaf__label">The classic Wayne State shape: Laravel with Blade views.</p>
+            <p><span class="tag tag--soon">Coming soon</span></p>
+            <div class="crumb" id="crumb-blade">
+              <p class="crumb__title">The crumb</p>
+              <p>Planned on Laravel's own installer, with the same SESAME, HELMET, PROCTOR and WayneUI wired in. Still proofing.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="loaf">
+          <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-islands" aria-label="Score the Laravel + Blade + Vue islands loaf: show what's baked in" data-score>
+            <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
+              <ellipse class="loaf__shadow" cx="70" cy="80" rx="54" ry="5"/>
+              <path d="M16 54 C16 14 124 14 124 54 C124 70 100 78 70 78 C40 78 16 70 16 54Z" fill="url(#g-crust)"/>
+              <path class="score" pathLength="1" d="M70 24 L70 66 M70 34 L54 24 M70 34 L86 24 M70 48 L52 38 M70 48 L88 38"/>
+              <g class="seeds"><ellipse cx="36" cy="50" rx="3.4" ry="1.8"/><ellipse cx="102" cy="56" rx="3.4" ry="1.8"/><ellipse cx="46" cy="64" rx="3.4" ry="1.8"/><ellipse cx="96" cy="36" rx="3.4" ry="1.8"/><ellipse cx="108" cy="46" rx="3.4" ry="1.8"/><ellipse cx="30" cy="60" rx="3.4" ry="1.8"/><ellipse cx="88" cy="68" rx="3.4" ry="1.8"/></g>
+            </svg>
+            <span class="loaf__hint">Score it</span>
+          </button>
+          <div class="loaf__body">
+            <p class="loaf__kind">Seeded loaf</p>
+            <h3>Laravel + Blade + Vue islands</h3>
+            <p class="loaf__label">Blade pages with Vue islands, like seeds in the crust.</p>
+            <p><span class="tag tag--soon">Coming soon</span></p>
+            <div class="crumb" id="crumb-islands">
+              <p class="crumb__title">The crumb</p>
+              <p>The seeds are counted, the oven isn't hot yet. Coming in a later release.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="loaf">
+          <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-inertia" aria-label="Score the Laravel + Inertia/Vue loaf: show what's baked in" data-score>
+            <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
+              <rect class="tin" x="20" y="46" width="100" height="34" rx="5"/>
+              <path d="M22 50 C22 12 118 12 118 50Z" fill="url(#g-crust)"/>
+              <path class="score" pathLength="1" d="M38 34 Q70 18 102 34"/>
+            </svg>
+            <span class="loaf__hint">Score it</span>
+          </button>
+          <div class="loaf__body">
+            <p class="loaf__kind">Tin loaf</p>
+            <h3>Laravel + Inertia/Vue</h3>
+            <p class="loaf__label">Inertia and Vue: the whole app baked in one tin.</p>
+            <p><span class="tag tag--soon">Coming soon</span></p>
+            <div class="crumb" id="crumb-inertia">
+              <p class="crumb__title">The crumb</p>
+              <p>Want this one already baked? WELD is the Inertia/Vue loaf, finished and sliced: <code>composer create-project waynestate/weld my-app</code>.</p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with any shape's flags, so you can read a loaf's plan before it bakes.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== recipe -->
+  <section class="section recipe-section" aria-labelledby="recipe-title">
+    <div class="wsu-container">
+      <article class="recipe-card">
+        <header class="recipe-card__head">
+          <p class="eyebrow">Recipe card No. 1</p>
+          <h2 id="recipe-title">What's baked in</h2>
+          <p>Baker's percentages, roughly. The parts are libraries, so they update with <code>composer update</code>; only the glue lives in the template.</p>
+        </header>
+        <div class="wsu-table-wrap recipe-card__table">
+          <table class="recipe">
+            <caption class="wsu-sr-only">The parts of the stack in every Sourdough app, as ingredients</caption>
+            <thead>
+              <tr><th scope="col">Ingredient</th><th scope="col">Part</th><th scope="col">What it does in your app</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><span class="pct">100%</span> Flour</th>
+                <td><span class="part"><span class="part__tile"><img src="assets/marks/wayneui.svg" width="26" height="26" alt=""></span>WayneUI</span></td>
+                <td>The interface: WayneUI's standalone PHP file, fetched once into <code>public/</code>.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">75%</span> Water</th>
+                <td><span class="part"><img src="assets/marks/sesame.png" width="34" height="34" alt="">SESAME</span></td>
+                <td>Sign-in. The fake driver in development; the cas driver in production, with <code>SESAME_CAS_URL</code> and <code>SESAME_SERVICE_URL</code>.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">2%</span> Salt</th>
+                <td><span class="part"><img src="assets/marks/helmet.png" width="34" height="34" alt="">HELMET</span></td>
+                <td>The runtime baseline: security headers, session cookie flags, trusted proxies from <code>HELMET_PROXIES</code>, and <code>/up</code> answering <code>200 ok</code>.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">20%</span> Levain</th>
+                <td><span class="part"><img src="assets/marks/proctor.png" width="34" height="34" alt="">PROCTOR</span></td>
+                <td>The checks. The release script runs <code>vendor/bin/proctor check</code> before anything ships.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">1</span> Oven</th>
+                <td><span class="part"><img src="assets/marks/preflight.png" width="34" height="34" alt="">PREFLIGHT</span></td>
+                <td>CI from <code>.gitlab-ci.yml</code>: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, and a Composer audit.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">1</span> Basket</th>
+                <td><span class="part"><span class="part__glyph" aria-hidden="true">⇢</span>Release script</span></td>
+                <td><code>deployments/release.sh</code> runs on Citadel at release time; <code>release.ps1</code> is its Windows twin. Off Citadel, the same env vars work on OpenShift, Coolify or raw Docker.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="recipe-card__foot">Bake at <code>php -S localhost:8000 -t public</code> until golden.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================================================= feeding -->
+  <section class="section chalk-section" aria-labelledby="feeding-title">
+    <div class="wsu-container">
+      <div class="chalkboard">
+        <div class="chalkboard__head">
+          <p class="chalk-eyebrow">Pinned above the bench</p>
+          <h2 id="feeding-title">Feeding schedule</h2>
+          <p>A starter you never feed goes flat. Every app Sourdough makes carries <code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 of every file. It's how the starter remembers what went into the loaf.</p>
+        </div>
+
+        <ol class="schedule">
+          <li class="schedule__row" data-reveal>
+            <p class="schedule__when">Bake day</p>
+            <div class="schedule__what">
+              <code class="chalk-cmd">sourdough new my-app</code>
+              <p>Makes the app and writes the manifest. Commit it: it's the record that keeps feeding honest.</p>
+            </div>
+          </li>
+          <li class="schedule__row" data-reveal>
+            <p class="schedule__when">Every day, in CI</p>
+            <div class="schedule__what">
+              <code class="chalk-cmd">sourdough manifest --check</code>
+              <p>Is it still alive? Lists every managed file that drifted from the manifest.</p>
+              <dl class="exits">
+                <div><dt>0</dt><dd>clean</dd></div>
+                <div><dt>1</dt><dd>a managed file changed or is missing</dd></div>
+                <div><dt>2</dt><dd>no manifest, or no <code>--check</code></dd></div>
+              </dl>
+            </div>
+          </li>
+          <li class="schedule__row schedule__row--soon" data-reveal>
+            <p class="schedule__when">Feeding</p>
+            <div class="schedule__what">
+              <p class="chalk-soon">sourdough feed <span class="tag tag--chalk">coming soon</span></p>
+              <p>Brings template updates into your app without clobbering what you changed.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="jars">
+          <div class="jars__col">
+            <h3>Managed <span>we keep feeding these</span></h3>
+            <ul><li><code>public/index.php</code></li><li><code>composer.json</code></li><li><code>.gitlab-ci.yml</code></li><li><code>deployments/</code></li><li><code>.gitattributes</code>, <code>.gitignore</code></li></ul>
+          </div>
+          <div class="jars__col">
+            <h3>Seeded <span>written once, yours now</span></h3>
+            <ul><li><code>.env.example</code></li><li><code>README.md</code></li></ul>
+            <p class="jars__aside">Seeded files are never reported. They're yours to knead.</p>
+          </div>
+        </div>
+        <span class="chalk-smudge" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= quick start -->
+  <section class="section start-section" aria-labelledby="start-title">
+    <div class="wsu-container start">
+      <div class="section__head section__head--left">
+        <p class="eyebrow">Quick start</p>
+        <h2 id="start-title">Your first loaf</h2>
+        <p>Sourdough is one PHP command, so the steps match on every system; only the shell changes. You need PHP 8.3 or newer and Composer.</p>
+      </div>
+
+      <div class="os" data-tabs>
+        <div class="wsu-tabs__list os__list" role="tablist" aria-label="Operating system">
+          <button class="wsu-tabs__tab" role="tab" type="button" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+          <button class="wsu-tabs__tab" role="tab" type="button" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">macOS</button>
+          <button class="wsu-tabs__tab" role="tab" type="button" id="tab-linux" aria-controls="panel-linux" aria-selected="false" tabindex="-1">Linux</button>
+        </div>
+
+        <div class="wsu-tabs__panel os__panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0">
+          <p class="os__shell">PowerShell</p>
+<pre class="steps"><span class="c"># 1. Get the starter</span>
+composer global require waynestate/sourdough
+<span class="c"># 2. Bake the app</span>
+sourdough new my-app
+cd my-app
+<span class="c"># 3. Fetch WayneUI's standalone file once</span>
+curl.exe -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
+<span class="c"># 4. Install and serve</span>
+composer install
+php -S localhost:8000 -t public</pre>
+        </div>
+
+        <div class="wsu-tabs__panel os__panel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" tabindex="0" hidden>
+          <p class="os__shell">Terminal (zsh)</p>
+<pre class="steps"><span class="c"># 1. Get the starter</span>
+composer global require waynestate/sourdough
+<span class="c"># 2. Bake the app</span>
+sourdough new my-app
+cd my-app
+<span class="c"># 3. Fetch WayneUI's standalone file once</span>
+curl -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
+<span class="c"># 4. Install and serve</span>
+composer install
+php -S localhost:8000 -t public</pre>
+        </div>
+
+        <div class="wsu-tabs__panel os__panel" role="tabpanel" id="panel-linux" aria-labelledby="tab-linux" tabindex="0" hidden>
+          <p class="os__shell">bash</p>
+<pre class="steps"><span class="c"># 1. Get the starter</span>
+composer global require waynestate/sourdough
+<span class="c"># 2. Bake the app</span>
+sourdough new my-app
+cd my-app
+<span class="c"># 3. Fetch WayneUI's standalone file once</span>
+curl -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
+<span class="c"># 4. Install and serve</span>
+composer install
+php -S localhost:8000 -t public</pre>
+        </div>
+
+        <p class="os__tip"><strong><code>sourdough</code> not found?</strong> Add the folder that <code>composer global config bin-dir --absolute</code> prints to your PATH. Then open <code>http://localhost:8000</code>: locally the app signs in with SESAME's fake driver.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================== bakery -->
+  <section class="section shop-section" aria-labelledby="shop-title">
+    <div class="wsu-container">
+      <div class="section__head">
+        <p class="eyebrow">The rest of the bakery</p>
+        <h2 id="shop-title">Same kitchen, many ovens</h2>
+        <p>Sourdough is one shelf in Wayne State's app stack. WELD is its sibling: the same parts, already baked.</p>
+      </div>
+
+      <div class="shelves">
+        <div class="shelf">
+          <h3 class="shelf__sign">In every loaf</h3>
+          <ul class="shelf__row">
+            <li class="good"><span class="good__tile good__tile--wui"><img src="assets/marks/wayneui.svg" width="40" height="40" alt="WayneUI mark: a rounded frame holding a solid form, with a gold tab on the lower edge"></span><span class="good__tag"><b>WayneUI</b> the interface</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/sesame.png" width="64" height="64" alt="SESAME mark: an open door with a gold gap"><span class="good__tag"><b>SESAME</b> sign-in</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/helmet.png" width="64" height="64" alt="HELMET mark: a white football helmet with a gold facemask"><span class="good__tag"><b>HELMET</b> runtime baseline</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/proctor.png" width="64" height="64" alt="PROCTOR mark: a watchful eye with a gold square pupil"><span class="good__tag"><b>PROCTOR</b> the checks</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/preflight.png" width="64" height="64" alt="PREFLIGHT mark: a runway with a gold centre line"><span class="good__tag"><b>PREFLIGHT</b> shared CI</span></li>
+          </ul>
+        </div>
+        <div class="shelf">
+          <h3 class="shelf__sign">From the same kitchen</h3>
+          <ul class="shelf__row">
+            <li class="good"><img class="good__mark" src="assets/marks/creed.png" width="64" height="64" alt="CREED mark: a stone arch whose gold keystone holds the other stones in place"><span class="good__tag"><b>CREED</b> the standards</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/pinstripe.png" width="64" height="64" alt="Pinstripe mark: a striped necktie with a gold tie bar"><span class="good__tag"><b>Pinstripe</b> the coding standard</span></li>
+            <li class="good good--here"><img class="good__mark" src="brand/sourdough-avatar-256.png" width="64" height="64" alt="Sourdough mark: a starter jar with a gold band"><span class="good__tag"><b>Sourdough</b> you are here</span></li>
+            <li class="good"><img class="good__mark" src="assets/marks/weld.png" width="64" height="64" alt="WELD mark: a welder's helmet"><span class="good__tag"><b>WELD</b> the finished loaf</span></li>
+          </ul>
+        </div>
+        <div class="shelf">
+          <h3 class="shelf__sign">Proofing now</h3>
+          <ul class="shelf__row">
+            <li class="good good--soon"><img class="good__mark" src="assets/marks/squire.png" width="64" height="64" alt="SQUIRE mark: a satchel with a gold buckle"><span class="good__tag"><b>SQUIRE</b> carries releases</span></li>
+            <li class="good good--soon"><img class="good__mark" src="assets/marks/rollcall.png" width="64" height="64" alt="ROLLCALL mark: an open register with gold ticks"><span class="good__tag"><b>ROLLCALL</b> every app, present</span></li>
+            <li class="good good--soon"><img class="good__mark" src="assets/marks/advisor.png" width="64" height="64" alt="ADVISOR mark: a speech bubble holding a gold compass needle"><span class="good__tag"><b>ADVISOR</b> what applies next</span></li>
+            <li class="good good--soon"><img class="good__mark" src="assets/marks/drawbridge.png" width="64" height="64" alt="DRAWBRIDGE mark: a castle tower lowering its bridge on a gold chain"><span class="good__tag"><b>DRAWBRIDGE</b> sign-in gateway</span></li>
+            <li class="good good--soon"><img class="good__mark" src="assets/marks/booster.png" width="64" height="64" alt="BOOSTER mark: a syringe that is also a rocket, with one gold accent"><span class="good__tag"><b>BOOSTER</b> PHP upgrades</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="flour flour--footer" aria-hidden="true"></div>
+  <div class="wsu-container site-footer__inner">
+    <img src="brand/sourdough-avatar-256.png" width="48" height="48" alt="">
+    <p class="site-footer__joke">Proofed before it ships. Every loaf, every time.</p>
+    <p class="site-footer__org">Wayne State University · Enterprise Applications · <a href="https://github.com/waynestate/sourdough">Source</a></p>
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/sourdough.js" defer></script>
+</body>
+</html>
