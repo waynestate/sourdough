@@ -1201,7 +1201,7 @@ h1, h2, h3 {
 }
 .motion .proof__pin > .wsu-container { width: 100%; }
 .motion .stage { max-height: 74vh; }
-.motion .log__entry { opacity: 0.4; }
+.motion .log__entry { opacity: 0.62; }
 .motion .log__entry.is-done { opacity: 0.85; }
 .motion .log__entry.is-now {
   opacity: 1;
