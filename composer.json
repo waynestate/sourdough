@@ -13,6 +13,8 @@
         "symfony/console": "^7.4"
     },
     "require-dev": {
+        "laravel/pint": "^1.32",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5"
     },
     "config": {
@@ -35,15 +37,20 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
         "ci": [
             "@composer validate --strict",
             "@test",
+            "@lint",
+            "@analyse",
             "@composer audit"
-        ]
+        ],
+        "test": "phpunit",
+        "lint": "pint --test",
+        "fix": "pint",
+        "analyse": "phpstan analyse --memory-limit=1G"
     },
     "scripts-descriptions": {
-        "ci": "Run every check: validate, tests, audit"
+        "ci": "The full CI gate: validate, tests, Pint, PHPStan, audit. Same command on GitLab and GitHub."
     },
     "minimum-stability": "stable",
     "prefer-stable": true
