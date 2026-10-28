@@ -29,7 +29,7 @@ Sourdough itself has no code on its main branch at the time of writing, and a de
 ### 1.1 Make the permutation an explicit, validated input
 Take the permutation from flags (`--raw`, `--vue`, `--laravel`, `--inertia`) and refuse combinations that make no sense, such as `--inertia` without `--laravel`. Why: a wrong guess here produces an app that looks fine and fails later, and a clear error costs nothing. Laravel's own installer works the same way: you choose one starter kit and get one coherent result.
 Sources: [S1], [S8].
-Stack: `Documented`. next-repos.md lists the flag table and says `--inertia` without `--laravel` is an error. Step 1 plans tests for every row and for the invalid combinations.
+Stack: `Documented`. the stack design notes lists the flag table and says `--inertia` without `--laravel` is an error. Step 1 plans tests for every row and for the invalid combinations.
 
 ### 1.2 Offer `--dry-run`, and make it write nothing
 `--dry-run` prints the plan (files, packages, commands) and changes nothing on disk. Why: a developer can see what will happen before it happens, and a test can assert that nothing was written.
@@ -39,7 +39,7 @@ Stack: `Documented`. Step 1 plans a test that `--dry-run` writes nothing.
 ### 1.3 Refuse a non-empty target; overwrite only on explicit request
 Refuse to generate into a directory that already has files. If you ever allow overwriting, require a `--force` flag, and prompt only when the session is interactive. Why: the worst outcome of a scaffolder is silently damaging work that was already there.
 Sources: [S6].
-Stack: `Documented`. The refusal is in next-repos.md. There is no `--force` design yet, which is fine as long as nobody adds one without a test.
+Stack: `Documented`. The refusal is in the stack design notes. There is no `--force` design yet, which is fine as long as nobody adds one without a test.
 
 ### 1.4 Use exit codes that scripts can rely on
 Return 0 on success and distinct non-zero codes for the main failure modes. Document them. Why: release scripts, CI and agents decide what to do from the code alone.
@@ -75,7 +75,7 @@ Stack: `Documented` for the page itself (the stack's design names the start.spri
 For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. The installer accepts a community starter kit published on Packagist (`laravel new my-app --using=vendor/kit`). A kit declares its environment variables in `.env.example` and its setup steps in the `post-create-project-cmd` list of its `composer.json`. Why: you inherit Laravel's upgrades to the skeleton, and developers already know the command.
 Second pass: draft 1 cited the 12.x docs. Laravel 13 (released 2026-03-17, PHP 8.3 to 8.5) is current. The first-party kits are now React, Svelte, Vue and Livewire (Inertia 3 for the first three), each with optional teams and a WorkOS AuthKit variant. There is no plain Blade kit, so the `--laravel` (Blade) and Blade-plus-Vue-islands permutations are a bare Laravel install plus Sourdough's own layer, not a vendor kit. The `--using` and `post-create-project-cmd` contract quoted above is unchanged in 13 [S47].
 Sources: [S1], [S3], [S47].
-Stack: `Documented`, with a conflict. The task description says Laravel starters build on `laravel new --using`. next-repos.md says they wrap `composer create-project laravel/laravel` and then add Inertia, Boost and Sail or Docker. Decide which, and write it in one place.
+Stack: `Documented`, with a conflict. The project brief says Laravel starters build on `laravel new --using`. the stack design notes says they wrap `composer create-project laravel/laravel` and then add Inertia, Boost and Sail or Docker. Decide which, and write it in one place.
 
 ### 2.2 Switch off kit features that do not fit WSU sign-in
 Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME. Turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time. Why: a live `/register` route in an app that is supposed to use central sign-in is a security hole and a support burden.
@@ -97,7 +97,7 @@ Stack: `Not yet`.
 ### 2.5 Trust the HA-Proxy, not every sender (second pass)
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Laravel's docs say that behind a balancer that ends TLS, the `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The docs also show `at: '*'`, meant for clouds where balancer addresses are unknown. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Laravel 13 formalised `PreventRequestForgery`, which adds origin-aware checks; a wrong scheme or host seen by the app could plausibly trip it (my inference, not tested). Raw PHP gets the same behaviour from HELMET.
 Sources: [S24], [S22].
-Stack: `Documented`. next-repos.md has HELMET's Laravel adapter set `trustProxies(at:)` from HELMET's list. Whether Citadel publishes its proxy addresses was not checked.
+Stack: `Documented`. the stack design notes has HELMET's Laravel adapter set `trustProxies(at:)` from HELMET's list. Whether Citadel publishes its proxy addresses was not checked.
 
 ### 2.6 Make the Laravel templates work on the shared MySQL 5.6, or say they cannot (second pass)
 Laravel 13's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported [S25]. The shared server is MySQL 5.6, which left extended support on 2021-02-28 (5.7 on 2023-10-31, 8.0 on 2026-04-30; 8.4 LTS is supported) [S26]. So the server is below Laravel's own minimum. The MySQL manual gives the practical limit: an index key prefix is 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4 [S27]. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071 unless the server uses DYNAMIC rows with large prefixes (the Citadel server's settings were not checked). The long-known Laravel workaround is `Schema::defaultStringLength(191)` in a service provider (seen in a Laracasts thread via search). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
@@ -118,7 +118,7 @@ Stack: `Not yet`.
 A `sourdough check` (or `--check`) compares the project with the template version it records and exits non-zero when the project is behind. Cruft's `cruft check` does this and is meant for pipelines. Why: this is what makes a starter "fed". Without a check, nobody finds out until the drift is large.
 Second pass: Copier has no `check` command, but `copier check-update` does the same job. It supports `--output-format json`, and `--quiet` makes it exit 2 when an update exists [S4]. That is a second model for the shape of `sourdough check`. The cruft project page showed no release or commit dates when fetched, so its maintenance status is unconfirmed.
 Sources: [S5], [S4].
-Stack: `Not yet`. The core-plus-adapters rule already requires `--check` gates for generated files, and the task brief says a starter must be fed, but next-repos.md does not describe it for Sourdough.
+Stack: `Not yet`. The core-plus-adapters rule already requires `--check` gates for generated files, and the project brief says a starter must be fed, but the stack design notes does not describe it for Sourdough.
 
 ### 3.3 Provide an update that merges, not overwrites
 Update by regenerating the project from the new template version, comparing, and applying the difference on top of the developer's changes (a three-way merge). Require a clean git state first. (Second pass: Copier recommends a clean `git status` but does not enforce it, so Sourdough should enforce it.) Mark conflicts with inline markers or `.rej` files, and add a hook or CI check that blocks a commit containing leftover markers. Why: Laravel says its kits are code you own and "there is no need to update" them. That is true for a hobby app, not for an app that must stay on supported PHP. A merge keeps the developer's work.
@@ -134,7 +134,7 @@ Stack: `Not yet`.
 On every change to Sourdough, and on every release of WayneUI, SESAME, HELMET and PROCTOR, generate each permutation, install it and run its own tests and the PROCTOR check. Why: the starter is the place where all the stack libraries meet, so it is where a break shows first.
 Second pass: also run it on a schedule (nightly), not only on changes, and cover PHP 8.4 and 8.5 and the current and previous Laravel major (see 2.4 and 4.13). A starter with no commits still rots, because the things it depends on keep moving.
 Sources: [S16].
-Stack: `Documented`. The one-repo-per-project decision asks for compatibility CI against WayneUI releases. next-repos.md puts the Laravel generation tests in a pipeline job. No pipeline exists yet.
+Stack: `Documented`. The one-repo-per-project decision asks for compatibility CI against WayneUI releases. the stack design notes puts the Laravel generation tests in a pipeline job. No pipeline exists yet.
 
 ### 3.6 Keep the template thin; put shared behaviour in libraries (second pass)
 Other universities ship starters as a Composer package plus an install command. Cornell's CIT Custom Development publishes a "starter kit and library": a new site installs it with `composer require` and `php artisan starterkit:install`, and an existing site can require it without publishing the project files (the README warns that publishing overwrites files). The README describes no update process and its releases list was empty when fetched, which is the gap `sourdough check` is meant to fill. Northwestern's system development team also publishes a Laravel starter on Packagist; the repository URL I tried returned 404, so only its Packagist listing (via search) was seen. Why: code that lives in SESAME, HELMET and PROCTOR updates with `composer update`, so only the glue lives in the template and the merge in 3.3 stays small. This is the "core plus adapters" rule applied to the starter itself.
@@ -165,7 +165,7 @@ Stack: `Not yet`. PROCTOR's `php-floor` check will catch an out-of-date floor in
 Include PREFLIGHT components with an exact version. GitLab supports a commit SHA, a tag or a branch. Its guidance is to pin to a SHA, or to a release tag from a maintainer you trust, and to avoid `~latest`. Why: an unpinned component changes your pipeline without a commit in your repo.
 Second pass: re-checked against the GitLab page. It says to pin to a commit SHA (preferred) or a release tag, to trust tags only from a maintainer you trust, to avoid `latest`, and to review changes before moving a pin. It also says component inputs are validated and variables are not, so pass settings as `inputs`. Components have been generally available since GitLab 17.0.
 Sources: [S16].
-Stack: `Documented`. next-repos.md says the pipeline includes PREFLIGHT components "pinned by tag". Tags can be moved by whoever owns the project, so decide whether a SHA is worth the extra upkeep.
+Stack: `Documented`. the stack design notes says the pipeline includes PREFLIGHT components "pinned by tag". Tags can be moved by whoever owns the project, so decide whether a SHA is worth the extra upkeep.
 
 ### 4.4 Keep configuration in the environment and out of the template
 Commit `.env.example` with names and safe placeholders, never `.env`. Templates hold no secrets, no real hostnames and no per-environment branches. A good test: could the generated repo be published right now without leaking anything? Why: config that varies per deploy belongs outside the code.
@@ -411,7 +411,7 @@ Added in the second pass, checked 2026-10-27. "Opened" means the page was fetche
 
 Not used: no S40 or S55 (numbers skipped when a draft source was reused: S13 for Vite env, S4 for Copier updating).
 
-Stack documents used: the stack's design docs and ADRs, and the SESAME, HELMET, PROCTOR and PREFLIGHT repos as of 2026-10-27.
+Stack documents used: the stack design notes and decisions, and the SESAME, HELMET, PROCTOR and PREFLIGHT repos as of 2026-10-27.
 Also read in the second pass: SQUIRE's best-practices notes (S18, S44 to S47 on MySQL 5.6) and the PROCTOR source (`ComposerAuditCheck`, `LockCommittedCheck`). The sourdough folder holds only brand assets under `site/`, so no tag above is `Enforced` or `Checked` for Sourdough itself.
 
 ---
@@ -442,7 +442,7 @@ A second reviewer re-read draft 1 and ran new web searches and page fetches. Dra
 PHP support dates and the 2027-01-01 floor (php.net); the GitLab pinning guidance; Laravel's "no need to update" starter-kit wording, the `--using` and `post-create-project-cmd` contract, and the Wayfinder build failure; Copier's newest-tag rule (PEP 440) and its inline and `.rej` conflict modes; cruft's `check` command; Boost's `--dev` install and `post-update-cmd` entry; Docker's WSL2 advice; Vite's `VITE_` exposure rule; Sail's WSL2 requirement.
 
 ### Not re-checked in this pass
-S6 (clig.dev), S7 (gitattributes), S8 and S9 (Symfony Console and Process), S12 (Vite backend integration), S14 (Twelve-Factor), S15 (PowerShell policy text), and the ADRs. Several new sources are marked "search only" above. OWASP Top 10:2025 (S57) and ASVS 5.0.0 (S58) are worth mapping to PROCTOR rules later; that mapping was not done.
+S6 (clig.dev), S7 (gitattributes), S8 and S9 (Symfony Console and Process), S12 (Vite backend integration), S14 (Twelve-Factor), S15 (PowerShell policy text), and the stack design decisions. Several new sources are marked "search only" above. OWASP Top 10:2025 (S57) and ASVS 5.0.0 (S58) are worth mapping to PROCTOR rules later; that mapping was not done.
 
 ### Content in fetched pages
 No instructions aimed at the reader were found in any fetched page or search result.
