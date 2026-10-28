@@ -50,10 +50,12 @@
         "test": "phpunit",
         "lint": "pint --test",
         "fix": "pint",
-        "analyse": "phpstan analyse --memory-limit=1G"
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "squire-copy:check": "php scripts/squire-copy-check.php"
     },
     "scripts-descriptions": {
-        "ci": "The full CI gate: validate, tests, Pint, PHPStan, audit. Same command on GitLab and GitHub."
+        "ci": "The full CI gate: validate, tests, Pint, PHPStan, audit. Same command on GitLab and GitHub.",
+        "squire-copy:check": "Check that templates/squire/ still matches a fresh export from the SQUIRE checkout (SQUIRE_PATH, default /squire). Skips with exit 0 when no checkout is mounted."
     },
     "minimum-stability": "stable",
     "prefer-stable": true

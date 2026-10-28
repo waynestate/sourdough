@@ -264,8 +264,78 @@ final class RawGeneratorTest extends TestCase
         foreach (['APP_ENV', 'HELMET_PROXIES', 'LOG_FILE', 'SESSION_SAVE_HANDLER', 'SESSION_SAVE_PATH', 'SESAME_SESSION_IDLE_MINUTES', 'SESAME_SESSION_ABSOLUTE_MINUTES'] as $var) {
             self::assertStringContainsString('`' . $var . '`', $readme);
         }
-        self::assertStringContainsString('deployments/', $readme);
+        self::assertStringContainsString('scripts/release.sh', $readme);
         self::assertStringContainsString('Dockerfile comes later', $readme);
+    }
+
+    public function testInstallsSquireDeployFilesAtCatalogPaths(): void
+    {
+        $target = $this->generateFromRealTemplate();
+
+        // The raw deploy files from SQUIRE's checked copy are installed at
+        // their catalog paths, as-is.
+        foreach ([
+            'build.sh',
+            'deployments/001-first-release.sh',
+            'scripts/release.sh',
+            'scripts/parity.sh',
+            'scripts/parity.ps1',
+            'health.php',
+            'public/up.php',
+            'docker-compose.squire.yml',
+            '.env.squire.example',
+            '.squire/Dockerfile',
+            '.squire/Dockerfile.dockerignore',
+            '.squire/base-fallback.Dockerfile',
+            '.squire/haproxy.cfg',
+            '.squire/php.ini',
+            '.squire/vhost.conf',
+            '.squire/fallback/citadel-apache-entrypoint',
+            '.squire/fallback/citadel-deploy',
+        ] as $path) {
+            self::assertFileExists($target . '/' . $path, $path);
+        }
+    }
+
+    public function testSquireReleaseScriptIsExecutable(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $path = $target . '/scripts/release.sh';
+
+        self::assertFileExists($path);
+        // The mode comes from SQUIRE's manifest (755). This needs a Unix
+        // filesystem; the test suite runs in Docker.
+        self::assertNotSame(0, fileperms($path) & 0111, 'scripts/release.sh should be executable');
+    }
+
+    public function testGeneratedAppHasNoSourdoughReleaseScripts(): void
+    {
+        $target = $this->generateFromRealTemplate();
+
+        // The old Sourdough release scripts are gone; SQUIRE's are the only ones.
+        self::assertFileDoesNotExist($target . '/deployments/release.sh');
+        self::assertFileDoesNotExist($target . '/deployments/release.ps1');
+        self::assertFileExists($target . '/scripts/release.sh');
+        self::assertFileExists($target . '/scripts/parity.ps1');
+    }
+
+    public function testManifestListsSquireFilesAsManaged(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        foreach (['build.sh', 'scripts/release.sh', 'deployments/001-first-release.sh', '.squire/Dockerfile'] as $path) {
+            self::assertArrayHasKey($path, $manifest['files'], $path);
+            self::assertSame('managed', $manifest['files'][$path]['class'], $path);
+        }
+    }
+
+    public function testGeneratedComposerHasNoRepositories(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayNotHasKey('repositories', $composer);
     }
 
     /**

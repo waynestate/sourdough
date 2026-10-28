@@ -16,8 +16,13 @@ use Waynestate\Sourdough\Manifest;
  * The generator refuses an existing non-empty target dir and writes nothing
  * outside the target dir.
  *
- * After copying, the generator writes `.sourdough/manifest.json` so a later
- * `sourdough feed` knows what was generated.
+ * After copying the template, the generator installs the raw deploy files
+ * from the checked copy of SQUIRE's templates (templates/squire/). Those
+ * files are copied as-is — SQUIRE owns them, so Sourdough does not rewrite
+ * them — and their executable bits come from SQUIRE's manifest.
+ *
+ * Finally the generator writes `.sourdough/manifest.json` so a later
+ * `sourdough feed` knows what was generated, including the SQUIRE files.
  */
 final class RawGenerator
 {
@@ -38,6 +43,7 @@ final class RawGenerator
 
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
+        private readonly string $squireDir = __DIR__ . '/../../templates/squire',
     ) {}
 
     /**
@@ -65,6 +71,7 @@ final class RawGenerator
         $this->refuseNonEmptyTarget($targetDir);
 
         $this->copyDir($this->templateDir, $targetDir, $name, $slug);
+        $this->installSquireFiles($targetDir);
 
         $answers = array_merge(['name' => $name], $answers);
         (new Manifest('raw', $answers, self::SEEDED_FILES))->write($targetDir);
@@ -134,5 +141,72 @@ final class RawGenerator
                 throw new \RuntimeException(sprintf('Could not write "%s".', $toPath));
             }
         }
+    }
+
+    /**
+     * Install the raw deploy files from the checked copy of SQUIRE's
+     * templates into the target dir.
+     *
+     * The file list and target paths come from the copy's catalog.json (the
+     * "raw" kind); the executable bit for each file comes from its mode in
+     * the copy's manifest.json. The files are copied as-is: SQUIRE owns
+     * them, so Sourdough does not rewrite their contents.
+     *
+     * @throws \RuntimeException when the copy is missing or a file cannot be read or written
+     */
+    private function installSquireFiles(string $targetDir): void
+    {
+        $catalog = $this->readJson($this->squireDir . '/catalog.json');
+        if (!isset($catalog['raw']) || !is_array($catalog['raw'])) {
+            throw new \RuntimeException('The SQUIRE copy has no "raw" kind in its catalog.');
+        }
+
+        $manifest = $this->readJson($this->squireDir . '/manifest.json');
+        $modes = is_array($manifest['files'] ?? null) ? $manifest['files'] : [];
+
+        foreach ($catalog['raw'] as $entry) {
+            $path = (string) $entry['path'];
+            $source = $this->squireDir . '/raw/' . $path;
+            $target = $targetDir . '/' . $path;
+
+            if (!is_file($source)) {
+                throw new \RuntimeException(sprintf('The SQUIRE template file "%s" does not exist.', $source));
+            }
+
+            $dir = dirname($target);
+            if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Could not create the directory "%s".', $dir));
+            }
+
+            $content = file_get_contents($source);
+            if (false === $content) {
+                throw new \RuntimeException(sprintf('Could not read "%s".', $source));
+            }
+            if (false === file_put_contents($target, $content)) {
+                throw new \RuntimeException(sprintf('Could not write "%s".', $target));
+            }
+
+            // The mode is an octal string ("644", "755"). chmod is a no-op for
+            // the executable bit on Windows, where the bit is not tracked; the
+            // mode is still recorded in the manifest, so this is best-effort.
+            $mode = (string) ($modes['raw/' . $path]['mode'] ?? '644');
+            chmod($target, intval($mode, 8));
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function readJson(string $path): array
+    {
+        if (!is_file($path)) {
+            throw new \RuntimeException(sprintf('The SQUIRE copy file "%s" does not exist.', $path));
+        }
+        $content = file_get_contents($path);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+
+        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 }

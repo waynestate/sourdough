@@ -57,8 +57,12 @@ starter rises on its own.
 | `SESAME_SESSION_IDLE_MINUTES` | Minutes of inactivity before SESAME signs out; unset keeps the default | `30` |
 | `SESAME_SESSION_ABSOLUTE_MINUTES` | Minutes after login before SESAME signs out regardless; unset keeps the default | `480` |
 
-On Citadel the release script in `deployments/` runs at release time.
-Elsewhere, set the env vars above; a Dockerfile comes later.
+On Citadel the deploy files from SQUIRE run at release time: `build.sh`
+prepares the image, `deployments/001-first-release.sh` is the one-time
+first-release hook, and `scripts/release.sh` is the idempotent release
+script. They come from SQUIRE's checked copy, so SQUIRE owns them — refresh
+them with Sourdough, not by hand. Elsewhere, set the env vars above; a
+Dockerfile comes later.
 
 ## Handbook
 

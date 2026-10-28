@@ -34,7 +34,7 @@ final class ManifestTest extends TestCase
         self::assertIsArray($manifest['files']);
         self::assertArrayHasKey('composer.json', $manifest['files']);
         self::assertArrayHasKey('public/index.php', $manifest['files']);
-        self::assertArrayHasKey('deployments/release.sh', $manifest['files']);
+        self::assertArrayHasKey('scripts/release.sh', $manifest['files']);
     }
 
     public function testManifestHashesMatchTheFiles(): void
@@ -58,7 +58,7 @@ final class ManifestTest extends TestCase
         self::assertSame('seeded', $manifest['files']['README.md']['class']);
         self::assertSame('managed', $manifest['files']['composer.json']['class']);
         self::assertSame('managed', $manifest['files']['public/index.php']['class']);
-        self::assertSame('managed', $manifest['files']['deployments/release.sh']['class']);
+        self::assertSame('managed', $manifest['files']['scripts/release.sh']['class']);
         self::assertSame('managed', $manifest['files']['.gitlab-ci.yml']['class']);
     }
 

@@ -14,6 +14,10 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
+# The SQUIRE copy is a verbatim export (all LF). Keep its exact bytes so the
+# `squire-copy:check` gate sees no drift from line-ending normalization.
+/templates/squire/** -text
+
 # Not part of the package.
 /tests             export-ignore
 /site              export-ignore

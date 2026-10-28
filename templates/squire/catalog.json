@@ -1,0 +1,171 @@
+{
+    "raw": [
+        {
+            "path": "build.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "deployments/001-first-release.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "scripts/release.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "health.php",
+            "group": "release",
+            "executable": false
+        },
+        {
+            "path": "public/up.php",
+            "group": "release",
+            "executable": false
+        },
+        {
+            "path": "docker-compose.squire.yml",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/Dockerfile",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/Dockerfile.dockerignore",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/base-fallback.Dockerfile",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/fallback/citadel-apache-entrypoint",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": ".squire/fallback/citadel-deploy",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": ".squire/haproxy.cfg",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/php.ini",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/vhost.conf",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": "scripts/parity.sh",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": "scripts/parity.ps1",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".env.squire.example",
+            "group": "parity",
+            "executable": false
+        }
+    ],
+    "laravel": [
+        {
+            "path": "build.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "deployments/001-first-release.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "scripts/release.sh",
+            "group": "release",
+            "executable": true
+        },
+        {
+            "path": "health.php",
+            "group": "release",
+            "executable": false
+        },
+        {
+            "path": "docker-compose.squire.yml",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/Dockerfile",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/Dockerfile.dockerignore",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/base-fallback.Dockerfile",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/fallback/citadel-apache-entrypoint",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": ".squire/fallback/citadel-deploy",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": ".squire/haproxy.cfg",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/php.ini",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".squire/vhost.conf",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": "scripts/parity.sh",
+            "group": "parity",
+            "executable": true
+        },
+        {
+            "path": "scripts/parity.ps1",
+            "group": "parity",
+            "executable": false
+        },
+        {
+            "path": ".env.squire.example",
+            "group": "parity",
+            "executable": false
+        }
+    ]
+}
