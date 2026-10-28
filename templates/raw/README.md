@@ -22,6 +22,20 @@ php -S localhost:8000 -t public
 Open http://localhost:8000. Locally the app signs in with SESAME's fake
 driver.
 
+## Sign-in
+
+The app signs in with SESAME. In development (when `APP_ENV` is not
+`production`) it uses the fake driver. It signs you in as `jdoe` with no
+password. In production it uses the cas driver. The cas driver needs two
+variables.
+
+- `SESAME_CAS_URL`: the CAS server URL.
+- `SESAME_SERVICE_URL`: this app's public URL. It is the URL the CAS server
+  sends the user back to.
+
+Set both in the environment before you deploy. A starter without its flour
+will not rise.
+
 ## Health check
 
 HELMET answers the load balancer's ping at `/up` with `200 ok`, without

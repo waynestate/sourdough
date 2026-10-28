@@ -58,13 +58,42 @@ if (is_string($sessionSavePath) && '' !== $sessionSavePath) {
 // The app owns the session. HELMET set the cookie flags; start it here.
 session_start();
 
-// Local development signs in with SESAME's fake driver. It refuses to boot
-// when the environment is production, so this is the only place a dev
-// identity can exist. In production, wire up the cas driver instead.
-$user = null;
-if ($appEnv !== 'production') {
-    // Config::fromArray reads dotted keys as nested arrays, so the fake
-    // driver's keys live under 'fake' and the session limits under 'session'.
+// SESAME signs the user in in every environment. The driver depends on the
+// environment: the fake driver for local development, the cas driver in
+// production. The fake driver refuses to boot in production, so the cas
+// driver is the only one that can run there.
+//
+// Config::fromArray reads dotted keys as nested arrays, so each driver's
+// keys live under the driver name and the session limits under 'session'.
+if ($appEnv === 'production') {
+    // The cas driver needs the CAS server URL and this app's service URL.
+    // Both come from the environment and neither has a default, so a missing
+    // value fails the boot with a clear message instead of a broken login.
+    $failBoot = static function (string $message): never {
+        error_log($message);
+        exit(1);
+    };
+
+    $casUrl = getenv('SESAME_CAS_URL');
+    if (!is_string($casUrl) || '' === $casUrl) {
+        $failBoot('SESAME_CAS_URL is not set. Set it to the CAS server URL so the cas driver can sign users in.');
+    }
+    $serviceUrl = getenv('SESAME_SERVICE_URL');
+    if (!is_string($serviceUrl) || '' === $serviceUrl) {
+        $failBoot('SESAME_SERVICE_URL is not set. Set it to this app\'s public URL, the one the CAS server sends the user back to.');
+    }
+    $sesameConfig = [
+        'driver' => 'cas',
+        'environment' => $appEnv,
+        'cas' => [
+            'base_url' => $casUrl,
+            'service_url' => $serviceUrl,
+        ],
+    ];
+} else {
+    // Local development signs in with the fake driver. It refuses to boot
+    // when the environment is production, so this is the only place a dev
+    // identity can exist.
     $sesameConfig = [
         'driver' => 'fake',
         'environment' => $appEnv,
@@ -73,38 +102,38 @@ if ($appEnv !== 'production') {
             'attributes' => ['cn' => ['John Doe']],
         ],
     ];
-    // Optional session limits, in minutes. Unset keeps the SESAME defaults;
-    // only the keys that are set are added.
-    $sessionLimits = [];
-    $idleMinutes = getenv('SESAME_SESSION_IDLE_MINUTES');
-    if (is_string($idleMinutes) && '' !== $idleMinutes) {
-        $sessionLimits['idle_minutes'] = (int) $idleMinutes;
-    }
-    $absoluteMinutes = getenv('SESAME_SESSION_ABSOLUTE_MINUTES');
-    if (is_string($absoluteMinutes) && '' !== $absoluteMinutes) {
-        $sessionLimits['absolute_minutes'] = (int) $absoluteMinutes;
-    }
-    if ([] !== $sessionLimits) {
-        $sesameConfig['session'] = $sessionLimits;
-    }
-
-    $config = Config::fromArray($sesameConfig);
-
-    $sesame = new Sesame(
-        DriverFactory::make($config),
-        new class implements UserResolver {
-            public function findOrImportUser(Identity $identity): mixed
-            {
-                return $identity->username;
-            }
-        },
-        new NativeSession(),
-        $config,
-    );
-    sesame($sesame);
-    sesame_login();
-    $user = sesame_user();
 }
+
+// Optional session limits, in minutes. Unset keeps the SESAME defaults;
+// only the keys that are set are added.
+$sessionLimits = [];
+$idleMinutes = getenv('SESAME_SESSION_IDLE_MINUTES');
+if (is_string($idleMinutes) && '' !== $idleMinutes) {
+    $sessionLimits['idle_minutes'] = (int) $idleMinutes;
+}
+$absoluteMinutes = getenv('SESAME_SESSION_ABSOLUTE_MINUTES');
+if (is_string($absoluteMinutes) && '' !== $absoluteMinutes) {
+    $sessionLimits['absolute_minutes'] = (int) $absoluteMinutes;
+}
+if ([] !== $sessionLimits) {
+    $sesameConfig['session'] = $sessionLimits;
+}
+
+$config = Config::fromArray($sesameConfig);
+
+$sesame = new Sesame(
+    DriverFactory::make($config),
+    new class implements UserResolver {
+        public function findOrImportUser(Identity $identity): mixed
+        {
+            return $identity->username;
+        }
+    },
+    new NativeSession(),
+    $config,
+);
+sesame($sesame);
+$user = sesame_user() ?? sesame_login();
 
 // WayneUI's standalone file. Fetch it once per the WayneUI raw PHP guide:
 //   curl -o public/wayne-ui.php \
