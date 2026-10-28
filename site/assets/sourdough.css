@@ -1254,3 +1254,13 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Part names in the stack list link to each part's own front page. They keep
+   this page's colours; the underline is the only new thing. */
+.part-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+.part-link:hover { text-decoration-thickness: 2px; }
