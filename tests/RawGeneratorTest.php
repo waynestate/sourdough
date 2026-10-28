@@ -104,11 +104,13 @@ final class RawGeneratorTest extends TestCase
         $target = $this->generateFromRealTemplate();
         $index = (string) file_get_contents($target . '/public/index.php');
 
-        // The config is built from an array with the fake driver's keys.
+        // The config is built from an array with the fake driver's keys,
+        // nested the way Config::fromArray reads them.
         self::assertStringContainsString("'driver' => 'fake'", $index);
         self::assertStringContainsString("'environment' => \$appEnv", $index);
-        self::assertStringContainsString("'fake.username' => 'jdoe'", $index);
-        self::assertStringContainsString("'fake.attributes' => ['cn' => ['John Doe']]", $index);
+        self::assertStringContainsString("'fake' => [", $index);
+        self::assertStringContainsString("'username' => 'jdoe'", $index);
+        self::assertStringContainsString("'attributes' => ['cn' => ['John Doe']]", $index);
         self::assertStringContainsString('Config::fromArray(', $index);
 
         // The driver comes from the factory, not a direct FakeDriver.
@@ -121,11 +123,13 @@ final class RawGeneratorTest extends TestCase
             $index
         );
 
-        // The optional session limits come from the environment, cast to int.
+        // The optional session limits come from the environment, cast to int,
+        // and are nested under 'session'.
         self::assertStringContainsString("getenv('SESAME_IDLE_MINUTES')", $index);
         self::assertStringContainsString("getenv('SESAME_ABSOLUTE_MINUTES')", $index);
-        self::assertStringContainsString("'session.idle_minutes'] = (int)", $index);
-        self::assertStringContainsString("'session.absolute_minutes'] = (int)", $index);
+        self::assertStringContainsString("'idle_minutes'] = (int)", $index);
+        self::assertStringContainsString("'absolute_minutes'] = (int)", $index);
+        self::assertStringContainsString("\$sesameConfig['session'] = \$sessionLimits", $index);
 
         $env = (string) file_get_contents($target . '/.env.example');
         self::assertStringContainsString('# SESAME_IDLE_MINUTES=', $env);

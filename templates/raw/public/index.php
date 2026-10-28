@@ -63,20 +63,29 @@ session_start();
 // identity can exist. In production, wire up the cas driver instead.
 $user = null;
 if ($appEnv !== 'production') {
+    // Config::fromArray reads dotted keys as nested arrays, so the fake
+    // driver's keys live under 'fake' and the session limits under 'session'.
     $sesameConfig = [
         'driver' => 'fake',
         'environment' => $appEnv,
-        'fake.username' => 'jdoe',
-        'fake.attributes' => ['cn' => ['John Doe']],
+        'fake' => [
+            'username' => 'jdoe',
+            'attributes' => ['cn' => ['John Doe']],
+        ],
     ];
-    // Optional session limits, in minutes. Unset keeps the SESAME defaults.
+    // Optional session limits, in minutes. Unset keeps the SESAME defaults;
+    // only the keys that are set are added.
+    $sessionLimits = [];
     $idleMinutes = getenv('SESAME_IDLE_MINUTES');
     if (is_string($idleMinutes) && '' !== $idleMinutes) {
-        $sesameConfig['session.idle_minutes'] = (int) $idleMinutes;
+        $sessionLimits['idle_minutes'] = (int) $idleMinutes;
     }
     $absoluteMinutes = getenv('SESAME_ABSOLUTE_MINUTES');
     if (is_string($absoluteMinutes) && '' !== $absoluteMinutes) {
-        $sesameConfig['session.absolute_minutes'] = (int) $absoluteMinutes;
+        $sessionLimits['absolute_minutes'] = (int) $absoluteMinutes;
+    }
+    if ([] !== $sessionLimits) {
+        $sesameConfig['session'] = $sessionLimits;
     }
 
     $config = Config::fromArray($sesameConfig);
