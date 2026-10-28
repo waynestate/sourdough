@@ -49,7 +49,7 @@ enum Permutation: string
     }
 
     /**
-     * The human name, from the permutation table in design/next-repos.md.
+     * The human name, from the stack's permutation table.
      */
     public function label(): string
     {
