@@ -1,6 +1,14 @@
-[![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+<div align="center">
 
-# Sourdough
+[![Sourdough: dough in a jar, risen past its gold band](docs/readme/hero.jpg)](site/index.html)
+
+# SOURDOUGH
+
+![php](docs/readme/badges/php.svg) ![licence](docs/readme/badges/license.svg) ![exit codes](docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+
+**Feed it and it grows.**
+
+</div>
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
 
@@ -13,6 +21,14 @@ Front page: [`site/index.html`](site/index.html), a static page you can open in 
 This repository is published from Wayne State University's internal GitLab and mirrored here. Changes land there first; Wayne State developers open issues and merge requests on the internal project.
 
 Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the PREFLIGHT CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+
+<div align="center">
+
+![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and PREFLIGHT go in one by one, over the feeding schedule](docs/readme/proof.svg)
+
+<sub>The proofing log from the front page: what goes into the tub when you run <code>sourdough new</code>, and the day-to-day check that keeps it alive.</sub>
+
+</div>
 
 ## Install
 
@@ -147,3 +163,40 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 ## CI
 
 Strongly recommended: a git.wayne.edu instance runner.
+
+<details>
+<summary>On the bench: the five loaves and the feeding schedule</summary>
+
+![Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard](docs/readme/gallery.jpg)
+
+</details>
+
+<details>
+<summary>The recipe card: Sourdough's brand board</summary>
+
+![Sourdough brand board: the starter jar mark, palette and type](docs/readme/board.jpg)
+
+</details>
+
+<div align="center">
+
+## Same kitchen, many ovens
+
+<a href="https://github.com/waynestate/wayne-ui"><img src="docs/readme/cast/wayneui.png" width="44" alt="WayneUI"></a>
+<a href="https://github.com/waynestate/creed"><img src="docs/readme/cast/creed.png" width="44" alt="CREED"></a>
+<a href="https://github.com/waynestate/proctor"><img src="docs/readme/cast/proctor.png" width="44" alt="PROCTOR"></a>
+<a href="https://github.com/waynestate/sesame"><img src="docs/readme/cast/sesame.png" width="44" alt="SESAME"></a>
+<a href="https://github.com/waynestate/helmet"><img src="docs/readme/cast/helmet.png" width="44" alt="HELMET"></a>
+<a href="https://github.com/waynestate/sourdough"><img src="docs/readme/cast/sourdough.png" width="44" alt="Sourdough"></a>
+<a href="https://github.com/waynestate/squire"><img src="docs/readme/cast/squire.png" width="44" alt="Squire"></a>
+<a href="https://github.com/waynestate/preflight"><img src="docs/readme/cast/preflight.png" width="44" alt="PREFLIGHT"></a>
+<a href="https://github.com/waynestate/pinstripe"><img src="docs/readme/cast/pinstripe.png" width="44" alt="Pinstripe"></a>
+<a href="https://github.com/waynestate/booster"><img src="docs/readme/cast/booster.png" width="44" alt="BOOSTER"></a>
+<a href="https://github.com/waynestate/rollcall"><img src="docs/readme/cast/rollcall.png" width="44" alt="ROLLCALL"></a>
+<a href="https://github.com/waynestate/drawbridge"><img src="docs/readme/cast/drawbridge.png" width="44" alt="Drawbridge"></a>
+<a href="https://github.com/waynestate/advisor"><img src="docs/readme/cast/advisor.png" width="44" alt="ADVISOR"></a>
+<a href="https://github.com/waynestate/weld"><img src="docs/readme/cast/weld.png" width="44" alt="WELD"></a>
+
+<sub>Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend.</sub>
+
+</div>
