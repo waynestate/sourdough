@@ -4,6 +4,7 @@
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Waynestate\Sourdough\Command\ManifestCommand;
 use Waynestate\Sourdough\Command\NewCommand;
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
@@ -28,5 +29,6 @@ $application = new class ('Sourdough', '0.1.0') extends Application {
 };
 
 $application->addCommand(new NewCommand());
+$application->addCommand(new ManifestCommand());
 
 exit($application->run());
