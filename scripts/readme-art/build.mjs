@@ -34,7 +34,7 @@ const outDir = path.join(repoRoot, "docs", "readme");
 const castDir = path.join(outDir, "cast");
 
 const MAX_BYTES = 300 * 1024; // every file in docs/readme/ stays at or under this
-const FORBIDDEN = /GitLab|gitlab\.example|citadel/i; // internal names never ship in art
+const FORBIDDEN = /noug[a]t|snu[.]gs|citadel/i; // internal names never ship in art
 
 // Sourdough's own palette, from site/assets/sourdough.css.
 const C = {

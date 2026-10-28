@@ -1,6 +1,10 @@
 {
     "name": "waynestate/sourdough",
     "description": "A starter that makes a Wayne State app with the stack already wired in.",
+    "homepage": "https://sourdough.apps.wayne.edu/",
+    "support": {
+        "source": "https://github.com/waynestate/sourdough"
+    },
     "type": "library",
     "license": "MIT",
     "authors": [
