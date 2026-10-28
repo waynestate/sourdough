@@ -101,9 +101,9 @@ Stack: `Documented`. next-repos.md has HELMET's Laravel adapter set `trustProxie
 
 ### 2.6 Make the Laravel templates work on the shared MySQL 5.6, or say they cannot (second pass)
 Laravel 13's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported [S25]. The shared server is MySQL 5.6, which left extended support on 2021-02-28 (5.7 on 2023-10-31, 8.0 on 2026-04-30; 8.4 LTS is supported) [S26]. So the server is below Laravel's own minimum. The MySQL manual gives the practical limit: an index key prefix is 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4 [S27]. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071 unless the server uses DYNAMIC rows with large prefixes (the Citadel server's settings were not checked). The long-known Laravel workaround is `Schema::defaultStringLength(191)` in a service provider (seen in a Laracasts thread via search). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
-So: (1) the Laravel templates set the 191 default and avoid JSON columns, as SQUIRE's S18 already asks; (2) CI runs the migrations against a 5.6 server in a service container (image availability and CPU architecture not checked); (3) the generated README says Laravel is outside the vendor's support on this database until D-008 is settled. Open question for the stack: the PHP rule bans EOL PHP, and the database has no matching rule yet.
+So: (1) the Laravel templates set the 191 default and avoid JSON columns, as SQUIRE's S18 already asks; (2) CI runs the migrations against a 5.6 server in a service container (image availability and CPU architecture not checked); (3) the generated README says Laravel is outside the vendor's support on this database until the MySQL timeline question is settled. Open question for the stack: the PHP rule bans EOL PHP, and the database has no matching rule yet.
 Sources: [S25], [S26], [S27].
-Stack: `Not yet`. D-008 (MySQL timeline) is open. SQUIRE's S18 is `Documented`.
+Stack: `Not yet`. The MySQL timeline question is still open. SQUIRE's S18 is `Documented`.
 
 ---
 
@@ -118,7 +118,7 @@ Stack: `Not yet`.
 A `sourdough check` (or `--check`) compares the project with the template version it records and exits non-zero when the project is behind. Cruft's `cruft check` does this and is meant for pipelines. Why: this is what makes a starter "fed". Without a check, nobody finds out until the drift is large.
 Second pass: Copier has no `check` command, but `copier check-update` does the same job. It supports `--output-format json`, and `--quiet` makes it exit 2 when an update exists [S4]. That is a second model for the shape of `sourdough check`. The cruft project page showed no release or commit dates when fetched, so its maintenance status is unconfirmed.
 Sources: [S5], [S4].
-Stack: `Not yet`. ADR-0001 already requires `--check` gates for generated files, and the task brief says a starter must be fed, but next-repos.md does not describe it for Sourdough.
+Stack: `Not yet`. The core-plus-adapters rule already requires `--check` gates for generated files, and the task brief says a starter must be fed, but next-repos.md does not describe it for Sourdough.
 
 ### 3.3 Provide an update that merges, not overwrites
 Update by regenerating the project from the new template version, comparing, and applying the difference on top of the developer's changes (a three-way merge). Require a clean git state first. (Second pass: Copier recommends a clean `git status` but does not enforce it, so Sourdough should enforce it.) Mark conflicts with inline markers or `.rej` files, and add a hook or CI check that blocks a commit containing leftover markers. Why: Laravel says its kits are code you own and "there is no need to update" them. That is true for a hobby app, not for an app that must stay on supported PHP. A merge keeps the developer's work.
@@ -134,7 +134,7 @@ Stack: `Not yet`.
 On every change to Sourdough, and on every release of WayneUI, SESAME, HELMET and PROCTOR, generate each permutation, install it and run its own tests and the PROCTOR check. Why: the starter is the place where all the stack libraries meet, so it is where a break shows first.
 Second pass: also run it on a schedule (nightly), not only on changes, and cover PHP 8.4 and 8.5 and the current and previous Laravel major (see 2.4 and 4.13). A starter with no commits still rots, because the things it depends on keep moving.
 Sources: [S16].
-Stack: `Documented`. ADR-0008 asks for compatibility CI against WayneUI releases. next-repos.md puts the Laravel generation tests in a pipeline job. No pipeline exists yet.
+Stack: `Documented`. The one-repo-per-project decision asks for compatibility CI against WayneUI releases. next-repos.md puts the Laravel generation tests in a pipeline job. No pipeline exists yet.
 
 ### 3.6 Keep the template thin; put shared behaviour in libraries (second pass)
 Other universities ship starters as a Composer package plus an install command. Cornell's CIT Custom Development publishes a "starter kit and library": a new site installs it with `composer require` and `php artisan starterkit:install`, and an existing site can require it without publishing the project files (the README warns that publishing overwrites files). The README describes no update process and its releases list was empty when fetched, which is the gap `sourdough check` is meant to fill. Northwestern's system development team also publishes a Laravel starter on Packagist; the repository URL I tried returned 404, so only its Packagist listing (via search) was seen. Why: code that lives in SESAME, HELMET and PROCTOR updates with `composer update`, so only the glue lives in the template and the merge in 3.3 stays small. This is the "core plus adapters" rule applied to the starter itself.
@@ -158,7 +158,7 @@ Stack: `Checked`. PROCTOR has `lock-committed`, `unbounded-constraints` and `com
 
 ### 4.2 Take the PHP floor from policy, not from the template
 Write the `php` constraint in the generated `composer.json` from CREED's `policy.json` at generation time. Why: the floor moves (to 8.3 on 2027-01-01), and a hard-coded value in a template goes out of date without anyone noticing.
-Sources: stack ADR-0003.
+Sources: the stack's version policy.
 Stack: `Not yet`. PROCTOR's `php-floor` check will catch an out-of-date floor in the app, but nothing yet stops the template from generating one.
 
 ### 4.3 Pin CI components to a tag, or better a commit
@@ -185,7 +185,7 @@ Stack: `Not yet`. A PROCTOR rule for secret-looking `VITE_` names would be cheap
 ### 4.7 Give raw PHP a real way to load Vite assets
 Vite does not inject production tags for a backend that renders its own HTML. The backend has to read the manifest and emit the stylesheet, script and preload tags, including imported chunks. Laravel has this built in. Raw PHP needs a small, tested manifest reader that ships with the template. Why: otherwise every raw-PHP team writes its own and gets caching and hashing wrong.
 Sources: [S12].
-Stack: `Not yet`. Step 3 (`--raw --vue`) is not built. Whether apps build assets at release time or commit them is still open (D-009).
+Stack: `Not yet`. Step 3 (`--raw --vue`) is not built. Whether apps build assets at release time or commit them is still an open question.
 
 ### 4.8 Run a current Composer in CI and in the build (second pass)
 Composer had a run of security fixes in 2026 [S20], [S33]. Version 2.9.6 (2026-04-14) fixed two Perforce command injections (CVE-2026-40261 and CVE-2026-40176), and Packagist stopped publishing Perforce source metadata on 2026-04-10. Version 2.10.2 (2026-07-01) added package-name validation and bin-path traversal protection. Version 2.10.3 (2026-08-27) fixed a path traversal through symlinked bin paths (CVE-2026-59944), another Perforce command injection, and a credential leak to the wrong GitLab domain. Earlier, 2.9.3 (2025-12-30) fixed ANSI sequence injection (CVE-2025-67746). Version 2.10.0 also stopped falling back from dist (zip) to source (git) installs, which can surprise a CI job that relied on it. A 2.11.0 release candidate (2026-10-22) exists and is not for production. Why: `composer install` runs on developer PCs and in CI, and it parses data from packages that other people publish. Pin the Composer version in the CI image, update it on a schedule, and find out whether Citadel's build image does the same (not known).
@@ -234,30 +234,30 @@ Stack: `Not yet`.
 ### 5.1 Ship `.gitattributes` in every generated app
 Use `* text=auto eol=lf`, and set `.ps1`, `.bat` and `.cmd` to CRLF. Prefer `.gitattributes` to the per-user `core.autocrlf` setting, because the file travels with the repo and gives every contributor the same rules. Why: Git on Windows converts line endings, and anything that runs on Citadel must be LF.
 Sources: [S7].
-Stack: `Documented`. ADR-0009 says generated apps carry it from day one. The repos already use it.
+Stack: `Documented`. The developer-OS rule says generated apps carry it from day one. The repos already use it.
 
 ### 5.2 Check server-run files for CRLF and for file-name case clashes
 Fail when `build.sh`, release scripts or `deployments/*` contain CRLF, and when two paths differ only by case. Why: macOS and Windows ignore case and Citadel does not, so an app can work on every laptop and break on deploy.
 Sources: [S7].
-Stack: `Not yet`. ADR-0009 says PROCTOR will flag these. The PROCTOR source does not have the checks yet.
+Stack: `Not yet`. The developer-OS rule says PROCTOR will flag these. The PROCTOR source does not have the checks yet.
 
 ### 5.3 Give each OS its own native path
 A script that developers run ships as a `.ps1` and a `.sh` that do the same thing, or is one PHP command. Windows never needs bash. Scripts for macOS are written for its stock bash and BSD tools. Prefer the single PHP command when the logic is more than a few lines. Be aware that PowerShell's default policy on Windows clients can block scripts that were downloaded from the internet (Microsoft calls the policy defence in depth, not a security boundary). Scripts the generator writes locally are not affected, but the docs should say what to do if a script is blocked.
 Second pass: Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex` [S49]. WSU's docs should not copy that pattern. The same page also shows `composer global require laravel/installer`, which is the better route.
 Sources: [S15], [S49].
-Stack: `Documented`. ADR-0009 sets the rule. No generated scripts exist yet to test it on.
+Stack: `Documented`. The developer-OS rule sets it. No generated scripts exist yet to test it on.
 
 ### 5.4 Start subprocesses with argument arrays
 Whenever Sourdough runs Composer, npm, git or Docker, pass the command as an array of arguments, never as a shell string. Accept paths with spaces and Windows drive letters. Set timeouts. Why: fewer quoting differences between PowerShell and bash, and no shell parsing of a directory name on Linux and macOS.
 Second pass, correction: draft 1 also promised "no escaping bugs" and "no injection". That is too strong on Windows. PHP's array form of `proc_open` had a command injection on Windows (CVE-2024-1874), and its first fix was incomplete (CVE-2024-5585); the fixes are in PHP 8.1.29, 8.2.20 and 8.3.8 [S53]. It belongs to the "BatBadBut" family: when the target is a `.bat` or `.cmd` file, Windows starts `cmd.exe`, which splits arguments by its own rules, and callers must escape for it [S54]. Composer and npm are usually `.bat` or `.cmd` shims on Windows. So: keep the array form; where you can, run `php.exe` with `composer.phar` and `node.exe` with npm's JavaScript entry point instead of the shims; never pass user-chosen text (an app name, a path) to a shim; validate names as in 1.7. The PHP floor already rules out the unpatched builds.
 Sources: [S9], [S53], [S54].
-Stack: `Documented`. ADR-0009 item 2. No code yet. The shim case was not checked against ADR-0009.
+Stack: `Documented`. The developer-OS rule, second point. No code yet. The shim case was not checked against the developer-OS rule.
 
 ### 5.5 Offer more than one local runtime, and be honest about Sail on Windows
 Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell. Docker's own advice for WSL2 is to keep source code inside the Linux file system, because bind mounts from the Windows side are slower and do not deliver file-change events. So offer: Docker Compose with a Citadel-parity image as the route that works natively on every OS, Sail as an option where it fits, and plain PHP with Composer. Why: a starter that only works for macOS users is not a starter for WSU.
 Second pass: re-checked and still correct. Sail's docs say Windows is supported "via WSL2" [S38], and Docker's WSL page says to keep bind-mounted source in the Linux file system, because Windows-side mounts are slower and Linux containers get no file-change events from them [S11]. Laravel's docs also offer Herd, a native macOS and Windows environment with PHP, Nginx, Node and the `laravel` CLI; Herd Pro adds local databases [S49]. It is a Laravel product. Its licence and its fit for WSU were not checked.
 Sources: [S2], [S11], [S38], [S49].
-Stack: `Documented`. ADR-0009 item 4 lists the routes and says Sail is never the only Windows route. The Docker image is SQUIRE's and does not exist yet.
+Stack: `Documented`. The developer-OS rule's fourth point lists the routes and says Sail is never the only Windows route. The Docker image is SQUIRE's and does not exist yet.
 
 ### 5.6 Treat Sail as a development tool
 Sail's compose file and images are for local work. Do not reuse them as the production image. Why: they carry dev tools, ports and defaults that a production container should not.
@@ -268,12 +268,12 @@ Stack: `Documented`. The design deploys on Citadel's own images and does not use
 If Sourdough generates a Dockerfile: pin the base image to an exact version (a digest is stronger), use a multi-stage build, run as a non-root user with a fixed UID, add a `.dockerignore`, never leave secrets in a layer, and rebuild regularly with `--pull`. State the CPU architecture. Citadel's images are x86-64 only as far as is known, so Apple Silicon users run them under emulation. Why: images are immutable, so a stale one stays stale.
 Second pass: Docker's page confirms these points. It adds that pinning to a digest also opts you out of automatic security fixes, so pair the pin with a scheduled update (it names Dependabot; the GitLab equivalent is not chosen) [S10]. Docker made its Hardened Images catalog free under Apache 2.0 on 2025-12-17, per press coverage [S51]. Production images here are Citadel's, so that matters only for development tooling.
 Sources: [S10], [S51].
-Stack: `Not yet`. ADR-0009 requires the architecture statement for SQUIRE's image only.
+Stack: `Not yet`. The developer-OS rule requires the architecture statement for SQUIRE's image only.
 
 ### 5.8 Test on all three systems
 Run the generator and the generated app's tests on Windows, macOS and Linux, or run a written smoke test before each minor release. Why: path, newline and shell bugs only appear on the system you did not test.
 Sources: [S15], [S11].
-Stack: `Not yet`. CI is Linux only, and Windows and macOS runners are an open question (D-023).
+Stack: `Not yet`. CI is Linux only, and Windows and macOS runners are an open question.
 
 ### 5.9 Fetch templates as archives, and keep Git current (second pass)
 CVE-2025-48384 turned a carriage return in a submodule path into code execution during a recursive clone. It was fixed on 2025-07-08 in Git 2.43.7, 2.44.4, 2.45.4, 2.46.4, 2.47.3, 2.48.2, 2.49.1 and 2.50.1, and CISA lists it as exploited [S50]. Sourdough should get templates as Composer dist archives, not with `git clone --recurse-submodules`, and the docs should name the Git floor for developers. Composer 2.10 no longer falls back from dist to source by default, which helps here (see 4.8).
@@ -291,8 +291,8 @@ Stack: `Documented`. The libraries themselves exist (SESAME, HELMET with a healt
 
 ### 6.2 Have the release script run the check, but do not call it the gate
 The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check. Why: promising a gate that does not hold is worse than having none.
-Sources: stack ADR-0002, ADR-0006.
-Stack: `Documented`. The limitation is written in ADR-0002. Nothing prevents someone from describing the script as a gate in a README.
+Sources: the stack's staged-enforcement and release-gate decisions.
+Stack: `Documented`. The limitation is written in the stack's staged-enforcement decision. Nothing prevents someone from describing the script as a gate in a README.
 
 ### 6.3 Keep the start-up path small and boring
 Generated commands should run and exit on their own, with no prompts and no network calls after install. Why: developers, CI and coding agents all run them, and a prompt that waits for input breaks all three.
@@ -322,13 +322,13 @@ Stack: `Not yet`.
 7. Ship a tested Vite manifest reader for the raw PHP plus Vue path.
 8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before SQUIRE's image or `--docker` is built.
 9. Add a compatibility pipeline that generates, installs and tests all five permutations.
-10. Get Windows and macOS runners, or write the smoke-test checklist (D-023).
+10. Get Windows and macOS runners, or write the smoke-test checklist.
 11. Say how Boost's generated files are refreshed and whether they are committed. (Second pass: the vendor says the generated files may be ignored and `.ai/rules` should be committed; Sourdough still has to choose.)
 12. Decide between pinning PREFLIGHT components by tag or by commit. (GitLab prefers a commit SHA.)
 
 Added in the second pass:
 
-13. Settle the database story for the Laravel paths. The shared MySQL 5.6 is below Laravel 13's MySQL 5.7+ minimum, and Laravel's default 255-character indexed strings exceed the 767-byte key limit. Set the 191 default, avoid JSON columns, and run CI migrations against 5.6 (2.6, D-008).
+13. Settle the database story for the Laravel paths. The shared MySQL 5.6 is below Laravel 13's MySQL 5.7+ minimum, and Laravel's default 255-character indexed strings exceed the 767-byte key limit. Set the 191 default, avoid JSON columns, and run CI migrations against 5.6 (2.6, the MySQL timeline question).
 14. Generate the newest Laravel major, name it in tests, and print each template's end-of-security date in the README and in `sourdough check` (2.4, 3.7).
 15. Validate names and paths and keep templates free of code in the generator; add hostile-input tests (1.7).
 16. Make the "new app" page call the same engine as the CLI and show the equivalent command (1.8).
@@ -339,7 +339,7 @@ Added in the second pass:
 21. Keep `APP_KEY` out of git, generate it per environment, and have the release script check it and `APP_DEBUG` (4.14).
 22. Add an accessibility check to the generated apps' CI and to the "new app" page, and ask the accessibility office how the Title II rule applies (6.4).
 23. Generate a `.gitlab-ci.yml` that protects deploy credentials (protected variables, job-token allowlist, no secrets in `inputs`) (6.5).
-24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into ADR-0009 or the Sourdough docs (5.4).
+24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into the developer-OS decision or the Sourdough docs (5.4).
 25. Name an owner and a support window per permutation (3.6, 3.7).
 26. Produce an SBOM in CI (4.15), low priority.
 
