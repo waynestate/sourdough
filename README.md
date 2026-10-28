@@ -1,4 +1,4 @@
-[![GitLab pipeline](https://gitlab.example/enterprise-apps/sourdough/badges/main/pipeline.svg)](https://gitlab.example/enterprise-apps/sourdough/-/pipelines) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+[![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
 
 # Sourdough
 
