@@ -136,6 +136,35 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('# SESAME_SESSION_ABSOLUTE_MINUTES=', $env);
     }
 
+    public function testGeneratedIndexWiresSesameInEveryEnvironment(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        // Log in only when needed: use the signed-in user, or log in.
+        self::assertStringContainsString('$user = sesame_user() ?? sesame_login();', $index);
+
+        // The whole SESAME block is no longer gated on a non-production
+        // environment; the driver is chosen per environment instead.
+        self::assertStringNotContainsString("!== 'production'", $index);
+
+        // The cas driver is wired for production, with both URLs from the
+        // environment, nested the way Config::fromArray reads them.
+        self::assertStringContainsString("getenv('SESAME_CAS_URL')", $index);
+        self::assertStringContainsString("getenv('SESAME_SERVICE_URL')", $index);
+        self::assertStringContainsString("'driver' => 'cas'", $index);
+        self::assertStringContainsString("'cas' => [", $index);
+        self::assertStringContainsString("'base_url' => \$casUrl", $index);
+        self::assertStringContainsString("'service_url' => \$serviceUrl", $index);
+
+        // The fake driver is still wired for non-production.
+        self::assertStringContainsString("'driver' => 'fake'", $index);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('# SESAME_CAS_URL=', $env);
+        self::assertStringContainsString('# SESAME_SERVICE_URL=', $env);
+    }
+
     public function testGeneratedIndexHandlesUnsetEnvVars(): void
     {
         $target = $this->generateFromRealTemplate();
