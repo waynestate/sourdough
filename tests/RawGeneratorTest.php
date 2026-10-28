@@ -44,6 +44,23 @@ final class RawGeneratorTest extends TestCase
         }
     }
 
+    public function testWritesTheManifestAfterGeneration(): void
+    {
+        $target = $this->makeTempDir();
+
+        (new RawGenerator($this->fixtureTemplateDir()))->generate($target, 'My Cool App');
+
+        self::assertFileExists($target . '/.sourdough/manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(1, $manifest['schema']);
+        self::assertSame('raw', $manifest['template']);
+        self::assertSame(['name' => 'My Cool App'], $manifest['answers']);
+        self::assertSame('seeded', $manifest['files']['README.md']['class']);
+        self::assertSame('managed', $manifest['files']['my-cool-app.txt']['class']);
+        self::assertSame('managed', $manifest['files']['config/my-cool-app.ini']['class']);
+    }
+
     public function testRefusesNonEmptyTarget(): void
     {
         $target = $this->makeTempDir();
