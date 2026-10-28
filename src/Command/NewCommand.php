@@ -70,12 +70,17 @@ final class NewCommand extends Command
 
         if ($dryRun) {
             if ($json) {
-                $output->writeln(json_encode([
+                $encoded = json_encode([
                     'permutation' => $permutation->value,
                     'label' => $permutation->label(),
                     'dir' => $dir,
                     'steps' => $plan->steps,
-                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if (false === $encoded) {
+                    $this->errorOutput($output)->writeln('Could not encode the plan as JSON.');
+                    return 2;
+                }
+                $output->writeln($encoded);
             } else {
                 $this->printPlan($output, $plan);
             }

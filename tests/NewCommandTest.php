@@ -171,7 +171,9 @@ final class NewCommandTest extends TestCase
         // auto-detected from the environment. FORCE_COLOR would enable color,
         // but NO_COLOR must take precedence.
         $this->withColorEnv('1', '1', function (): void {
-            $output = new StreamOutput(fopen('php://memory', 'w+'));
+            $stream = fopen('php://memory', 'w+');
+            self::assertIsResource($stream);
+            $output = new StreamOutput($stream);
             self::assertFalse($output->isDecorated(), 'NO_COLOR should disable color even when FORCE_COLOR is set.');
         });
     }
@@ -181,7 +183,9 @@ final class NewCommandTest extends TestCase
         // The companion: without NO_COLOR, FORCE_COLOR does enable color, so
         // the NO_COLOR test above is meaningful.
         $this->withColorEnv(null, '1', function (): void {
-            $output = new StreamOutput(fopen('php://memory', 'w+'));
+            $stream = fopen('php://memory', 'w+');
+            self::assertIsResource($stream);
+            $output = new StreamOutput($stream);
             self::assertTrue($output->isDecorated(), 'FORCE_COLOR should enable color when NO_COLOR is not set.');
         });
     }
