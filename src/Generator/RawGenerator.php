@@ -18,8 +18,8 @@ use Waynestate\Sourdough\Manifest;
  *
  * After copying the template, the generator installs the raw deploy files
  * from the checked copy of SQUIRE's templates (templates/squire/). Those
- * files are copied as-is — SQUIRE owns them, so Sourdough does not rewrite
- * them — and their executable bits come from SQUIRE's manifest.
+ * files are copied as-is (SQUIRE owns them, so Sourdough does not rewrite
+ * them), and their executable bits come from SQUIRE's manifest.
  *
  * Finally the generator writes `.sourdough/manifest.json` so a later
  * `sourdough feed` knows what was generated, including the SQUIRE files.

@@ -108,7 +108,7 @@ sourdough new my-app --plan plan.json
 - `SOURDOUGH_LLM_API_KEY` the API key
 - `SOURDOUGH_LLM_MODEL` the model name
 
-Any OpenAI-compatible endpoint works — a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.
+Any OpenAI-compatible endpoint works: a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.
 
 A plan is a small JSON object:
 
@@ -134,7 +134,7 @@ A plan is a small JSON object:
 
 ## The manifest
 
-Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now — `.env.example` and `README.md`).
+Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
 
 The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
 
@@ -144,11 +144,11 @@ Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app
 sourdough manifest --check
 ```
 
-Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported — they're yours.
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
 
 Commit the manifest. It's the record that keeps `feed` honest.
 
-The deploy files in your app — `build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends — come from SQUIRE's exported copy, checked into this repository at `templates/squire/`. SQUIRE owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, re-export the copy from a SQUIRE checkout and verify it with `composer squire-copy:check`.
+The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from SQUIRE's exported copy, checked into this repository at `templates/squire/`. SQUIRE owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, re-export the copy from a SQUIRE checkout and verify it with `composer squire-copy:check`.
 
 ## Testing
 

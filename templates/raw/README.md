@@ -44,7 +44,7 @@ touching the database.
 ## Running off Citadel
 
 The app reads its platform facts from the environment, so it runs on
-Citadel, OpenShift, Coolify or raw Docker. Mix these to taste — a good
+Citadel, OpenShift, Coolify or raw Docker. Mix these to taste: a good
 starter rises on its own.
 
 | Variable | What it does | Example |
@@ -60,7 +60,7 @@ starter rises on its own.
 On Citadel the deploy files from SQUIRE run at release time: `build.sh`
 prepares the image, `deployments/001-first-release.sh` is the one-time
 first-release hook, and `scripts/release.sh` is the idempotent release
-script. They come from SQUIRE's checked copy, so SQUIRE owns them — refresh
+script. They come from SQUIRE's checked copy, so SQUIRE owns them. Refresh
 them with Sourdough, not by hand. Elsewhere, set the env vars above; a
 Dockerfile comes later.
 

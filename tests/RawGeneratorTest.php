@@ -134,7 +134,7 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('DriverFactory::make($config)', $index);
         self::assertStringNotContainsString('new FakeDriver(', $index);
 
-        // new Sesame(driver, resolver, session, config) — four arguments.
+        // new Sesame(driver, resolver, session, config): four arguments.
         self::assertMatchesRegularExpression(
             '/new Sesame\(\s*DriverFactory::make\(\$config\),\s*new class implements UserResolver \{[\s\S]*?\},\s*new NativeSession\(\),\s*\$config,\s*\);/',
             $index,
