@@ -1,6 +1,12 @@
+[![GitLab pipeline](https://gitlab.example/enterprise-apps/sourdough/badges/main/pipeline.svg)](https://gitlab.example/enterprise-apps/sourdough/-/pipelines) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+
 # Sourdough
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
+
+Checks: `composer ci` (the same command runs on GitLab and GitHub).
+
+Every loaf gets proofed before it ships.
 
 This repository is published from Wayne State University's internal GitLab and mirrored here. Changes land there first; Wayne State developers open issues and merge requests on the internal project.
 

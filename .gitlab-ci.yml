@@ -1,5 +1,6 @@
 # Sourdough's pipeline, built from the PREFLIGHT components on this GitLab.
 # Pinned to PREFLIGHT 0.1.0. Never use ~latest.
+# composer ci is the contract: the same checks run on GitLab and GitHub.
 # Sourdough requires PHP ^8.3, so the test matrix starts at 8.3. A starter
 # that can't pass its own tests is just flour and wishful thinking.
 include:
@@ -7,3 +8,9 @@ include:
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.1.0
+
+composer-ci:
+  image: composer:2.10.3
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - composer ci

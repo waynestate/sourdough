@@ -35,7 +35,15 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "ci": [
+            "@composer validate --strict",
+            "@test",
+            "@composer audit"
+        ]
+    },
+    "scripts-descriptions": {
+        "ci": "Run every check: validate, tests, audit"
     },
     "minimum-stability": "stable",
     "prefer-stable": true
