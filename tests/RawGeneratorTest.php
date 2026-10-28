@@ -136,6 +136,23 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString('# SESAME_SESSION_ABSOLUTE_MINUTES=', $env);
     }
 
+    public function testGeneratedIndexHandlesUnsetEnvVars(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $index = (string) file_get_contents($target . '/public/index.php');
+
+        // getenv() returns false, not '', when a variable is unset, so the
+        // generated code must never compare its result to '' directly.
+        self::assertStringNotContainsString("'' !== getenv(", $index);
+
+        // Config::fromArray reads dotted keys as nested arrays, so the fake
+        // driver's keys must be nested, not dotted.
+        self::assertStringNotContainsString("'fake.username' =>", $index);
+
+        // The session limits use the SESAME_SESSION_* names.
+        self::assertStringContainsString('SESAME_SESSION_IDLE_MINUTES', $index);
+    }
+
     public function testGeneratedIndexReadsTrustedProxiesFromEnv(): void
     {
         $target = $this->generateFromRealTemplate();
