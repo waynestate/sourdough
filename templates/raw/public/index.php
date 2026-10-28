@@ -44,12 +44,14 @@ $helmet = helmet_boot([
 // The session store comes from the environment so more than one replica can
 // share it (for example SESSION_SAVE_HANDLER=redis and
 // SESSION_SAVE_PATH=tcp://redis:6379). Unset keeps PHP's default.
+// getenv() returns false, not '', when a variable is unset, so check the
+// type before comparing to an empty string.
 $sessionSaveHandler = getenv('SESSION_SAVE_HANDLER');
-if ('' !== $sessionSaveHandler) {
+if (is_string($sessionSaveHandler) && '' !== $sessionSaveHandler) {
     ini_set('session.save_handler', $sessionSaveHandler);
 }
 $sessionSavePath = getenv('SESSION_SAVE_PATH');
-if ('' !== $sessionSavePath) {
+if (is_string($sessionSavePath) && '' !== $sessionSavePath) {
     ini_set('session.save_path', $sessionSavePath);
 }
 
@@ -69,11 +71,11 @@ if ($appEnv !== 'production') {
     ];
     // Optional session limits, in minutes. Unset keeps the SESAME defaults.
     $idleMinutes = getenv('SESAME_IDLE_MINUTES');
-    if ('' !== $idleMinutes) {
+    if (is_string($idleMinutes) && '' !== $idleMinutes) {
         $sesameConfig['session.idle_minutes'] = (int) $idleMinutes;
     }
     $absoluteMinutes = getenv('SESAME_ABSOLUTE_MINUTES');
-    if ('' !== $absoluteMinutes) {
+    if (is_string($absoluteMinutes) && '' !== $absoluteMinutes) {
         $sesameConfig['session.absolute_minutes'] = (int) $absoluteMinutes;
     }
 
