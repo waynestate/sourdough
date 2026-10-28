@@ -21,8 +21,7 @@ final class Plan
         public readonly Permutation $permutation,
         public readonly string $dir,
         public readonly array $steps,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws \InvalidArgumentException when --sail or --docker is combined with a raw permutation
@@ -33,7 +32,7 @@ final class Plan
 
         if ($isRaw && ($sail || $docker)) {
             throw new \InvalidArgumentException(
-                '--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.'
+                '--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.',
             );
         }
 

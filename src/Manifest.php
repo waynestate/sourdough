@@ -37,8 +37,7 @@ final class Manifest
         private readonly array $answers,
         private readonly array $seededFiles,
         private readonly ?string $sourdoughVersion = null,
-    ) {
-    }
+    ) {}
 
     /**
      * The Sourdough package version, or 'dev' when it cannot be determined

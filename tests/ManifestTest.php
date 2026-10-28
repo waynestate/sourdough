@@ -75,11 +75,12 @@ final class ManifestTest extends TestCase
         $manifest = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         self::assertSame(
             ['answers', 'files', 'generated_at', 'schema', 'sourdough_version', 'template'],
-            array_keys($manifest)
+            array_keys($manifest),
         );
 
-        // File paths are sorted and use forward slashes.
-        $paths = array_keys($manifest['files']);
+        // File paths are sorted and use forward slashes. JSON object keys are
+        // always strings, so strval is a no-op here.
+        $paths = array_map('strval', array_keys($manifest['files']));
         $sorted = $paths;
         sort($sorted);
         self::assertSame($sorted, $paths);
