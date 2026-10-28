@@ -38,8 +38,7 @@ final class RawGenerator
 
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
-    ) {
-    }
+    ) {}
 
     /**
      * Generate the app named $name into $targetDir.
@@ -55,7 +54,7 @@ final class RawGenerator
         if ('' === $slug) {
             throw new \InvalidArgumentException(sprintf(
                 'The app name "%s" does not produce a valid slug: use letters, numbers and dashes.',
-                $name
+                $name,
             ));
         }
 
@@ -97,7 +96,7 @@ final class RawGenerator
             if ('.' !== $entry && '..' !== $entry) {
                 throw new \InvalidArgumentException(sprintf(
                     'The target directory "%s" already exists and is not empty.',
-                    $targetDir
+                    $targetDir,
                 ));
             }
         }

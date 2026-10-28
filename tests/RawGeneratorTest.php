@@ -137,7 +137,7 @@ final class RawGeneratorTest extends TestCase
         // new Sesame(driver, resolver, session, config) — four arguments.
         self::assertMatchesRegularExpression(
             '/new Sesame\(\s*DriverFactory::make\(\$config\),\s*new class implements UserResolver \{[\s\S]*?\},\s*new NativeSession\(\),\s*\$config,\s*\);/',
-            $index
+            $index,
         );
 
         // The optional session limits come from the environment, cast to int,
