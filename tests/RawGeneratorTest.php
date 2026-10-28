@@ -125,15 +125,15 @@ final class RawGeneratorTest extends TestCase
 
         // The optional session limits come from the environment, cast to int,
         // and are nested under 'session'.
-        self::assertStringContainsString("getenv('SESAME_IDLE_MINUTES')", $index);
-        self::assertStringContainsString("getenv('SESAME_ABSOLUTE_MINUTES')", $index);
+        self::assertStringContainsString("getenv('SESAME_SESSION_IDLE_MINUTES')", $index);
+        self::assertStringContainsString("getenv('SESAME_SESSION_ABSOLUTE_MINUTES')", $index);
         self::assertStringContainsString("'idle_minutes'] = (int)", $index);
         self::assertStringContainsString("'absolute_minutes'] = (int)", $index);
         self::assertStringContainsString("\$sesameConfig['session'] = \$sessionLimits", $index);
 
         $env = (string) file_get_contents($target . '/.env.example');
-        self::assertStringContainsString('# SESAME_IDLE_MINUTES=', $env);
-        self::assertStringContainsString('# SESAME_ABSOLUTE_MINUTES=', $env);
+        self::assertStringContainsString('# SESAME_SESSION_IDLE_MINUTES=', $env);
+        self::assertStringContainsString('# SESAME_SESSION_ABSOLUTE_MINUTES=', $env);
     }
 
     public function testGeneratedIndexReadsTrustedProxiesFromEnv(): void
@@ -198,7 +198,7 @@ final class RawGeneratorTest extends TestCase
         $readme = (string) file_get_contents($target . '/README.md');
 
         self::assertStringContainsString('## Running off Citadel', $readme);
-        foreach (['APP_ENV', 'HELMET_PROXIES', 'LOG_FILE', 'SESSION_SAVE_HANDLER', 'SESSION_SAVE_PATH', 'SESAME_IDLE_MINUTES', 'SESAME_ABSOLUTE_MINUTES'] as $var) {
+        foreach (['APP_ENV', 'HELMET_PROXIES', 'LOG_FILE', 'SESSION_SAVE_HANDLER', 'SESSION_SAVE_PATH', 'SESAME_SESSION_IDLE_MINUTES', 'SESAME_SESSION_ABSOLUTE_MINUTES'] as $var) {
             self::assertStringContainsString('`' . $var . '`', $readme);
         }
         self::assertStringContainsString('deployments/', $readme);

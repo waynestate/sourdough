@@ -40,8 +40,8 @@ starter rises on its own.
 | `LOG_FILE` | Where PHP errors go; unset means stderr | `/var/log/app/error.log` |
 | `SESSION_SAVE_HANDLER` | The session store; unset keeps PHP's default | `redis` |
 | `SESSION_SAVE_PATH` | The session store's address; unset keeps PHP's default | `tcp://redis:6379` |
-| `SESAME_IDLE_MINUTES` | Minutes of inactivity before SESAME signs out; unset keeps the default | `30` |
-| `SESAME_ABSOLUTE_MINUTES` | Minutes after login before SESAME signs out regardless; unset keeps the default | `480` |
+| `SESAME_SESSION_IDLE_MINUTES` | Minutes of inactivity before SESAME signs out; unset keeps the default | `30` |
+| `SESAME_SESSION_ABSOLUTE_MINUTES` | Minutes after login before SESAME signs out regardless; unset keeps the default | `480` |
 
 On Citadel the release script in `deployments/` runs at release time.
 Elsewhere, set the env vars above; a Dockerfile comes later.

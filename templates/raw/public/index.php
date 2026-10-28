@@ -76,11 +76,11 @@ if ($appEnv !== 'production') {
     // Optional session limits, in minutes. Unset keeps the SESAME defaults;
     // only the keys that are set are added.
     $sessionLimits = [];
-    $idleMinutes = getenv('SESAME_IDLE_MINUTES');
+    $idleMinutes = getenv('SESAME_SESSION_IDLE_MINUTES');
     if (is_string($idleMinutes) && '' !== $idleMinutes) {
         $sessionLimits['idle_minutes'] = (int) $idleMinutes;
     }
-    $absoluteMinutes = getenv('SESAME_ABSOLUTE_MINUTES');
+    $absoluteMinutes = getenv('SESAME_SESSION_ABSOLUTE_MINUTES');
     if (is_string($absoluteMinutes) && '' !== $absoluteMinutes) {
         $sessionLimits['absolute_minutes'] = (int) $absoluteMinutes;
     }
