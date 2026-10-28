@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Generator;
 
+use Waynestate\Sourdough\Manifest;
+
 /**
  * Copies the raw template into a target dir, replacing {{app_name}} and
  * {{app_slug}} in file contents and file names.
@@ -13,9 +15,27 @@ namespace Waynestate\Sourdough\Generator;
  *
  * The generator refuses an existing non-empty target dir and writes nothing
  * outside the target dir.
+ *
+ * After copying, the generator writes `.sourdough/manifest.json` so a later
+ * `sourdough feed` knows what was generated.
  */
 final class RawGenerator
 {
+    /**
+     * The files Sourdough seeds once and then leaves to the app. Everything
+     * else in the template is managed: `sourdough feed` (a later release)
+     * will update it.
+     *
+     * - .env.example: the app's environment config. The developer fills in
+     *   real values per environment, so Sourdough must not clobber them.
+     * - README.md: the app's own documentation. The developer rewrites it
+     *   for their app, so overwriting it would destroy their work.
+     */
+    public const SEEDED_FILES = [
+        '.env.example',
+        'README.md',
+    ];
+
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
     ) {
@@ -24,10 +44,12 @@ final class RawGenerator
     /**
      * Generate the app named $name into $targetDir.
      *
+     * @param array<string, string|bool> $answers each option the user chose, recorded in the manifest
+     *
      * @throws \InvalidArgumentException when the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the template is missing or a file cannot be read or written
      */
-    public function generate(string $targetDir, string $name): void
+    public function generate(string $targetDir, string $name, array $answers = []): void
     {
         $slug = self::slugify($name);
         if ('' === $slug) {
@@ -44,6 +66,9 @@ final class RawGenerator
         $this->refuseNonEmptyTarget($targetDir);
 
         $this->copyDir($this->templateDir, $targetDir, $name, $slug);
+
+        $answers = array_merge(['name' => $name], $answers);
+        (new Manifest('raw', $answers, self::SEEDED_FILES))->write($targetDir);
     }
 
     /**

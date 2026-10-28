@@ -91,8 +91,28 @@ final class NewCommand extends Command
 
         $this->printPlan($output, $plan);
 
+        $answers = [];
+        if ($raw) {
+            $answers['raw'] = true;
+        }
+        if ($laravel) {
+            $answers['laravel'] = true;
+        }
+        if ($vue) {
+            $answers['vue'] = true;
+        }
+        if ($inertia) {
+            $answers['inertia'] = true;
+        }
+        if ($sail) {
+            $answers['sail'] = true;
+        }
+        if ($docker) {
+            $answers['docker'] = true;
+        }
+
         try {
-            (new RawGenerator())->generate($dir, $name);
+            (new RawGenerator())->generate($dir, $name, $answers);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
