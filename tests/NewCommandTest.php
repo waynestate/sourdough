@@ -147,6 +147,24 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('not available in this release', $tester->getDisplay());
     }
 
+    public function testManifestRecordsTheChosenFlags(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--raw' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/.sourdough/manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['name' => 'demo', 'raw' => true], $manifest['answers']);
+    }
+
     public function testNoColorIsHonored(): void
     {
         // The CLI renders through Symfony Console output, whose decoration is

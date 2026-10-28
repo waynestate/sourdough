@@ -52,6 +52,22 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 
 Only `--raw` generates in 0.1. The other permutations print the plan and exit `1` with "not available in this release"; later steps add them.
 
+## The manifest
+
+Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now — `.env.example` and `README.md`).
+
+The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
+
+Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app to list the managed files that have drifted from the manifest:
+
+```
+sourdough manifest --check
+```
+
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported — they're yours.
+
+Commit the manifest. It's the record that keeps `feed` honest.
+
 ## Testing
 
 From the repo root:
