@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough;
 
 /**
- * The five ways a Wayne State app can be built (ADR-0001).
+ * The five ways a Wayne State app can be built. Every project is a framework-free core with thin adapters, and every permutation must work.
  *
  * The flags come from `sourdough new`: --raw, --laravel, --vue and --inertia.
  * Combinations that make no sense are refused with an InvalidArgumentException.
