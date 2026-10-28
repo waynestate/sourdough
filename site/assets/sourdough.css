@@ -710,7 +710,7 @@ h1, h2, h3 {
 .recipe-card::after { right: 6%; transform: rotate(4deg); }
 .recipe-card__head h2 { font-size: clamp(2.1rem, 5vw, 3.2rem); margin: 0 0 0.5rem; line-height: 1.05; }
 .recipe-card__head p:not(.eyebrow) { margin: 0 0 1.5rem; color: var(--sd-muted); max-width: 40rem; }
-.recipe-card__table { overflow-x: auto; }
+.recipe-card__table { overflow-x: auto; border: 0; border-radius: 0; background: none; }
 .recipe {
   width: 100%;
   border-collapse: collapse;
@@ -1085,7 +1085,9 @@ h1, h2, h3 {
   .recipe tbody th { white-space: normal; }
   .chalkboard { border-width: 10px; }
   .good { width: 33.33%; min-width: 0; }
-  .good__tag { min-width: 0; width: 92%; }
+  .good__tag { min-width: 0; width: 94%; padding-inline: 0.25rem; font-size: 0.8rem; }
+  .good__tag b { font-size: 0.82rem; }
+  .recipe-card { transform: none; }
   .note { font-size: 1.1rem; }
 }
 
