@@ -39,5 +39,5 @@ terminal usage. When in doubt about what the mark looks like, look at the board,
 
 ## Rule
 Do not redraw or edit the mark. No new geometry, no "just a little" cleanup, no stretching, no effects. If a
-vector is ever needed, trace the PNG with vtracer or potrace — and keep the trace next to the PNG it came
+vector is ever needed, trace the PNG with vtracer or potrace, and keep the trace next to the PNG it came
 from, never in its place.
