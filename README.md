@@ -2,6 +2,8 @@
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
 
+This repository is published from Wayne State University's internal GitLab and mirrored here. Changes land there first; Wayne State developers open issues and merge requests on the internal project.
+
 Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the PREFLIGHT CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 ## Install
@@ -58,4 +60,4 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 
 ## CI
 
-Strongly recommended: a git.wayne.edu instance runner. See `design/instance-runner-case.md` in the coordination repo (`the stack`).
+Strongly recommended: a git.wayne.edu instance runner.

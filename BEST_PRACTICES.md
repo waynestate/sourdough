@@ -65,7 +65,7 @@ Stack: `Not yet`. Step 1 plans tests for invalid flag combinations. It does not 
 ### 1.8 Make the "new app" page and the CLI one engine (second pass)
 The page should call the same plan code as `sourdough new --dry-run --json`, show the equivalent command so a developer can repeat it, validate on the server with the rules in 1.7, and return the same archive the CLI would write. A snapshot test should compare the two. Why: two generators drift apart, and a page that quietly differs from the CLI produces apps nobody can reproduce. Spring Initializr is the model the portfolio names: it is open source under Apache 2.0, can be run as an organisation's own instance, exposes generation over HTTP, and the Spring CLI can be pointed at a custom server (from the project's reference docs, seen in search results; the page was not opened). The page must also pass the stack's accessibility gate (see 6.4).
 Sources: [S21].
-Stack: `Documented` for the page itself (design/portfolio.md mentions the start.spring.io pattern). `Not yet` for the shared-engine rule. Only brand assets exist under `site/`.
+Stack: `Documented` for the page itself (the stack's design names the start.spring.io pattern). `Not yet` for the shared-engine rule. Only brand assets exist under `site/`.
 
 ---
 
@@ -411,8 +411,8 @@ Added in the second pass, checked 2026-10-27. "Opened" means the page was fetche
 
 Not used: no S40 or S55 (numbers skipped when a draft source was reused: S13 for Vite env, S4 for Copier updating).
 
-Stack documents used: ADR-0001, ADR-0002, ADR-0003, ADR-0005, ADR-0006, ADR-0008, ADR-0009, design/next-repos.md, design/portfolio.md, design/DECISIONS.md, and the SESAME, HELMET, PROCTOR and PREFLIGHT repos as of 2026-10-27.
-Also read in the second pass: design/best-practices/squire.md (S18, S44 to S47 on MySQL 5.6) and the PROCTOR source (`ComposerAuditCheck`, `LockCommittedCheck`). The sourdough folder holds only brand assets under `site/`, so no tag above is `Enforced` or `Checked` for Sourdough itself.
+Stack documents used: the stack's design docs and ADRs, and the SESAME, HELMET, PROCTOR and PREFLIGHT repos as of 2026-10-27.
+Also read in the second pass: SQUIRE's best-practices notes (S18, S44 to S47 on MySQL 5.6) and the PROCTOR source (`ComposerAuditCheck`, `LockCommittedCheck`). The sourdough folder holds only brand assets under `site/`, so no tag above is `Enforced` or `Checked` for Sourdough itself.
 
 ---
 
