@@ -8,7 +8,7 @@
 <meta name="stack-env" content="auto">
 <script src="assets/stack-env.js" defer></script>
 <title>Sourdough: Feed it and it grows.</title>
-<meta name="description" content="Sourdough makes a new Wayne State app with the stack already wired in: SESAME sign-in, HELMET runtime baseline, PROCTOR checks, WayneUI and a Citadel release script. One PHP command, every operating system.">
+<meta name="description" content="Sourdough makes a new raw PHP app for Wayne State with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's Citadel deploy files already in it. The Laravel shapes come in a later release.">
 <meta name="theme-color" content="#0c5449">
 <link rel="canonical" href="https://sourdough.apps.wayne.edu/">
 <!-- For agents (ADR-0019): this page as Markdown, written by bin/agent-ready.php from Squire's kit.
@@ -67,7 +67,7 @@
       <!-- The name is the loaf: it spans the whole page, and the jar below
            proofs up under its baseline. -->
       <div class="hero__banner">
-        <p class="eyebrow">Wayne State's app starters</p>
+        <p class="eyebrow">A starter for Wayne State apps</p>
         <h1 class="hero__title" id="hero-title">
           <span class="wsu-sr-only">Sourdough</span>
           <span class="hero__letters" aria-hidden="true"><span style="--i:0">S</span><span style="--i:1">o</span><span style="--i:2">u</span><span style="--i:3">r</span><span style="--i:4">d</span><span style="--i:5">o</span><span style="--i:6">u</span><span style="--i:7">g</span><span style="--i:8">h</span></span>
@@ -83,7 +83,7 @@
             <i style="--x:68%;--d:2.1s;--s:8px"></i><i style="--x:47%;--d:3s;--s:6px"></i><i style="--x:30%;--d:2.6s;--s:9px"></i>
             <i style="--x:76%;--d:1s;--s:6px"></i>
           </span>
-          <img class="jar__mark" src="brand/sourdough-avatar-512.png" width="512" height="512" alt="Sourdough mark: a starter jar whose starter has risen into a dome, well above the gold band that marks where it began">
+          <img class="jar__mark" src="brand/sourdough-avatar-512.png" width="512" height="512" alt="Sourdough logo: a starter jar whose starter has risen into a dome, well above the gold band that marks where it began">
           <!-- Chalk notes a baker scribbles on the board's front edge, one on
                each side of the feeding button. Each hand-drawn arrow starts
                at its note, stays off the green tile, and stops at the
@@ -107,7 +107,7 @@
       </div>
 
       <div class="hero__copy">
-        <p class="hero__blurb">One command makes a new Wayne State app with the stack already wired in. SESAME signs people in, HELMET sets the runtime baseline, PROCTOR checks the code, WayneUI draws the page, and a Citadel release script ships it. One PHP command, so it bakes the same on Windows, macOS and Linux.</p>
+        <p class="hero__blurb"><code>sourdough new</code> makes a raw PHP app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. You add WayneUI's standalone file with one download. Raw PHP is the only shape it makes today; the Laravel shapes come in a later release.</p>
 
         <div class="recipe-cmd">
           <p class="recipe-cmd__label">The whole recipe</p>
@@ -116,7 +116,7 @@
           <button class="copy-btn" type="button" data-copy="composer global require waynestate/sourdough&#10;sourdough new my-app">Copy</button>
         </div>
 
-        <p class="hero__weld"><strong>Want every piece already joined? Start from <a href="https://weld.apps.wayne.edu/">WELD</a>.</strong> Use Sourdough when you want a smaller raw PHP app with SESAME, HELMET, PROCTOR and Preflight already wired in.</p>
+        <p class="hero__weld"><strong>Want Laravel with Inertia and Vue? Start from <a href="https://weld.apps.wayne.edu/">WELD</a>.</strong> Sourdough is for a smaller raw PHP app with the same sign-in, headers and checks.</p>
 
         <p class="hero__cta">
           <a class="btn btn--gold" href="#start-title">Start baking</a>
@@ -246,13 +246,13 @@
         </div>
 
         <ol class="log" data-log>
-          <li class="log__entry" data-at="0.00"><span class="log__time">08:00</span> <span class="log__what"><strong>Mix.</strong> <code>sourdough new</code> picks the shape: raw PHP, or Laravel, with or without Vue.</span></li>
-          <li class="log__entry" data-at="0.14"><span class="log__time">08:20</span> <span class="log__what"><strong>Flour: WayneUI.</strong> The interface, from WayneUI's standalone PHP path.</span></li>
+          <li class="log__entry" data-at="0.00"><span class="log__time">08:00</span> <span class="log__what"><strong>Mix.</strong> <code>sourdough new</code> picks the shape. In 0.1 that's raw PHP.</span></li>
+          <li class="log__entry" data-at="0.14"><span class="log__time">08:20</span> <span class="log__what"><strong>Flour: WayneUI.</strong> The interface, from WayneUI's standalone PHP file, which you download once.</span></li>
           <li class="log__entry" data-at="0.28"><span class="log__time">08:40</span> <span class="log__what"><strong>Water: SESAME.</strong> Sign-in. A fake driver locally, CAS in production.</span></li>
           <li class="log__entry" data-at="0.40"><span class="log__time">09:00</span> <span class="log__what"><strong>Salt: HELMET.</strong> Security headers, a hardened session, and <code>/up</code> for the load balancer.</span></li>
-          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The checks, with Preflight's CI components and a Citadel release script that runs them.</span></li>
+          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The standards check. Preflight's CI components run it on every push, along with the tests and a Composer audit.</span></li>
           <li class="log__entry" data-at="0.66"><span class="log__time">13:00</span> <span class="log__what"><strong>Doubled.</strong> Well past the gold band. A label goes on: <code>.sourdough/manifest.json</code>.</span></li>
-          <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> One starter, five loaves.</span></li>
+          <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> Cut into the five shapes the stack plans for.</span></li>
         </ol>
 
       </div>
@@ -265,7 +265,7 @@
       <div class="section__head">
         <p class="eyebrow">On the cooling rack</p>
         <h2 id="loaves-title">Five loaves, one starter</h2>
-        <p>Every shape a Wayne State app can take. The raw PHP boule is out of the oven in 0.1; the other four are still proofing. Score a loaf to see what's baked in.</p>
+        <p>These are the five app shapes the stack supports. Sourdough 0.1 makes the raw PHP one. The other four print their plan and stop with exit 1, so they're still proofing. Score a loaf to see what's inside.</p>
       </div>
 
       <div class="rack">
@@ -299,7 +299,7 @@
                 <li><code>public/index.php</code> HELMET boots first, then SESAME signs you in</li>
                 <li><code>composer.json</code> helmet and sesame, with proctor for dev</li>
                 <li><code>.gitlab-ci.yml</code> Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
-                <li><code>deployments/release.sh</code> and <code>release.ps1</code> the Citadel release script</li>
+                <li><code>build.sh</code> and <code>scripts/release.sh</code> Squire's Citadel deploy files</li>
                 <li><code>.env.example</code> and <code>README.md</code> seeded: yours from day one</li>
                 <li><code>.sourdough/manifest.json</code> the label on the jar</li>
               </ul>
@@ -323,7 +323,7 @@
             <p><span class="tag tag--soon">Coming soon</span></p>
             <div class="crumb" id="crumb-rawvue">
               <p class="crumb__title">The crumb</p>
-              <p>Cut too early: still dough in the middle. The bake lands in a later release.</p>
+              <p>Cut too early: still dough in the middle. In 0.1, <code>--raw --vue</code> prints its plan and stops.</p>
             </div>
           </div>
         </article>
@@ -344,7 +344,7 @@
             <p><span class="tag tag--soon">Coming soon</span></p>
             <div class="crumb" id="crumb-blade">
               <p class="crumb__title">The crumb</p>
-              <p>Planned on Laravel's own installer, with the same SESAME, HELMET, PROCTOR and WayneUI wired in. Still proofing.</p>
+              <p>The plan is to start from Laravel's own installer and add SESAME, HELMET, PROCTOR and WayneUI. In 0.1, <code>--laravel</code> prints that plan and stops.</p>
             </div>
           </div>
         </article>
@@ -366,7 +366,7 @@
             <p><span class="tag tag--soon">Coming soon</span></p>
             <div class="crumb" id="crumb-islands">
               <p class="crumb__title">The crumb</p>
-              <p>The seeds are counted, the oven isn't hot yet. Coming in a later release.</p>
+              <p>Planned for a later release. In 0.1, <code>--laravel --vue</code> prints its plan and stops.</p>
             </div>
           </div>
         </article>
@@ -383,18 +383,18 @@
           <div class="loaf__body">
             <p class="loaf__kind">Tin loaf</p>
             <h3>Laravel + Inertia/Vue</h3>
-            <p class="loaf__label">Inertia and Vue: the whole app baked in one tin.</p>
+            <p class="loaf__label">Laravel with Inertia and Vue, as one app.</p>
             <p><span class="tag tag--soon">Coming soon</span></p>
             <div class="crumb" id="crumb-inertia">
               <p class="crumb__title">The crumb</p>
-              <p>Want this one already baked? <a href="https://weld.apps.wayne.edu/">WELD</a> is the Inertia/Vue loaf, finished and sliced: <code>composer create-project waynestate/weld my-app</code>.</p>
+              <p>Need this one now? <a href="https://weld.apps.wayne.edu/">WELD</a> is a Laravel app with Inertia and Vue and the stack already installed: <code>composer create-project waynestate/weld my-app</code>.</p>
             </div>
           </div>
         </article>
 
       </div>
 
-      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with any shape's flags, so you can read a loaf's plan before it bakes.</p>
+      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with every shape's flags, including the four that don't bake yet.</p>
     </div>
   </section>
 
@@ -405,7 +405,7 @@
         <header class="recipe-card__head">
           <p class="eyebrow">Recipe card No. 1</p>
           <h2 id="recipe-title">What's baked in</h2>
-          <p>Baker's percentages, roughly. The parts are libraries, so they update with <code>composer update</code>; only the glue lives in the template.</p>
+          <p>Baker's percentages, roughly. The parts are Composer packages, so <code>composer update</code> updates them. Only the code that connects them lives in the template.</p>
         </header>
         <div class="wsu-table-wrap recipe-card__table">
           <table class="recipe">
@@ -432,7 +432,7 @@
               <tr>
                 <th scope="row"><span class="pct">20%</span> Levain</th>
                 <td><span class="part"><a class="part-link" href="https://proctor.apps.wayne.edu/"><img src="assets/marks/proctor.png" width="34" height="34" alt="">PROCTOR</a></span></td>
-                <td>The checks. The release script runs <code>vendor/bin/proctor check</code> before anything ships.</td>
+                <td>The standards check. CI runs <code>vendor/bin/proctor check</code> on every push. The release script runs PROCTOR too, as a report unless you set <code>SQUIRE_PROCTOR=enforce</code>.</td>
               </tr>
               <tr>
                 <th scope="row"><span class="pct">1</span> Oven</th>
@@ -442,7 +442,7 @@
               <tr>
                 <th scope="row"><span class="pct">1</span> Basket</th>
                 <td><span class="part"><span class="part__glyph" aria-hidden="true">⇢</span>Release script</span></td>
-                <td><code>deployments/release.sh</code> runs on Citadel at release time; <code>release.ps1</code> is its Windows twin. Off Citadel, the same env vars work on OpenShift, Coolify or raw Docker.</td>
+                <td><code>build.sh</code> and <code>scripts/release.sh</code> come from Squire and run on Citadel at build and release time. Off Citadel, the app reads the same environment variables on OpenShift, Coolify or raw Docker.</td>
               </tr>
             </tbody>
           </table>
@@ -459,7 +459,7 @@
         <div class="chalkboard__head">
           <p class="chalk-eyebrow">Pinned above the bench</p>
           <h2 id="feeding-title">Feeding schedule</h2>
-          <p>A starter you never feed goes flat. Every app Sourdough makes carries <code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 of every file. It's how the starter remembers what went into the loaf.</p>
+          <p>A starter you never feed goes flat. Every app Sourdough makes carries <code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how a later <code>sourdough feed</code> will know which files it can update.</p>
         </div>
 
         <ol class="schedule">
@@ -467,14 +467,14 @@
             <p class="schedule__when">Bake day</p>
             <div class="schedule__what">
               <code class="chalk-cmd">sourdough new my-app</code>
-              <p>Makes the app and writes the manifest. Commit it: it's the record that keeps feeding honest.</p>
+              <p>Makes the app and writes the manifest. Commit the manifest with the rest of the app.</p>
             </div>
           </li>
           <li class="schedule__row" data-reveal>
-            <p class="schedule__when">Every day, in CI</p>
+            <p class="schedule__when">Any day</p>
             <div class="schedule__what">
               <code class="chalk-cmd">sourdough manifest --check</code>
-              <p>Is it still alive? Lists every managed file that drifted from the manifest.</p>
+              <p>Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app; the generated CI doesn't run it for you.</p>
               <dl class="exits">
                 <div><dt>0</dt><dd>clean</dd></div>
                 <div><dt>1</dt><dd>a managed file changed or is missing</dd></div>
@@ -494,7 +494,7 @@
         <div class="jars">
           <div class="jars__col">
             <h3>Managed <span>we keep feeding these</span></h3>
-            <ul><li><code>public/index.php</code></li><li><code>composer.json</code></li><li><code>.gitlab-ci.yml</code></li><li><code>deployments/</code></li><li><code>.gitattributes</code>, <code>.gitignore</code></li></ul>
+            <ul><li><code>public/index.php</code></li><li><code>composer.json</code></li><li><code>.gitlab-ci.yml</code></li><li>Squire's deploy files: <code>build.sh</code>, <code>scripts/</code>, <code>deployments/</code>, <code>.squire/</code></li><li><code>.gitattributes</code>, <code>.gitignore</code></li></ul>
           </div>
           <div class="jars__col">
             <h3>Seeded <span>written once, yours now</span></h3>
@@ -583,7 +583,7 @@ php -S localhost:8000 -t public</pre>
       <div class="section__head">
         <p class="eyebrow">Hand it to your agent</p>
         <h2 id="agents-title">Recipes for your agent</h2>
-        <p>Two cards, ready for the coding agent you already use. Copy one, or run it straight in OpenCode, Claude Code, Codex or ChatGPT. Each one says what is in the tub, what the agent may not touch, and to ask before it guesses.</p>
+        <p>Two prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask you before it guesses. There's no prompt for the Laravel shapes yet, because they don't bake yet.</p>
       </div>
 
       <div class="agents">
@@ -593,7 +593,7 @@ php -S localhost:8000 -t public</pre>
             <div>
               <p class="ar-prompt__kicker">Recipe No. 1 · Raw PHP</p>
               <h3 class="ar-prompt__title" id="prompt-get-started-title">Get started with Sourdough</h3>
-              <p class="ar-prompt__desc">Install the starter, bake a raw PHP app, fetch WayneUI, serve it, and check the label on the jar.</p>
+              <p class="ar-prompt__desc">Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check.</p>
             </div>
           </header>
           <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes one shape, raw PHP on WayneUI's standalone path, with SESAME (sign-in), HELMET (security headers and the /up check), PROCTOR (checks), the Preflight CI components and Squire's Citadel deploy files already in it.
@@ -627,7 +627,7 @@ Output: what you ran and what it said, the app's files one level deep, then your
             <div>
               <p class="ar-prompt__kicker">Recipe No. 2 · An app Sourdough baked</p>
               <h3 class="ar-prompt__title" id="prompt-manifest-title">Check what has drifted in a Sourdough app</h3>
-              <p class="ar-prompt__desc">Read the manifest, list the managed files that changed, and propose what to put back, before anything is fed.</p>
+              <p class="ar-prompt__desc">Lists the managed files that changed since Sourdough wrote them and suggests what to put back. It changes nothing.</p>
             </div>
           </header>
           <pre class="ar-prompt__text"><code>You are a coding agent checking an app that Sourdough baked, at Wayne State University. Sourdough is the app starter of WELD, the Wayne State application stack. Every app it bakes carries .sourdough/manifest.json: the Sourdough version, the template, the answers chosen, and a sha256 hash of every file it wrote, each marked managed or seeded.
@@ -652,7 +652,7 @@ Constraints:
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.</code></pre>
         </section>
 
-        <p class="agents__fine">The agent reads the same pages you do: <a href="llms.txt">llms.txt</a> lists them, <a href="llms-full.txt">llms-full.txt</a> holds them all in one file, and this page has a <a href="index.md" type="text/markdown">Markdown twin</a>. Nothing here phones home; the buttons only copy text or open the tool you picked. The agent can knead, but you decide when the loaf is ready to bake.</p>
+        <p class="agents__fine">The agent reads the same pages you do: <a href="llms.txt">llms.txt</a> lists them, <a href="llms-full.txt">llms-full.txt</a> holds them all in one file, and this page has a <a href="index.md" type="text/markdown">Markdown twin</a>. Nothing here phones home. The buttons only copy text or open the tool you picked.</p>
       </div>
     </div>
   </section>
@@ -663,37 +663,37 @@ Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR
       <div class="section__head">
         <p class="eyebrow">The rest of the bakery</p>
         <h2 id="shop-title">Same kitchen, many ovens</h2>
-        <p>Sourdough is one shelf in Wayne State's app stack. <a href="https://weld.apps.wayne.edu/">WELD</a> is its sibling: the same parts, already baked.</p>
+        <p>Sourdough is one part of the Wayne State app stack. <a href="https://weld.apps.wayne.edu/">WELD</a> is the other starter: a Laravel app with Inertia and Vue, with the same parts already installed.</p>
       </div>
 
       <div class="shelves">
         <div class="shelf">
           <h3 class="shelf__sign">In every loaf</h3>
           <ul class="shelf__row">
-            <li class="good"><a class="good__link" href="https://wayneui.apps.wayne.edu/"><span class="good__tile good__tile--wui"><img src="assets/marks/wayneui.svg" width="40" height="40" alt="WayneUI mark: a rounded frame holding a solid form, with a gold tab on the lower edge"></span><span class="good__tag"><b>WayneUI</b> the interface</span></a></li>
-            <li class="good"><a class="good__link" href="https://sesame.apps.wayne.edu/"><img class="good__mark" src="assets/marks/sesame.png" width="64" height="64" alt="SESAME mark: an open door with a gold gap"><span class="good__tag"><b>SESAME</b> sign-in</span></a></li>
-            <li class="good"><a class="good__link" href="https://helmet.apps.wayne.edu/"><img class="good__mark" src="assets/marks/helmet.png" width="64" height="64" alt="HELMET mark: a white football helmet with a gold facemask"><span class="good__tag"><b>HELMET</b> runtime baseline</span></a></li>
-            <li class="good"><a class="good__link" href="https://proctor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/proctor.png" width="64" height="64" alt="PROCTOR mark: a watchful eye with a gold square pupil"><span class="good__tag"><b>PROCTOR</b> the checks</span></a></li>
-            <li class="good"><a class="good__link" href="https://preflight.apps.wayne.edu/"><img class="good__mark" src="assets/marks/preflight.png" width="64" height="64" alt="Preflight mark: a runway with a gold centre line"><span class="good__tag"><b>Preflight</b> shared CI</span></a></li>
+            <li class="good"><a class="good__link" href="https://wayneui.apps.wayne.edu/"><span class="good__tile good__tile--wui"><img src="assets/marks/wayneui.svg" width="40" height="40" alt="WayneUI logo: a rounded frame holding a solid form, with a gold tab on the lower edge"></span><span class="good__tag"><b>WayneUI</b> the interface</span></a></li>
+            <li class="good"><a class="good__link" href="https://sesame.apps.wayne.edu/"><img class="good__mark" src="assets/marks/sesame.png" width="64" height="64" alt="SESAME logo: an open door with a gold gap"><span class="good__tag"><b>SESAME</b> sign-in</span></a></li>
+            <li class="good"><a class="good__link" href="https://helmet.apps.wayne.edu/"><img class="good__mark" src="assets/marks/helmet.png" width="64" height="64" alt="HELMET logo: a white football helmet with a gold facemask"><span class="good__tag"><b>HELMET</b> runtime baseline</span></a></li>
+            <li class="good"><a class="good__link" href="https://proctor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/proctor.png" width="64" height="64" alt="PROCTOR logo: a watchful eye with a gold square pupil"><span class="good__tag"><b>PROCTOR</b> the checks</span></a></li>
+            <li class="good"><a class="good__link" href="https://preflight.apps.wayne.edu/"><img class="good__mark" src="assets/marks/preflight.png" width="64" height="64" alt="Preflight logo: a runway with a gold centre line"><span class="good__tag"><b>Preflight</b> shared CI</span></a></li>
           </ul>
         </div>
         <div class="shelf">
           <h3 class="shelf__sign">From the same kitchen</h3>
           <ul class="shelf__row">
-            <li class="good"><a class="good__link" href="https://creed.apps.wayne.edu/"><img class="good__mark" src="assets/marks/creed.png" width="64" height="64" alt="CREED mark: a stone arch whose gold keystone holds the other stones in place"><span class="good__tag"><b>CREED</b> the standards</span></a></li>
-            <li class="good"><a class="good__link" href="https://pinstripe.apps.wayne.edu/"><img class="good__mark" src="assets/marks/pinstripe.png" width="64" height="64" alt="Pinstripe mark: a striped necktie with a gold tie bar"><span class="good__tag"><b>Pinstripe</b> the coding standard</span></a></li>
-            <li class="good good--here"><img class="good__mark" src="brand/sourdough-avatar-256.png" width="64" height="64" alt="Sourdough mark: a starter jar with a gold band"><span class="good__tag"><b>Sourdough</b> you are here</span></li>
-            <li class="good"><a class="good__link" href="https://weld.apps.wayne.edu/"><img class="good__mark" src="assets/marks/weld.png" width="64" height="64" alt="WELD mark: a welder's helmet"><span class="good__tag"><b>WELD</b> the finished loaf</span></a></li>
+            <li class="good"><a class="good__link" href="https://creed.apps.wayne.edu/"><img class="good__mark" src="assets/marks/creed.png" width="64" height="64" alt="CREED logo: a stone arch whose gold keystone holds the other stones in place"><span class="good__tag"><b>CREED</b> the standards</span></a></li>
+            <li class="good"><a class="good__link" href="https://pinstripe.apps.wayne.edu/"><img class="good__mark" src="assets/marks/pinstripe.png" width="64" height="64" alt="Pinstripe logo: a striped necktie with a gold tie bar"><span class="good__tag"><b>Pinstripe</b> the coding standard</span></a></li>
+            <li class="good good--here"><img class="good__mark" src="brand/sourdough-avatar-256.png" width="64" height="64" alt="Sourdough logo: a starter jar with a gold band"><span class="good__tag"><b>Sourdough</b> you are here</span></li>
+            <li class="good"><a class="good__link" href="https://weld.apps.wayne.edu/"><img class="good__mark" src="assets/marks/weld.png" width="64" height="64" alt="WELD logo: a welder's helmet"><span class="good__tag"><b>WELD</b> Laravel and Vue</span></a></li>
           </ul>
         </div>
         <div class="shelf">
           <h3 class="shelf__sign">Also in the kitchen</h3>
           <ul class="shelf__row">
-            <li class="good"><a class="good__link" href="https://squire.apps.wayne.edu/"><img class="good__mark" src="assets/marks/squire.png" width="64" height="64" alt="Squire mark: a satchel with a gold buckle"><span class="good__tag"><b>Squire</b> carries releases</span></a></li>
-            <li class="good"><a class="good__link" href="https://rollcall.apps.wayne.edu/"><img class="good__mark" src="assets/marks/rollcall.png" width="64" height="64" alt="Rollcall mark: an open register with gold ticks"><span class="good__tag"><b>Rollcall</b> every app, present</span></a></li>
-            <li class="good"><a class="good__link" href="https://advisor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/advisor.png" width="64" height="64" alt="ADVISOR mark: a speech bubble holding a gold compass needle"><span class="good__tag"><b>ADVISOR</b> what applies next</span></a></li>
-            <li class="good good--soon"><a class="good__link" href="https://drawbridge.apps.wayne.edu/"><img class="good__mark" src="assets/marks/drawbridge.png" width="64" height="64" alt="Drawbridge mark: a castle tower lowering its bridge on a gold chain"><span class="good__tag"><b>Drawbridge</b> sign-in gateway</span></a></li>
-            <li class="good"><a class="good__link" href="https://booster.apps.wayne.edu/"><img class="good__mark" src="assets/marks/booster.png" width="64" height="64" alt="Booster mark: a syringe that is also a rocket, with one gold accent"><span class="good__tag"><b>Booster</b> PHP upgrades</span></a></li>
+            <li class="good"><a class="good__link" href="https://squire.apps.wayne.edu/"><img class="good__mark" src="assets/marks/squire.png" width="64" height="64" alt="Squire logo: a satchel with a gold buckle"><span class="good__tag"><b>Squire</b> carries releases</span></a></li>
+            <li class="good"><a class="good__link" href="https://rollcall.apps.wayne.edu/"><img class="good__mark" src="assets/marks/rollcall.png" width="64" height="64" alt="Rollcall logo: an open register with gold ticks"><span class="good__tag"><b>Rollcall</b> every app, present</span></a></li>
+            <li class="good"><a class="good__link" href="https://advisor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/advisor.png" width="64" height="64" alt="ADVISOR logo: a speech bubble holding a gold compass needle"><span class="good__tag"><b>ADVISOR</b> the MCP server</span></a></li>
+            <li class="good good--soon"><a class="good__link" href="https://drawbridge.apps.wayne.edu/"><img class="good__mark" src="assets/marks/drawbridge.png" width="64" height="64" alt="Drawbridge logo: a castle tower lowering its bridge on a gold chain"><span class="good__tag"><b>Drawbridge</b> sign-in gateway</span></a></li>
+            <li class="good"><a class="good__link" href="https://booster.apps.wayne.edu/"><img class="good__mark" src="assets/marks/booster.png" width="64" height="64" alt="Booster logo: a syringe that is also a rocket, with one gold accent"><span class="good__tag"><b>Booster</b> PHP upgrades</span></a></li>
           </ul>
         </div>
       </div>
@@ -706,7 +706,7 @@ Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR
   <div class="flour flour--footer" aria-hidden="true"></div>
   <div class="wsu-container site-footer__inner">
     <img src="brand/sourdough-avatar-256.png" width="48" height="48" alt="">
-    <p class="site-footer__joke">Proofed before it ships. Every loaf, every time.</p>
+    <p class="site-footer__joke">Proofed before it ships.</p>
     <p class="site-footer__org">Wayne State University · Enterprise Applications · <a href="https://github.com/waynestate/sourdough">Source</a></p>
   </div>
 </footer>

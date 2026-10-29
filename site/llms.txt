@@ -1,17 +1,17 @@
 # .
 
-> Sourdough makes a new Wayne State app with the stack already wired in: SESAME sign-in, HELMET runtime baseline, PROCTOR checks, WayneUI and a Citadel release script. One PHP command, every operating system.
+> Sourdough makes a new raw PHP app for Wayne State with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's Citadel deploy files already in it. The Laravel shapes come in a later release.
 
 Every page below is Markdown. The HTML pages send the same Markdown to a client that asks for `text/markdown`. Written by Squire's agent-ready kit from the README and the pages; do not edit.
 
 ## Pages
 
-- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough makes a new Wayne State app with the stack already wired in: SESAME sign-in, HELMET runtime baseline, PROCTOR checks, WayneUI and a Citadel release script. One PHP command, every operating system.
+- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough makes a new raw PHP app for Wayne State with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's Citadel deploy files already in it. The Laravel shapes come in a later release.
 
 ## Prompts
 
-- [Get started with Sourdough](https://sourdough.apps.wayne.edu/#prompt-get-started): Install the starter, bake a raw PHP app, fetch WayneUI, serve it, and check the label on the jar. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
-- [Check what has drifted in a Sourdough app](https://sourdough.apps.wayne.edu/#prompt-manifest): Read the manifest, list the managed files that changed, and propose what to put back, before anything is fed. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
+- [Get started with Sourdough](https://sourdough.apps.wayne.edu/#prompt-get-started): Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
+- [Check what has drifted in a Sourdough app](https://sourdough.apps.wayne.edu/#prompt-manifest): Lists the managed files that changed since Sourdough wrote them and suggests what to put back. It changes nothing. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
 
 ## Source
 
