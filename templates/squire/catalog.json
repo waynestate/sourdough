@@ -167,5 +167,17 @@
             "group": "parity",
             "executable": false
         }
+    ],
+    "vue": [
+        {
+            "path": ".npmrc",
+            "group": "release",
+            "executable": false
+        },
+        {
+            "path": "docker-compose.squire.yml",
+            "group": "parity",
+            "executable": false
+        }
     ]
 }
