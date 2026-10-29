@@ -42,7 +42,7 @@ final class NewCommand extends Command
             ->addOption('raw', null, InputOption::VALUE_NONE, 'Raw PHP with WayneUI (the default).')
             ->addOption('laravel', null, InputOption::VALUE_NONE, 'Laravel + Blade.')
             ->addOption('vue', null, InputOption::VALUE_NONE, 'Add a Vue front end (SPA over JSON, or islands with --laravel).')
-            ->addOption('inertia', null, InputOption::VALUE_NONE, 'Use Inertia/Vue (requires --laravel).')
+            ->addOption('inertia', null, InputOption::VALUE_NONE, 'Use Inertia/Vue (implies --laravel).')
             ->addOption('sail', null, InputOption::VALUE_NONE, 'Use Sail for the local runtime (Laravel paths only).')
             ->addOption('docker', null, InputOption::VALUE_NONE, 'Use Docker for the local runtime (Laravel paths only).')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the plan and write nothing.')

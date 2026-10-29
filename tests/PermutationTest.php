@@ -22,6 +22,7 @@ final class PermutationTest extends TestCase
         yield '--laravel is laravel blade' => [false, true, false, false, Permutation::LaravelBlade];
         yield '--laravel --vue is laravel blade vue' => [false, true, true, false, Permutation::LaravelBladeVue];
         yield '--laravel --inertia is laravel inertia' => [false, true, false, true, Permutation::LaravelInertia];
+        yield '--inertia alone is laravel inertia' => [false, false, false, true, Permutation::LaravelInertia];
     }
 
     /**
@@ -29,8 +30,8 @@ final class PermutationTest extends TestCase
      */
     public static function invalidFlags(): iterable
     {
-        yield 'inertia without laravel' => [false, false, false, true, '--inertia needs --laravel'];
         yield 'raw with laravel' => [true, true, false, false, '--raw and --laravel are mutually exclusive'];
+        yield 'raw with inertia' => [true, false, false, true, '--raw and --laravel are mutually exclusive'];
         yield 'vue with inertia' => [false, true, true, true, '--vue is not needed with --inertia'];
     }
 
@@ -47,6 +48,20 @@ final class PermutationTest extends TestCase
         $this->expectExceptionMessageMatches('/' . preg_quote($messagePart, '/') . '/');
 
         Permutation::fromFlags($raw, $laravel, $vue, $inertia);
+    }
+
+    public function testConflictErrorsNameTheFiveShapes(): void
+    {
+        try {
+            Permutation::fromFlags(true, false, false, true);
+            self::fail('Expected an InvalidArgumentException for --raw --inertia.');
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringContainsString('--raw and --laravel are mutually exclusive', $e->getMessage());
+            self::assertStringContainsString('The five shapes are:', $e->getMessage());
+            foreach (Permutation::cases() as $shape) {
+                self::assertStringContainsString($shape->label(), $e->getMessage());
+            }
+        }
     }
 
     public function testLabelsMatchTheSpecTable(): void
