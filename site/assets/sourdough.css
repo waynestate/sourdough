@@ -226,7 +226,7 @@ h1, h2, h3 {
 }
 .hero__title {
   margin: 0;
-  font-size: clamp(3.1rem, 13.2vw, 11rem);
+  font-size: clamp(3.1rem, 14.5vw, 11.25rem);
   line-height: 0.92;
   color: var(--sd-green);
 }
@@ -411,6 +411,19 @@ h1, h2, h3 {
 /* On the board's front edge, one on each side of the feeding button. */
 .note--risen { bottom: -16%; right: -30%; transform: rotate(6deg); }
 .note--fed { bottom: -16%; left: -30%; transform: rotate(-7deg); }
+
+/* Two-column range: the notes ride the board's rim, pulled out only as far
+   as the page lets them before the viewport edge would clip them. */
+@media (min-width: 861px) {
+  .note--fed { left: calc(min(99px, 19.95vw - 159.72px) * -1); }
+  .note--risen { right: calc(min(99px, 19.95vw - 159.72px) * -1); }
+}
+
+/* In the two-column band the feeding button crowds the jar's rim, so the
+   chalk notes write a little smaller until there is room for full size. */
+@media (min-width: 861px) and (max-width: 1259px) {
+  .note { font-size: 1.1rem; }
+}
 
 .feed {
   position: relative;
