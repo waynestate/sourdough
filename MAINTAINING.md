@@ -14,7 +14,7 @@ needs regular feeding, or it goes flat.
 - **Generated apps** require `waynestate/helmet`, `waynestate/sesame` and `waynestate/proctor` from Packagist.
 - **It carries a copy of Squire's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`,
   `catalog.json`, `manifest.json`). Squire owns those files; Sourdough never hand-edits them. `composer squire-copy:sync`
-  rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.2`), and
+  rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.3`), and
   `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
 - The planned `feed` will need only git on the developer's machine: it records the template commit an app came from
   and applies template changes with `git apply --3way`.
