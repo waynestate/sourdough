@@ -5,6 +5,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 0.1.4 (2026-10-29)
+
 ### Added
 
 - Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.

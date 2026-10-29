@@ -15,7 +15,7 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$application = new class ('Sourdough', '0.1.0') extends Application {
+$application = new class ('Sourdough', '0.1.4') extends Application {
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $name = $this->getCommandName($input);
