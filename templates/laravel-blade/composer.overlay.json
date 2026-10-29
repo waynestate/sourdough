@@ -1,0 +1,21 @@
+{
+    "require": {
+        "waynestate/helmet": "^0.2",
+        "waynestate/sesame": "^0.2"
+    },
+    "require-dev": {
+        "waynestate/creed": "^0.1",
+        "waynestate/pinstripe": "^0.1",
+        "waynestate/proctor": "^0.2"
+    },
+    "scripts": {
+        "ci": [
+            "@composer validate --strict",
+            "phpunit",
+            "pint --test",
+            "phpstan analyse --memory-limit=1G",
+            "@composer audit"
+        ],
+        "proctor": "proctor check --policy=vendor/waynestate/creed/policy/policy.json"
+    }
+}
