@@ -63,8 +63,12 @@ Options:
 - `--describe "<sentence>"` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing
 - `--plan <file>` a ready-made plan file (JSON matching `resources/plan.schema.json`)
+- `--playbook` require `waynestate/playbook` in the generated app: adds the VCS repository and the package to `require`
+- `--no-playbook` skip the PLAYBOOK wiring (no `suggest`, no `.env.example` block, no README section)
 
 Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
+
+By default the generated app suggests `waynestate/playbook` (WSU's private shared-values package on git.wayne.edu), lists its seven setting names in `.env.example`, and documents how to fetch them in a "WSU values (PLAYBOOK)" README section; the command prints a hint line pointing at it after generation. `--playbook` additionally adds the VCS repository and requires the package; `--no-playbook` skips all of it. The two flags together are refused with exit `1`.
 
 The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
 
