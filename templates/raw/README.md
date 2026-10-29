@@ -67,6 +67,3 @@ Dockerfile comes later.
 ## Handbook
 
 See the CREED handbook for the WSU app stack standards.
-
-TODO(lead): the waynestate packages (helmet, sesame, proctor) are not tagged
-yet.
