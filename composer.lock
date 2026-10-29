@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d263e69f226c0ec114a46f7a8d16b1d4",
+    "content-hash": "c973448e9797060c747c16639d67d4dc",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -3699,16 +3699,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.2.0",
+            "version": "0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "56dd4278ee99bb6664ca83a7a7c99119c257da04"
+                "reference": "49893d6d8f1dc6c6618a8699ab0c60a5ca9f26f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/56dd4278ee99bb6664ca83a7a7c99119c257da04",
-                "reference": "56dd4278ee99bb6664ca83a7a7c99119c257da04",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/49893d6d8f1dc6c6618a8699ab0c60a5ca9f26f8",
+                "reference": "49893d6d8f1dc6c6618a8699ab0c60a5ca9f26f8",
                 "shasum": ""
             },
             "require": {
@@ -3745,7 +3745,7 @@
                 "issues": "https://github.com/waynestate/squire/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-10-29T17:46:02+00:00"
+            "time": "2026-10-29T19:29:03+00:00"
         }
     ],
     "aliases": [],
