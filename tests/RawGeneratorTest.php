@@ -106,12 +106,13 @@ final class RawGeneratorTest extends TestCase
         (new RawGenerator($target . '/no-such-template'))->generate($target, 'My Cool App');
     }
 
-    public function testNameWithNoValidSlugThrows(): void
+    public function testNameWithOnlySymbolsThrows(): void
     {
         $target = $this->makeTempDir();
 
+        // The name allow-list rejects this before the slug check runs.
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('does not produce a valid slug');
+        $this->expectExceptionMessage('must start with a letter or number');
 
         (new RawGenerator($this->fixtureTemplateDir()))->generate($target, '!!!');
     }
