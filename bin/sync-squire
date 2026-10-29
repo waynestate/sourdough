@@ -1,0 +1,136 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Keep the checked copy of SQUIRE's deploy templates in templates/squire/
+ * in step with the installed SQUIRE package (vendor/waynestate/squire).
+ *
+ * The export and the drift detection are done by SQUIRE's own
+ * bin/export-templates.php, so the rules for what belongs in the copy live
+ * in SQUIRE, not here. This script only finds the package, clears the copy
+ * before a refresh (the exporter writes files but never removes stale ones),
+ * and passes the exit code straight through. A squire keeps the armour
+ * polished; the copy stays in step.
+ *
+ * Usage:
+ *   composer squire-copy:sync           # rewrite templates/squire/, then commit the result
+ *   composer squire-copy:check          # verify the committed copy; exit 1 on drift
+ *   php bin/sync-squire --to=<dir>      # sync or check another directory
+ *
+ * Exit codes:
+ *   0  the copy matches a fresh export from the installed SQUIRE package
+ *   1  the copy has drifted (a file differs, is missing, or is extra)
+ *   2  the tool could not run (SQUIRE not installed, bad arguments)
+ */
+
+$repoRoot = dirname(__DIR__);
+$packageDir = $repoRoot . '/vendor/waynestate/squire';
+$export = $packageDir . '/bin/export-templates.php';
+
+$usage = "Usage: php bin/sync-squire [--check] [--to=<dir>]\n"
+    . "\n"
+    . "Sync the checked copy of SQUIRE's deploy templates with the installed SQUIRE package\n"
+    . "(vendor/waynestate/squire), or with --check, verify an existing copy and exit 1 on drift.\n"
+    . "The default <dir> is templates/squire at the repository root.\n";
+
+$check = false;
+$to = $repoRoot . '/templates/squire';
+
+foreach (array_slice($argv, 1) as $arg) {
+    if ($arg === '--check') {
+        $check = true;
+    } elseif (str_starts_with($arg, '--to=')) {
+        $to = substr($arg, 5);
+    } elseif ($arg === '--help' || $arg === '-h') {
+        fwrite(STDOUT, $usage);
+        exit(0);
+    } else {
+        fwrite(STDERR, $usage);
+        exit(2);
+    }
+}
+
+if (!is_file($export)) {
+    fwrite(STDERR, "sync-squire: waynestate/squire is not installed. Run `composer install` first.\n");
+    exit(2);
+}
+
+// The exporter records its version with `git describe` from inside the
+// package. Without a ceiling, git would walk up out of vendor/ and describe
+// whatever repository surrounds it, so pin discovery to the package itself.
+$env = [];
+foreach (getenv() as $key => $value) {
+    if (is_string($value)) {
+        $env[$key] = $value;
+    }
+}
+$env['GIT_CEILING_DIRECTORIES'] = $packageDir;
+
+if (!$check && !clearDirectory($to)) {
+    fwrite(STDERR, "sync-squire: could not clear {$to}; the old copy is left in place\n");
+    exit(2);
+}
+
+$command = [PHP_BINARY, $export, '--to=' . $to];
+if ($check) {
+    $command[] = '--check';
+}
+
+$descriptors = [
+    0 => ['pipe', 'r'],
+    1 => ['pipe', 'w'],
+    2 => ['pipe', 'w'],
+];
+$pipes = [];
+$process = proc_open($command, $descriptors, $pipes, $repoRoot, $env);
+if (!is_resource($process)) {
+    fwrite(STDERR, "sync-squire: could not start the SQUIRE export\n");
+    exit(2);
+}
+fclose($pipes[0]);
+// The export writes either an all-clear (stdout) or a list of problems
+// (stderr), never both in volume, so draining one pipe then the other cannot
+// deadlock. Stream each straight through to the matching parent handle.
+$stdout = stream_get_contents($pipes[1]);
+$stderr = stream_get_contents($pipes[2]);
+fclose($pipes[1]);
+fclose($pipes[2]);
+$exit = proc_close($process);
+if ($stdout !== false && $stdout !== '') {
+    fwrite(STDOUT, $stdout);
+}
+if ($stderr !== false && $stderr !== '') {
+    fwrite(STDERR, $stderr);
+}
+if (!$check && $exit !== 0) {
+    fwrite(STDERR, "sync-squire: the export failed after clearing {$to}; restore it with `git checkout -- templates/squire`\n");
+}
+exit($exit);
+
+/**
+ * Remove every file and subdirectory under $dir, keeping $dir itself.
+ * Returns false when something could not be removed.
+ */
+function clearDirectory(string $dir): bool
+{
+    if (!is_dir($dir)) {
+        return true;
+    }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST,
+    );
+    foreach ($iterator as $item) {
+        if ($item->isDir()) {
+            if (@rmdir($item->getPathname()) === false) {
+                return false;
+            }
+        } elseif (@unlink($item->getPathname()) === false) {
+            return false;
+        }
+    }
+
+    return true;
+}

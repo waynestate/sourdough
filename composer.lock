@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6841833c2f291d1727003da5ef9ebe35",
+    "content-hash": "d263e69f226c0ec114a46f7a8d16b1d4",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -3696,6 +3696,56 @@
                 "source": "https://github.com/waynestate/pinstripe"
             },
             "time": "2026-10-29T03:28:00+00:00"
+        },
+        {
+            "name": "waynestate/squire",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/waynestate/squire.git",
+                "reference": "56dd4278ee99bb6664ca83a7a7c99119c257da04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/56dd4278ee99bb6664ca83a7a7c99119c257da04",
+                "reference": "56dd4278ee99bb6664ca83a7a7c99119c257da04",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3",
+                "symfony/console": "^7.4"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.32",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^11.5",
+                "waynestate/pinstripe": "^0.1"
+            },
+            "bin": [
+                "bin/squire"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Waynestate\\Squire\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wayne State University, Enterprise Applications"
+                }
+            ],
+            "description": "The Citadel kit: standard build.sh, release script and health check, and local parity on the Citadel images.",
+            "homepage": "https://squire.apps.wayne.edu/",
+            "support": {
+                "issues": "https://github.com/waynestate/squire/issues",
+                "source": "https://github.com/waynestate/squire"
+            },
+            "time": "2026-10-29T17:46:02+00:00"
         }
     ],
     "aliases": [],

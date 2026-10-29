@@ -7,9 +7,10 @@
 #   Quick Update post-script in the Citadel dashboard:  user `citadel`, script `./scripts/release.sh`
 #
 # Steps: preconditions, composer install from the lock file without dev packages, composer audit (report),
-# frontend install and build, Laravel migrate and optimize, PROCTOR as a report, and a smoke test of /up.
-# PROCTOR is a report here, never a gate: a failing post-script cannot undo a Quick Update, because the new commit is
-# already live (S20). The real gates are CI and the platform.
+# frontend install and build, Laravel migrate and optimize, PROCTOR, and a smoke test of /up.
+# By default PROCTOR is a report here, never a gate: a failing post-script cannot undo a Quick Update, because the
+# new commit is already live (S20). With SQUIRE_PROCTOR=enforce a failed check stops the release: the first release
+# never comes up healthy, and a Quick Update keeps the new commit checked out, so fix the findings and re-run.
 #
 # Configuration is environment variables, all optional. See .env.squire.example or the SQUIRE README.
 #   SQUIRE_APP_DIR=                  app root (default: the parent of this script's directory)
@@ -23,9 +24,9 @@
 #   SQUIRE_NPM_BUILD_SCRIPT=build    the package.json script to run after install
 #   SQUIRE_MIGRATE=1                 Laravel: run `migrate --force`
 #   SQUIRE_ARTISAN_OPTIMIZE=1        Laravel: run `optimize` after the environment is in place (S16)
-#   SQUIRE_PROCTOR=auto              auto | skip
+#   SQUIRE_PROCTOR=auto              auto | skip | enforce (report only by default; enforce stops the release)
 #   SQUIRE_PROCTOR_BIN=              path to proctor (default: vendor/bin/proctor, then `proctor` on PATH)
-#   SQUIRE_PROCTOR_POLICY=           path to the CREED policy.json (PROCTOR needs one)
+#   SQUIRE_PROCTOR_POLICY=           path to the CREED policy.json (when unset: the one CREED ships, if installed; otherwise PROCTOR's own default)
 #   SQUIRE_SMOKE=1                   1 requests the health URL at the end and fails if it is not 200 (S21)
 #   SQUIRE_SMOKE_URL=                full URL (default: http://127.0.0.1:80/up for Laravel, /up.php for raw PHP)
 #   SQUIRE_SMOKE_RETRIES=5           attempts
@@ -225,9 +226,18 @@ if [ "$framework" = "laravel" ]; then
     fi
 fi
 
-step "PROCTOR report (report only, never a gate)"
+proctor_mode="$SQUIRE_PROCTOR"
+case "$proctor_mode" in
+    auto | skip | enforce) ;;
+    *) fail "SQUIRE_PROCTOR must be auto, skip or enforce; got '$proctor_mode'" ;;
+esac
+if [ "$proctor_mode" = "enforce" ]; then
+    step "PROCTOR check (enforced, stops the release)"
+else
+    step "PROCTOR report (report only, never a gate)"
+fi
 proctor_bin="$SQUIRE_PROCTOR_BIN"
-if [ "$SQUIRE_PROCTOR" = "skip" ]; then
+if [ "$proctor_mode" = "skip" ]; then
     note "skipped (SQUIRE_PROCTOR=skip)"
 else
     if [ -z "$proctor_bin" ]; then
@@ -237,17 +247,42 @@ else
             proctor_bin="proctor"
         fi
     fi
+    if [ "$proctor_mode" = "enforce" ] && [ -n "$SQUIRE_PROCTOR_BIN" ] && [ ! -x "$SQUIRE_PROCTOR_BIN" ]; then
+        fail "SQUIRE_PROCTOR_BIN is not an executable file: $SQUIRE_PROCTOR_BIN"
+    fi
     if [ -z "$proctor_bin" ]; then
+        if [ "$proctor_mode" = "enforce" ]; then
+            fail "proctor not found (it is a dev dependency, so --no-dev leaves it out); set SQUIRE_PROCTOR_BIN to use it here"
+        fi
         note "proctor not found (it is a dev dependency, so --no-dev leaves it out); set SQUIRE_PROCTOR_BIN to use it here"
-    elif [ -z "$SQUIRE_PROCTOR_POLICY" ]; then
-        note "SQUIRE_PROCTOR_POLICY is not set; PROCTOR needs a policy.json, so no report this release"
     else
-        proctor_status=0
-        "$proctor_bin" check --path . --policy "$SQUIRE_PROCTOR_POLICY" || proctor_status=$?
+        # An explicit policy wins. When none is set, the policy CREED ships is used when it is installed; otherwise
+        # PROCTOR runs on its own default policy. A missing CREED file never stops the release.
+        if [ -n "$SQUIRE_PROCTOR_POLICY" ]; then
+            proctor_status=0
+            "$proctor_bin" check --path . --policy "$SQUIRE_PROCTOR_POLICY" || proctor_status=$?
+        elif [ -f vendor/waynestate/creed/policy/policy.json ]; then
+            proctor_status=0
+            "$proctor_bin" check --path . --policy vendor/waynestate/creed/policy/policy.json || proctor_status=$?
+        else
+            printf '%s\n' 'squire: CREED policy not installed; PROCTOR uses its own default policy'
+            proctor_status=0
+            "$proctor_bin" check --path . || proctor_status=$?
+        fi
         case "$proctor_status" in
             0) note "proctor: pass" ;;
-            1) warn "proctor reported failures (exit 1); the release goes on, fix them in CI" ;;
-            *) warn "proctor itself failed (exit $proctor_status); the release goes on" ;;
+            1)
+                if [ "$proctor_mode" = "enforce" ]; then
+                    fail "proctor reported failures (exit 1)"
+                fi
+                warn "proctor reported failures (exit 1); the release goes on, fix them in CI"
+                ;;
+            *)
+                if [ "$proctor_mode" = "enforce" ]; then
+                    fail "proctor itself failed (exit $proctor_status)"
+                fi
+                warn "proctor itself failed (exit $proctor_status); the release goes on"
+                ;;
         esac
     fi
 fi
