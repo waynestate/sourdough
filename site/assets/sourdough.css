@@ -1341,3 +1341,114 @@ h1, h2, h3 {
 .good__link:focus-visible { outline: none; box-shadow: none; }
 li.good:has(.good__link:focus-visible) { outline: 3px solid var(--sd-ink); outline-offset: 2px; border-radius: 14px; }
 li.good:has(.good__link:hover) :is(.good__mark, .good__tile) { filter: brightness(1.12) saturate(1.1); }
+
+/* ------------------------------------------------------- agent-ready kit */
+/* Squire's agent-ready.css lays out the prompt blocks and the page menu; this
+   maps its tokens onto the bakery. A prompt is a recipe card taped above the
+   bench: flour-white stock, a gold band across the top, tape on two corners,
+   the recipe written out on kraft paper, and gold pills like the rest of the
+   page. */
+:root {
+  --ar-bg: #fffefa;
+  --ar-ink: var(--sd-ink);
+  --ar-muted: var(--sd-muted);
+  --ar-rule: rgba(138, 79, 31, 0.28);
+  --ar-accent: var(--sd-gold);
+  --ar-on-accent: var(--sd-ink);
+  --ar-focus: var(--sd-green);
+  --ar-code-bg: #f6efdf;
+  --ar-code-ink: var(--sd-ink);
+  --ar-term-bg: var(--sd-term);
+  --ar-term-ink: #e7ece9;
+  --ar-display: var(--sd-display);
+  --ar-body: var(--wsu-font-family-body);
+  --ar-mono: var(--wsu-font-family-mono);
+  --ar-radius: 12px;
+  --ar-shadow: 0 24px 40px -28px rgba(74, 46, 18, 0.6), 0 2px 0 rgba(138, 79, 31, 0.12);
+}
+
+.ar-prompt {
+  border: 0;
+  border-top: 6px solid var(--sd-gold);
+  border-radius: 6px;
+}
+/* Tape on two corners, like the recipe card further up. */
+.ar-prompt::before,
+.ar-prompt::after {
+  content: "";
+  position: absolute;
+  top: -16px;
+  width: 92px;
+  height: 26px;
+  background: rgba(232, 212, 171, 0.75);
+  border: 1px solid rgba(138, 79, 31, 0.12);
+  pointer-events: none;
+}
+.ar-prompt::before { left: 5%; transform: rotate(-5deg); }
+.ar-prompt::after { right: 5%; transform: rotate(4deg); }
+.ar-prompt__kicker {
+  font-family: var(--sd-hand);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sd-brown-ink);
+}
+.ar-prompt__title { font-weight: 400; font-size: clamp(1.4rem, 3vw, 1.75rem); }
+.ar-prompt__glyph {
+  color: var(--sd-gold);
+  background: var(--sd-green);
+  border-color: var(--sd-green-deep);
+  border-radius: 50%;
+}
+/* The recipe, written out on kraft paper. */
+.ar-prompt__text {
+  border: 1px dashed rgba(138, 79, 31, 0.4);
+  border-radius: 8px;
+}
+.ar-prompt__more { color: var(--sd-green); }
+/* Gold pills, the page's own buttons. */
+.ar-btn, .ar-chip { border-radius: 999px; }
+.ar-btn--primary { border: 2px solid var(--sd-green-deep); box-shadow: 0 4px 0 var(--sd-green-deep); }
+.ar-btn--primary:hover { box-shadow: 0 4px 0 var(--sd-green-deep), inset 0 0 0 2px var(--sd-green-deep); }
+.ar-chip { background: #fffefa; border-color: rgba(138, 79, 31, 0.35); }
+.ar-chip:hover { border-color: var(--sd-green-deep); }
+.ar-chip[aria-expanded="true"] { background: rgba(255, 204, 51, 0.35); border-color: var(--sd-green-deep); box-shadow: inset 0 -3px 0 var(--sd-green); }
+.ar-run__label { font-family: var(--sd-hand); font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--sd-brown-ink); }
+.ar-cmd { border-radius: 16px; }
+.ar-cmd__title b { font-family: var(--sd-hand); color: var(--sd-gold-chalk); font-weight: 700; }
+.ar-cmd .ar-btn { border-color: var(--sd-gold); color: var(--sd-gold); }
+.ar-cmd .ar-seg { border-radius: 999px; border-color: rgba(231, 236, 233, 0.5); }
+.ar-cmd .ar-seg__btn[aria-pressed="true"] { background: var(--sd-gold); color: var(--sd-ink); }
+.ar-cmd :focus-visible { outline-color: var(--sd-gold); }
+@media (prefers-reduced-motion: no-preference) {
+  .motion .ar-btn--primary:hover { transform: translateY(-2px); }
+  .motion .ar-btn--primary:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--sd-green-deep); }
+  .motion .ar-btn, .motion .ar-chip { transition: transform 0.25s var(--sd-ease-rise), background-color 0.15s, border-color 0.15s, box-shadow 0.15s; }
+}
+
+/* The page menu: a note pinned under the recipe, in the baker's hand. */
+.hero__agent { margin-top: 1.1rem; font-size: 0.95rem; }
+.hero__agent .ar-page__label { font-family: var(--sd-hand); font-size: 1.05rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--sd-brown-ink); }
+.hero__agent .ar-page__list { gap: 0 1rem; }
+.hero__agent .ar-page__link,
+.hero__agent .ar-page__btn { color: var(--sd-green); font-weight: 700; text-decoration-color: var(--sd-crust); }
+.hero__agent .ar-status { flex-basis: 100%; font-family: var(--sd-hand); color: var(--sd-brown-ink); }
+.hero__agent .ar-status:empty { display: none; }
+
+/* The cards, stacked full width: a recipe reads badly in narrow columns. */
+.agents-section { padding-block-start: 0; }
+.agents {
+  display: grid;
+  gap: 2.75rem;
+  max-width: 62rem;
+  margin: 0 auto;
+}
+.agents .ar-prompt:not(.ar-prompt--lead) { --ar-preview-lines: 7; }
+.agents__fine { margin: 0; max-width: 44rem; color: var(--sd-muted); }
+.agents__fine a { color: var(--sd-green); font-weight: 700; }
+
+@media print {
+  .ar-prompt__actions, .ar-cmd, .ar-prompt__more, .hero__agent { display: none; }
+  .ar-prompt.is-collapsed .ar-prompt__text { max-height: none; -webkit-mask-image: none; mask-image: none; }
+}
