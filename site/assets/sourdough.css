@@ -344,12 +344,17 @@ h1, h2, h3 {
   justify-items: center;
   margin-top: -3rem;
 }
-/* The rim tucks about 25px under the wordmark's baseline: 12px below the
-   jar's top, which leaves the letters clear and keeps the wood in the
-   descender zone only. */
+/* A true circle centred on the tile: one value sets the diameter, so the
+   board never squashes. The diameter keeps the old ellipse's width (128% of
+   the tile), so the hand-note arrow tips (drawn at -14% and +113% of the
+   tile) still stop right on the rim, pointing in from outside. */
 .board {
   position: absolute;
-  inset: 12px -14% -12%;
+  left: 50%;
+  top: 50%;
+  width: 128%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   background:
     radial-gradient(ellipse at 45% 40%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 55%),
@@ -1115,6 +1120,18 @@ h1, h2, h3 {
   }
   .start { grid-template-columns: minmax(0, 1fr); }
   .schedule__row { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+}
+
+/* Between 600px and 1100px the g sinks low enough to touch the pinned note,
+   so the note pins 17px lower. The banner grows by the same amount and the
+   art would follow it down, so the art is pulled back up 17px to keep the
+   board tucked under the name. Keep the two 17px values in step. */
+@media (min-width: 600px) and (max-width: 1100px) {
+  .hero__tagline { margin-top: calc(0.4rem + 17px); }
+  .hero__art { margin-top: calc(1.5rem - 17px); }
+}
+@media (min-width: 861px) and (max-width: 1100px) {
+  .hero__art { margin-top: calc(-3rem - 17px); }
 }
 
 @media (max-width: 640px) {
