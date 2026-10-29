@@ -17,6 +17,7 @@ Versioning once 1.0 is out.
 ### Fixed
 
 - Fixed: `--laravel --inertia` is accepted.
+- Fixed: stale capability claims in the site and README.
 
 ## 0.1.3 (2026-10-29)
 
