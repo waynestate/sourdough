@@ -153,26 +153,35 @@ final class NewCommandTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{array<string, bool>, string}>
+     * @return iterable<string, array{bool, bool, bool, bool, string}>
      */
     public static function documentedShapes(): iterable
     {
-        yield 'raw php' => [[], 'raw'];
-        yield 'raw php + vue spa' => [['--raw' => true, '--vue' => true], 'raw-vue'];
-        yield 'laravel + blade' => [['--laravel' => true], 'laravel-blade'];
-        yield 'laravel + blade + vue islands' => [['--laravel' => true, '--vue' => true], 'laravel-blade-vue'];
-        yield 'laravel + inertia/vue' => [['--laravel' => true, '--inertia' => true], 'laravel-inertia'];
+        yield 'raw php' => [false, false, false, false, 'raw'];
+        yield 'raw php + vue spa' => [true, false, true, false, 'raw-vue'];
+        yield 'laravel + blade' => [false, true, false, false, 'laravel-blade'];
+        yield 'laravel + blade + vue islands' => [false, true, true, false, 'laravel-blade-vue'];
+        yield 'laravel + inertia/vue' => [false, true, false, true, 'laravel-inertia'];
     }
 
     #[DataProvider('documentedShapes')]
-    public function testEachShapeFromItsDocumentedFlags(array $flags, string $expected): void
+    public function testEachShapeFromItsDocumentedFlags(bool $raw, bool $laravel, bool $vue, bool $inertia, string $expected): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
 
         $input = ['dir' => $target];
-        foreach ($flags as $flag => $value) {
-            $input[$flag] = $value;
+        if ($raw) {
+            $input['--raw'] = true;
+        }
+        if ($laravel) {
+            $input['--laravel'] = true;
+        }
+        if ($vue) {
+            $input['--vue'] = true;
+        }
+        if ($inertia) {
+            $input['--inertia'] = true;
         }
         $input['--dry-run'] = true;
         $input['--json'] = true;
