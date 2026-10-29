@@ -371,6 +371,18 @@ final class RawGeneratorTest extends TestCase
         self::assertArrayNotHasKey('repositories', $composer);
     }
 
+    public function testGeneratedAppShipsItsPhpunitFiles(): void
+    {
+        $target = $this->generateFromRealTemplate();
+
+        // The CI job runs vendor/bin/phpunit, so the template must require it.
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('phpunit/phpunit', $composer['require-dev']);
+
+        self::assertFileExists($target . '/phpunit.xml.dist');
+        self::assertFileExists($target . '/tests/SmokeTest.php');
+    }
+
     public function testDefaultGenerationSuggestsPlaybook(): void
     {
         $target = $this->generateFromRealTemplate();
