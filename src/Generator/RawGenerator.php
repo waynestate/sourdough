@@ -213,7 +213,10 @@ final class RawGenerator
      * The file list and target paths come from the copy's catalog.json (the
      * "raw" kind); the executable bit for each file comes from its mode in
      * the copy's manifest.json. The files are copied as-is: Squire owns
-     * them, so Sourdough does not rewrite their contents.
+     * them, so Sourdough does not rewrite their contents. A file flagged
+     * appMayOwn (the raw target's public/index.php and .htaccess) is the
+     * app's own when the template already wrote one: it is installed only
+     * where the path is free, never overwritten.
      *
      * @throws \RuntimeException when the copy is missing or a file cannot be read or written
      */
@@ -231,6 +234,13 @@ final class RawGenerator
             $path = (string) $entry['path'];
             $source = $this->squireDir . '/raw/' . $path;
             $target = $targetDir . '/' . $path;
+
+            // An appMayOwn file is the app's own when one is already there:
+            // the raw template's public/index.php carries the SESAME wiring,
+            // and Squire writes these only where the path is free.
+            if ((bool) ($entry['appMayOwn'] ?? false) && is_file($target)) {
+                continue;
+            }
 
             if (!is_file($source)) {
                 throw new \RuntimeException(sprintf('The SQUIRE template file "%s" does not exist.', $source));

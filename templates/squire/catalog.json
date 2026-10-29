@@ -3,278 +3,344 @@
         {
             "path": "build.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "deployments/001-first-release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "health.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "public/up.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": "public/index.php",
+            "group": "release",
+            "executable": false,
+            "appMayOwn": true
+        },
+        {
+            "path": "public/.htaccess",
+            "group": "release",
+            "executable": false,
+            "appMayOwn": true
         },
         {
             "path": "docker-compose.squire.yml",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile.dockerignore",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/base-fallback.Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-deploy",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/haproxy.cfg",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/php.ini",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/vhost.conf",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.sh",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.ps1",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".env.squire.example",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         }
     ],
     "laravel": [
         {
             "path": "build.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "deployments/001-first-release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "health.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "docker-compose.squire.yml",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile.dockerignore",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/base-fallback.Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-deploy",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/haproxy.cfg",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/php.ini",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/vhost.conf",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.sh",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.ps1",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".env.squire.example",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         }
     ],
     "static": [
         {
             "path": "build.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "deployments/001-first-release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/release.sh",
             "group": "release",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "health.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "public/up.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "public/index.php",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "public/.htaccess",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "docker-compose.squire.yml",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/Dockerfile.dockerignore",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/base-fallback.Dockerfile",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/fallback/citadel-deploy",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": ".squire/haproxy.cfg",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/php.ini",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".squire/vhost.conf",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.sh",
             "group": "parity",
-            "executable": true
+            "executable": true,
+            "appMayOwn": false
         },
         {
             "path": "scripts/parity.ps1",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": ".env.squire.example",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         }
     ],
     "vue": [
         {
             "path": ".npmrc",
             "group": "release",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         },
         {
             "path": "docker-compose.squire.yml",
             "group": "parity",
-            "executable": false
+            "executable": false,
+            "appMayOwn": false
         }
     ]
 }
