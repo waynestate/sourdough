@@ -14,6 +14,11 @@ Versioning once 1.0 is out.
 - `composer squire-copy:check`: verify that `templates/squire/` still matches a fresh export from the SQUIRE checkout
   (`SQUIRE_PATH`, default `/squire`). Skips with exit 0 when no checkout is mounted.
 
+### Changed
+
+- Refreshed the SQUIRE template copy in `templates/squire/` from e66f07b to 2a893c0: the Vue layer's `.npmrc` and
+  `docker-compose.squire.yml` joined the batch. Fresh flour, same recipe.
+
 ### Removed
 
 - The raw template's own `deployments/release.sh` and `deployments/release.ps1`; the release steps now come from SQUIRE.
