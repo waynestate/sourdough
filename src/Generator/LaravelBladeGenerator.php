@@ -115,7 +115,9 @@ final class LaravelBladeGenerator
             $fromPath = $this->templateDir . DIRECTORY_SEPARATOR . $item;
 
             if (is_dir($fromPath)) {
-                $this->support->copyDir($fromPath, $targetDir, $name, $slug);
+                // copyDir copies the contents of its first argument into its
+                // second, so the destination keeps the source dir's name.
+                $this->support->copyDir($fromPath, $targetDir . DIRECTORY_SEPARATOR . strtr($item, $replacements), $name, $slug);
                 continue;
             }
 
