@@ -9,6 +9,11 @@ parameters:
         - src
         - bin
         - tests
+    # The Laravel skeleton fixture is reference material, not Sourdough code:
+    # its framework classes are not installed here, so analysing it would only
+    # report unknown classes.
+    excludePaths:
+        - tests/fixtures/*
     # Tests run on 8.3, 8.4 and 8.5; analyse against that range.
     phpVersion:
         min: 80300
