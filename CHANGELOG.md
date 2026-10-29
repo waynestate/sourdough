@@ -5,6 +5,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Added
+
+- Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
+
 ### Changed
 
 - The Squire template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev

@@ -55,8 +55,11 @@
             "@lint",
             "@analyse",
             "@squire-copy:check",
+            "@site:agent-ready-check",
             "@composer audit"
         ],
+        "site:agent-ready": "php bin/agent-ready.php",
+        "site:agent-ready-check": "php bin/agent-ready.php --check",
         "test": "phpunit",
         "lint": "pint --test",
         "fix": "pint",
@@ -65,9 +68,11 @@
         "squire-copy:check": "php bin/sync-squire --check"
     },
     "scripts-descriptions": {
-        "ci": "The full CI gate: validate, tests, Pint, PHPStan, SQUIRE copy check, audit. Same command on GitLab and GitHub.",
+        "ci": "The full CI gate: validate, tests, Pint, PHPStan, Squire copy check, agent-ready files, audit. Same command on GitLab and GitHub.",
         "squire-copy:sync": "Rewrite templates/squire/ from the installed SQUIRE package (vendor/waynestate/squire). Run it when SQUIRE moves on, then commit the result.",
-        "squire-copy:check": "Check that templates/squire/ still matches a fresh export from the installed SQUIRE package (vendor/waynestate/squire). Exits 1 on drift; exits 2 when the package is not installed."
+        "squire-copy:check": "Check that templates/squire/ still matches a fresh export from the installed SQUIRE package (vendor/waynestate/squire). Exits 1 on drift; exits 2 when the package is not installed.",
+        "site:agent-ready": "Rewrite the Markdown twins, llms.txt, llms-full.txt, robots.txt and sitemap.xml in site/ (Squire's agent-ready kit).",
+        "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here."
     },
     "minimum-stability": "stable",
     "prefer-stable": true
