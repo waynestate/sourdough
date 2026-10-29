@@ -16,6 +16,7 @@ use Waynestate\Sourdough\DescribeException;
 use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PlaybookMode;
 use Waynestate\Sourdough\Plan;
 
 /**
@@ -50,7 +51,9 @@ final class NewCommand extends Command
             ->addOption('json', null, InputOption::VALUE_NONE, 'With --dry-run, print the plan as JSON.')
             ->addOption('describe', null, InputOption::VALUE_REQUIRED, 'Describe what the app does in a sentence; a model plans it. Needs the SOURDOUGH_LLM_* env vars.')
             ->addOption('plan-only', null, InputOption::VALUE_NONE, 'With --describe, print the plan as JSON and write nothing.')
-            ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON matching resources/plan.schema.json).');
+            ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON matching resources/plan.schema.json)')
+            ->addOption('playbook', null, InputOption::VALUE_NONE, 'Require waynestate/playbook in the generated app: adds the VCS repository and the package to require.')
+            ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring: no suggest, no .env.example block, no README section.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -68,10 +71,24 @@ final class NewCommand extends Command
         $describe = $input->getOption('describe');
         $planOnly = (bool) $input->getOption('plan-only');
         $planFile = $input->getOption('plan');
+        $playbook = (bool) $input->getOption('playbook');
+        $noPlaybook = (bool) $input->getOption('no-playbook');
 
         if (null !== $describe && null !== $planFile) {
             $this->errorOutput($output)->writeln('--describe and --plan are mutually exclusive.');
             return 1;
+        }
+
+        if ($playbook && $noPlaybook) {
+            $this->errorOutput($output)->writeln('--playbook and --no-playbook are mutually exclusive.');
+            return 1;
+        }
+
+        $mode = PlaybookMode::Suggest;
+        if ($playbook) {
+            $mode = PlaybookMode::Require;
+        } elseif ($noPlaybook) {
+            $mode = PlaybookMode::None;
         }
 
         if ($planOnly && null === $describe) {
@@ -96,7 +113,7 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : basename($dir);
 
         if (null !== $planFile) {
-            return $this->runPlanFile($output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json);
+            return $this->runPlanFile($output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json, $mode);
         }
 
         try {
@@ -120,7 +137,7 @@ final class NewCommand extends Command
             $flags['inertia'] = true;
         }
 
-        return $this->generate($output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags);
+        return $this->generate($output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode);
     }
 
     private function runDescribe(OutputInterface $output, string $sentence, bool $planOnly): int
@@ -155,6 +172,7 @@ final class NewCommand extends Command
         bool $docker,
         bool $dryRun,
         bool $json,
+        PlaybookMode $playbook,
     ): int {
         try {
             $plan = $this->describeService()->fromFile($planFile);
@@ -167,7 +185,7 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : $plan->name;
         $flags = $this->flagsForPermutation($plan->permutation);
 
-        return $this->generate($output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags);
+        return $this->generate($output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook);
     }
 
     /**
@@ -183,6 +201,7 @@ final class NewCommand extends Command
         bool $dryRun,
         bool $json,
         array $flags,
+        PlaybookMode $playbook,
     ): int {
         try {
             $plan = Plan::forPermutation($permutation, $dir, $sail, $docker);
@@ -226,9 +245,15 @@ final class NewCommand extends Command
         if ($docker) {
             $answers['docker'] = true;
         }
+        if (PlaybookMode::Require === $playbook) {
+            $answers['playbook'] = true;
+        }
+        if (PlaybookMode::None === $playbook) {
+            $answers['no-playbook'] = true;
+        }
 
         try {
-            (new RawGenerator())->generate($dir, $name, $answers);
+            (new RawGenerator())->generate($dir, $name, $answers, $playbook);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
@@ -242,6 +267,11 @@ final class NewCommand extends Command
         $output->writeln(sprintf('  cd %s', $dir));
         $output->writeln('  composer install');
         $output->writeln('  php -S localhost:8000 -t public');
+
+        if (PlaybookMode::Suggest === $playbook) {
+            $output->writeln('');
+            $output->writeln('WSU values: see "WSU values (PLAYBOOK)" in README.md, or re-run with --playbook.');
+        }
 
         return 0;
     }
