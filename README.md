@@ -156,7 +156,7 @@ Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error 
 
 Commit the manifest. It's the record that keeps `feed` honest.
 
-The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from SQUIRE's exported copy, checked into this repository at `templates/squire/`. SQUIRE owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, re-export the copy from a SQUIRE checkout and verify it with `composer squire-copy:check`.
+The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from SQUIRE's exported copy, checked into this repository at `templates/squire/`. SQUIRE owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 
 ## Testing
 

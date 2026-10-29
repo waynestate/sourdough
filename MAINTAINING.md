@@ -12,8 +12,10 @@ needs regular feeding, or it goes flat.
   (only for `new --describe`, which can ask an OpenAI-compatible model for a plan; optional). No other stack package
   at runtime.
 - **Generated apps** require `waynestate/helmet`, `waynestate/sesame` and `waynestate/proctor` from Packagist.
-- **It carries a copy of SQUIRE's templates** in `templates/squire/` (`raw/`, `laravel/`, `vue/`, `catalog.json`,
-  `manifest.json`). SQUIRE owns those files; Sourdough never hand-edits them.
+- **It carries a copy of SQUIRE's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`,
+  `catalog.json`, `manifest.json`). SQUIRE owns those files; Sourdough never hand-edits them. `composer squire-copy:sync`
+  rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.2`), and
+  `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
 - The planned `feed` will need only git on the developer's machine: it records the template commit an app came from
   and applies template changes with `git apply --3way`.
 
@@ -31,8 +33,8 @@ directly.
 | All checks (what CI runs) | `composer ci` |
 | Only the tests | `composer test` |
 | Fix code style | `composer fix` |
-| Check the SQUIRE copy, Windows | `$env:SQUIRE_PATH = "..\squire"; composer squire-copy:check` |
-| Check the SQUIRE copy, Linux and macOS | `SQUIRE_PATH=../squire composer squire-copy:check` |
+| Check the SQUIRE copy | `composer squire-copy:check` |
+| Refresh the SQUIRE copy | `composer squire-copy:sync`, then commit `templates/squire/` |
 | Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
 
 With only Docker (the same lines work in PowerShell and sh):
@@ -42,8 +44,7 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan and `composer audit`. It does **not** run the
-SQUIRE copy check, which needs a SQUIRE checkout and prints "skipping" (exit 0) without one. Run it by hand.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the SQUIRE copy check and `composer audit`.
 
 ## CI
 
