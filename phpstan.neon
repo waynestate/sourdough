@@ -1,12 +1,15 @@
-# Same settings as Pinstripe's phpstan/raw.neon. Swap for an include once waynestate/pinstripe is on Packagist.
+# The coding standard comes from Pinstripe (waynestate/pinstripe): level 8,
+# deprecation checks, and the report flags all live in its raw preset. This
+# file adds only what is specific to Sourdough itself.
+includes:
+    - vendor/waynestate/pinstripe/phpstan/raw.neon
+
 parameters:
-    level: 8
     paths:
         - src
         - bin
         - tests
-    reportIgnoresWithoutComments: true
-    reportUnmatchedIgnoredErrors: true
+    # Tests run on 8.3, 8.4 and 8.5; analyse against that range.
     phpVersion:
         min: 80300
         max: 80599
