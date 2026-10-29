@@ -41,6 +41,16 @@ final class RawGenerator
         'README.md',
     ];
 
+    /**
+     * The app name allow-list: a letter or number first, then letters,
+     * numbers, spaces, dots, dashes and underscores, at most 63 characters.
+     *
+     * The allowed alphabet needs no escaping in JSON, single-quoted PHP
+     * strings, Markdown or INI, so the generator may paste the name into
+     * template contents unescaped.
+     */
+    public const NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,62}\z/';
+
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
         private readonly string $squireDir = __DIR__ . '/../../templates/squire',
@@ -51,11 +61,13 @@ final class RawGenerator
      *
      * @param array<string, string|bool> $answers each option the user chose, recorded in the manifest
      *
-     * @throws \InvalidArgumentException when the target exists and is not empty, or the name has no valid slug
+     * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the template is missing or a file cannot be read or written
      */
     public function generate(string $targetDir, string $name, array $answers = []): void
     {
+        self::assertValidName($name);
+
         $slug = self::slugify($name);
         if ('' === $slug) {
             throw new \InvalidArgumentException(sprintf(
@@ -75,6 +87,21 @@ final class RawGenerator
 
         $answers = array_merge(['name' => $name], $answers);
         (new Manifest('raw', $answers, self::SEEDED_FILES))->write($targetDir);
+    }
+
+    /**
+     * Throw when $name is not safe to paste into generated file names and
+     * contents. Called before generate() touches the disk.
+     *
+     * @throws \InvalidArgumentException when the name does not match NAME_PATTERN
+     */
+    public static function assertValidName(string $name): void
+    {
+        if (1 !== preg_match(self::NAME_PATTERN, $name)) {
+            throw new \InvalidArgumentException(
+                'The app name must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters.',
+            );
+        }
     }
 
     /**

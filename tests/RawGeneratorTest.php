@@ -106,14 +106,46 @@ final class RawGeneratorTest extends TestCase
         (new RawGenerator($target . '/no-such-template'))->generate($target, 'My Cool App');
     }
 
-    public function testNameWithNoValidSlugThrows(): void
+    public function testNameWithOnlySymbolsThrows(): void
     {
         $target = $this->makeTempDir();
 
+        // The name allow-list rejects this before the slug check runs.
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('does not produce a valid slug');
+        $this->expectExceptionMessage('must start with a letter or number');
 
         (new RawGenerator($this->fixtureTemplateDir()))->generate($target, '!!!');
+    }
+
+    #[DataProvider('hostileNames')]
+    public function testHostileNamesThrowAndWriteNothing(string $name): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/app';
+
+        try {
+            (new RawGenerator($this->fixtureTemplateDir()))->generate($target, $name);
+            self::fail('Expected \InvalidArgumentException for ' . var_export($name, true));
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringContainsString('must start with a letter or number', $e->getMessage());
+        }
+
+        // The name check runs before anything touches the disk, so the target
+        // is absent, or empty if something created it anyway.
+        self::assertFalse(is_file($target), var_export($name, true));
+        if (is_dir($target)) {
+            self::assertSame(['.', '..'], scandir($target) ?: [], var_export($name, true));
+        }
+    }
+
+    public function testRealTemplateAcceptsANameWithSpacesDotsAndUnderscores(): void
+    {
+        $target = $this->makeTempDir();
+
+        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My App v2.1_beta');
+
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('My App v2.1_beta', $composer['description']);
     }
 
     public function testGeneratedIndexUsesNewSesameConstructor(): void
@@ -336,6 +368,29 @@ final class RawGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertArrayNotHasKey('repositories', $composer);
+    }
+
+    /**
+     * Names that used to be pasted into file names and contents unescaped.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function hostileNames(): iterable
+    {
+        yield 'double quote' => ['a"b'];
+        yield 'single quote' => ["a'b"];
+        yield 'backslash' => ['a\\b'];
+        yield 'newline' => ["a\nb"];
+        yield 'trailing newline' => ["My App\n"];
+        yield 'NUL byte' => ["a\x00b"];
+        yield 'placeholder' => ['{{app_slug}}'];
+        yield 'path traversal' => ['../x'];
+        yield 'too long' => [str_repeat('a', 64)];
+        yield 'empty' => [''];
+        yield 'only dashes' => ['---'];
+        yield 'leading dash' => ['-my-app'];
+        yield 'leading dot' => ['.my-app'];
+        yield 'unicode look-alike' => ["\u{430}pp"];
     }
 
     /**
