@@ -14,6 +14,7 @@
         "waynestate/sesame": "^0.2"
     },
     "require-dev": {
+        "phpunit/phpunit": "^11.5",
         "waynestate/proctor": "^0.2"
     }
 }
