@@ -5,6 +5,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Changed
+
+- Changed: the Squire copy comes from Squire 0.3.3.
+
 ## 0.1.4 (2026-10-29)
 
 ### Added
