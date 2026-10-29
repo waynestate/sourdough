@@ -224,7 +224,11 @@ h1, h2, h3 {
   z-index: 2;
   min-width: 0;
 }
+/* The name sits in front of the board below it, so no letter ever hides
+   behind the wood. */
 .hero__title {
+  position: relative;
+  z-index: 3;
   margin: 0;
   font-size: clamp(3.1rem, 14.5vw, 11.25rem);
   line-height: 0.92;
@@ -331,8 +335,7 @@ h1, h2, h3 {
 }
 
 /* The art: a floured wooden board, the mark as a jar on it, and chalk notes.
-   The board proofs up under the name's baseline; a fed starter does not ask
-   permission, so the letters stay in front of it. */
+   A fed starter does not ask permission, so the letters stay in front of it. */
 .hero__art {
   grid-area: art;
   position: relative;
@@ -341,9 +344,12 @@ h1, h2, h3 {
   justify-items: center;
   margin-top: -3rem;
 }
+/* The rim tucks about 25px under the wordmark's baseline: 12px below the
+   jar's top, which leaves the letters clear and keeps the wood in the
+   descender zone only. */
 .board {
   position: absolute;
-  inset: -9% -14% -12%;
+  inset: 12px -14% -12%;
   border-radius: 50%;
   background:
     radial-gradient(ellipse at 45% 40%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 55%),
@@ -1099,7 +1105,8 @@ h1, h2, h3 {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "banner" "art" "copy";
   }
-  .hero__art { margin-top: 1.5rem; }
+  /* One row of air under the board, so the caption never touches the blurb. */
+  .hero__art { margin-top: 1.5rem; margin-bottom: 1.5rem; }
   .jar { width: min(240px, 52vw); }
   .proof__grid {
     grid-template-columns: minmax(0, 1fr);
