@@ -18,7 +18,7 @@ Versioning once 1.0 is out.
   `SQUIRE_PROCTOR=enforce` handling, and the `static` target joins the catalog. Fresh flour, straight from the mill.
 - Changed: project names written as words except acronyms.
 - Changed: generated apps require SESAME ^0.2 (Entra sign-in).
-- Changed: the Squire copy comes from Squire 0.2.2.
+- Changed: the Squire copy comes from Squire 0.3.0.
 
 ### Fixed
 
