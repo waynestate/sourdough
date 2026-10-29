@@ -287,7 +287,7 @@ Stack: `Not yet`.
 ### 6.1 Wire the stack in by default, not as an option
 Every generated app has SESAME, HELMET, PROCTOR as a dev dependency, a `.gitlab-ci.yml` that includes the Preflight components, a `/up` route that does not touch the database, and a README that points at the CREED handbook. Why: Laravel's own kits include sign-in, rate limiting and two-factor login out of the box for the same reason. Defaults decide what most apps end up doing.
 Sources: [S1].
-Stack: `Documented`. The libraries themselves exist (SESAME, HELMET with a health check, PROCTOR, Preflight templates), but Sourdough does not wire them yet. Until they are tagged, generated `composer.json` files carry a TODO and the generator tests do not install them.
+Stack: `Documented`. The libraries are tagged (SESAME, HELMET with a health check, PROCTOR, Preflight templates), and `sourdough new --raw` wires them into every generated app. Only the raw shape generates in 0.1; the Laravel shapes are not built yet.
 
 ### 6.2 Have the release script run the check, but do not call it the gate
 The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check. Why: promising a gate that does not hold is worse than having none.
