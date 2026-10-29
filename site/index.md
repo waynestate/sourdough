@@ -25,6 +25,8 @@ $ composer global require waynestate/sourdough
 $ sourdough new my-app
 ```
 
+**Want every piece already joined? Start from [WELD](https://weld.apps.wayne.edu/).** Use Sourdough when you want a smaller raw PHP app with SESAME, HELMET, PROCTOR and Preflight already wired in.
+
 [Start baking](https://sourdough.apps.wayne.edu/#start-title) [See the five loaves](https://sourdough.apps.wayne.edu/#loaves-title)
 
 Proofing log

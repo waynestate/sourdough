@@ -333,6 +333,17 @@ h1, h2, h3 {
 }
 .btn--gold:hover { transform: translateY(-3px); box-shadow: 0 7px 0 var(--sd-green-deep); }
 .btn--gold:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--sd-green-deep); }
+/* A baker's note pencilled under the recipe: where the bigger loaf lives. */
+.hero__weld {
+  max-width: 34rem;
+  margin: 1.1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--sd-muted);
+}
+.hero__weld strong { color: var(--sd-ink); }
+.hero__weld a { color: var(--sd-green); text-underline-offset: 0.25em; text-decoration-thickness: 2px; }
+
 .hero__link {
   font-weight: 700;
   color: var(--sd-green);
