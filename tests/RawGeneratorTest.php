@@ -381,6 +381,7 @@ final class RawGeneratorTest extends TestCase
         yield 'single quote' => ["a'b"];
         yield 'backslash' => ['a\\b'];
         yield 'newline' => ["a\nb"];
+        yield 'trailing newline' => ["My App\n"];
         yield 'NUL byte' => ["a\x00b"];
         yield 'placeholder' => ['{{app_slug}}'];
         yield 'path traversal' => ['../x'];

@@ -49,7 +49,7 @@ final class RawGenerator
      * strings, Markdown or INI, so the generator may paste the name into
      * template contents unescaped.
      */
-    public const NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,62}$/';
+    public const NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,62}\z/';
 
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
