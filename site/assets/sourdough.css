@@ -216,6 +216,12 @@ h1, h2, h3 {
     "art copy";
   column-gap: clamp(2rem, 5vw, 4.5rem);
   align-items: start;
+  /* The name's size, and the room its g needs: at line-height 0.92 the g's
+     tail hangs about 0.16em below the line box, so the pinned note drops by
+     that much and the art is pulled up by the same amount. It scales with
+     the name, so the note clears the g at every width. */
+  --sd-hero-size: clamp(3.1rem, 14.5vw, 11.25rem);
+  --sd-g-room: calc(var(--sd-hero-size) * 0.16);
 }
 /* The name is the loaf: it takes the whole bench, crust edge to crust edge. */
 .hero__banner {
@@ -230,7 +236,7 @@ h1, h2, h3 {
   position: relative;
   z-index: 3;
   margin: 0;
-  font-size: clamp(3.1rem, 14.5vw, 11.25rem);
+  font-size: var(--sd-hero-size);
   line-height: 0.92;
   color: var(--sd-green);
 }
@@ -238,7 +244,7 @@ h1, h2, h3 {
 .hero__letters > span { display: inline-block; transform-origin: 50% 100%; }
 /* A note the baker pinned under the end of the word. */
 .hero__tagline {
-  margin: 0.4rem 0 0;
+  margin: calc(0.4rem + var(--sd-g-room)) 0 0;
   font-family: var(--sd-hand);
   font-weight: 700;
   font-size: clamp(1.4rem, 2.4vw, 2.1rem);
@@ -342,7 +348,7 @@ h1, h2, h3 {
   z-index: 1;
   display: grid;
   justify-items: center;
-  margin-top: -3rem;
+  margin-top: calc(-3rem - var(--sd-g-room));
 }
 /* A true circle centred on the tile: one value sets the diameter, so the
    board never squashes. The diameter keeps the old ellipse's width (128% of
@@ -1111,7 +1117,7 @@ h1, h2, h3 {
     grid-template-areas: "banner" "art" "copy";
   }
   /* One row of air under the board, so the caption never touches the blurb. */
-  .hero__art { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+  .hero__art { margin-top: calc(1.5rem - var(--sd-g-room)); margin-bottom: 1.5rem; }
   .jar { width: min(240px, 52vw); }
   .proof__grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1120,18 +1126,6 @@ h1, h2, h3 {
   }
   .start { grid-template-columns: minmax(0, 1fr); }
   .schedule__row { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
-}
-
-/* Between 600px and 1100px the g sinks low enough to touch the pinned note,
-   so the note pins 17px lower. The banner grows by the same amount and the
-   art would follow it down, so the art is pulled back up 17px to keep the
-   board tucked under the name. Keep the two 17px values in step. */
-@media (min-width: 600px) and (max-width: 1100px) {
-  .hero__tagline { margin-top: calc(0.4rem + 17px); }
-  .hero__art { margin-top: calc(1.5rem - 17px); }
-}
-@media (min-width: 861px) and (max-width: 1100px) {
-  .hero__art { margin-top: calc(-3rem - 17px); }
 }
 
 @media (max-width: 640px) {
