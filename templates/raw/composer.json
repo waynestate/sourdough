@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.3",
         "waynestate/helmet": "^0.2",
-        "waynestate/sesame": "^0.1"
+        "waynestate/sesame": "^0.2"
     },
     "require-dev": {
         "waynestate/proctor": "^0.2"
