@@ -416,7 +416,7 @@ final class RawGeneratorTest extends TestCase
         // The rest of the require section is untouched.
         self::assertSame('^8.3', $composer['require']['php']);
         self::assertSame('^0.2', $composer['require']['waynestate/helmet']);
-        self::assertSame('^0.1', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.2', $composer['require']['waynestate/sesame']);
     }
 
     public function testNoneModeLeavesTheAppWithoutPlaybook(): void
