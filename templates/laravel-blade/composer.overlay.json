@@ -4,6 +4,7 @@
         "waynestate/sesame": "^0.2"
     },
     "require-dev": {
+        "larastan/larastan": "^3.13",
         "waynestate/creed": "^0.1",
         "waynestate/pinstripe": "^0.1",
         "waynestate/proctor": "^0.2"
