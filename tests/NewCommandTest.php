@@ -7,6 +7,7 @@ namespace Waynestate\Sourdough\Tests;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Responses\Meta\MetaInformation;
 use OpenAI\Testing\ClientFake;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -131,7 +132,7 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('--json is only available with --dry-run', $tester->getDisplay());
     }
 
-    public function testInertiaWithoutLaravelExitsOne(): void
+    public function testInertiaAloneImpliesLaravel(): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
@@ -141,10 +142,98 @@ final class NewCommandTest extends TestCase
             'dir' => $target,
             '--inertia' => true,
             '--dry-run' => true,
+            '--json' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        $data = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('laravel-inertia', $data['permutation']);
+        self::assertSame('Laravel + Inertia/Vue', $data['label']);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, bool>, string}>
+     */
+    public static function documentedShapes(): iterable
+    {
+        yield 'raw php' => [[], 'raw'];
+        yield 'raw php + vue spa' => [['--raw' => true, '--vue' => true], 'raw-vue'];
+        yield 'laravel + blade' => [['--laravel' => true], 'laravel-blade'];
+        yield 'laravel + blade + vue islands' => [['--laravel' => true, '--vue' => true], 'laravel-blade-vue'];
+        yield 'laravel + inertia/vue' => [['--laravel' => true, '--inertia' => true], 'laravel-inertia'];
+    }
+
+    #[DataProvider('documentedShapes')]
+    public function testEachShapeFromItsDocumentedFlags(array $flags, string $expected): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $input = ['dir' => $target];
+        foreach ($flags as $flag => $value) {
+            $input[$flag] = $value;
+        }
+        $input['--dry-run'] = true;
+        $input['--json'] = true;
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute($input);
+
+        self::assertSame(0, $exit);
+        $data = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame($expected, $data['permutation']);
+    }
+
+    public function testLaravelInertiaFlagOrderGivesTheSamePlan(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $first = new CommandTester($this->createCommand());
+        $firstExit = $first->execute([
+            'dir' => $target,
+            '--laravel' => true,
+            '--inertia' => true,
+            '--dry-run' => true,
+            '--json' => true,
+        ]);
+
+        $second = new CommandTester($this->createCommand());
+        $secondExit = $second->execute([
+            'dir' => $target,
+            '--inertia' => true,
+            '--laravel' => true,
+            '--dry-run' => true,
+            '--json' => true,
+        ]);
+
+        self::assertSame(0, $firstExit);
+        self::assertSame(0, $secondExit);
+        self::assertSame(
+            json_decode($first->getDisplay(), true, 512, JSON_THROW_ON_ERROR),
+            json_decode($second->getDisplay(), true, 512, JSON_THROW_ON_ERROR),
+        );
+    }
+
+    public function testRawWithInertiaExitsOneAndNamesTheShapes(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--raw' => true,
+            '--inertia' => true,
+            '--dry-run' => true,
         ]);
 
         self::assertSame(1, $exit);
-        self::assertStringContainsString('--inertia needs --laravel', $tester->getDisplay());
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('--raw and --laravel are mutually exclusive', $tester->getDisplay());
+        self::assertStringContainsString('The five shapes are:', $tester->getDisplay());
     }
 
     public function testRawWithLaravelExitsOne(): void
