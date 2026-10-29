@@ -18,17 +18,17 @@ use Waynestate\Sourdough\PlaybookMode;
  * outside the target dir.
  *
  * After copying the template, the generator installs the raw deploy files
- * from the checked copy of SQUIRE's templates (templates/squire/). Those
- * files are copied as-is (SQUIRE owns them, so Sourdough does not rewrite
- * them), and their executable bits come from SQUIRE's manifest.
+ * from the checked copy of Squire's templates (templates/squire/). Those
+ * files are copied as-is (Squire owns them, so Sourdough does not rewrite
+ * them), and their executable bits come from Squire's manifest.
  *
- * Then the generator wires PLAYBOOK into the app per the chosen mode: by
+ * Then the generator wires Playbook into the app per the chosen mode: by
  * default it suggests the package, lists its values in .env.example and
  * documents them in the README; --playbook also requires it with its VCS
  * repository; --no-playbook leaves the app untouched.
  *
  * Finally the generator writes `.sourdough/manifest.json` so a later
- * `sourdough feed` knows what was generated, including the SQUIRE files.
+ * `sourdough feed` knows what was generated, including the Squire files.
  */
 final class RawGenerator
 {
@@ -58,9 +58,9 @@ final class RawGenerator
     public const NAME_PATTERN = '/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,62}\z/';
 
     /**
-     * PLAYBOOK (waynestate/playbook) is WSU's private shared-values package
+     * Playbook (waynestate/playbook) is WSU's private shared-values package
      * on git.wayne.edu. The stack reads the environment first, then
-     * PLAYBOOK, so a generated app installs without it by default.
+     * Playbook, so a generated app installs without it by default.
      */
     public const PLAYBOOK_PACKAGE = 'waynestate/playbook';
 
@@ -71,7 +71,7 @@ final class RawGenerator
     public const PLAYBOOK_SUGGEST = "WSU's shared values; private, git.wayne.edu";
 
     /**
-     * The seven setting names PLAYBOOK holds, listed in .env.example.
+     * The seven setting names Playbook holds, listed in .env.example.
      *
      * @var list<string>
      */
@@ -94,7 +94,7 @@ final class RawGenerator
      * Generate the app named $name into $targetDir.
      *
      * @param array<string, string|bool> $answers  each option the user chose, recorded in the manifest
-     * @param PlaybookMode               $playbook how the app wires PLAYBOOK (see applyPlaybook)
+     * @param PlaybookMode               $playbook how the app wires Playbook (see applyPlaybook)
      *
      * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the template is missing or a file cannot be read or written
@@ -207,12 +207,12 @@ final class RawGenerator
     }
 
     /**
-     * Install the raw deploy files from the checked copy of SQUIRE's
+     * Install the raw deploy files from the checked copy of Squire's
      * templates into the target dir.
      *
      * The file list and target paths come from the copy's catalog.json (the
      * "raw" kind); the executable bit for each file comes from its mode in
-     * the copy's manifest.json. The files are copied as-is: SQUIRE owns
+     * the copy's manifest.json. The files are copied as-is: Squire owns
      * them, so Sourdough does not rewrite their contents.
      *
      * @throws \RuntimeException when the copy is missing or a file cannot be read or written
@@ -258,7 +258,7 @@ final class RawGenerator
     }
 
     /**
-     * Wire PLAYBOOK into the generated app, per the chosen mode.
+     * Wire Playbook into the generated app, per the chosen mode.
      *
      * - Suggest and Require: composer.json gets a suggest for the package,
      *   .env.example lists the seven setting names, and the README gains a
@@ -296,7 +296,7 @@ final class RawGenerator
     }
 
     /**
-     * Add the PLAYBOOK wiring to the app's composer.json: a suggest entry in
+     * Add the Playbook wiring to the app's composer.json: a suggest entry in
      * every mode, and in Require mode the VCS repository (after authors,
      * where composer.json convention puts it) plus the package under
      * require.
@@ -353,8 +353,8 @@ final class RawGenerator
     }
 
     /**
-     * Append the commented PLAYBOOK block to .env.example: each of the seven
-     * setting names, empty, with the note that PLAYBOOK supplies it when
+     * Append the commented Playbook block to .env.example: each of the seven
+     * setting names, empty, with the note that Playbook supplies it when
      * unset.
      *
      * @throws \RuntimeException when the file cannot be read or written

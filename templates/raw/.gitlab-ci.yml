@@ -1,4 +1,4 @@
-# PREFLIGHT components. @0.1.0 is the first tag and is not cut yet; until it
+# Preflight components. @0.1.0 is the first tag and is not cut yet; until it
 # is, pin a full commit SHA instead.
 include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.1.0
