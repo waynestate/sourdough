@@ -5,6 +5,11 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Changed
+
+- PHPStan and Pint now take their settings from Pinstripe (`waynestate/pinstripe` ^0.1) instead of a hand
+  copy: `phpstan.neon` includes the raw preset, and `pint.json` extends the per preset. Same cut, off the rack.
+
 ## 0.1.0 (2026-10-29)
 
 ### Added

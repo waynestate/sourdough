@@ -1,5 +1,5 @@
 {
-    "preset": "per",
+    "extend": "vendor/waynestate/pinstripe/pint/per.json",
     "exclude": [
         "vendor",
         "templates",
