@@ -2,7 +2,7 @@
 
 [![Sourdough: dough in a jar, risen past its gold band](docs/readme/hero.jpg)](site/index.html)
 
-# SOURDOUGH
+# Sourdough
 
 ![php](docs/readme/badges/php.svg) ![licence](docs/readme/badges/license.svg) ![exit codes](docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
 
@@ -18,15 +18,15 @@ Every loaf gets proofed before it ships.
 
 Front page: [`site/index.html`](site/index.html), a static page you can open in a browser or serve from `site/`.
 
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a SQUIRE kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
 This repository is published from Wayne State University's internal GitLab and mirrored here. Changes land there first; Wayne State developers open issues and merge requests on the internal project.
 
-Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the PREFLIGHT CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 <div align="center">
 
-![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and PREFLIGHT go in one by one, over the feeding schedule](docs/readme/proof.svg)
+![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](docs/readme/proof.svg)
 
 <sub>The proofing log from the front page: what goes into the tub when you run <code>sourdough new</code>, and the day-to-day check that keeps it alive.</sub>
 
@@ -64,7 +64,7 @@ Options:
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing
 - `--plan <file>` a ready-made plan file (JSON matching `resources/plan.schema.json`)
 - `--playbook` require `waynestate/playbook` in the generated app: adds the VCS repository and the package to `require`
-- `--no-playbook` skip the PLAYBOOK wiring (no `suggest`, no `.env.example` block, no README section)
+- `--no-playbook` skip the Playbook wiring (no `suggest`, no `.env.example` block, no README section)
 
 Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
 
@@ -156,7 +156,7 @@ Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error 
 
 Commit the manifest. It's the record that keeps `feed` honest.
 
-The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from SQUIRE's exported copy, checked into this repository at `templates/squire/`. SQUIRE owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
+The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 
 ## Testing
 
@@ -201,10 +201,10 @@ Strongly recommended: a git.wayne.edu instance runner.
 <a href="https://github.com/waynestate/helmet"><img src="docs/readme/cast/helmet.png" width="44" alt="HELMET"></a>
 <a href="https://github.com/waynestate/sourdough"><img src="docs/readme/cast/sourdough.png" width="44" alt="Sourdough"></a>
 <a href="https://github.com/waynestate/squire"><img src="docs/readme/cast/squire.png" width="44" alt="Squire"></a>
-<a href="https://github.com/waynestate/preflight"><img src="docs/readme/cast/preflight.png" width="44" alt="PREFLIGHT"></a>
+<a href="https://github.com/waynestate/preflight"><img src="docs/readme/cast/preflight.png" width="44" alt="Preflight"></a>
 <a href="https://github.com/waynestate/pinstripe"><img src="docs/readme/cast/pinstripe.png" width="44" alt="Pinstripe"></a>
-<a href="https://github.com/waynestate/booster"><img src="docs/readme/cast/booster.png" width="44" alt="BOOSTER"></a>
-<a href="https://github.com/waynestate/rollcall"><img src="docs/readme/cast/rollcall.png" width="44" alt="ROLLCALL"></a>
+<a href="https://github.com/waynestate/booster"><img src="docs/readme/cast/booster.png" width="44" alt="Booster"></a>
+<a href="https://github.com/waynestate/rollcall"><img src="docs/readme/cast/rollcall.png" width="44" alt="Rollcall"></a>
 <a href="https://github.com/waynestate/drawbridge"><img src="docs/readme/cast/drawbridge.png" width="44" alt="Drawbridge"></a>
 <a href="https://github.com/waynestate/advisor"><img src="docs/readme/cast/advisor.png" width="44" alt="ADVISOR"></a>
 <a href="https://github.com/waynestate/weld"><img src="docs/readme/cast/weld.png" width="44" alt="WELD"></a>

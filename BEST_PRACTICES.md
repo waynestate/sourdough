@@ -4,7 +4,7 @@ Status: draft 2. Draft 1 was checked against the design docs and the sibling rep
 
 ## What this covers
 
-Sourdough is the starter for WSU applications. `sourdough new <dir>` makes an app for one of five permutations (raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, Laravel with Inertia and Vue), with the stack already wired in: SESAME for sign-in, HELMET for the runtime, PROCTOR for checks, PREFLIGHT for CI, a Citadel release script and a `/up` route.
+Sourdough is the starter for WSU applications. `sourdough new <dir>` makes an app for one of five permutations (raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, Laravel with Inertia and Vue), with the stack already wired in: SESAME for sign-in, HELMET for the runtime, PROCTOR for checks, Preflight for CI, a Citadel release script and a `/up` route.
 
 This guide is for two groups:
 - WSU developers who generate and then own a Sourdough app.
@@ -20,7 +20,7 @@ Each practice ends with one tag that says how the stack holds it today.
 - `Documented`: written down in an ADR or design doc only. Where the design says a test will cover it, the text says so, but the test does not exist yet.
 - `Not yet`: a gap. Nothing holds it.
 
-Sourdough itself has no code on its main branch at the time of writing, and a delegate is building step 1 on a branch. So most tags describe the design, not a working tool. Sibling projects (SESAME, HELMET, PROCTOR, PREFLIGHT) do have code, and where a practice leans on them the tag says so.
+Sourdough itself has no code on its main branch at the time of writing, and a delegate is building step 1 on a branch. So most tags describe the design, not a working tool. Sibling projects (SESAME, HELMET, PROCTOR, Preflight) do have code, and where a practice leans on them the tag says so.
 
 ---
 
@@ -101,9 +101,9 @@ Stack: `Documented`. the stack design notes has HELMET's Laravel adapter set `tr
 
 ### 2.6 Make the Laravel templates work on the shared MySQL 5.6, or say they cannot (second pass)
 Laravel 13's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported [S25]. The shared server is MySQL 5.6, which left extended support on 2021-02-28 (5.7 on 2023-10-31, 8.0 on 2026-04-30; 8.4 LTS is supported) [S26]. So the server is below Laravel's own minimum. The MySQL manual gives the practical limit: an index key prefix is 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4 [S27]. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071 unless the server uses DYNAMIC rows with large prefixes (the Citadel server's settings were not checked). The long-known Laravel workaround is `Schema::defaultStringLength(191)` in a service provider (seen in a Laracasts thread via search). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
-So: (1) the Laravel templates set the 191 default and avoid JSON columns, as SQUIRE's S18 already asks; (2) CI runs the migrations against a 5.6 server in a service container (image availability and CPU architecture not checked); (3) the generated README says Laravel is outside the vendor's support on this database until the MySQL timeline question is settled. Open question for the stack: the PHP rule bans EOL PHP, and the database has no matching rule yet.
+So: (1) the Laravel templates set the 191 default and avoid JSON columns, as Squire's S18 already asks; (2) CI runs the migrations against a 5.6 server in a service container (image availability and CPU architecture not checked); (3) the generated README says Laravel is outside the vendor's support on this database until the MySQL timeline question is settled. Open question for the stack: the PHP rule bans EOL PHP, and the database has no matching rule yet.
 Sources: [S25], [S26], [S27].
-Stack: `Not yet`. The MySQL timeline question is still open. SQUIRE's S18 is `Documented`.
+Stack: `Not yet`. The MySQL timeline question is still open. Squire's S18 is `Documented`.
 
 ---
 
@@ -154,7 +154,7 @@ Stack: `Not yet`.
 Generated apps commit `composer.lock`, have no `dev-*` or `*` constraints on runtime packages, and run `composer audit --locked` in CI. Why: the lockfile is what makes two builds the same, and the audit is what tells you when a locked package is known to be vulnerable.
 Second pass, correction: draft 1 said `composer install` does not audit by default. Composer's CLI page does not say either way, so that claim is unverified. Keep the explicit `composer audit --locked` step. Composer's own behaviour has also changed [S20], [S32]. Version 2.9.0 (2025-11-13) blocks packages with known advisories on update (`audit.block-insecure`, on by default). Version 2.10.0 (2026-05-28) adds a `policy` block covering advisories, abandoned packages, malware and a release cooldown; malware blocking is on by default; the old `audit` block is deprecated; and `composer audit` now exits only 0 or 1. The generated `composer.json` should set `policy` explicitly rather than rely on defaults.
 Sources: [S3], [S20], [S32].
-Stack: `Checked`. PROCTOR has `lock-committed`, `unbounded-constraints` and `composer-audit` checks, and PREFLIGHT has a `composer-audit` component. Sourdough's job is to wire both into the generated `.gitlab-ci.yml`, which is not built yet. Read in the second pass: PROCTOR's audit check runs `composer audit --format=json --locked` and decides from the JSON on stdout, not from the exit code, so the 2.10 exit-code change should not hurt it. It has not been run against 2.10 output, which can include malware and cooldown findings. `lock-committed` looks only for `composer.lock`; nothing checks `package-lock.json` (see 4.10).
+Stack: `Checked`. PROCTOR has `lock-committed`, `unbounded-constraints` and `composer-audit` checks, and Preflight has a `composer-audit` component. Sourdough's job is to wire both into the generated `.gitlab-ci.yml`, which is not built yet. Read in the second pass: PROCTOR's audit check runs `composer audit --format=json --locked` and decides from the JSON on stdout, not from the exit code, so the 2.10 exit-code change should not hurt it. It has not been run against 2.10 output, which can include malware and cooldown findings. `lock-committed` looks only for `composer.lock`; nothing checks `package-lock.json` (see 4.10).
 
 ### 4.2 Take the PHP floor from policy, not from the template
 Write the `php` constraint in the generated `composer.json` from CREED's `policy.json` at generation time. Why: the floor moves (to 8.3 on 2027-01-01), and a hard-coded value in a template goes out of date without anyone noticing.
@@ -162,10 +162,10 @@ Sources: the stack's version policy.
 Stack: `Not yet`. PROCTOR's `php-floor` check will catch an out-of-date floor in the app, but nothing yet stops the template from generating one.
 
 ### 4.3 Pin CI components to a tag, or better a commit
-Include PREFLIGHT components with an exact version. GitLab supports a commit SHA, a tag or a branch. Its guidance is to pin to a SHA, or to a release tag from a maintainer you trust, and to avoid `~latest`. Why: an unpinned component changes your pipeline without a commit in your repo.
+Include Preflight components with an exact version. GitLab supports a commit SHA, a tag or a branch. Its guidance is to pin to a SHA, or to a release tag from a maintainer you trust, and to avoid `~latest`. Why: an unpinned component changes your pipeline without a commit in your repo.
 Second pass: re-checked against the GitLab page. It says to pin to a commit SHA (preferred) or a release tag, to trust tags only from a maintainer you trust, to avoid `latest`, and to review changes before moving a pin. It also says component inputs are validated and variables are not, so pass settings as `inputs`. Components have been generally available since GitLab 17.0.
 Sources: [S16].
-Stack: `Documented`. the stack design notes says the pipeline includes PREFLIGHT components "pinned by tag". Tags can be moved by whoever owns the project, so decide whether a SHA is worth the extra upkeep.
+Stack: `Documented`. the stack design notes says the pipeline includes Preflight components "pinned by tag". Tags can be moved by whoever owns the project, so decide whether a SHA is worth the extra upkeep.
 
 ### 4.4 Keep configuration in the environment and out of the template
 Commit `.env.example` with names and safe placeholders, never `.env`. Templates hold no secrets, no real hostnames and no per-environment branches. A good test: could the generated repo be published right now without leaking anything? Why: config that varies per deploy belongs outside the code.
@@ -205,7 +205,7 @@ Stack: `Not yet`. PROCTOR's `lock-committed` check covers `composer.lock` only.
 ### 4.11 Pin Node to a supported LTS line, as with PHP (second pass)
 Per endoflife.date: Node 20 ended 2026-04-30, 22 ends 2027-04-30, 24 ends 2028-04-30, and 26 becomes LTS on 2026-10-28 [S37]. Generated apps declare `engines` and `.nvmrc` from a policy file, as for the PHP floor in 4.2, and CI uses the same version. The nodejs.org release page was fetched too, but its dates did not match this source (the summary looked garbled), so check nodejs.org's schedule before relying on these. Sail installs Node 24 by default [S38].
 Sources: [S37], [S38].
-Stack: `Not yet`. CREED's `policy.json` carries MySQL dates per SQUIRE; whether it carries Node is not known.
+Stack: `Not yet`. CREED's `policy.json` carries MySQL dates per Squire; whether it carries Node is not known.
 
 ### 4.12 Keep the Vite dev server on localhost, and keep Vite current (second pass)
 CVE-2025-62522 (published 2025-10-20; fixed in Vite 5.4.21, 6.4.1, 7.0.8 and 7.1.11) let a request with a trailing backslash read files that `server.fs.deny` should block, such as `.env`, on Windows when the dev server was reachable from the network [S39]. A later Windows `fs.deny` bypass, CVE-2026-53571 (2026-06-22), appeared in search results and its details were not checked. In a container the dev server must listen on all interfaces, so publish its port on the host's loopback only (`127.0.0.1:5173:5173` in the compose file), not on every interface. Set a Vite version floor in the template and run `npm audit`. Vite's docs also ask that `*.local` be in `.gitignore`, because `.env.*.local` files can hold secrets [S13].
@@ -257,7 +257,7 @@ Stack: `Documented`. The developer-OS rule, second point. No code yet. The shim 
 Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell. Docker's own advice for WSL2 is to keep source code inside the Linux file system, because bind mounts from the Windows side are slower and do not deliver file-change events. So offer: Docker Compose with a Citadel-parity image as the route that works natively on every OS, Sail as an option where it fits, and plain PHP with Composer. Why: a starter that only works for macOS users is not a starter for WSU.
 Second pass: re-checked and still correct. Sail's docs say Windows is supported "via WSL2" [S38], and Docker's WSL page says to keep bind-mounted source in the Linux file system, because Windows-side mounts are slower and Linux containers get no file-change events from them [S11]. Laravel's docs also offer Herd, a native macOS and Windows environment with PHP, Nginx, Node and the `laravel` CLI; Herd Pro adds local databases [S49]. It is a Laravel product. Its licence and its fit for WSU were not checked.
 Sources: [S2], [S11], [S38], [S49].
-Stack: `Documented`. The developer-OS rule's fourth point lists the routes and says Sail is never the only Windows route. The Docker image is SQUIRE's and does not exist yet.
+Stack: `Documented`. The developer-OS rule's fourth point lists the routes and says Sail is never the only Windows route. The Docker image is Squire's and does not exist yet.
 
 ### 5.6 Treat Sail as a development tool
 Sail's compose file and images are for local work. Do not reuse them as the production image. Why: they carry dev tools, ports and defaults that a production container should not.
@@ -268,7 +268,7 @@ Stack: `Documented`. The design deploys on Citadel's own images and does not use
 If Sourdough generates a Dockerfile: pin the base image to an exact version (a digest is stronger), use a multi-stage build, run as a non-root user with a fixed UID, add a `.dockerignore`, never leave secrets in a layer, and rebuild regularly with `--pull`. State the CPU architecture. Citadel's images are x86-64 only as far as is known, so Apple Silicon users run them under emulation. Why: images are immutable, so a stale one stays stale.
 Second pass: Docker's page confirms these points. It adds that pinning to a digest also opts you out of automatic security fixes, so pair the pin with a scheduled update (it names Dependabot; the GitLab equivalent is not chosen) [S10]. Docker made its Hardened Images catalog free under Apache 2.0 on 2025-12-17, per press coverage [S51]. Production images here are Citadel's, so that matters only for development tooling.
 Sources: [S10], [S51].
-Stack: `Not yet`. The developer-OS rule requires the architecture statement for SQUIRE's image only.
+Stack: `Not yet`. The developer-OS rule requires the architecture statement for Squire's image only.
 
 ### 5.8 Test on all three systems
 Run the generator and the generated app's tests on Windows, macOS and Linux, or run a written smoke test before each minor release. Why: path, newline and shell bugs only appear on the system you did not test.
@@ -285,9 +285,9 @@ Stack: `Not yet`.
 ## 6. Wiring the stack in
 
 ### 6.1 Wire the stack in by default, not as an option
-Every generated app has SESAME, HELMET, PROCTOR as a dev dependency, a `.gitlab-ci.yml` that includes the PREFLIGHT components, a `/up` route that does not touch the database, and a README that points at the CREED handbook. Why: Laravel's own kits include sign-in, rate limiting and two-factor login out of the box for the same reason. Defaults decide what most apps end up doing.
+Every generated app has SESAME, HELMET, PROCTOR as a dev dependency, a `.gitlab-ci.yml` that includes the Preflight components, a `/up` route that does not touch the database, and a README that points at the CREED handbook. Why: Laravel's own kits include sign-in, rate limiting and two-factor login out of the box for the same reason. Defaults decide what most apps end up doing.
 Sources: [S1].
-Stack: `Documented`. The libraries themselves exist (SESAME, HELMET with a health check, PROCTOR, PREFLIGHT templates), but Sourdough does not wire them yet. Until they are tagged, generated `composer.json` files carry a TODO and the generator tests do not install them.
+Stack: `Documented`. The libraries themselves exist (SESAME, HELMET with a health check, PROCTOR, Preflight templates), but Sourdough does not wire them yet. Until they are tagged, generated `composer.json` files carry a TODO and the generator tests do not install them.
 
 ### 6.2 Have the release script run the check, but do not call it the gate
 The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check. Why: promising a gate that does not hold is worse than having none.
@@ -320,11 +320,11 @@ Stack: `Not yet`.
 5. List which Laravel kit features Sourdough removes (registration, password reset, two-factor) and test that they are gone.
 6. Add PROCTOR checks for CRLF in server-run files, name-case clashes, secret-looking `VITE_` variables and `env()` outside config.
 7. Ship a tested Vite manifest reader for the raw PHP plus Vue path.
-8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before SQUIRE's image or `--docker` is built.
+8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before Squire's image or `--docker` is built.
 9. Add a compatibility pipeline that generates, installs and tests all five permutations.
 10. Get Windows and macOS runners, or write the smoke-test checklist.
 11. Say how Boost's generated files are refreshed and whether they are committed. (Second pass: the vendor says the generated files may be ignored and `.ai/rules` should be committed; Sourdough still has to choose.)
-12. Decide between pinning PREFLIGHT components by tag or by commit. (GitLab prefers a commit SHA.)
+12. Decide between pinning Preflight components by tag or by commit. (GitLab prefers a commit SHA.)
 
 Added in the second pass:
 
@@ -411,8 +411,8 @@ Added in the second pass, checked 2026-10-27. "Opened" means the page was fetche
 
 Not used: no S40 or S55 (numbers skipped when a draft source was reused: S13 for Vite env, S4 for Copier updating).
 
-Stack documents used: the stack design notes and decisions, and the SESAME, HELMET, PROCTOR and PREFLIGHT repos as of 2026-10-27.
-Also read in the second pass: SQUIRE's best-practices notes (S18, S44 to S47 on MySQL 5.6) and the PROCTOR source (`ComposerAuditCheck`, `LockCommittedCheck`). The sourdough folder holds only brand assets under `site/`, so no tag above is `Enforced` or `Checked` for Sourdough itself.
+Stack documents used: the stack design notes and decisions, and the SESAME, HELMET, PROCTOR and Preflight repos as of 2026-10-27.
+Also read in the second pass: Squire's best-practices notes (S18, S44 to S47 on MySQL 5.6) and the PROCTOR source (`ComposerAuditCheck`, `LockCommittedCheck`). The sourdough folder holds only brand assets under `site/`, so no tag above is `Enforced` or `Checked` for Sourdough itself.
 
 ---
 

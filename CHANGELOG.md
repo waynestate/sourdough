@@ -7,11 +7,13 @@ Versioning once 1.0 is out.
 
 ### Changed
 
-- The SQUIRE template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev
-  dependency, `^0.2`) instead of a SQUIRE checkout. `composer squire-copy:sync` rewrites the copy from
+- The Squire template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev
+  dependency, `^0.2`) instead of a Squire checkout. `composer squire-copy:sync` rewrites the copy from
   `vendor/waynestate/squire`, and `composer squire-copy:check` (now part of `composer ci`) exits 1 when the committed
-  copy has drifted. The refresh brings SQUIRE 0.2.0's deploy files: `scripts/release.sh` gains the
+  copy has drifted. The refresh brings Squire 0.2.0's deploy files: `scripts/release.sh` gains the
   `SQUIRE_PROCTOR=enforce` handling, and the `static` target joins the catalog. Fresh flour, straight from the mill.
+
+- Project names written as words except acronyms.
 
 ### Fixed
 
