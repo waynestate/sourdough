@@ -232,7 +232,7 @@
           <li class="log__entry" data-at="0.14"><span class="log__time">08:20</span> <span class="log__what"><strong>Flour: WayneUI.</strong> The interface, from WayneUI's standalone PHP path.</span></li>
           <li class="log__entry" data-at="0.28"><span class="log__time">08:40</span> <span class="log__what"><strong>Water: SESAME.</strong> Sign-in. A fake driver locally, CAS in production.</span></li>
           <li class="log__entry" data-at="0.40"><span class="log__time">09:00</span> <span class="log__what"><strong>Salt: HELMET.</strong> Security headers, a hardened session, and <code>/up</code> for the load balancer.</span></li>
-          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The checks, with PREFLIGHT's CI components and a Citadel release script that runs them.</span></li>
+          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The checks, with Preflight's CI components and a Citadel release script that runs them.</span></li>
           <li class="log__entry" data-at="0.66"><span class="log__time">13:00</span> <span class="log__what"><strong>Doubled.</strong> Well past the gold band. A label goes on: <code>.sourdough/manifest.json</code>.</span></li>
           <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> One starter, five loaves.</span></li>
         </ol>
@@ -280,7 +280,7 @@
               <ul class="crumb__list">
                 <li><code>public/index.php</code> HELMET boots first, then SESAME signs you in</li>
                 <li><code>composer.json</code> helmet and sesame, with proctor for dev</li>
-                <li><code>.gitlab-ci.yml</code> PREFLIGHT components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
+                <li><code>.gitlab-ci.yml</code> Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
                 <li><code>deployments/release.sh</code> and <code>release.ps1</code> the Citadel release script</li>
                 <li><code>.env.example</code> and <code>README.md</code> seeded: yours from day one</li>
                 <li><code>.sourdough/manifest.json</code> the label on the jar</li>
@@ -418,7 +418,7 @@
               </tr>
               <tr>
                 <th scope="row"><span class="pct">1</span> Oven</th>
-                <td><span class="part"><a class="part-link" href="https://preflight.apps.wayne.edu/"><img src="assets/marks/preflight.png" width="34" height="34" alt="">PREFLIGHT</a></span></td>
+                <td><span class="part"><a class="part-link" href="https://preflight.apps.wayne.edu/"><img src="assets/marks/preflight.png" width="34" height="34" alt="">Preflight</a></span></td>
                 <td>CI from <code>.gitlab-ci.yml</code>: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, and a Composer audit.</td>
               </tr>
               <tr>
@@ -569,7 +569,7 @@ php -S localhost:8000 -t public</pre>
             <li class="good"><a class="good__link" href="https://sesame.apps.wayne.edu/"><img class="good__mark" src="assets/marks/sesame.png" width="64" height="64" alt="SESAME mark: an open door with a gold gap"><span class="good__tag"><b>SESAME</b> sign-in</span></a></li>
             <li class="good"><a class="good__link" href="https://helmet.apps.wayne.edu/"><img class="good__mark" src="assets/marks/helmet.png" width="64" height="64" alt="HELMET mark: a white football helmet with a gold facemask"><span class="good__tag"><b>HELMET</b> runtime baseline</span></a></li>
             <li class="good"><a class="good__link" href="https://proctor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/proctor.png" width="64" height="64" alt="PROCTOR mark: a watchful eye with a gold square pupil"><span class="good__tag"><b>PROCTOR</b> the checks</span></a></li>
-            <li class="good"><a class="good__link" href="https://preflight.apps.wayne.edu/"><img class="good__mark" src="assets/marks/preflight.png" width="64" height="64" alt="PREFLIGHT mark: a runway with a gold centre line"><span class="good__tag"><b>PREFLIGHT</b> shared CI</span></a></li>
+            <li class="good"><a class="good__link" href="https://preflight.apps.wayne.edu/"><img class="good__mark" src="assets/marks/preflight.png" width="64" height="64" alt="Preflight mark: a runway with a gold centre line"><span class="good__tag"><b>Preflight</b> shared CI</span></a></li>
           </ul>
         </div>
         <div class="shelf">
@@ -584,11 +584,11 @@ php -S localhost:8000 -t public</pre>
         <div class="shelf">
           <h3 class="shelf__sign">Proofing now</h3>
           <ul class="shelf__row">
-            <li class="good good--soon"><a class="good__link" href="https://squire.apps.wayne.edu/"><img class="good__mark" src="assets/marks/squire.png" width="64" height="64" alt="SQUIRE mark: a satchel with a gold buckle"><span class="good__tag"><b>SQUIRE</b> carries releases</span></a></li>
-            <li class="good good--soon"><a class="good__link" href="https://rollcall.apps.wayne.edu/"><img class="good__mark" src="assets/marks/rollcall.png" width="64" height="64" alt="ROLLCALL mark: an open register with gold ticks"><span class="good__tag"><b>ROLLCALL</b> every app, present</span></a></li>
+            <li class="good good--soon"><a class="good__link" href="https://squire.apps.wayne.edu/"><img class="good__mark" src="assets/marks/squire.png" width="64" height="64" alt="Squire mark: a satchel with a gold buckle"><span class="good__tag"><b>Squire</b> carries releases</span></a></li>
+            <li class="good good--soon"><a class="good__link" href="https://rollcall.apps.wayne.edu/"><img class="good__mark" src="assets/marks/rollcall.png" width="64" height="64" alt="Rollcall mark: an open register with gold ticks"><span class="good__tag"><b>Rollcall</b> every app, present</span></a></li>
             <li class="good good--soon"><a class="good__link" href="https://advisor.apps.wayne.edu/"><img class="good__mark" src="assets/marks/advisor.png" width="64" height="64" alt="ADVISOR mark: a speech bubble holding a gold compass needle"><span class="good__tag"><b>ADVISOR</b> what applies next</span></a></li>
-            <li class="good good--soon"><a class="good__link" href="https://drawbridge.apps.wayne.edu/"><img class="good__mark" src="assets/marks/drawbridge.png" width="64" height="64" alt="DRAWBRIDGE mark: a castle tower lowering its bridge on a gold chain"><span class="good__tag"><b>DRAWBRIDGE</b> sign-in gateway</span></a></li>
-            <li class="good good--soon"><a class="good__link" href="https://booster.apps.wayne.edu/"><img class="good__mark" src="assets/marks/booster.png" width="64" height="64" alt="BOOSTER mark: a syringe that is also a rocket, with one gold accent"><span class="good__tag"><b>BOOSTER</b> PHP upgrades</span></a></li>
+            <li class="good good--soon"><a class="good__link" href="https://drawbridge.apps.wayne.edu/"><img class="good__mark" src="assets/marks/drawbridge.png" width="64" height="64" alt="Drawbridge mark: a castle tower lowering its bridge on a gold chain"><span class="good__tag"><b>Drawbridge</b> sign-in gateway</span></a></li>
+            <li class="good good--soon"><a class="good__link" href="https://booster.apps.wayne.edu/"><img class="good__mark" src="assets/marks/booster.png" width="64" height="64" alt="Booster mark: a syringe that is also a rocket, with one gold accent"><span class="good__tag"><b>Booster</b> PHP upgrades</span></a></li>
           </ul>
         </div>
       </div>

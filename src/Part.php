@@ -9,7 +9,7 @@ namespace Waynestate\Sourdough;
  *
  * These are the other projects in the stack that the raw template already
  * includes: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks) and the
- * PREFLIGHT CI components. A plan's `parts` is a subset of these.
+ * Preflight CI components. A plan's `parts` is a subset of these.
  */
 enum Part: string
 {

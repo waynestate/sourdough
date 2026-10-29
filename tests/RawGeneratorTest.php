@@ -305,7 +305,7 @@ final class RawGeneratorTest extends TestCase
     {
         $target = $this->generateFromRealTemplate();
 
-        // The raw deploy files from SQUIRE's checked copy are installed at
+        // The raw deploy files from Squire's checked copy are installed at
         // their catalog paths, as-is.
         foreach ([
             'build.sh',
@@ -336,7 +336,7 @@ final class RawGeneratorTest extends TestCase
         $path = $target . '/scripts/release.sh';
 
         self::assertFileExists($path);
-        // The mode comes from SQUIRE's manifest (755). This needs a Unix
+        // The mode comes from Squire's manifest (755). This needs a Unix
         // filesystem; the test suite runs in Docker.
         self::assertNotSame(0, fileperms($path) & 0111, 'scripts/release.sh should be executable');
     }
@@ -345,7 +345,7 @@ final class RawGeneratorTest extends TestCase
     {
         $target = $this->generateFromRealTemplate();
 
-        // The old Sourdough release scripts are gone; SQUIRE's are the only ones.
+        // The old Sourdough release scripts are gone; Squire's are the only ones.
         self::assertFileDoesNotExist($target . '/deployments/release.sh');
         self::assertFileDoesNotExist($target . '/deployments/release.ps1');
         self::assertFileExists($target . '/scripts/release.sh');
@@ -380,7 +380,7 @@ final class RawGeneratorTest extends TestCase
         self::assertArrayNotHasKey('repositories', $composer);
         self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
 
-        // All seven setting names, each empty and marked as coming from PLAYBOOK.
+        // All seven setting names, each empty and marked as coming from Playbook.
         $env = (string) file_get_contents($target . '/.env.example');
         foreach (RawGenerator::PLAYBOOK_ENV_VARS as $name) {
             self::assertStringContainsString("# {$name}= # from PLAYBOOK when unset", $env, $name);

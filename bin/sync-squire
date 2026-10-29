@@ -4,12 +4,12 @@
 declare(strict_types=1);
 
 /**
- * Keep the checked copy of SQUIRE's deploy templates in templates/squire/
- * in step with the installed SQUIRE package (vendor/waynestate/squire).
+ * Keep the checked copy of Squire's deploy templates in templates/squire/
+ * in step with the installed Squire package (vendor/waynestate/squire).
  *
- * The export and the drift detection are done by SQUIRE's own
+ * The export and the drift detection are done by Squire's own
  * bin/export-templates.php, so the rules for what belongs in the copy live
- * in SQUIRE, not here. This script only finds the package, clears the copy
+ * in Squire, not here. This script only finds the package, clears the copy
  * before a refresh (the exporter writes files but never removes stale ones),
  * and passes the exit code straight through. A squire keeps the armour
  * polished; the copy stays in step.
@@ -20,9 +20,9 @@ declare(strict_types=1);
  *   php bin/sync-squire --to=<dir>      # sync or check another directory
  *
  * Exit codes:
- *   0  the copy matches a fresh export from the installed SQUIRE package
+ *   0  the copy matches a fresh export from the installed Squire package
  *   1  the copy has drifted (a file differs, is missing, or is extra)
- *   2  the tool could not run (SQUIRE not installed, bad arguments)
+ *   2  the tool could not run (Squire not installed, bad arguments)
  */
 
 $repoRoot = dirname(__DIR__);

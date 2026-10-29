@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough;
 
 /**
- * How a generated app wires PLAYBOOK (waynestate/playbook), WSU's private
+ * How a generated app wires Playbook (waynestate/playbook), WSU's private
  * shared-values package on git.wayne.edu.
  *
- * The stack reads each value from the environment first, then from PLAYBOOK,
+ * The stack reads each value from the environment first, then from Playbook,
  * so an app installs without it by default: not every developer has read
  * access to the package.
  */
@@ -28,7 +28,7 @@ enum PlaybookMode: string
     case Require = 'require';
 
     /**
-     * No PLAYBOOK wiring at all: no suggest, no .env.example block, no
+     * No Playbook wiring at all: no suggest, no .env.example block, no
      * README section, no hint.
      */
     case None = 'none';
