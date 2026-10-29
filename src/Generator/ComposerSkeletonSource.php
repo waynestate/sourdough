@@ -61,16 +61,13 @@ final class ComposerSkeletonSource implements SkeletonSource
         fclose($pipes[1]);
         fclose($pipes[2]);
 
+        // The resource is live here, so proc_get_status() reports an array.
         $status = proc_get_status($process);
-        while (is_array($status) && $status['running']) {
+        while ($status['running']) {
             usleep(50000);
             $status = proc_get_status($process);
         }
         proc_close($process);
-
-        if (!is_array($status)) {
-            throw new \RuntimeException(sprintf('Lost track of "%s".', $command[0]));
-        }
 
         $exitCode = (int) $status['exitcode'];
         if (0 !== $exitCode) {
