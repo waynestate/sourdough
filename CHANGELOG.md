@@ -13,6 +13,10 @@ Versioning once 1.0 is out.
   copy has drifted. The refresh brings SQUIRE 0.2.0's deploy files: `scripts/release.sh` gains the
   `SQUIRE_PROCTOR=enforce` handling, and the `static` target joins the catalog. Fresh flour, straight from the mill.
 
+### Fixed
+
+- Fixed: `--laravel --inertia` is accepted.
+
 ## 0.1.3 (2026-10-29)
 
 ### Added

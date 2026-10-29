@@ -53,7 +53,7 @@ Options:
 - `--raw` use the raw PHP base
 - `--laravel` use the Laravel base
 - `--vue` add a Vue front end
-- `--inertia` use Inertia (Laravel only)
+- `--inertia` use Inertia/Vue (implies `--laravel`)
 - `--sail` use Laravel Sail for the local runtime (Laravel paths)
 - `--docker` use a Docker image for the local runtime (Laravel paths)
 - `--dry-run` print the plan and write nothing
@@ -80,7 +80,7 @@ The app name (from `--name`, from the plan, or from the basename of `<dir>`) mus
 | `--raw --vue` | Raw PHP + Vue SPA over JSON |
 | `--laravel` | Laravel + Blade |
 | `--laravel --vue` | Laravel + Blade + Vue islands |
-| `--laravel --inertia` | Laravel + Inertia/Vue |
+| `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
 Only `--raw` generates in 0.1. The other permutations print the plan and exit `1` with "not available in this release"; later steps add them.
 
