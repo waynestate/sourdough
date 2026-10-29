@@ -210,25 +210,42 @@ h1, h2, h3 {
 .hero__grid {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: center;
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+  grid-template-areas:
+    "banner banner"
+    "art copy";
+  column-gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+/* The name is the loaf: it takes the whole bench, crust edge to crust edge. */
+.hero__banner {
+  grid-area: banner;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
 }
 .hero__title {
   margin: 0;
-  font-size: clamp(3.6rem, 10vw, 7rem);
+  font-size: clamp(3.1rem, 13.2vw, 11rem);
   line-height: 0.92;
   color: var(--sd-green);
 }
 .hero__letters { display: inline-flex; }
 .hero__letters > span { display: inline-block; transform-origin: 50% 100%; }
+/* A note the baker pinned under the end of the word. */
 .hero__tagline {
-  margin: 0.6rem 0 1.25rem;
+  margin: 0.4rem 0 0;
   font-family: var(--sd-hand);
   font-weight: 700;
-  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
   color: var(--sd-brown-ink);
   line-height: 1.1;
+  text-align: right;
+  transform: rotate(-2deg);
+}
+.hero__copy {
+  grid-area: copy;
+  min-width: 0;
 }
 .hero__blurb {
   max-width: 34rem;
@@ -313,12 +330,16 @@ h1, h2, h3 {
   text-decoration-thickness: 2px;
 }
 
-/* The art: a floured wooden board, the mark as a jar on it, and chalk notes. */
+/* The art: a floured wooden board, the mark as a jar on it, and chalk notes.
+   The board proofs up under the name's baseline; a fed starter does not ask
+   permission, so the letters stay in front of it. */
 .hero__art {
+  grid-area: art;
   position: relative;
+  z-index: 1;
   display: grid;
   justify-items: center;
-  padding-block: 1.5rem 0;
+  margin-top: -3rem;
 }
 .board {
   position: absolute;
@@ -333,7 +354,6 @@ h1, h2, h3 {
 .jar {
   position: relative;
   width: min(330px, 70vw);
-  margin-top: 1.5rem;
 }
 .jar__mark {
   display: block;
@@ -388,8 +408,9 @@ h1, h2, h3 {
   font-size: 1.3rem;
   color: var(--sd-brown-ink);
 }
-.note--risen { top: -19%; right: -36%; transform: rotate(8deg); }
-.note--fed { top: 82%; left: -40%; transform: rotate(-7deg); }
+/* On the board's front edge, one on each side of the feeding button. */
+.note--risen { bottom: -16%; right: -30%; transform: rotate(6deg); }
+.note--fed { bottom: -16%; left: -30%; transform: rotate(-7deg); }
 
 .feed {
   position: relative;
@@ -1061,8 +1082,11 @@ h1, h2, h3 {
 @media (max-width: 860px) {
   .site-nav { display: none; }
   .ticket { margin-inline-start: auto; }
-  .hero__grid { grid-template-columns: minmax(0, 1fr); }
-  .hero__art { padding-block-start: 2.5rem; }
+  .hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "banner" "art" "copy";
+  }
+  .hero__art { margin-top: 1.5rem; }
   .jar { width: min(240px, 52vw); }
   .proof__grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1092,7 +1116,6 @@ h1, h2, h3 {
 }
 
 @media (max-width: 360px) {
-  .hero__title { font-size: 3.1rem; }
   .good { width: 50%; }
   .recipe-cmd__code { padding-inline-end: 0; padding-top: 2.2rem; }
 }
@@ -1116,7 +1139,8 @@ h1, h2, h3 {
 .motion .eyebrow {
   animation: fade-up 0.8s var(--sd-ease-out) both;
 }
-.motion .hero__tagline { animation-delay: 0.65s; }
+/* The tagline keeps its pin angle while it arrives, like the eyebrow. */
+.motion .hero__tagline { animation-delay: 0.65s; animation-name: fade-up-tilt-tag; }
 .motion .hero__blurb { animation-delay: 0.8s; }
 .motion .recipe-cmd { animation-delay: 0.95s; }
 .motion .hero__cta { animation-delay: 1.1s; }
@@ -1128,6 +1152,10 @@ h1, h2, h3 {
 @keyframes fade-up-tilt {
   from { opacity: 0; transform: translateY(16px) rotate(-1.5deg); }
   to { opacity: 1; transform: rotate(-1.5deg); }
+}
+@keyframes fade-up-tilt-tag {
+  from { opacity: 0; transform: translateY(16px) rotate(-2deg); }
+  to { opacity: 1; transform: rotate(-2deg); }
 }
 
 /* The mark proofs: it rises out of the board, then breathes slowly, the
