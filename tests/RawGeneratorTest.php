@@ -7,6 +7,7 @@ namespace Waynestate\Sourdough\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\RawGenerator;
+use Waynestate\Sourdough\PlaybookMode;
 
 final class RawGeneratorTest extends TestCase
 {
@@ -370,6 +371,70 @@ final class RawGeneratorTest extends TestCase
         self::assertArrayNotHasKey('repositories', $composer);
     }
 
+    public function testDefaultGenerationSuggestsPlaybook(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
+        self::assertArrayNotHasKey('repositories', $composer);
+        self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
+
+        // All seven setting names, each empty and marked as coming from PLAYBOOK.
+        $env = (string) file_get_contents($target . '/.env.example');
+        foreach (RawGenerator::PLAYBOOK_ENV_VARS as $name) {
+            self::assertStringContainsString("# {$name}= # from PLAYBOOK when unset", $env, $name);
+        }
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringContainsString('## WSU values (PLAYBOOK)', $readme);
+        self::assertStringContainsString('curl --fail -H "PRIVATE-TOKEN: $GITLAB_TOKEN"', $readme);
+        self::assertStringContainsString('$env:GITLAB_TOKEN', $readme);
+        self::assertStringContainsString('git clone https://git.wayne.edu/enterprise-apps/playbook.git', $readme);
+        self::assertStringContainsString('If you get a 404, ask the Enterprise Applications team for read access.', $readme);
+
+        // The section sits before the Handbook section, which stays last.
+        $sectionPos = strpos($readme, '## WSU values (PLAYBOOK)');
+        $handbookPos = strpos($readme, '## Handbook');
+        self::assertIsInt($sectionPos);
+        self::assertIsInt($handbookPos);
+        self::assertLessThan($handbookPos, $sectionPos);
+    }
+
+    public function testRequireModeAddsTheRepositoryAndTheRequire(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::Require);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame([
+            ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
+        ], $composer['repositories']);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        // The default wiring stays in place under Require mode.
+        self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
+
+        // The rest of the require section is untouched.
+        self::assertSame('^8.3', $composer['require']['php']);
+        self::assertSame('^0.2', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.1', $composer['require']['waynestate/sesame']);
+    }
+
+    public function testNoneModeLeavesTheAppWithoutPlaybook(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::None);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayNotHasKey('suggest', $composer);
+        self::assertArrayNotHasKey('repositories', $composer);
+        self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringNotContainsString('PLAYBOOK', $env);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('WSU values (PLAYBOOK)', $readme);
+    }
+
     /**
      * Names that used to be pasted into file names and contents unescaped.
      *
@@ -424,10 +489,10 @@ final class RawGeneratorTest extends TestCase
     /**
      * Generate an app from the real templates/raw dir and return the target.
      */
-    private function generateFromRealTemplate(): string
+    private function generateFromRealTemplate(PlaybookMode $playbook = PlaybookMode::Suggest): string
     {
         $target = $this->makeTempDir();
-        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App');
+        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App', [], $playbook);
 
         return $target;
     }

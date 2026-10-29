@@ -225,6 +225,93 @@ final class NewCommandTest extends TestCase
         self::assertSame(['name' => 'demo', 'raw' => true], $manifest['answers']);
     }
 
+    public function testDefaultRunPrintsThePlaybookHint(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertStringContainsString('WSU values: see "WSU values (PLAYBOOK)" in README.md, or re-run with --playbook.', $tester->getDisplay());
+    }
+
+    public function testPlaybookFlagRequiresThePackageAndAddsTheRepository(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--playbook' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame([
+            ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
+        ], $composer['repositories']);
+        // The default wiring stays in place under --playbook.
+        self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertTrue($manifest['answers']['playbook']);
+
+        // The hint is for the default mode; with --playbook the package is already in.
+        self::assertStringNotContainsString('or re-run with --playbook', $tester->getDisplay());
+    }
+
+    public function testNoPlaybookFlagSkipsThePlaybookWiring(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--no-playbook' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('suggest', $composer);
+        self::assertArrayNotHasKey('repositories', $composer);
+        self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringNotContainsString('PLAYBOOK', $env);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('WSU values (PLAYBOOK)', $readme);
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertTrue($manifest['answers']['no-playbook']);
+
+        self::assertStringNotContainsString('or re-run with --playbook', $tester->getDisplay());
+    }
+
+    public function testPlaybookAndNoPlaybookAreMutuallyExclusive(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--playbook' => true,
+            '--no-playbook' => true,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('--playbook and --no-playbook are mutually exclusive', $tester->getDisplay());
+    }
+
     public function testDescribeAndPlanAreMutuallyExclusive(): void
     {
         $parent = $this->makeTempDir();
