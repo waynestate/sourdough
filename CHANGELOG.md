@@ -5,6 +5,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Changed
+
+- The raw template now requires HELMET `^0.2` and PROCTOR `^0.2`, so `sourdough new` installs the current stack releases instead of the 0.1 line. SESAME stays at `^0.1` until it cuts 0.2.
+
 ## 0.1.1 (2026-10-29)
 
 ### Changed
