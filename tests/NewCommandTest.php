@@ -180,6 +180,33 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('not available in this release', $tester->getDisplay());
     }
 
+    public function testHostileNameExitsOneWritesStderrAndCreatesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        // Run the real binary so stdout and stderr stay separate: the error
+        // must land on stderr, where scripts can read it.
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $pipes = [];
+        $process = proc_open([PHP_BINARY, __DIR__ . '/../bin/sourdough', 'new', $target, '--name', 'a"b'], $descriptors, $pipes);
+        self::assertIsResource($process);
+        fclose($pipes[0]);
+        $stdout = (string) stream_get_contents($pipes[1]);
+        $stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $exit = proc_close($process);
+
+        self::assertSame(1, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
+        self::assertStringContainsString('must start with a letter or number', $stderr);
+        self::assertDirectoryDoesNotExist($target);
+    }
+
     public function testManifestRecordsTheChosenFlags(): void
     {
         $parent = $this->makeTempDir();
