@@ -58,15 +58,22 @@ if (!is_file($export)) {
 }
 
 // The exporter records its version with `git describe` from inside the
-// package. Without a ceiling, git would walk up out of vendor/ and describe
-// whatever repository surrounds it, so pin discovery to the package itself.
+// package. A source checkout is its own git repository, so describe reads
+// the package's own tag. A dist install (composer from a zip) has no .git
+// of its own, and git would walk up out of vendor/ and describe whatever
+// repository surrounds it, such as this one. When the package is not its
+// own root, point GIT_DIR at a path that cannot exist: describe then fails
+// inside the exporter, and it falls back to the version Composer recorded
+// for the installed package.
 $env = [];
 foreach (getenv() as $key => $value) {
     if (is_string($value)) {
         $env[$key] = $value;
     }
 }
-$env['GIT_CEILING_DIRECTORIES'] = $packageDir;
+if (!squireIsOwnGitRoot($packageDir)) {
+    $env['GIT_DIR'] = $packageDir . '/.git-not-a-repo';
+}
 
 if (!$check && !clearDirectory($to)) {
     fwrite(STDERR, "sync-squire: could not clear {$to}; the old copy is left in place\n");
@@ -133,4 +140,43 @@ function clearDirectory(string $dir): bool
     }
 
     return true;
+}
+
+/**
+ * Decide whether $packageDir is the top level of its own git repository.
+ *
+ * A source checkout of the package is, so `git describe` from inside it
+ * reads the package's own tag. A dist install is not: git would walk up
+ * and describe the repository that surrounds vendor/, such as this one.
+ * Returns false when git is missing or the command fails, which is the
+ * safe side: the exporter then falls back to the Composer version.
+ */
+function squireIsOwnGitRoot(string $packageDir): bool
+{
+    $descriptors = [
+        0 => ['pipe', 'r'],
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+    ];
+    $pipes = [];
+    $process = proc_open(['git', '-C', $packageDir, 'rev-parse', '--show-toplevel'], $descriptors, $pipes);
+    if (!is_resource($process)) {
+        return false;
+    }
+    fclose($pipes[0]);
+    $toplevel = (string) stream_get_contents($pipes[1]);
+    stream_get_contents($pipes[2]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $exit = proc_close($process);
+
+    $toplevel = trim($toplevel);
+    if ($exit !== 0 || $toplevel === '') {
+        return false;
+    }
+
+    $realToplevel = realpath($toplevel);
+    $realPackage = realpath($packageDir);
+
+    return $realToplevel !== false && $realToplevel === $realPackage;
 }
