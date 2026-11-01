@@ -161,11 +161,13 @@ final class Oracle
         try {
             $statement = oci_parse($connection, $sql);
             if (false === $statement) {
-                throw $this->failure(oci_error($connection));
+            throw $this->failure(oci_error());
             }
 
-            foreach ($binds as $name => $value) {
-                oci_bind_by_name($statement, $name, $value);
+            // oci_bind_by_name binds by reference: bind each array slot, never the
+            // loop variable, or every placeholder ends up with the last value.
+            foreach (array_keys($binds) as $name) {
+                oci_bind_by_name($statement, $name, $binds[$name]);
             }
 
             if (!oci_execute($statement)) {
