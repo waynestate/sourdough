@@ -7,9 +7,10 @@ Versioning once 1.0 is out.
 
 ### Changed
 
-- Changed: the Squire copy comes from Squire 0.3.3.
+- Changed: the Squire copy comes from Squire 0.4.0 (adds oracle-check.php to every target; the dev dependency is now ^0.4).
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.3 (release options can now live in ./.env.squire).
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.4 (the local .env.squire file is now git-ignored).
+- Changed: the deploy layer's Squire kit is refreshed to 0.4.0 (deploy/oracle-check.php arrives; release.sh runs it without failing the release).
 
 ## 0.1.4 (2026-10-29)
 
