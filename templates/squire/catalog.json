@@ -25,6 +25,12 @@
             "appMayOwn": false
         },
         {
+            "path": "oracle-check.php",
+            "group": "release",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": "public/up.php",
             "group": "release",
             "executable": false,
@@ -141,6 +147,12 @@
             "appMayOwn": false
         },
         {
+            "path": "oracle-check.php",
+            "group": "release",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": "docker-compose.squire.yml",
             "group": "parity",
             "executable": false,
@@ -234,6 +246,12 @@
         },
         {
             "path": "health.php",
+            "group": "release",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": "oracle-check.php",
             "group": "release",
             "executable": false,
             "appMayOwn": false
