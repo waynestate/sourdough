@@ -1,7 +1,13 @@
 {
     "require": {
         "waynestate/helmet": "^0.2",
-        "waynestate/sesame": "^0.2"
+        "waynestate/sesame": "^0.2",
+        "yajra/laravel-oci8": "^13.14"
+    },
+    "config": {
+        "platform": {
+            "ext-oci8": "3.4.1"
+        }
     },
     "require-dev": {
         "larastan/larastan": "^3.13",

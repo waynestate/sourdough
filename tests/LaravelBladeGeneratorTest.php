@@ -74,9 +74,96 @@ final class LaravelBladeGeneratorTest extends TestCase
         );
         self::assertArrayHasKey('setup', $composer['scripts']);
 
+        // The Oracle driver lands in require with the platform pin that lets
+        // composer install run on a PHP without oci8...
+        self::assertSame('^13.14', $composer['require']['yajra/laravel-oci8']);
+        self::assertSame('3.4.1', $composer['config']['platform']['ext-oci8']);
+        // ...while the skeleton's own config survives the deep merge.
+        self::assertTrue($composer['config']['optimize-autoloader']);
+        self::assertSame('dist', $composer['config']['preferred-install']);
+
         // The skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
+    }
+
+    public function testWiresTheOracleConnectionDormant(): void
+    {
+        $target = $this->generate();
+
+        // The connection ships as its own config file; yajra laravel-oci8
+        // merges it into the database connections on boot.
+        self::assertFileExists($target . '/config/oracle.php');
+        $oracle = (string) file_get_contents($target . '/config/oracle.php');
+        self::assertStringContainsString("'driver' => 'oracle'", $oracle);
+        foreach ([
+            'ORACLE_TNS',
+            'ORACLE_HOST',
+            'ORACLE_PORT',
+            'ORACLE_SERVICE_NAME',
+            'ORACLE_USERNAME',
+            'ORACLE_PASSWORD',
+        ] as $setting) {
+            self::assertStringContainsString("env('$setting', '')", $oracle, $setting);
+        }
+
+        // Dormant: the file only defines the connection, it never sets the
+        // default, and nothing in the env additions points at it.
+        self::assertStringNotContainsString("'default'", $oracle);
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringNotContainsString('DB_CONNECTION=oracle', $env);
+
+        // Every setting is present in .env.example, commented out.
+        foreach ([
+            '#ORACLE_USERNAME=',
+            '#ORACLE_PASSWORD=',
+            '#ORACLE_TNS=',
+            '#ORACLE_HOST=',
+            '#ORACLE_PORT=',
+            '#ORACLE_SERVICE_NAME=',
+        ] as $line) {
+            self::assertStringContainsString($line, $env);
+        }
+    }
+
+    public function testShipsTheOracleCheckCommandAndSentences(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Console/Commands/OracleCheck.php');
+        self::assertFileExists($target . '/app/Support/OracleErrors.php');
+
+        // The command runs Squire's check file and knows its absence.
+        $command = (string) file_get_contents($target . '/app/Console/Commands/OracleCheck.php');
+        self::assertStringContainsString("'oracle:check'", $command);
+        self::assertStringContainsString('Check the Oracle settings and connection, in plain language', $command);
+        self::assertStringContainsString('deploy/oracle-check.php', $command);
+        self::assertStringContainsString(
+            'The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.',
+            $command,
+        );
+
+        // Every plain sentence ships, word for word.
+        $errors = (string) file_get_contents($target . '/app/Support/OracleErrors.php');
+        foreach ([
+            'Oracle is set up for this app, but this PHP has no Oracle driver (oci8). Deploy to Citadel, which has it, or use the WSU Sail or Docker image with Oracle.',
+            'Oracle could not find the connect name in ORACLE_TNS. Use host:port/service or a full descriptor.',
+            'The Oracle listener answered but that service is not available. Check ORACLE_SERVICE_NAME; the database may be in maintenance.',
+            'There is no Oracle listener at that address. Check the host and port; the database may be down.',
+            'Oracle refused the username or password. Check ORACLE_USERNAME and ORACLE_PASSWORD.',
+            'The login worked, but this account lacks permission on that table or view (ORA-%d). Ask the data owner for the grant.',
+        ] as $sentence) {
+            self::assertStringContainsString($sentence, $errors);
+        }
+        foreach ([12154, 12514, 12541, 1017, 1031, 942] as $code) {
+            self::assertStringContainsString((string) $code, $errors);
+        }
+
+        // The reportable callback wires the sentences into logging.
+        $bootstrap = (string) file_get_contents($target . '/bootstrap/app.php');
+        self::assertStringContainsString('->reportable(', $bootstrap);
+        self::assertStringContainsString('OracleErrors::describe', $bootstrap);
+        self::assertStringContainsString("'[oracle] '", $bootstrap);
     }
 
     public function testAppendsTheEnvAdditions(): void

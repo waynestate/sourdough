@@ -383,6 +383,27 @@ final class RawGeneratorTest extends TestCase
         self::assertFileExists($target . '/tests/SmokeTest.php');
     }
 
+    public function testGeneratedAppShipsTheOracleHelper(): void
+    {
+        $target = $this->generateFromRealTemplate();
+
+        self::assertFileExists($target . '/src/Oracle.php');
+        self::assertFileExists($target . '/src/OracleException.php');
+        self::assertFileExists($target . '/tests/OracleTest.php');
+
+        // The helper is autoloaded from src/, and no oci8 requirement is added.
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['App\\' => 'src/'], $composer['autoload']['psr-4']);
+        self::assertArrayNotHasKey('ext-oci8', $composer['require'] ?? []);
+
+        // The keys are present but commented out, so nothing connects until set.
+        $env = (string) file_get_contents($target . '/.env.example');
+        foreach (['# ORACLE_USERNAME=', '# ORACLE_PASSWORD=', '# ORACLE_TNS=', '# ORACLE_HOST=', '# ORACLE_PORT=', '# ORACLE_SERVICE_NAME='] as $line) {
+            self::assertStringContainsString($line, $env, $line);
+        }
+        self::assertStringNotContainsString("ORACLE_USERNAME='", $env);
+    }
+
     public function testDefaultGenerationSuggestsPlaybook(): void
     {
         $target = $this->generateFromRealTemplate();
