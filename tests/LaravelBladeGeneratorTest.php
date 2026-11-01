@@ -126,6 +126,46 @@ final class LaravelBladeGeneratorTest extends TestCase
         }
     }
 
+    public function testShipsTheOracleCheckCommandAndSentences(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Console/Commands/OracleCheck.php');
+        self::assertFileExists($target . '/app/Support/OracleErrors.php');
+
+        // The command runs Squire's check file and knows its absence.
+        $command = (string) file_get_contents($target . '/app/Console/Commands/OracleCheck.php');
+        self::assertStringContainsString("'oracle:check'", $command);
+        self::assertStringContainsString('Check the Oracle settings and connection, in plain language', $command);
+        self::assertStringContainsString('deploy/oracle-check.php', $command);
+        self::assertStringContainsString(
+            'The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.',
+            $command,
+        );
+
+        // Every plain sentence ships, word for word.
+        $errors = (string) file_get_contents($target . '/app/Support/OracleErrors.php');
+        foreach ([
+            'Oracle is set up for this app, but this PHP has no Oracle driver (oci8). Deploy to Citadel, which has it, or use the WSU Sail or Docker image with Oracle.',
+            'Oracle could not find the connect name in ORACLE_TNS. Use host:port/service or a full descriptor.',
+            'The Oracle listener answered but that service is not available. Check ORACLE_SERVICE_NAME; the database may be in maintenance.',
+            'There is no Oracle listener at that address. Check the host and port; the database may be down.',
+            'Oracle refused the username or password. Check ORACLE_USERNAME and ORACLE_PASSWORD.',
+            'The login worked, but this account lacks permission on that table or view (ORA-%d). Ask the data owner for the grant.',
+        ] as $sentence) {
+            self::assertStringContainsString($sentence, $errors);
+        }
+        foreach ([12154, 12514, 12541, 1017, 1031, 942] as $code) {
+            self::assertStringContainsString((string) $code, $errors);
+        }
+
+        // The reportable callback wires the sentences into logging.
+        $bootstrap = (string) file_get_contents($target . '/bootstrap/app.php');
+        self::assertStringContainsString('->reportable(', $bootstrap);
+        self::assertStringContainsString('OracleErrors::describe', $bootstrap);
+        self::assertStringContainsString("'[oracle] '", $bootstrap);
+    }
+
     public function testAppendsTheEnvAdditions(): void
     {
         $target = $this->generate();

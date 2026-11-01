@@ -1,8 +1,10 @@
 <?php
 
+use App\Support\OracleErrors;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Log;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,5 +25,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // platform address never lives in the app's code.
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Oracle failures earn one plain sentence, logged once under
+        // [oracle]; normal reporting continues either way.
+        $exceptions->reportable(function (\Throwable $e): void {
+            $sentence = OracleErrors::describe($e);
+
+            if (null !== $sentence) {
+                Log::info('[oracle] '.$sentence);
+            }
+        });
     })->create();
