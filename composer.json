@@ -75,5 +75,10 @@
         "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here."
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "proctor": {
+            "wayneui.copies": "fail"
+        }
+    }
 }
