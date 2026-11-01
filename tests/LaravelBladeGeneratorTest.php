@@ -74,9 +74,56 @@ final class LaravelBladeGeneratorTest extends TestCase
         );
         self::assertArrayHasKey('setup', $composer['scripts']);
 
+        // The Oracle driver lands in require with the platform pin that lets
+        // composer install run on a PHP without oci8...
+        self::assertSame('^13.14', $composer['require']['yajra/laravel-oci8']);
+        self::assertSame('3.4.1', $composer['config']['platform']['ext-oci8']);
+        // ...while the skeleton's own config survives the deep merge.
+        self::assertTrue($composer['config']['optimize-autoloader']);
+        self::assertSame('dist', $composer['config']['preferred-install']);
+
         // The skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
+    }
+
+    public function testWiresTheOracleConnectionDormant(): void
+    {
+        $target = $this->generate();
+
+        // The connection ships as its own config file; yajra laravel-oci8
+        // merges it into the database connections on boot.
+        self::assertFileExists($target . '/config/oracle.php');
+        $oracle = (string) file_get_contents($target . '/config/oracle.php');
+        self::assertStringContainsString("'driver' => 'oracle'", $oracle);
+        foreach ([
+            'ORACLE_TNS',
+            'ORACLE_HOST',
+            'ORACLE_PORT',
+            'ORACLE_SERVICE_NAME',
+            'ORACLE_USERNAME',
+            'ORACLE_PASSWORD',
+        ] as $setting) {
+            self::assertStringContainsString("env('$setting', '')", $oracle, $setting);
+        }
+
+        // Dormant: the file only defines the connection, it never sets the
+        // default, and nothing in the env additions points at it.
+        self::assertStringNotContainsString("'default'", $oracle);
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringNotContainsString('DB_CONNECTION=oracle', $env);
+
+        // Every setting is present in .env.example, commented out.
+        foreach ([
+            '#ORACLE_USERNAME=',
+            '#ORACLE_PASSWORD=',
+            '#ORACLE_TNS=',
+            '#ORACLE_HOST=',
+            '#ORACLE_PORT=',
+            '#ORACLE_SERVICE_NAME=',
+        ] as $line) {
+            self::assertStringContainsString($line, $env);
+        }
     }
 
     public function testAppendsTheEnvAdditions(): void

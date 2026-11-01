@@ -22,8 +22,8 @@ use Waynestate\Sourdough\PlaybookMode;
  * {{app_slug}} replaced as in the raw template. Its two control files are
  * applied, not copied: composer.overlay.json merges into the app's
  * composer.json (require and require-dev entries added, the overlay winning
- * a clash, scripts keys added), and env-additions.txt appends to the app's
- * .env.example.
+ * a clash, scripts keys added, config deep-merged with the app keeping its
+ * own keys), and env-additions.txt appends to the app's .env.example.
  *
  * The generator refuses an existing non-empty target dir and writes nothing
  * outside the target dir. A good starter rises on its own.
@@ -136,8 +136,10 @@ final class LaravelBladeGenerator
     /**
      * Merge composer.overlay.json into the app's composer.json: the
      * require and require-dev entries are added (the overlay wins a clash),
-     * and the scripts keys are added. Written pretty-printed with unescaped
-     * slashes and a trailing newline.
+     * the scripts keys are added, and config is deep-merged so the app keeps
+     * its own config (a platform.php pin, plugin allowances) while the
+     * overlay wins a clash on the same key. Written pretty-printed with
+     * unescaped slashes and a trailing newline.
      *
      * @throws \RuntimeException when a file cannot be read, parsed or written
      */
@@ -177,6 +179,18 @@ final class LaravelBladeGenerator
             throw new \RuntimeException('composer.overlay.json has no usable scripts section.');
         }
         $composer['scripts'] = array_merge($scripts, $addedScripts);
+
+        $addedConfig = $overlay['config'] ?? [];
+        if (is_array($addedConfig) && [] !== $addedConfig) {
+            $existingConfig = $composer['config'] ?? [];
+            if (!is_array($existingConfig)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable config section.', $composerPath));
+            }
+            // Deep-merge: the app keeps its own config, the overlay wins a
+            // clash on the same key (for example platform.ext-oci8 next to a
+            // platform.php pin).
+            $composer['config'] = array_replace_recursive($existingConfig, $addedConfig);
+        }
 
         $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if (false === $encoded) {

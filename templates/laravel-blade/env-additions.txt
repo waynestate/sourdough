@@ -39,3 +39,13 @@ HELMET_CSRF_ENABLED=
 HELMET_CSRF_ALLOW_SAME_SITE=
 HELMET_CSRF_TRUSTED_ORIGINS=
 HELMET_CSRF_EXCEPT=
+#
+# Oracle: leave these empty if your app does not use Oracle; nothing
+# connects until they are set. On Citadel, set them in the app's
+# environment settings, never in a file in git.
+#ORACLE_USERNAME=
+#ORACLE_PASSWORD=
+#ORACLE_TNS=
+#ORACLE_HOST=
+#ORACLE_PORT=
+#ORACLE_SERVICE_NAME=
