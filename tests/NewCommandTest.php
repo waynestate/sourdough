@@ -13,6 +13,8 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Waynestate\Sourdough\Command\NewCommand;
 use Waynestate\Sourdough\Describe;
+use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
+use Waynestate\Sourdough\Generator\SkeletonSource;
 
 final class NewCommandTest extends TestCase
 {
@@ -262,7 +264,7 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('--raw and --laravel are mutually exclusive', $tester->getDisplay());
     }
 
-    public function testNonRawRealRunExitsOneAndWritesNothing(): void
+    public function testUnavailableShapeExitsOneAndWritesNothing(): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
@@ -271,11 +273,74 @@ final class NewCommandTest extends TestCase
         $exit = $tester->execute([
             'dir' => $target,
             '--laravel' => true,
+            '--vue' => true,
         ]);
 
         self::assertSame(1, $exit);
         self::assertDirectoryDoesNotExist($target);
         self::assertStringContainsString('not available in this release', $tester->getDisplay());
+    }
+
+    public function testInertiaExitsOneAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--inertia' => true,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('not available in this release', $tester->getDisplay());
+    }
+
+    public function testRawVueExitsOneAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--raw' => true,
+            '--vue' => true,
+        ]);
+
+        self::assertSame(1, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('not available in this release', $tester->getDisplay());
+    }
+
+    public function testLaravelGeneratesWithTheFixtureSource(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--laravel' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/.sourdough/manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('laravel-blade', $manifest['template']);
+        self::assertTrue($manifest['answers']['laravel']);
+
+        // The overlay replaced the skeleton's files.
+        self::assertFileExists($target . '/routes/web.php');
+        self::assertFileExists($target . '/resources/views/dashboard.blade.php');
+
+        // The Next steps suit the Laravel shape.
+        self::assertStringContainsString('cp .env.example .env', $tester->getDisplay());
+        self::assertStringContainsString('php artisan key:generate', $tester->getDisplay());
+        self::assertStringContainsString('php artisan serve', $tester->getDisplay());
+        self::assertStringNotContainsString('php -S localhost:8000', $tester->getDisplay());
     }
 
     public function testHostileNameExitsOneWritesStderrAndCreatesNothing(): void
@@ -589,9 +654,9 @@ final class NewCommandTest extends TestCase
         });
     }
 
-    private function createCommand(?Describe $describe = null): NewCommand
+    private function createCommand(?Describe $describe = null, ?SkeletonSource $skeletonSource = null): NewCommand
     {
-        return new NewCommand($describe);
+        return new NewCommand($describe, $skeletonSource);
     }
 
     private function describeWithResponse(string $content): Describe
