@@ -20,6 +20,14 @@ Versioning once 1.0 is out.
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.4 (the local .env.squire file is now git-ignored).
 - Changed: the deploy layer's Squire kit is refreshed to 0.4.0 (deploy/oracle-check.php arrives; release.sh runs it without failing the release).
 
+### Fixed
+
+- Fixed: `composer install` in a freshly baked Laravel + Blade app no longer stops at the plugin gate; the overlay allows `phpstan/extension-installer` next to the pinned `ext-oci8`.
+- Fixed: a fresh Laravel + Blade app boots with nothing in its environment. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe` (SESAME wants a non-empty fake username), and the appended SESAME and HELMET env keys ship commented out so their defaults hold instead of being overridden by empty values.
+- Fixed: the plan printed after `sourdough new --laravel` no longer carries the "(not available in this release)" suffix; only the permutations that really refuse keep it.
+- Fixed: the generated Laravel + Blade app passes its own `composer ci`. The template's Oracle command, Oracle error helper and bootstrap are Pint-clean, and Pint skips the two Squire-owned root scripts (`health.php`, `oracle-check.php`) through `notPath`.
+- Fixed: the agent-ready site twins (`site/index.md`, `site/llms-full.txt`) are resynced with the README, so the `site:agent-ready-check` step of `composer ci` passes.
+
 ## 0.1.4 (2026-10-29)
 
 ### Added
