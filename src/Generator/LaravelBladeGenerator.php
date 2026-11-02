@@ -11,7 +11,8 @@ use Waynestate\Sourdough\PlaybookMode;
  * Generate a Laravel + Blade app: a fresh Laravel skeleton from a
  * SkeletonSource, the laravel-blade overlay copied over it, the stack's
  * composer packages merged into the app's composer.json, Squire's laravel
- * deploy files installed, Playbook wired in, and the manifest written.
+ * deploy files installed, Playbook and ADVISOR wired in, and the manifest
+ * written.
  *
  * The skeleton source defaults to ComposerSkeletonSource, which runs
  * `composer create-project laravel/laravel`; tests use FixtureSkeletonSource
@@ -57,11 +58,12 @@ final class LaravelBladeGenerator
      *
      * @param array<string, string|bool> $answers  each option the user chose, recorded in the manifest
      * @param PlaybookMode               $playbook how the app wires Playbook (see GeneratorSupport::applyPlaybook)
+     * @param bool                       $advisor  wire ADVISOR into the app (the default) or remove the wiring (--no-advisor)
      *
      * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the skeleton or the template is missing or a file cannot be read, parsed or written
      */
-    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest): void
+    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): void
     {
         RawGenerator::assertValidName($name);
 
@@ -86,6 +88,7 @@ final class LaravelBladeGenerator
 
         $this->support->installSquireFiles($targetDir, 'laravel');
         $this->support->applyPlaybook($targetDir, $playbook);
+        $this->support->applyAdvisor($targetDir, $advisor);
 
         $answers = array_merge(['name' => $name], $answers);
         (new Manifest('laravel-blade', $answers, self::SEEDED_FILES))->write($targetDir);

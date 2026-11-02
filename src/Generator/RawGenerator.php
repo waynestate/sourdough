@@ -27,6 +27,10 @@ use Waynestate\Sourdough\PlaybookMode;
  * documents them in the README; --playbook also requires it with its VCS
  * repository; --no-playbook leaves the app untouched.
  *
+ * The app ships ADVISOR by default: waynestate/advisor under require-dev,
+ * .mcp.json git-ignored and an "ADVISOR" section in the README. With
+ * $advisor false (--no-advisor) the wiring comes out again.
+ *
  * Finally the generator writes `.sourdough/manifest.json` so a later
  * `sourdough feed` knows what was generated, including the Squire files.
  *
@@ -75,6 +79,15 @@ final class RawGenerator
     public const PLAYBOOK_SUGGEST = "WSU's shared values; private, git.wayne.edu";
 
     /**
+     * ADVISOR (waynestate/advisor) is the stack's MCP server, on Packagist.
+     * Every Sourdough app ships it in require-dev by default; --no-advisor
+     * removes the wiring again.
+     */
+    public const ADVISOR_PACKAGE = 'waynestate/advisor';
+
+    public const ADVISOR_VERSION = '^0.1';
+
+    /**
      * The seven setting names Playbook holds, listed in .env.example.
      *
      * @var list<string>
@@ -103,11 +116,12 @@ final class RawGenerator
      *
      * @param array<string, string|bool> $answers  each option the user chose, recorded in the manifest
      * @param PlaybookMode               $playbook how the app wires Playbook (see GeneratorSupport::applyPlaybook)
+     * @param bool                       $advisor  wire ADVISOR into the app (the default) or remove the wiring (--no-advisor)
      *
      * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the template is missing or a file cannot be read or written
      */
-    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest): void
+    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): void
     {
         self::assertValidName($name);
 
@@ -128,6 +142,7 @@ final class RawGenerator
         $this->support->copyDir($this->templateDir, $targetDir, $name, $slug);
         $this->support->installSquireFiles($targetDir);
         $this->support->applyPlaybook($targetDir, $playbook);
+        $this->support->applyAdvisor($targetDir, $advisor);
 
         $answers = array_merge(['name' => $name], $answers);
         (new Manifest('raw', $answers, self::SEEDED_FILES))->write($targetDir);

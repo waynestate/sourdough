@@ -9,7 +9,8 @@ use Waynestate\Sourdough\PlaybookMode;
 /**
  * The steps every Sourdough generator shares: refusing a non-empty target,
  * copying a template tree with placeholders replaced, installing Squire's
- * deploy files for a flavour, and wiring Playbook into the generated app.
+ * deploy files for a flavour, and wiring Playbook and ADVISOR into the
+ * generated app.
  *
  * The generators keep their own template, name and manifest knowledge and
  * delegate these steps here, so every permutation gets the same behaviour.
@@ -361,6 +362,186 @@ final class GeneratorSupport
             'A fetched `.env.playbook` is plain `KEY=value` lines: copy the ones you need into `.env`.',
             '',
             'PLAYBOOK is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.',
+        ];
+    }
+
+    /**
+     * Wire ADVISOR into the generated app, or remove the wiring when the
+     * user passed --no-advisor.
+     *
+     * On: composer.json carries waynestate/advisor under require-dev,
+     * .gitignore ignores .mcp.json, and the README gains an "ADVISOR"
+     * section before the Handbook heading. Off: the require-dev entry and
+     * the .gitignore line are removed again, so the template shipping the
+     * wiring by default stays clean either way.
+     *
+     * Files the template does not ship are skipped, so a custom template
+     * stays as-is. A README without a Handbook heading is left alone.
+     *
+     * @throws \RuntimeException when a file cannot be read, parsed or written
+     */
+    public function applyAdvisor(string $targetDir, bool $advisor): void
+    {
+        $composerPath = $targetDir . '/composer.json';
+        if (is_file($composerPath)) {
+            $this->applyAdvisorComposer($composerPath, $advisor);
+        }
+
+        $gitignorePath = $targetDir . '/.gitignore';
+        if (is_file($gitignorePath)) {
+            $this->applyAdvisorGitignore($gitignorePath, $advisor);
+        }
+
+        $readmePath = $targetDir . '/README.md';
+        if ($advisor && is_file($readmePath)) {
+            $this->insertAdvisorReadmeSection($readmePath);
+        }
+    }
+
+    /**
+     * Add waynestate/advisor to the app's composer.json require-dev, or
+     * remove it again. The file is only rewritten when something changes.
+     *
+     * @throws \RuntimeException when the file is not valid JSON or cannot be written
+     */
+    public function applyAdvisorComposer(string $path, bool $advisor): void
+    {
+        $content = file_get_contents($path);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+        $composer = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($composer)) {
+            throw new \RuntimeException(sprintf('"%s" is not a composer.json object.', $path));
+        }
+
+        if ($advisor) {
+            $requireDev = $composer['require-dev'] ?? [];
+            if (!is_array($requireDev)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable require-dev section.', $path));
+            }
+            $requireDev[RawGenerator::ADVISOR_PACKAGE] = RawGenerator::ADVISOR_VERSION;
+            $composer['require-dev'] = $requireDev;
+        } elseif (isset($composer['require-dev'][RawGenerator::ADVISOR_PACKAGE])) {
+            unset($composer['require-dev'][RawGenerator::ADVISOR_PACKAGE]);
+        } else {
+            return;
+        }
+
+        $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (false === $encoded) {
+            throw new \RuntimeException(sprintf('Could not encode "%s".', $path));
+        }
+        if (false === file_put_contents($path, $encoded . "\n")) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
+    }
+
+    /**
+     * Keep .gitignore in step with the ADVISOR wiring: on, make sure it
+     * ignores .mcp.json (the client config names local paths, so each
+     * developer keeps their own); off, drop the line again. The file is
+     * only rewritten when something changes.
+     *
+     * @throws \RuntimeException when the file cannot be read or written
+     */
+    public function applyAdvisorGitignore(string $path, bool $advisor): void
+    {
+        $existing = file_get_contents($path);
+        if (false === $existing) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+
+        $lines = preg_split('/\R/', $existing) ?: [];
+        $hasLine = false;
+        foreach ($lines as $line) {
+            if ('.mcp.json' === trim($line)) {
+                $hasLine = true;
+                break;
+            }
+        }
+
+        if ($advisor && !$hasLine) {
+            if ('' !== $existing && !str_ends_with($existing, "\n")) {
+                $existing .= "\n";
+            }
+            $existing .= ".mcp.json\n";
+        } elseif (!$advisor && $hasLine) {
+            $kept = array_values(array_filter(
+                $lines,
+                static fn(string $line): bool => '.mcp.json' !== trim($line),
+            ));
+            $existing = implode("\n", $kept);
+            if ('' !== $existing && !str_ends_with($existing, "\n")) {
+                $existing .= "\n";
+            }
+        } else {
+            return;
+        }
+
+        if (false === file_put_contents($path, $existing)) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
+    }
+
+    /**
+     * Insert the "ADVISOR" section into the README before the Handbook
+     * heading. A README that already has the section, or one without the
+     * heading, is left alone.
+     *
+     * @throws \RuntimeException when the file cannot be read or written
+     */
+    public function insertAdvisorReadmeSection(string $path): void
+    {
+        $readme = file_get_contents($path);
+        if (false === $readme) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+
+        if (false !== strpos($readme, '## ADVISOR')) {
+            return;
+        }
+
+        $pos = strpos($readme, '## Handbook');
+        if (false === $pos) {
+            return;
+        }
+
+        $updated = substr($readme, 0, $pos) . implode("\n", $this->advisorReadmeLines()) . "\n\n" . substr($readme, $pos);
+        if (false === file_put_contents($path, $updated)) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
+    }
+
+    /**
+     * The "ADVISOR" README section, line by line.
+     *
+     * @return list<string>
+     */
+    public function advisorReadmeLines(): array
+    {
+        return [
+            '## ADVISOR',
+            '',
+            'This app ships waynestate/advisor in require-dev. ADVISOR is the',
+            'stack\'s MCP server: it gives your coding agent read-only tools over',
+            'the CREED standards, the version policy and the rest of the stack,',
+            'and it answers from bundled data with the source and date named,',
+            'not from what the model remembers.',
+            '',
+            'After `composer install`, wire it into your client:',
+            '',
+            '```bash',
+            'php vendor/bin/advisor install --client=claude --write',
+            '```',
+            '',
+            'Other clients take the same shape: `--client=cursor`,',
+            '`--client=vscode`, `--client=warriorgpt`. If the server never shows',
+            'up, run `php vendor/bin/advisor doctor`.',
+            '',
+            'The `.mcp.json` the command writes is git-ignored on purpose: a',
+            'client config starts a program for whoever opens the project, so',
+            'each developer keeps their own.',
         ];
     }
 

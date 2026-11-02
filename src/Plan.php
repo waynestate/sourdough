@@ -7,10 +7,11 @@ namespace Waynestate\Sourdough;
 /**
  * What `sourdough new` will do, as a list of plain steps.
  *
- * The plan is built from the permutation, the target dir and the local
- * runtime flags (--sail/--docker). In 0.1 only the raw permutation is
- * generated; the generation step for the other four says "not available in
- * this release" (steps 2 and 3 add them).
+ * The plan is built from the permutation, the target dir, the local
+ * runtime flags (--sail/--docker) and whether ADVISOR is wired in
+ * (--no-advisor opts out). In 0.1 only the raw and Laravel + Blade
+ * permutations are generated; the generation step for the others says
+ * "not available in this release".
  */
 final class Plan
 {
@@ -26,7 +27,7 @@ final class Plan
     /**
      * @throws \InvalidArgumentException when --sail or --docker is combined with a raw permutation
      */
-    public static function forPermutation(Permutation $permutation, string $dir, bool $sail, bool $docker): self
+    public static function forPermutation(Permutation $permutation, string $dir, bool $sail, bool $docker, bool $advisor = true): self
     {
         $isRaw = $permutation === Permutation::Raw || $permutation === Permutation::RawVue;
 
@@ -38,11 +39,19 @@ final class Plan
 
         $steps = [];
 
+        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade;
+
         if ($permutation === Permutation::Raw) {
             $steps[] = sprintf('Copy the raw template into %s', $dir);
             $steps[] = 'Replace {{app_name}} and {{app_slug}} in file names and contents';
         } else {
             $steps[] = sprintf('Create the %s app in %s (not available in this release)', $permutation->label(), $dir);
+        }
+
+        // ADVISOR is wired in as part of generation, so the step only shows
+        // for the permutations this release actually generates.
+        if ($generatable && $advisor) {
+            $steps[] = 'Wire ADVISOR into the app';
         }
 
         if ($sail) {

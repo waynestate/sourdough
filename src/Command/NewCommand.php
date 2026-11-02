@@ -57,7 +57,8 @@ final class NewCommand extends Command
             ->addOption('plan-only', null, InputOption::VALUE_NONE, 'With --describe, print the plan as JSON and write nothing.')
             ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON matching resources/plan.schema.json)')
             ->addOption('playbook', null, InputOption::VALUE_NONE, 'Require waynestate/playbook in the generated app: adds the VCS repository and the package to require.')
-            ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring: no suggest, no .env.example block, no README section.');
+            ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring: no suggest, no .env.example block, no README section.')
+            ->addOption('no-advisor', null, InputOption::VALUE_NONE, 'Skip the ADVISOR wiring: no waynestate/advisor in require-dev, no .mcp.json in .gitignore, no README section.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -77,6 +78,7 @@ final class NewCommand extends Command
         $planFile = $input->getOption('plan');
         $playbook = (bool) $input->getOption('playbook');
         $noPlaybook = (bool) $input->getOption('no-playbook');
+        $noAdvisor = (bool) $input->getOption('no-advisor');
 
         if (null !== $describe && null !== $planFile) {
             $this->errorOutput($output)->writeln('--describe and --plan are mutually exclusive.');
@@ -117,7 +119,7 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : basename($dir);
 
         if (null !== $planFile) {
-            return $this->runPlanFile($output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json, $mode);
+            return $this->runPlanFile($output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json, $mode, !$noAdvisor);
         }
 
         try {
@@ -141,7 +143,7 @@ final class NewCommand extends Command
             $flags['inertia'] = true;
         }
 
-        return $this->generate($output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode);
+        return $this->generate($output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode, !$noAdvisor);
     }
 
     private function runDescribe(OutputInterface $output, string $sentence, bool $planOnly): int
@@ -177,6 +179,7 @@ final class NewCommand extends Command
         bool $dryRun,
         bool $json,
         PlaybookMode $playbook,
+        bool $advisor = true,
     ): int {
         try {
             $plan = $this->describeService()->fromFile($planFile);
@@ -189,7 +192,7 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : $plan->name;
         $flags = $this->flagsForPermutation($plan->permutation);
 
-        return $this->generate($output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook);
+        return $this->generate($output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
     }
 
     /**
@@ -206,9 +209,10 @@ final class NewCommand extends Command
         bool $json,
         array $flags,
         PlaybookMode $playbook,
+        bool $advisor = true,
     ): int {
         try {
-            $plan = Plan::forPermutation($permutation, $dir, $sail, $docker);
+            $plan = Plan::forPermutation($permutation, $dir, $sail, $docker, $advisor);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
@@ -255,13 +259,16 @@ final class NewCommand extends Command
         if (PlaybookMode::None === $playbook) {
             $answers['no-playbook'] = true;
         }
+        if (!$advisor) {
+            $answers['no-advisor'] = true;
+        }
 
         try {
             if (Permutation::LaravelBlade === $permutation) {
                 (new LaravelBladeGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
-                    ->generate($dir, $name, $answers, $playbook);
+                    ->generate($dir, $name, $answers, $playbook, $advisor);
             } else {
-                (new RawGenerator())->generate($dir, $name, $answers, $playbook);
+                (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             }
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
@@ -275,6 +282,9 @@ final class NewCommand extends Command
         $output->writeln('Next steps:');
         $output->writeln(sprintf('  cd %s', $dir));
         $output->writeln('  composer install');
+        if ($advisor) {
+            $output->writeln('  php vendor/bin/advisor install --client=claude --write');
+        }
         if (Permutation::LaravelBlade === $permutation) {
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');

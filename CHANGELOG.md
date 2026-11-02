@@ -9,6 +9,7 @@ Versioning once 1.0 is out.
 
 - Added: `sourdough new --laravel` bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan serve`. One more loaf on the bench.
 - Added: the raw template ships `scripts` (`test`, `proctor`, `ci`) and `scripts-descriptions`, so a generated raw app can run its own gate locally with `composer ci`.
+- Added: generated apps ship ADVISOR by default. `waynestate/advisor` lands in `require-dev` (raw template and the laravel-blade overlay), `.mcp.json` is git-ignored, the README gains an "ADVISOR" section, and the Next steps print `php vendor/bin/advisor install --client=claude --write`. `--no-advisor` skips all of it and records the choice in the manifest.
 
 ### Changed
 

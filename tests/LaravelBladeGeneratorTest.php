@@ -7,6 +7,7 @@ namespace Waynestate\Sourdough\Tests;
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
+use Waynestate\Sourdough\PlaybookMode;
 
 final class LaravelBladeGeneratorTest extends TestCase
 {
@@ -62,6 +63,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertSame('^0.2', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
+        self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/creed']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/pinstripe']);
         self::assertSame('^0.2', $composer['require-dev']['waynestate/proctor']);
@@ -253,15 +255,50 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/env-additions.txt');
     }
 
+    public function testDefaultGenerationWiresAdvisor(): void
+    {
+        $target = $this->generate();
+
+        // The skeleton's .gitignore does not ship .mcp.json; the wiring adds it.
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertStringContainsString('.mcp.json', $gitignore);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringContainsString('## ADVISOR', $readme);
+        self::assertStringContainsString('php vendor/bin/advisor install --client=claude --write', $readme);
+
+        // The section sits before the Handbook section, which stays last.
+        $sectionPos = strpos($readme, '## ADVISOR');
+        $handbookPos = strpos($readme, '## Handbook');
+        self::assertIsInt($sectionPos);
+        self::assertIsInt($handbookPos);
+        self::assertLessThan($handbookPos, $sectionPos);
+    }
+
+    public function testNoAdvisorRemovesTheWiring(): void
+    {
+        $target = $this->generate(false);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // The overlay merge adds the package; the opt-out removes it again.
+        self::assertArrayNotHasKey('waynestate/advisor', $composer['require-dev']);
+
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertStringNotContainsString('.mcp.json', $gitignore);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('ADVISOR', $readme);
+    }
+
     private function generator(): LaravelBladeGenerator
     {
         return new LaravelBladeGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));
     }
 
-    private function generate(): string
+    private function generate(bool $advisor = true): string
     {
         $target = $this->makeTempDir();
-        $this->generator()->generate($target, 'My Cool App');
+        $this->generator()->generate($target, 'My Cool App', [], PlaybookMode::Suggest, $advisor);
 
         return $target;
     }
