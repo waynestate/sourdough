@@ -17,6 +17,20 @@
         "phpunit/phpunit": "^11.5",
         "waynestate/proctor": "^0.2"
     },
+    "scripts": {
+        "test": "phpunit",
+        "proctor": "proctor check",
+        "ci": [
+            "@test",
+            "@proctor",
+            "composer audit"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Run the PHPUnit test suite.",
+        "proctor": "Run PROCTOR's stack checks against the app.",
+        "ci": "Run the full local gate: tests, PROCTOR and composer audit."
+    },
     "autoload": {
         "psr-4": {
             "App\\": "src/"

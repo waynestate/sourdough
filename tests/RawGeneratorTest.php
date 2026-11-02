@@ -371,6 +371,17 @@ final class RawGeneratorTest extends TestCase
         self::assertArrayNotHasKey('repositories', $composer);
     }
 
+    public function testGeneratedComposerHasTheCiScripts(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('phpunit', $composer['scripts']['test']);
+        self::assertSame('proctor check', $composer['scripts']['proctor']);
+        self::assertSame(['@test', '@proctor', 'composer audit'], $composer['scripts']['ci']);
+        self::assertArrayHasKey('scripts-descriptions', $composer);
+    }
+
     public function testGeneratedAppShipsItsPhpunitFiles(): void
     {
         $target = $this->generateFromRealTemplate();

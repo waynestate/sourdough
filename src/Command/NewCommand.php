@@ -13,7 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Waynestate\Sourdough\AppPlan;
 use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\DescribeException;
+use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
+use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
+use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PlaybookMode;
@@ -29,6 +32,7 @@ final class NewCommand extends Command
 {
     public function __construct(
         private readonly ?Describe $describe = null,
+        private readonly ?SkeletonSource $skeletonSource = null,
     ) {
         parent::__construct();
     }
@@ -230,7 +234,7 @@ final class NewCommand extends Command
             return 0;
         }
 
-        if (Permutation::Raw !== $permutation) {
+        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation) {
             $this->printPlan($output, $plan);
             $this->errorOutput($output)->writeln('not available in this release');
             return 1;
@@ -253,7 +257,12 @@ final class NewCommand extends Command
         }
 
         try {
-            (new RawGenerator())->generate($dir, $name, $answers, $playbook);
+            if (Permutation::LaravelBlade === $permutation) {
+                (new LaravelBladeGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
+                    ->generate($dir, $name, $answers, $playbook);
+            } else {
+                (new RawGenerator())->generate($dir, $name, $answers, $playbook);
+            }
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
@@ -266,7 +275,13 @@ final class NewCommand extends Command
         $output->writeln('Next steps:');
         $output->writeln(sprintf('  cd %s', $dir));
         $output->writeln('  composer install');
-        $output->writeln('  php -S localhost:8000 -t public');
+        if (Permutation::LaravelBlade === $permutation) {
+            $output->writeln('  cp .env.example .env');
+            $output->writeln('  php artisan key:generate');
+            $output->writeln('  php artisan serve');
+        } else {
+            $output->writeln('  php -S localhost:8000 -t public');
+        }
 
         if (PlaybookMode::Suggest === $playbook) {
             $output->writeln('');
