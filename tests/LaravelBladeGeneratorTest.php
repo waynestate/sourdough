@@ -186,9 +186,29 @@ final class LaravelBladeGeneratorTest extends TestCase
         // ...and the stack's keys are appended, with the fake driver for
         // local work.
         self::assertStringContainsString('SESAME_DRIVER=fake', $env);
-        self::assertStringContainsString('SESAME_CAS_BASE_URL=', $env);
-        self::assertStringContainsString('HELMET_PRESET=', $env);
-        self::assertStringContainsString('HELMET_PROXIES=', $env);
+        self::assertStringContainsString('# SESAME_CAS_BASE_URL=', $env);
+        self::assertStringContainsString('# HELMET_PRESET=', $env);
+        self::assertStringContainsString('# HELMET_PROXIES=', $env);
+    }
+
+    /**
+     * An empty KEY= line overrides the package default with an empty string
+     * (env() returns "", not null), which is how the smoke run lost its fake
+     * user, session limits and login routes. So every SESAME_ and HELMET_
+     * key ships commented out; only the fake driver is set.
+     */
+    public function testShipsNoUncommentedEmptySesameOrHelmetKeys(): void
+    {
+        $target = $this->generate();
+        $env = (string) file_get_contents($target . '/.env.example');
+
+        foreach (preg_split('/\R/', $env) ?: [] as $line) {
+            if (preg_match('/^(SESAME_|HELMET_)[A-Z0-9_]*=$/', $line) === 1) {
+                self::fail('Uncommented empty key in .env.example: ' . $line);
+            }
+        }
+
+        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
     }
 
     public function testInstallsTheSquireLaravelFiles(): void
