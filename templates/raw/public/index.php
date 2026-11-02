@@ -135,9 +135,9 @@ $sesame = new Sesame(
 sesame($sesame);
 $user = sesame_user() ?? sesame_login();
 
-// WayneUI's standalone file. Fetch it once per the WayneUI raw PHP guide:
+// WayneUI's standalone file. Fetch the pinned 2.0.8 release copy once:
 //   curl -o public/wayne-ui.php \
-//     https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
+//     https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 require_once __DIR__ . '/wayne-ui.php';
 
 echo wsu_shell_start([

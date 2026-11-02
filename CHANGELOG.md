@@ -12,6 +12,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- Changed: the raw template pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
 - Changed: the raw template's `.gitlab-ci.yml` pins the Preflight components to released Preflight tags; the "not cut yet" note is gone.
 - Changed: the Squire copy comes from Squire 0.4.0 (adds oracle-check.php to every target; the dev dependency is now ^0.4).
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.3 (release options can now live in ./.env.squire).
