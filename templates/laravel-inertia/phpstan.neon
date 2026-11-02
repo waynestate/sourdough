@@ -1,0 +1,14 @@
+# Pinstripe owns the level and the ignore hygiene: level 8, and every
+# ignore needs a comment. It ships in require-dev, so the include below
+# resolves for every app this overlay bakes. Point at
+# vendor/waynestate/pinstripe/phpstan/strict.neon instead to take the
+# strict cut.
+includes:
+    - vendor/waynestate/pinstripe/phpstan/laravel.neon
+
+parameters:
+    paths:
+        - app
+        - bootstrap
+        - routes
+        - database
