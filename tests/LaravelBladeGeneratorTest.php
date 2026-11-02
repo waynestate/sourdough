@@ -211,6 +211,19 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertStringContainsString('SESAME_DRIVER=fake', $env);
     }
 
+    /**
+     * SESAME requires a non-empty fake.username when the driver is fake, so
+     * the config carries a default that matches the hardcoded display name;
+     * otherwise a fresh app with nothing in its environment cannot boot.
+     */
+    public function testFakeDriverBootsWithNoEnvironment(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/sesame.php');
+
+        self::assertStringContainsString("env('SESAME_FAKE_USERNAME', 'jane.doe')", $config);
+    }
+
     public function testInstallsTheSquireLaravelFiles(): void
     {
         $target = $this->generate();
