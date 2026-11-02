@@ -83,7 +83,7 @@ The app name (from `--name`, from the plan, or from the basename of ``) must sta
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-`--raw` and `--laravel` generate in 0.1. The other permutations print the plan and exit `1` with "not available in this release"; later steps add them.
+`--raw`, `--laravel` and `--inertia` generate in 0.1. The remaining permutations (`--raw --vue`, `--laravel --vue`) print the plan and exit `1` with "not available in this release"; later steps add them.
 
 Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
 
@@ -368,6 +368,7 @@ cd my-app
 curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -385,6 +386,7 @@ cd my-app
 curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -402,8 +404,11 @@ cd my-app
 curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
+
+ADVISOR answers questions about the stack from inside your AI assistant; skip it with `sourdough new --no-advisor`.
 
 To move to a newer WayneUI release, change the version in the URL above and run the fetch again.
 
@@ -433,7 +438,7 @@ Task:
 2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
 3. Bake the app with `sourdough new my-app --raw`, using the folder name I give you in place of my-app, and change into it.
 4. Fetch WayneUI's standalone file once. Windows (PowerShell): `curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`. macOS and Linux: `curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`.
-5. Run `composer install`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+5. Run `composer install`, then wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:

@@ -15,6 +15,7 @@ use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\DescribeException;
 use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
+use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
@@ -238,7 +239,7 @@ final class NewCommand extends Command
             return 0;
         }
 
-        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation) {
+        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation && Permutation::LaravelInertia !== $permutation) {
             $this->printPlan($output, $plan);
             $this->errorOutput($output)->writeln('not available in this release');
             return 1;
@@ -267,6 +268,9 @@ final class NewCommand extends Command
             if (Permutation::LaravelBlade === $permutation) {
                 (new LaravelBladeGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
                     ->generate($dir, $name, $answers, $playbook, $advisor);
+            } elseif (Permutation::LaravelInertia === $permutation) {
+                (new LaravelInertiaGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
+                    ->generate($dir, $name, $answers, $playbook, $advisor);
             } else {
                 (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             }
@@ -288,6 +292,12 @@ final class NewCommand extends Command
         if (Permutation::LaravelBlade === $permutation) {
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');
+            $output->writeln('  php artisan serve');
+        } elseif (Permutation::LaravelInertia === $permutation) {
+            $output->writeln('  cp .env.example .env');
+            $output->writeln('  php artisan key:generate');
+            $output->writeln('  npm install');
+            $output->writeln('  npm run build');
             $output->writeln('  php artisan serve');
         } else {
             $output->writeln('  php -S localhost:8000 -t public');

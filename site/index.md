@@ -191,6 +191,7 @@ cd my-app
 curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -208,6 +209,7 @@ cd my-app
 curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -225,8 +227,11 @@ cd my-app
 curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
+
+ADVISOR answers questions about the stack from inside your AI assistant; skip it with `sourdough new --no-advisor`.
 
 To move to a newer WayneUI release, change the version in the URL above and run the fetch again.
 
@@ -256,7 +261,7 @@ Task:
 2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
 3. Bake the app with `sourdough new my-app --raw`, using the folder name I give you in place of my-app, and change into it.
 4. Fetch WayneUI's standalone file once. Windows (PowerShell): `curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`. macOS and Linux: `curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`.
-5. Run `composer install`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+5. Run `composer install`, then wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:
