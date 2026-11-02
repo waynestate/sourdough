@@ -84,6 +84,14 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertTrue($composer['config']['optimize-autoloader']);
         self::assertSame('dist', $composer['config']['preferred-install']);
 
+        // larastan pulls in phpstan/extension-installer; the overlay allows
+        // that plugin so a fresh composer install does not stop on a blocked
+        // plugin...
+        self::assertTrue($composer['config']['allow-plugins']['phpstan/extension-installer']);
+        // ...while the skeleton's own plugin allowances survive the deep merge.
+        self::assertTrue($composer['config']['allow-plugins']['pestphp/pest-plugin']);
+        self::assertTrue($composer['config']['allow-plugins']['php-http/discovery']);
+
         // The skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
@@ -178,9 +186,42 @@ final class LaravelBladeGeneratorTest extends TestCase
         // ...and the stack's keys are appended, with the fake driver for
         // local work.
         self::assertStringContainsString('SESAME_DRIVER=fake', $env);
-        self::assertStringContainsString('SESAME_CAS_BASE_URL=', $env);
-        self::assertStringContainsString('HELMET_PRESET=', $env);
-        self::assertStringContainsString('HELMET_PROXIES=', $env);
+        self::assertStringContainsString('# SESAME_CAS_BASE_URL=', $env);
+        self::assertStringContainsString('# HELMET_PRESET=', $env);
+        self::assertStringContainsString('# HELMET_PROXIES=', $env);
+    }
+
+    /**
+     * An empty KEY= line overrides the package default with an empty string
+     * (env() returns "", not null), which is how the smoke run lost its fake
+     * user, session limits and login routes. So every SESAME_ and HELMET_
+     * key ships commented out; only the fake driver is set.
+     */
+    public function testShipsNoUncommentedEmptySesameOrHelmetKeys(): void
+    {
+        $target = $this->generate();
+        $env = (string) file_get_contents($target . '/.env.example');
+
+        foreach (preg_split('/\R/', $env) ?: [] as $line) {
+            if (preg_match('/^(SESAME_|HELMET_)[A-Z0-9_]*=$/', $line) === 1) {
+                self::fail('Uncommented empty key in .env.example: ' . $line);
+            }
+        }
+
+        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
+    }
+
+    /**
+     * SESAME requires a non-empty fake.username when the driver is fake, so
+     * the config carries a default that matches the hardcoded display name;
+     * otherwise a fresh app with nothing in its environment cannot boot.
+     */
+    public function testFakeDriverBootsWithNoEnvironment(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/sesame.php');
+
+        self::assertStringContainsString("env('SESAME_FAKE_USERNAME', 'jane.doe')", $config);
     }
 
     public function testInstallsTheSquireLaravelFiles(): void

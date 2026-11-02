@@ -40,12 +40,14 @@ return [
     | Fake driver
     |--------------------------------------------------------------------------
     |
-    | The identity the fake driver returns, for local development.
+    | The identity the fake driver returns, for local development. The
+    | username defaults to jane.doe, the persona behind the attributes
+    | below, so the app boots with nothing in the environment.
     |
     */
 
     'fake' => [
-        'username' => env('SESAME_FAKE_USERNAME'),
+        'username' => env('SESAME_FAKE_USERNAME', 'jane.doe'),
         // A display name, so the imported user reads like a person in the
         // settings page instead of as a bare username.
         'attributes' => [

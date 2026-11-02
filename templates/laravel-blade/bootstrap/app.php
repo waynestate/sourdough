@@ -27,10 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         // Oracle failures earn one plain sentence, logged once under
         // [oracle]; normal reporting continues either way.
-        $exceptions->reportable(function (\Throwable $e): void {
+        $exceptions->reportable(function (Throwable $e): void {
             $sentence = OracleErrors::describe($e);
 
-            if (null !== $sentence) {
+            if ($sentence !== null) {
                 Log::info('[oracle] '.$sentence);
             }
         });
