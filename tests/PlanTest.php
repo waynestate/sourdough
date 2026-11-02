@@ -33,12 +33,22 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
-    public function testNonRawPlanSaysNotAvailableInThisRelease(): void
+    public function testLaravelBladePlanIsGeneratable(): void
     {
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', false, false);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
+            'Wire ADVISOR into the app',
+        ], $plan->steps);
+    }
+
+    public function testLaravelInertiaPlanIsGeneratable(): void
+    {
+        $plan = Plan::forPermutation(Permutation::LaravelInertia, '/tmp/demo', false, false);
+
+        self::assertSame([
+            'Create the Laravel + Inertia/Vue app in /tmp/demo',
             'Wire ADVISOR into the app',
         ], $plan->steps);
     }
@@ -48,7 +58,7 @@ final class PlanTest extends TestCase
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', true, false);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
             'Use Sail for the local runtime',
         ], $plan->steps);
@@ -59,7 +69,7 @@ final class PlanTest extends TestCase
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', false, true);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
             'Use Docker for the local runtime',
         ], $plan->steps);
@@ -71,6 +81,15 @@ final class PlanTest extends TestCase
 
         self::assertSame([
             'Create the Raw PHP + Vue SPA over JSON app in /tmp/demo (not available in this release)',
+        ], $plan->steps);
+    }
+
+    public function testLaravelBladeVuePlanSaysNotAvailableInThisRelease(): void
+    {
+        $plan = Plan::forPermutation(Permutation::LaravelBladeVue, '/tmp/demo', false, false);
+
+        self::assertSame([
+            'Create the Laravel + Blade + Vue islands app in /tmp/demo (not available in this release)',
         ], $plan->steps);
     }
 

@@ -1,0 +1,32 @@
+{
+    "require": {
+        "inertiajs/inertia-laravel": "^2.0",
+        "tightenco/ziggy": "^2.4",
+        "waynestate/helmet": "^0.2",
+        "waynestate/sesame": "^0.2",
+        "yajra/laravel-oci8": "^13.14"
+    },
+    "config": {
+        "platform": {
+            "ext-oci8": "3.4.1"
+        }
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.13",
+        "waynestate/advisor": "^0.1",
+        "waynestate/creed": "^0.1",
+        "waynestate/pinstripe": "^0.1",
+        "waynestate/proctor": "^0.2"
+    },
+    "scripts": {
+        "ci": [
+            "@composer validate --strict",
+            "phpunit",
+            "pint --test",
+            "phpstan analyse --memory-limit=1G",
+            "@composer audit"
+        ],
+        "proctor": "proctor check --policy=vendor/waynestate/creed/policy/policy.json",
+        "ziggy": "php artisan ziggy:generate --types"
+    }
+}
