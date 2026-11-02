@@ -84,7 +84,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 
 ## Things that trip people up
 
-- In 0.1 only `--raw` generates; other permutations exit 1 for now.
+- In 0.1 `--raw` and `--laravel` generate; the other permutations exit 1 for now.
 - Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
 
 ## Who maintains it

@@ -33,12 +33,16 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
-    public function testNonRawPlanSaysNotAvailableInThisRelease(): void
+    /**
+     * Laravel + Blade generates in 0.1, so its plan carries no availability
+     * suffix; only the permutations that cannot generate do.
+     */
+    public function testLaravelBladePlanHasNoAvailabilitySuffix(): void
     {
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', false, false);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
         ], $plan->steps);
     }
@@ -48,7 +52,7 @@ final class PlanTest extends TestCase
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', true, false);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
             'Use Sail for the local runtime',
         ], $plan->steps);
@@ -59,7 +63,7 @@ final class PlanTest extends TestCase
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', false, true);
 
         self::assertSame([
-            'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
             'Use Docker for the local runtime',
         ], $plan->steps);

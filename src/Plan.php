@@ -44,6 +44,8 @@ final class Plan
         if ($permutation === Permutation::Raw) {
             $steps[] = sprintf('Copy the raw template into %s', $dir);
             $steps[] = 'Replace {{app_name}} and {{app_slug}} in file names and contents';
+        } elseif ($generatable) {
+            $steps[] = sprintf('Create the %s app in %s', $permutation->label(), $dir);
         } else {
             $steps[] = sprintf('Create the %s app in %s (not available in this release)', $permutation->label(), $dir);
         }
