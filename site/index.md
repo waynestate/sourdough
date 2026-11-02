@@ -62,7 +62,7 @@ Out of the oven · 0.1
 The crumb
 
 - `public/index.php` HELMET boots first, then SESAME signs you in
-- `composer.json` helmet and sesame, with proctor for dev
+- `composer.json` helmet and sesame, with proctor and advisor for dev
 - `.gitlab-ci.yml` Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit
 - `build.sh` and `scripts/release.sh` Squire's Citadel deploy files
 - `.env.example` and `README.md` seeded: yours from day one
@@ -191,6 +191,7 @@ cd my-app
 curl.exe -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -208,6 +209,7 @@ cd my-app
 curl -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -225,6 +227,7 @@ cd my-app
 curl -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php
 # 4. Install and serve
 composer install
+php vendor/bin/advisor install --client=claude --write
 php -S localhost:8000 -t public
 ```
 
@@ -243,7 +246,7 @@ Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes one shape, raw PHP on WayneUI's standalone path, with SESAME (sign-in), HELMET (security headers and the /up check), PROCTOR (checks), the Preflight CI components and Squire's Citadel deploy files already in it.
+You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes one shape, raw PHP on WayneUI's standalone path, with SESAME (sign-in), HELMET (security headers and the /up check), PROCTOR (checks), ADVISOR (the stack's rulebook as an MCP server), the Preflight CI components and Squire's Citadel deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -254,7 +257,7 @@ Task:
 2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
 3. Bake the app with `sourdough new my-app --raw`, using the folder name I give you in place of my-app, and change into it.
 4. Fetch WayneUI's standalone file once. Windows (PowerShell): `curl.exe -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php`. macOS and Linux: `curl -o public/wayne-ui.php https://git.wayne.edu/enterprise-apps/wayne-ui/-/raw/main/php/standalone/wayne-ui.php`.
-5. Run `composer install`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+5. Run `composer install`, then wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:

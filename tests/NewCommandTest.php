@@ -475,6 +475,78 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('--playbook and --no-playbook are mutually exclusive', $tester->getDisplay());
     }
 
+    public function testDryRunListsTheAdvisorStep(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--dry-run' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertStringContainsString('Wire ADVISOR into the app', $tester->getDisplay());
+    }
+
+    public function testNoAdvisorDryRunOmitsTheAdvisorStep(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--dry-run' => true,
+            '--no-advisor' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertStringNotContainsString('Wire ADVISOR into the app', $tester->getDisplay());
+    }
+
+    public function testDefaultRunPrintsTheAdvisorNextStep(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertStringContainsString('php vendor/bin/advisor install --client=claude --write', $tester->getDisplay());
+    }
+
+    public function testNoAdvisorFlagSkipsTheAdvisorWiring(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand());
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--no-advisor' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('waynestate/advisor', $composer['require-dev']);
+
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertStringNotContainsString('.mcp.json', $gitignore);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('ADVISOR', $readme);
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertTrue($manifest['answers']['no-advisor']);
+
+        self::assertStringNotContainsString('php vendor/bin/advisor install', $tester->getDisplay());
+    }
+
     public function testDescribeAndPlanAreMutuallyExclusive(): void
     {
         $parent = $this->makeTempDir();

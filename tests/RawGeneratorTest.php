@@ -479,6 +479,42 @@ final class RawGeneratorTest extends TestCase
         self::assertStringNotContainsString('WSU values (PLAYBOOK)', $readme);
     }
 
+    public function testDefaultGenerationWiresAdvisor(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
+
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertStringContainsString('.mcp.json', $gitignore);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringContainsString('## ADVISOR', $readme);
+        self::assertStringContainsString('php vendor/bin/advisor install --client=claude --write', $readme);
+
+        // The section sits before the Handbook section, which stays last.
+        $sectionPos = strpos($readme, '## ADVISOR');
+        $handbookPos = strpos($readme, '## Handbook');
+        self::assertIsInt($sectionPos);
+        self::assertIsInt($handbookPos);
+        self::assertLessThan($handbookPos, $sectionPos);
+    }
+
+    public function testNoAdvisorRemovesTheWiring(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::Suggest, false);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayNotHasKey('waynestate/advisor', $composer['require-dev']);
+
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertStringNotContainsString('.mcp.json', $gitignore);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('ADVISOR', $readme);
+    }
+
     /**
      * Names that used to be pasted into file names and contents unescaped.
      *
@@ -533,10 +569,10 @@ final class RawGeneratorTest extends TestCase
     /**
      * Generate an app from the real templates/raw dir and return the target.
      */
-    private function generateFromRealTemplate(PlaybookMode $playbook = PlaybookMode::Suggest): string
+    private function generateFromRealTemplate(PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): string
     {
         $target = $this->makeTempDir();
-        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App', [], $playbook);
+        (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App', [], $playbook, $advisor);
 
         return $target;
     }

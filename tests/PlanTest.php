@@ -19,6 +19,17 @@ final class PlanTest extends TestCase
         self::assertSame([
             'Copy the raw template into /tmp/demo',
             'Replace {{app_name}} and {{app_slug}} in file names and contents',
+            'Wire ADVISOR into the app',
+        ], $plan->steps);
+    }
+
+    public function testNoAdvisorDropsTheAdvisorStep(): void
+    {
+        $plan = Plan::forPermutation(Permutation::Raw, '/tmp/demo', false, false, false);
+
+        self::assertSame([
+            'Copy the raw template into /tmp/demo',
+            'Replace {{app_name}} and {{app_slug}} in file names and contents',
         ], $plan->steps);
     }
 
@@ -28,6 +39,7 @@ final class PlanTest extends TestCase
 
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Wire ADVISOR into the app',
         ], $plan->steps);
     }
 
@@ -37,6 +49,7 @@ final class PlanTest extends TestCase
 
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Wire ADVISOR into the app',
             'Use Sail for the local runtime',
         ], $plan->steps);
     }
@@ -47,7 +60,17 @@ final class PlanTest extends TestCase
 
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo (not available in this release)',
+            'Wire ADVISOR into the app',
             'Use Docker for the local runtime',
+        ], $plan->steps);
+    }
+
+    public function testNonGeneratablePermutationOmitsAdvisorStep(): void
+    {
+        $plan = Plan::forPermutation(Permutation::RawVue, '/tmp/demo', false, false);
+
+        self::assertSame([
+            'Create the Raw PHP + Vue SPA over JSON app in /tmp/demo (not available in this release)',
         ], $plan->steps);
     }
 

@@ -11,6 +11,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.13",
+        "waynestate/advisor": "^0.1",
         "waynestate/creed": "^0.1",
         "waynestate/pinstripe": "^0.1",
         "waynestate/proctor": "^0.2"
