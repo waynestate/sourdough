@@ -84,6 +84,14 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertTrue($composer['config']['optimize-autoloader']);
         self::assertSame('dist', $composer['config']['preferred-install']);
 
+        // larastan pulls in phpstan/extension-installer; the overlay allows
+        // that plugin so a fresh composer install does not stop on a blocked
+        // plugin...
+        self::assertTrue($composer['config']['allow-plugins']['phpstan/extension-installer']);
+        // ...while the skeleton's own plugin allowances survive the deep merge.
+        self::assertTrue($composer['config']['allow-plugins']['pestphp/pest-plugin']);
+        self::assertTrue($composer['config']['allow-plugins']['php-http/discovery']);
+
         // The skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
