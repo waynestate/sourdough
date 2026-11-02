@@ -33,16 +33,22 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
-    /**
-     * Laravel + Blade generates in 0.1, so its plan carries no availability
-     * suffix; only the permutations that cannot generate do.
-     */
-    public function testLaravelBladePlanHasNoAvailabilitySuffix(): void
+    public function testLaravelBladePlanIsGeneratable(): void
     {
         $plan = Plan::forPermutation(Permutation::LaravelBlade, '/tmp/demo', false, false);
 
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo',
+            'Wire ADVISOR into the app',
+        ], $plan->steps);
+    }
+
+    public function testLaravelInertiaPlanIsGeneratable(): void
+    {
+        $plan = Plan::forPermutation(Permutation::LaravelInertia, '/tmp/demo', false, false);
+
+        self::assertSame([
+            'Create the Laravel + Inertia/Vue app in /tmp/demo',
             'Wire ADVISOR into the app',
         ], $plan->steps);
     }
@@ -75,6 +81,15 @@ final class PlanTest extends TestCase
 
         self::assertSame([
             'Create the Raw PHP + Vue SPA over JSON app in /tmp/demo (not available in this release)',
+        ], $plan->steps);
+    }
+
+    public function testLaravelBladeVuePlanSaysNotAvailableInThisRelease(): void
+    {
+        $plan = Plan::forPermutation(Permutation::LaravelBladeVue, '/tmp/demo', false, false);
+
+        self::assertSame([
+            'Create the Laravel + Blade + Vue islands app in /tmp/demo (not available in this release)',
         ], $plan->steps);
     }
 

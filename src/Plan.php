@@ -9,9 +9,9 @@ namespace Waynestate\Sourdough;
  *
  * The plan is built from the permutation, the target dir, the local
  * runtime flags (--sail/--docker) and whether ADVISOR is wired in
- * (--no-advisor opts out). In 0.1 only the raw and Laravel + Blade
- * permutations are generated; the generation step for the others says
- * "not available in this release".
+ * (--no-advisor opts out). In 0.1 the raw, Laravel + Blade and
+ * Laravel + Inertia/Vue permutations are generated; the generation step
+ * for the others says "not available in this release".
  */
 final class Plan
 {
@@ -39,15 +39,14 @@ final class Plan
 
         $steps = [];
 
-        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade;
+        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade || $permutation === Permutation::LaravelInertia;
 
         if ($permutation === Permutation::Raw) {
             $steps[] = sprintf('Copy the raw template into %s', $dir);
             $steps[] = 'Replace {{app_name}} and {{app_slug}} in file names and contents';
-        } elseif ($generatable) {
-            $steps[] = sprintf('Create the %s app in %s', $permutation->label(), $dir);
         } else {
-            $steps[] = sprintf('Create the %s app in %s (not available in this release)', $permutation->label(), $dir);
+            $suffix = $generatable ? '' : ' (not available in this release)';
+            $steps[] = sprintf('Create the %s app in %s%s', $permutation->label(), $dir, $suffix);
         }
 
         // ADVISOR is wired in as part of generation, so the step only shows
