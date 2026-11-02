@@ -19,6 +19,7 @@ Versioning once 1.0 is out.
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.3 (release options can now live in ./.env.squire).
 - Changed: the deploy layer's Squire kit is refreshed to 0.3.4 (the local .env.squire file is now git-ignored).
 - Changed: the deploy layer's Squire kit is refreshed to 0.4.0 (deploy/oracle-check.php arrives; release.sh runs it without failing the release).
+- Changed: CI pulls its Docker Hub images through the GitLab Dependency Proxy (the group's CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX), so pipelines no longer hit Docker Hub's anonymous pull limit.
 
 ## 0.1.4 (2026-10-29)
 
