@@ -5,7 +5,7 @@ A static page: plain HTML, CSS and a little vanilla JS, no build step. Open `ind
 
 - world: a bakery at dawn. Flour-dusted paper, a linen proofing couche, a cooling rack, a recipe card, the
   feeding schedule chalked above the bench, and the shop shelves holding the rest of the stack.
-- type: **Caprasimo** 400 (SIL OFL 1.1, self-hosted in `assets/fonts/` from `@fontsource/caprasimo`, licence in
+- type: **Caprasimo** 400 (SIL OFL 1.1, self-hosted in `assets/fonts/` from `@fontsource/caprasimo`, license in
   `OFL-caprasimo.txt`) for display, and **Kalam** 400/700 (SIL OFL 1.1, `OFL-kalam.txt`) for the baker's hand;
   body text is Lato from WayneUI.
 - base: WayneUI 2.0.8, copied into `assets/wayne-ui/` from its documented static path (tokens, Lato, container,

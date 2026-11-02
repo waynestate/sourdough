@@ -311,7 +311,7 @@ Sourdough is one part of the Wayne State app stack. [WELD](https://weld.apps.way
 - [![SESAME logo: an open door with a gold gap](https://sourdough.apps.wayne.edu/assets/marks/sesame.png) **SESAME** sign-in](https://sesame.apps.wayne.edu/)
 - [![HELMET logo: a white football helmet with a gold facemask](https://sourdough.apps.wayne.edu/assets/marks/helmet.png) **HELMET** runtime baseline](https://helmet.apps.wayne.edu/)
 - [![PROCTOR logo: a watchful eye with a gold square pupil](https://sourdough.apps.wayne.edu/assets/marks/proctor.png) **PROCTOR** the checks](https://proctor.apps.wayne.edu/)
-- [![Preflight logo: a runway with a gold centre line](https://sourdough.apps.wayne.edu/assets/marks/preflight.png) **Preflight** shared CI](https://preflight.apps.wayne.edu/)
+- [![Preflight logo: a runway with a gold center line](https://sourdough.apps.wayne.edu/assets/marks/preflight.png) **Preflight** shared CI](https://preflight.apps.wayne.edu/)
 
 ### From the same kitchen
 
