@@ -273,6 +273,11 @@ final class GeneratorSupport
             $config['gitlab-domains'] = $domains;
             $withConfig = [];
             foreach ($composer as $key => $value) {
+                // The merged config lands after the require sections, so
+                // the template's own config entry is not copied here.
+                if ('config' === $key) {
+                    continue;
+                }
                 $withConfig[$key] = $value;
                 // Keep the usual composer.json order: config after the
                 // require sections, before everything else.

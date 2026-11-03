@@ -441,7 +441,7 @@ final class RawGeneratorTest extends TestCase
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
-        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+        self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
         // The suggest stays, so a developer who removes the require still
         // sees what the package is for.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
@@ -484,7 +484,9 @@ final class RawGeneratorTest extends TestCase
         ], $composer['repositories']);
         self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
         // The token is only sent to git.wayne.edu, never to Packagist.
-        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+        self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
+        // The template's own config keys survive the merge.
+        self::assertSame(['phpstan/extension-installer' => true], $composer['config']['allow-plugins']);
         // The default wiring stays in place under Require mode.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
 
