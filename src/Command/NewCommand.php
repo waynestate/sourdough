@@ -449,13 +449,8 @@ final class NewCommand extends Command
             return ['status' => 'skipped', 'via' => null];
         }
 
-        // getenv() may hold false values; isCi wants strings only.
-        $env = [];
-        foreach (getenv() as $key => $value) {
-            if (is_string($value)) {
-                $env[$key] = $value;
-            }
-        }
+        // getenv() returns array<string, string>, which is all isCi needs.
+        $env = getenv();
         if (PlaybookAccess::isCi($env)) {
             return ['status' => 'skipped', 'via' => null];
         }

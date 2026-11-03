@@ -38,7 +38,7 @@ final class NewCommandTest extends TestCase
     /** @var array<string, string|false> */
     private array $savedCiEnv = [];
 
-    /** @var list<list<string>> */
+    /** @var list<array<int|string, mixed>> */
     private array $playbookCalls = [];
 
     protected function setUp(): void

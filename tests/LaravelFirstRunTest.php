@@ -79,7 +79,7 @@ final class LaravelFirstRunTest extends TestCase
         $target = $parent . '/demo';
 
         $tester = new CommandTester(new NewCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
-        $exit = $tester->execute(array_merge(['dir' => $target], $flags));
+        $exit = $tester->execute(array_merge(['dir' => $target, '--no-playbook' => true], $flags));
 
         self::assertSame(0, $exit);
 
