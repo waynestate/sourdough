@@ -96,14 +96,55 @@ final class LaravelInertiaGeneratorTest extends TestCase
         $target = $this->generate();
         $env = (string) file_get_contents($target . '/.env.example');
 
-        // The skeleton's own lines survive...
-        self::assertStringContainsString('APP_NAME=Laravel', $env);
+        // The skeleton's own lines survive (APP_NAME aside: it now carries
+        // the app name)...
+        self::assertStringContainsString('APP_ENV=local', $env);
         // ...and the stack's keys are appended, with the fake driver for
         // local work...
         self::assertStringContainsString('SESAME_DRIVER=fake', $env);
         self::assertStringContainsString('HELMET_PRESET=', $env);
         // ...and Vite gets the app name from the same variable.
         self::assertStringContainsString('VITE_APP_NAME="${APP_NAME}"', $env);
+    }
+
+    public function testNameReachesComposerJson(): void
+    {
+        $target = $this->generate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // An application is not a published package: the skeleton's
+        // laravel/laravel name becomes app/<slug>.
+        self::assertSame('app/my-cool-app', $composer['name']);
+        self::assertSame('My Cool App, a Wayne State app baked from Sourdough.', $composer['description']);
+
+        // The merge's formatting rules hold: pretty printed, unescaped
+        // slashes, trailing newline, key order kept.
+        $raw = (string) file_get_contents($target . '/composer.json');
+        self::assertStringEndsWith("\n", $raw);
+        self::assertStringNotContainsString('\/', $raw);
+        self::assertSame(
+            array_keys(json_decode($raw, true, 512, JSON_THROW_ON_ERROR)),
+            ['$schema', 'name', 'type', 'description', 'keywords', 'license', 'require', 'require-dev', 'autoload', 'autoload-dev', 'scripts', 'extra', 'config', 'minimum-stability', 'prefer-stable', 'suggest'],
+        );
+    }
+
+    public function testNameReachesEnvExample(): void
+    {
+        $target = $this->generate();
+        $env = (string) file_get_contents($target . '/.env.example');
+
+        // The name carries a space, so the value is quoted.
+        self::assertStringContainsString("APP_NAME=\"My Cool App\"", $env);
+        self::assertStringNotContainsString('APP_NAME=Laravel', $env);
+    }
+
+    public function testNameReachesAppConfig(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/app.php');
+
+        self::assertStringContainsString("'name' => env('APP_NAME', 'My Cool App')", $config);
+        self::assertStringNotContainsString("'name' => env('APP_NAME', 'Laravel')", $config);
     }
 
     /**
@@ -218,6 +259,40 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertSame('seeded', $manifest['files']['.env.example']['class']);
         self::assertSame('managed', $manifest['files']['routes/web.php']['class']);
         self::assertSame('managed', $manifest['files']['scripts/release.sh']['class']);
+    }
+
+    public function testTempEdgeCases(): void
+    {
+        // A name without a space stays unquoted in .env.example.
+        $target = $this->makeTempDir();
+        $this->generator()->generate($target, 'PlainApp', [], PlaybookMode::Suggest, true);
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringContainsString('APP_NAME=PlainApp', $env);
+        self::assertStringNotContainsString('APP_NAME="PlainApp"', $env);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('app/plainapp', $composer['name']);
+        self::assertSame('PlainApp, a Wayne State app baked from Sourdough.', $composer['description']);
+        self::assertStringContainsString("'name' => env('APP_NAME', 'PlainApp')", (string) file_get_contents($target . '/config/app.php'));
+
+        // A skeleton without config/app.php still bakes: the step skips it.
+        $skeleton = $this->makeTempDir();
+        $this->copyDir(__DIR__ . '/fixtures/laravel-skeleton', $skeleton);
+        unlink($skeleton . '/config/app.php');
+        $target = $this->makeTempDir();
+        (new LaravelInertiaGenerator(new FixtureSkeletonSource($skeleton)))
+            ->generate($target, 'My Cool App', [], PlaybookMode::Suggest, true);
+        self::assertFileExists($target . '/composer.json');
+
+        // A pattern that does not match leaves the file alone and does not fail.
+        $skeleton = $this->makeTempDir();
+        $this->copyDir(__DIR__ . '/fixtures/laravel-skeleton', $skeleton);
+        file_put_contents($skeleton . '/.env.example', str_replace('APP_NAME=Laravel', 'APP_NAME=SomethingElse', (string) file_get_contents($skeleton . '/.env.example')));
+        file_put_contents($skeleton . '/config/app.php', str_replace("'name' => env('APP_NAME', 'Laravel')", "'name' => env('APP_NAME', 'Old')", (string) file_get_contents($skeleton . '/config/app.php')));
+        $target = $this->makeTempDir();
+        (new LaravelInertiaGenerator(new FixtureSkeletonSource($skeleton)))
+            ->generate($target, 'My Cool App', [], PlaybookMode::Suggest, true);
+        self::assertStringContainsString('APP_NAME=SomethingElse', (string) file_get_contents($target . '/.env.example'));
+        self::assertStringContainsString("'name' => env('APP_NAME', 'Old')", (string) file_get_contents($target . '/config/app.php'));
     }
 
     public function testReplacesEveryPlaceholder(): void

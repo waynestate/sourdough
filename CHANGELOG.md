@@ -15,6 +15,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- Changed: `--name` on the Laravel bakes reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package) with the description reading "<name>, a Wayne State app baked from Sourdough.", `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
 - Changed: the raw template pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
 - Changed: the raw template's `.gitlab-ci.yml` pins the Preflight components to released Preflight tags; the "not cut yet" note is gone.
 - Changed: the Squire copy comes from Squire 0.4.0 (adds oracle-check.php to every target; the dev dependency is now ^0.4).

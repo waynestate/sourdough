@@ -181,14 +181,55 @@ final class LaravelBladeGeneratorTest extends TestCase
         $target = $this->generate();
         $env = (string) file_get_contents($target . '/.env.example');
 
-        // The skeleton's own lines survive...
-        self::assertStringContainsString('APP_NAME=Laravel', $env);
+        // The skeleton's own lines survive (APP_NAME aside: it now carries
+        // the app name)...
+        self::assertStringContainsString('APP_ENV=local', $env);
         // ...and the stack's keys are appended, with the fake driver for
         // local work.
         self::assertStringContainsString('SESAME_DRIVER=fake', $env);
         self::assertStringContainsString('# SESAME_CAS_BASE_URL=', $env);
         self::assertStringContainsString('# HELMET_PRESET=', $env);
         self::assertStringContainsString('# HELMET_PROXIES=', $env);
+    }
+
+    public function testNameReachesComposerJson(): void
+    {
+        $target = $this->generate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // An application is not a published package: the skeleton's
+        // laravel/laravel name becomes app/<slug>.
+        self::assertSame('app/my-cool-app', $composer['name']);
+        self::assertSame('My Cool App, a Wayne State app baked from Sourdough.', $composer['description']);
+
+        // The merge's formatting rules hold: pretty printed, unescaped
+        // slashes, trailing newline, key order kept.
+        $raw = (string) file_get_contents($target . '/composer.json');
+        self::assertStringEndsWith("\n", $raw);
+        self::assertStringNotContainsString('\/', $raw);
+        self::assertSame(
+            array_keys(json_decode($raw, true, 512, JSON_THROW_ON_ERROR)),
+            ['$schema', 'name', 'type', 'description', 'keywords', 'license', 'require', 'require-dev', 'autoload', 'autoload-dev', 'scripts', 'extra', 'config', 'minimum-stability', 'prefer-stable', 'suggest'],
+        );
+    }
+
+    public function testNameReachesEnvExample(): void
+    {
+        $target = $this->generate();
+        $env = (string) file_get_contents($target . '/.env.example');
+
+        // The name carries a space, so the value is quoted.
+        self::assertStringContainsString("APP_NAME=\"My Cool App\"", $env);
+        self::assertStringNotContainsString('APP_NAME=Laravel', $env);
+    }
+
+    public function testNameReachesAppConfig(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/app.php');
+
+        self::assertStringContainsString("'name' => env('APP_NAME', 'My Cool App')", $config);
+        self::assertStringNotContainsString("'name' => env('APP_NAME', 'Laravel')", $config);
     }
 
     /**
