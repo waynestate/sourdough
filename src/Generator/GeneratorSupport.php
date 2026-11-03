@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Generator;
 
+use Waynestate\Sourdough\PlaybookAccess;
 use Waynestate\Sourdough\PlaybookMode;
 
 /**
@@ -181,8 +182,9 @@ final class GeneratorSupport
      * - Suggest and Require: composer.json gets a suggest for the package,
      *   .env.example lists the seven setting names, and the README gains a
      *   "WSU values (PLAYBOOK)" section.
-     * - Require additionally adds the VCS repository and the package under
-     *   require.
+     * - Require additionally adds the VCS repository, the package under
+     *   require, and the gitlab-domains config entry that lets composer
+     *   read the private host.
      * - None leaves the app untouched.
      *
      * Files the template does not ship are skipped, so a custom template
@@ -204,20 +206,21 @@ final class GeneratorSupport
 
         $envPath = $targetDir . '/.env.example';
         if (is_file($envPath)) {
-            $this->appendPlaybookEnvBlock($envPath);
+            $this->appendPlaybookEnvBlock($envPath, $mode);
         }
 
         $readmePath = $targetDir . '/README.md';
         if (is_file($readmePath)) {
-            $this->insertPlaybookReadmeSection($readmePath);
+            $this->insertPlaybookReadmeSection($readmePath, $mode);
         }
     }
 
     /**
      * Add the Playbook wiring to the app's composer.json: a suggest entry in
      * every mode, and in Require mode the VCS repository (after authors,
-     * where composer.json convention puts it) plus the package under
-     * require.
+     * where composer.json convention puts it), the package under require,
+     * and the gitlab-domains config entry that lets composer read
+     * git.wayne.edu with the developer's token.
      *
      * @throws \RuntimeException when the file is not valid JSON or cannot be written
      */
@@ -252,6 +255,35 @@ final class GeneratorSupport
             }
             $require[RawGenerator::PLAYBOOK_PACKAGE] = RawGenerator::PLAYBOOK_VERSION;
             $composer['require'] = $require;
+
+            // Composer only sends the gitlab-token credential to hosts it
+            // knows are GitLab; without this entry the private VCS
+            // repository above would still fail to fetch.
+            $config = $composer['config'] ?? [];
+            if (!is_array($config)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable config section.', $path));
+            }
+            $domains = $config['gitlab-domains'] ?? [];
+            if (!is_array($domains)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable gitlab-domains entry.', $path));
+            }
+            if (!in_array(PlaybookAccess::HOST, $domains, true)) {
+                $domains[] = PlaybookAccess::HOST;
+            }
+            $config['gitlab-domains'] = $domains;
+            $withConfig = [];
+            foreach ($composer as $key => $value) {
+                $withConfig[$key] = $value;
+                // Keep the usual composer.json order: config after the
+                // require sections, before everything else.
+                if ('require-dev' === $key || ('require' === $key && !array_key_exists('require-dev', $composer))) {
+                    $withConfig['config'] = $config;
+                }
+            }
+            if (!array_key_exists('config', $withConfig)) {
+                $withConfig['config'] = $config;
+            }
+            $composer = $withConfig;
         }
 
         $suggest = $composer['suggest'] ?? [];
@@ -272,25 +304,37 @@ final class GeneratorSupport
 
     /**
      * Append the commented Playbook block to .env.example: each of the seven
-     * setting names, empty, with the note that Playbook supplies it when
-     * unset.
+     * setting names, empty, with a note per mode: in Suggest mode Playbook
+     * supplies a value when unset, in Require mode composer install brings
+     * Playbook in and the stack supplies the values automatically.
      *
      * @throws \RuntimeException when the file cannot be read or written
      */
-    public function appendPlaybookEnvBlock(string $path): void
+    public function appendPlaybookEnvBlock(string $path, PlaybookMode $mode): void
     {
         $existing = file_get_contents($path);
         if (false === $existing) {
             throw new \RuntimeException(sprintf('Could not read "%s".', $path));
         }
 
-        $lines = [
-            '',
-            '# WSU shared values from PLAYBOOK (waynestate/playbook), private on',
-            '# git.wayne.edu. The stack reads the environment first, then',
-            '# PLAYBOOK, so leave these empty unless your environment needs',
-            '# its own value.',
-        ];
+        $comment = PlaybookMode::Require === $mode
+            ? [
+                '# WSU shared values from PLAYBOOK (waynestate/playbook), private on',
+                '# git.wayne.edu. Once Playbook is installed the stack supplies',
+                '# these automatically; leave them empty unless your environment',
+                '# needs its own value.',
+            ]
+            : [
+                '# WSU shared values from PLAYBOOK (waynestate/playbook), private on',
+                '# git.wayne.edu. The stack reads the environment first, then',
+                '# PLAYBOOK, so leave these empty unless your environment needs',
+                '# its own value.',
+            ];
+
+        $lines = [''];
+        foreach ($comment as $line) {
+            $lines[] = $line;
+        }
         foreach (RawGenerator::PLAYBOOK_ENV_VARS as $name) {
             $lines[] = sprintf('# %s= # from PLAYBOOK when unset', $name);
         }
@@ -306,7 +350,7 @@ final class GeneratorSupport
      *
      * @throws \RuntimeException when the file cannot be read or written
      */
-    public function insertPlaybookReadmeSection(string $path): void
+    public function insertPlaybookReadmeSection(string $path, PlaybookMode $mode): void
     {
         $readme = file_get_contents($path);
         if (false === $readme) {
@@ -319,19 +363,23 @@ final class GeneratorSupport
             return;
         }
 
-        $updated = substr($readme, 0, $pos) . implode("\n", $this->playbookReadmeLines()) . "\n\n" . substr($readme, $pos);
+        $updated = substr($readme, 0, $pos) . implode("\n", $this->playbookReadmeLines($mode)) . "\n\n" . substr($readme, $pos);
         if (false === file_put_contents($path, $updated)) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $path));
         }
     }
 
     /**
-     * The "WSU values (PLAYBOOK)" README section, line by line.
+     * The "WSU values (PLAYBOOK)" README section, line by line, per mode.
      *
      * @return list<string>
      */
-    public function playbookReadmeLines(): array
+    public function playbookReadmeLines(PlaybookMode $mode): array
     {
+        if (PlaybookMode::Require === $mode) {
+            return $this->requireReadmeLines();
+        }
+
         return [
             '## WSU values (PLAYBOOK)',
             '',
@@ -363,6 +411,95 @@ final class GeneratorSupport
             '',
             'PLAYBOOK is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.',
         ];
+    }
+
+    /**
+     * The Require-mode section: Playbook is a prerequisite of composer
+     * install, so the access steps come from PlaybookAccess::howTo(),
+     * rendered into fenced code blocks here. The two never drift apart
+     * because this reads the same lines the command prints.
+     *
+     * @return list<string>
+     */
+    private function requireReadmeLines(): array
+    {
+        $howTo = PlaybookAccess::howTo();
+        // The last line is the closing sentence ("Then run this command
+        // again."), not a command for the last block.
+        $closing = (string) array_pop($howTo);
+
+        $intro = [];
+        $steps = [];
+        $blocks = [];
+
+        foreach ($howTo as $line) {
+            if ('Windows PowerShell:' === $line || 'Linux or macOS:' === $line) {
+                $blocks[] = [
+                    'label' => $line,
+                    'lang' => 'Windows PowerShell:' === $line ? 'powershell' : 'bash',
+                    'commands' => [],
+                ];
+                continue;
+            }
+
+            if ([] === $blocks) {
+                if ([] === $intro) {
+                    $intro[] = $line;
+                } else {
+                    $steps[] = $line;
+                }
+                continue;
+            }
+
+            $last = count($blocks) - 1;
+            $blocks[$last]['commands'][] = $line;
+        }
+
+        $lines = ['## WSU values (PLAYBOOK)', ''];
+        foreach ($intro as $paragraph) {
+            foreach (self::wrapLine($paragraph) as $wrapped) {
+                $lines[] = $wrapped;
+            }
+            $lines[] = '';
+        }
+
+        $lines[] = 'You need read access before `composer install` works.';
+        $lines[] = '';
+
+        foreach ($steps as $step) {
+            foreach (self::wrapLine($step) as $wrapped) {
+                $lines[] = $wrapped;
+            }
+            $lines[] = '';
+        }
+
+        foreach ($blocks as $block) {
+            $lines[] = $block['label'];
+            $lines[] = '';
+            $lines[] = '```' . $block['lang'];
+            foreach ($block['commands'] as $command) {
+                $lines[] = $command;
+            }
+            $lines[] = '```';
+            $lines[] = '';
+        }
+
+        foreach (self::wrapLine($closing) as $wrapped) {
+            $lines[] = $wrapped;
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Wrap a prose line at 72 columns, the width the other README sections
+     * use. Commands are never wrapped: they are pasted verbatim.
+     *
+     * @return list<string>
+     */
+    private static function wrapLine(string $line): array
+    {
+        return preg_split('/\R/', (string) wordwrap($line, 72)) ?: [];
     }
 
     /**

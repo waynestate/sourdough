@@ -21,20 +21,29 @@ use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PlaybookAccess;
 use Waynestate\Sourdough\PlaybookMode;
 use Waynestate\Sourdough\Plan;
 
 /**
  * The `sourdough new` command.
  *
- * Exit codes (matching PROCTOR): 0 done, 1 refused (invalid flags, non-empty
- * dir, not available in this release), 2 tool error.
+ * Before it writes anything for a real app, the command checks that the
+ * developer can read Playbook (a private package on git.wayne.edu): the
+ * generated app requires it by default, so composer install would fail
+ * otherwise. The check is skipped for --no-playbook, for non-interactive
+ * inputs and in CI, where the app is still generated with the wiring.
+ *
+ * Exit codes (matching PROCTOR): 0 done, 1 refused (invalid flags, no
+ * Playbook access, non-empty dir, not available in this release), 2 tool
+ * error.
  */
 final class NewCommand extends Command
 {
     public function __construct(
         private readonly ?Describe $describe = null,
         private readonly ?SkeletonSource $skeletonSource = null,
+        private readonly ?PlaybookAccess $playbookAccess = null,
     ) {
         parent::__construct();
     }
@@ -58,8 +67,8 @@ final class NewCommand extends Command
             ->addOption('describe', null, InputOption::VALUE_REQUIRED, 'Describe what the app does in a sentence; a model plans it. Needs the SOURDOUGH_LLM_* env vars.')
             ->addOption('plan-only', null, InputOption::VALUE_NONE, 'With --describe, print the plan as JSON and write nothing.')
             ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON matching resources/plan.schema.json)')
-            ->addOption('playbook', null, InputOption::VALUE_NONE, 'Require waynestate/playbook in the generated app: adds the VCS repository and the package to require.')
-            ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring: no suggest, no .env.example block, no README section.')
+            ->addOption('playbook', null, InputOption::VALUE_NONE, 'Kept for compatibility: Playbook is now the default.')
+            ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring. For CI and automated tests only; WSU apps need Playbook.')
             ->addOption('no-advisor', null, InputOption::VALUE_NONE, 'Skip the ADVISOR wiring: no waynestate/advisor in require-dev, no .mcp.json in .gitignore, no README section.');
     }
 
@@ -92,10 +101,10 @@ final class NewCommand extends Command
             return 1;
         }
 
-        $mode = PlaybookMode::Suggest;
-        if ($playbook) {
-            $mode = PlaybookMode::Require;
-        } elseif ($noPlaybook) {
+        // Playbook is the default now; --playbook stays so old scripts keep
+        // working, and --no-playbook turns the wiring off entirely.
+        $mode = PlaybookMode::Require;
+        if ($noPlaybook) {
             $mode = PlaybookMode::None;
         }
 
@@ -121,7 +130,7 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : basename($dir);
 
         if (null !== $planFile) {
-            return $this->runPlanFile($output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json, $mode, !$noAdvisor);
+            return $this->runPlanFile($input, $output, (string) $planFile, $dir, $nameOption, $sail, $docker, $dryRun, $json, $mode, !$noAdvisor);
         }
 
         try {
@@ -145,7 +154,7 @@ final class NewCommand extends Command
             $flags['inertia'] = true;
         }
 
-        return $this->generate($output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode, !$noAdvisor);
+        return $this->generate($input, $output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode, !$noAdvisor);
     }
 
     private function runDescribe(OutputInterface $output, string $sentence, bool $planOnly): int
@@ -172,6 +181,7 @@ final class NewCommand extends Command
     }
 
     private function runPlanFile(
+        InputInterface $input,
         OutputInterface $output,
         string $planFile,
         string $dir,
@@ -194,13 +204,14 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : $plan->name;
         $flags = $this->flagsForPermutation($plan->permutation);
 
-        return $this->generate($output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
+        return $this->generate($input, $output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
     }
 
     /**
      * @param array<string, bool> $flags the raw/laravel/vue/inertia flags
      */
     private function generate(
+        InputInterface $input,
         OutputInterface $output,
         Permutation $permutation,
         string $name,
@@ -221,11 +232,21 @@ final class NewCommand extends Command
         }
 
         if ($dryRun) {
+            // A dry run still checks access, so the developer learns about a
+            // missing Playbook read before they commit to the real run. It
+            // never refuses: the plan is printed either way.
+            $access = $this->detectPlaybook($input, $playbook);
+
             if ($json) {
                 $encoded = json_encode([
                     'permutation' => $permutation->value,
                     'label' => $permutation->label(),
                     'dir' => $dir,
+                    'playbook' => [
+                        'mode' => $playbook->value,
+                        'access' => $access['status'],
+                        'via' => $access['via'],
+                    ],
                     'steps' => $plan->steps,
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 if (false === $encoded) {
@@ -235,6 +256,10 @@ final class NewCommand extends Command
                 $output->writeln($encoded);
             } else {
                 $this->printPlan($output, $plan);
+                $output->writeln(sprintf('Playbook: %s (access: %s)', $playbook->value, $access['status']));
+                if ('no-access' === $access['status']) {
+                    $this->errorOutput($output)->writeln('No Playbook access: a real run would stop until you can read the package.');
+                }
             }
 
             return 0;
@@ -243,6 +268,27 @@ final class NewCommand extends Command
         if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation && Permutation::LaravelBladeVue !== $permutation && Permutation::LaravelInertia !== $permutation) {
             $this->printPlan($output, $plan);
             $this->errorOutput($output)->writeln('not available in this release');
+            return 1;
+        }
+
+        // The name is validated before the access check so a bad name never
+        // triggers a network call.
+        try {
+            RawGenerator::assertValidName($name);
+        } catch (\InvalidArgumentException $e) {
+            $this->errorOutput($output)->writeln($e->getMessage());
+            return 1;
+        }
+
+        $access = $this->detectPlaybook($input, $playbook);
+
+        if (PlaybookMode::Require === $playbook && 'no-access' === $access['status']) {
+            $error = $this->errorOutput($output);
+            $error->writeln('You need read access to Playbook (a private package on git.wayne.edu) to make a Wayne State app.');
+            foreach (PlaybookAccess::howTo() as $line) {
+                $error->writeln($line);
+            }
+
             return 1;
         }
 
@@ -286,6 +332,10 @@ final class NewCommand extends Command
             return 2;
         }
 
+        if (PlaybookMode::Require === $playbook && 'offline' === $access['status']) {
+            $this->errorOutput($output)->writeln('Could not reach git.wayne.edu to check your Playbook access; composer install will need it.');
+        }
+
         $output->writeln('');
         $output->writeln('Next steps:');
         $output->writeln(sprintf('  cd %s', $dir));
@@ -311,7 +361,10 @@ final class NewCommand extends Command
 
         if (PlaybookMode::Suggest === $playbook) {
             $output->writeln('');
-            $output->writeln('WSU values: see "WSU values (PLAYBOOK)" in README.md, or re-run with --playbook.');
+            $output->writeln('WSU values: see "WSU values (PLAYBOOK)" in README.md.');
+        } elseif (PlaybookMode::Require === $playbook) {
+            $output->writeln('');
+            $output->writeln('WSU values: Playbook installs with composer install. Check it any time with: composer playbook');
         }
 
         return 0;
@@ -375,6 +428,41 @@ final class NewCommand extends Command
     private function describeService(): Describe
     {
         return $this->describe ?? new Describe();
+    }
+
+    private function playbookService(): PlaybookAccess
+    {
+        return $this->playbookAccess ?? new PlaybookAccess();
+    }
+
+    /**
+     * Ask whether the developer can read Playbook, per the mode and the
+     * input. None never asks; a non-interactive input or a CI environment
+     * skips the network check and reports "skipped", so automated runs stay
+     * hermetic.
+     *
+     * @return array{status: string, via: string|null}
+     */
+    private function detectPlaybook(InputInterface $input, PlaybookMode $mode): array
+    {
+        if (PlaybookMode::None === $mode || !$input->isInteractive()) {
+            return ['status' => 'skipped', 'via' => null];
+        }
+
+        // getenv() may hold false values; isCi wants strings only.
+        $env = [];
+        foreach (getenv() as $key => $value) {
+            if (is_string($value)) {
+                $env[$key] = $value;
+            }
+        }
+        if (PlaybookAccess::isCi($env)) {
+            return ['status' => 'skipped', 'via' => null];
+        }
+
+        $result = $this->playbookService()->detect();
+
+        return ['status' => $result['status'], 'via' => $result['via']];
     }
 
     private function printPlan(OutputInterface $output, Plan $plan): void

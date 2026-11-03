@@ -101,7 +101,7 @@ abstract class LaravelOverlayGenerator
      * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the skeleton or the template is missing or a file cannot be read, parsed or written
      */
-    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): void
+    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Require, bool $advisor = true): void
     {
         RawGenerator::assertValidName($name);
 

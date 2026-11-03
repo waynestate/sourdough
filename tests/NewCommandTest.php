@@ -15,9 +15,17 @@ use Waynestate\Sourdough\Command\NewCommand;
 use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\SkeletonSource;
+use Waynestate\Sourdough\PlaybookAccess;
 
 final class NewCommandTest extends TestCase
 {
+    /**
+     * The variables PlaybookAccess::isCi looks at. They are stripped for
+     * every test so a developer's CI machine cannot change what "interactive"
+     * means here, and restored afterwards.
+     */
+    private const CI_ENV_KEYS = ['CI', 'GITLAB_CI', 'GITHUB_ACTIONS', 'SOURDOUGH_NO_INTERACTION', 'COMPOSER_NO_INTERACTION'];
+
     /** @var list<string> */
     private array $tempDirs = [];
 
@@ -27,10 +35,20 @@ final class NewCommandTest extends TestCase
     /** @var array<string, string|false> */
     private array $savedLlmEnv = [];
 
+    /** @var array<string, string|false> */
+    private array $savedCiEnv = [];
+
+    /** @var list<list<string>> */
+    private array $playbookCalls = [];
+
     protected function setUp(): void
     {
         foreach (['SOURDOUGH_LLM_BASE_URL', 'SOURDOUGH_LLM_API_KEY', 'SOURDOUGH_LLM_MODEL'] as $name) {
             $this->savedLlmEnv[$name] = getenv($name);
+        }
+        foreach (self::CI_ENV_KEYS as $name) {
+            $this->savedCiEnv[$name] = getenv($name);
+            putenv($name);
         }
     }
 
@@ -56,6 +74,15 @@ final class NewCommandTest extends TestCase
             }
         }
         $this->savedLlmEnv = [];
+
+        foreach ($this->savedCiEnv as $name => $value) {
+            if ($value === false) {
+                putenv($name);
+            } else {
+                putenv($name . '=' . $value);
+            }
+        }
+        $this->savedCiEnv = [];
     }
 
     public function testDryRunWritesNothingAndExitsZero(): void
@@ -423,10 +450,11 @@ final class NewCommandTest extends TestCase
         self::assertFileExists($target . '/.sourdough/manifest.json');
 
         $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame(['name' => 'demo', 'raw' => true], $manifest['answers']);
+        // Playbook is the default now, so a plain run records it too. Keys are sorted by Manifest.
+        self::assertSame(['name' => 'demo', 'playbook' => true, 'raw' => true], $manifest['answers']);
     }
 
-    public function testDefaultRunPrintsThePlaybookHint(): void
+    public function testDefaultRunPrintsThePlaybookNextStep(): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
@@ -437,7 +465,7 @@ final class NewCommandTest extends TestCase
         ]);
 
         self::assertSame(0, $exit);
-        self::assertStringContainsString('WSU values: see "WSU values (PLAYBOOK)" in README.md, or re-run with --playbook.', $tester->getDisplay());
+        self::assertStringContainsString('WSU values: Playbook installs with composer install. Check it any time with: composer playbook', $tester->getDisplay());
     }
 
     public function testPlaybookFlagRequiresThePackageAndAddsTheRepository(): void
@@ -457,6 +485,9 @@ final class NewCommandTest extends TestCase
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
+        // Composer must be told git.wayne.edu is a GitLab host or the token
+        // is never sent to it.
+        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
         // The default wiring stays in place under --playbook.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
 
@@ -472,13 +503,15 @@ final class NewCommandTest extends TestCase
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
 
-        $tester = new CommandTester($this->createCommand());
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
         $exit = $tester->execute([
             'dir' => $target,
             '--no-playbook' => true,
         ]);
 
         self::assertSame(0, $exit);
+        // None mode never asks the machine about access.
+        self::assertSame([], $this->playbookCalls);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
         self::assertArrayNotHasKey('suggest', $composer);
         self::assertArrayNotHasKey('repositories', $composer);
@@ -511,6 +544,176 @@ final class NewCommandTest extends TestCase
         self::assertSame(1, $exit);
         self::assertDirectoryDoesNotExist($target);
         self::assertStringContainsString('--playbook and --no-playbook are mutually exclusive', $tester->getDisplay());
+    }
+
+    public function testPlaybookNoAccessRefusesAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('no-access')));
+        $exit = $tester->execute([
+            'dir' => $target,
+        ]);
+
+        self::assertSame(1, $exit);
+        // The refusal happens before anything is written.
+        self::assertDirectoryDoesNotExist($target);
+        self::assertStringContainsString('You need read access to Playbook (a private package on git.wayne.edu) to make a Wayne State app.', $tester->getDisplay());
+        self::assertStringContainsString('read_repository', $tester->getDisplay());
+        self::assertStringContainsString('Then run this command again.', $tester->getDisplay());
+    }
+
+    public function testPlaybookAccessGeneratesRequireWithGitlabDomains(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute([
+            'dir' => $target,
+        ]);
+
+        self::assertSame(0, $exit);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame([
+            ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
+        ], $composer['repositories']);
+        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+    }
+
+    public function testPlaybookOfflineWarnsAndGenerates(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('offline')));
+        $exit = $tester->execute([
+            'dir' => $target,
+        ]);
+
+        // Offline is not a refusal: the app is generated and the developer
+        // hears about it before composer install fails for them.
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/composer.json');
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertStringContainsString('Could not reach git.wayne.edu to check your Playbook access; composer install will need it.', $tester->getDisplay());
+    }
+
+    public function testPlaybookSkippedWhenNonInteractiveOrCi(): void
+    {
+        $parent = $this->makeTempDir();
+
+        // Non-interactive input: no network check, the wiring still goes in.
+        $target = $parent . '/non-interactive';
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute(['dir' => $target], ['interactive' => false]);
+
+        self::assertSame(0, $exit);
+        self::assertSame([], $this->playbookCalls);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+
+        // A CI environment: same skip, same result.
+        putenv('CI=1');
+        $target = $parent . '/ci';
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute(['dir' => $target]);
+
+        self::assertSame(0, $exit);
+        self::assertSame([], $this->playbookCalls);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+    }
+
+    public function testNoPlaybookSkipsDetectionAndWiring(): void
+    {
+        $parent = $this->makeTempDir();
+
+        // The default run wires Playbook, so there is something to skip.
+        $defaultTarget = $parent . '/default';
+        $tester = new CommandTester($this->createCommand());
+        self::assertSame(0, $tester->execute(['dir' => $defaultTarget]));
+        $composer = json_decode((string) file_get_contents($defaultTarget . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+
+        // --no-playbook never detects and leaves no wiring behind.
+        $target = $parent . '/demo';
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute(['dir' => $target, '--no-playbook' => true]);
+
+        self::assertSame(0, $exit);
+        self::assertSame([], $this->playbookCalls);
+
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('suggest', $composer);
+        self::assertArrayNotHasKey('repositories', $composer);
+        self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
+
+        $env = (string) file_get_contents($target . '/.env.example');
+        self::assertStringNotContainsString('PLAYBOOK', $env);
+
+        $readme = (string) file_get_contents($target . '/README.md');
+        self::assertStringNotContainsString('WSU values (PLAYBOOK)', $readme);
+    }
+
+    public function testPlaybookFlagIsNoOp(): void
+    {
+        // Both apps get the same name (the dir basename) so the only thing
+        // that may differ between the runs is the Playbook wiring.
+        $withParent = $this->makeTempDir();
+        $with = $withParent . '/demo';
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        self::assertSame(0, $tester->execute(['dir' => $with, '--playbook' => true]));
+        $withComposer = json_decode((string) file_get_contents($with . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1', $withComposer['require']['waynestate/playbook']);
+
+        // Without it: the very same wiring, so the flag changed nothing.
+        $withoutParent = $this->makeTempDir();
+        $without = $withoutParent . '/demo';
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        self::assertSame(0, $tester->execute(['dir' => $without]));
+        $withoutComposer = json_decode((string) file_get_contents($without . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame($withComposer, $withoutComposer);
+    }
+
+    public function testDryRunJsonHasPlaybookKey(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--dry-run' => true,
+            '--json' => true,
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        $data = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['mode' => 'require', 'access' => 'access', 'via' => 'git'], $data['playbook']);
+    }
+
+    public function testDescribeNeverDetectsPlaybook(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        $this->setLlmEnv();
+
+        $describe = $this->describeWithResponse($this->validPlanJson());
+        $tester = new CommandTester($this->createCommand($describe, null, $this->fakePlaybookAccess('access')));
+        $exit = $tester->execute([
+            'dir' => $target,
+            '--describe' => 'A blog with posts.',
+        ]);
+
+        self::assertSame(0, $exit);
+        self::assertDirectoryDoesNotExist($target);
+        // Describing plans an app; it never asks the machine about access.
+        self::assertSame([], $this->playbookCalls);
     }
 
     public function testDryRunListsTheAdvisorStep(): void
@@ -764,9 +967,38 @@ final class NewCommandTest extends TestCase
         });
     }
 
-    private function createCommand(?Describe $describe = null, ?SkeletonSource $skeletonSource = null): NewCommand
+    private function createCommand(?Describe $describe = null, ?SkeletonSource $skeletonSource = null, ?PlaybookAccess $playbookAccess = null): NewCommand
     {
-        return new NewCommand($describe, $skeletonSource);
+        // Tests get a network-free access check by default; tests that care
+        // about the outcome inject their own status.
+        return new NewCommand($describe, $skeletonSource, $playbookAccess ?? $this->fakePlaybookAccess('access'));
+    }
+
+    /**
+     * A PlaybookAccess that never touches the network: the injected runner
+     * answers the composer credential probe with "no token" and the git
+     * probe with $status. Every argv it sees lands in $this->playbookCalls.
+     */
+    private function fakePlaybookAccess(string $status): PlaybookAccess
+    {
+        $this->playbookCalls = [];
+
+        /** @param list<string> $argv @param array<string, string> $env @return array{0: int, 1: string} */
+        $run = function (array $argv, array $env, int $timeout) use ($status): array {
+            $this->playbookCalls[] = $argv;
+
+            if ('composer' === ($argv[0] ?? '')) {
+                return [1, ''];
+            }
+
+            return match ($status) {
+                'access' => [0, ''],
+                'no-access' => [128, 'fatal: Authentication failed for \'https://git.wayne.edu/enterprise-apps/playbook.git\''],
+                default => [124, 'timeout'],
+            };
+        };
+
+        return new PlaybookAccess($run, [], 1);
     }
 
     private function describeWithResponse(string $content): Describe

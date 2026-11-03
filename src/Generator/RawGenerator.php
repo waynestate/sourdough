@@ -23,9 +23,10 @@ use Waynestate\Sourdough\PlaybookMode;
  * them), and their executable bits come from Squire's manifest.
  *
  * Then the generator wires Playbook into the app per the chosen mode: by
- * default it suggests the package, lists its values in .env.example and
- * documents them in the README; --playbook also requires it with its VCS
- * repository; --no-playbook leaves the app untouched.
+ * default it requires the package (VCS repository, require entry and the
+ * gitlab-domains config entry), lists its values in .env.example and
+ * documents them in the README; Suggest keeps the old suggest-only wiring
+ * for library mode; None leaves the app untouched.
  *
  * The app ships ADVISOR by default: waynestate/advisor under require-dev,
  * .mcp.json git-ignored and an "ADVISOR" section in the README. With
@@ -67,8 +68,8 @@ final class RawGenerator
 
     /**
      * Playbook (waynestate/playbook) is WSU's private shared-values package
-     * on git.wayne.edu. The stack reads the environment first, then
-     * Playbook, so a generated app installs without it by default.
+     * on git.wayne.edu. A generated app requires it by default; the stack
+     * reads each value from the environment first, then from Playbook.
      */
     public const PLAYBOOK_PACKAGE = 'waynestate/playbook';
 
@@ -121,7 +122,7 @@ final class RawGenerator
      * @throws \InvalidArgumentException when the name does not match NAME_PATTERN, the target exists and is not empty, or the name has no valid slug
      * @throws \RuntimeException         when the template is missing or a file cannot be read or written
      */
-    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): void
+    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Require, bool $advisor = true): void
     {
         self::assertValidName($name);
 

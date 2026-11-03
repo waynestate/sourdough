@@ -363,9 +363,9 @@ final class RawGeneratorTest extends TestCase
         }
     }
 
-    public function testGeneratedComposerHasNoRepositories(): void
+    public function testSuggestModeComposerHasNoRepositories(): void
     {
-        $target = $this->generateFromRealTemplate();
+        $target = $this->generateFromRealTemplate(PlaybookMode::Suggest);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertArrayNotHasKey('repositories', $composer);
@@ -427,14 +427,22 @@ final class RawGeneratorTest extends TestCase
         self::assertStringNotContainsString("ORACLE_USERNAME='", $env);
     }
 
-    public function testDefaultGenerationSuggestsPlaybook(): void
+    public function testDefaultGenerationRequiresPlaybook(): void
     {
         $target = $this->generateFromRealTemplate();
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
+        // Playbook is required by default now: the package, the VCS
+        // repository and the gitlab-domains entry that lets composer send
+        // the token to git.wayne.edu.
+        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame([
+            ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
+        ], $composer['repositories']);
+        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+        // The suggest stays, so a developer who removes the require still
+        // sees what the package is for.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
-        self::assertArrayNotHasKey('repositories', $composer);
-        self::assertArrayNotHasKey('waynestate/playbook', $composer['require']);
 
         // All seven setting names, each empty and marked as coming from Playbook.
         $env = (string) file_get_contents($target . '/.env.example');
@@ -444,10 +452,17 @@ final class RawGeneratorTest extends TestCase
 
         $readme = (string) file_get_contents($target . '/README.md');
         self::assertStringContainsString('## WSU values (PLAYBOOK)', $readme);
-        self::assertStringContainsString('curl --fail -H "PRIVATE-TOKEN: $GITLAB_TOKEN"', $readme);
-        self::assertStringContainsString('$env:GITLAB_TOKEN', $readme);
-        self::assertStringContainsString('git clone https://git.wayne.edu/enterprise-apps/playbook.git', $readme);
-        self::assertStringContainsString('If you get a 404, ask the Enterprise Applications team for read access.', $readme);
+        self::assertStringContainsString('You need read access before `composer install` works.', $readme);
+        self::assertStringContainsString('Windows PowerShell:', $readme);
+        self::assertStringContainsString('Linux or macOS:', $readme);
+        self::assertStringContainsString('composer config --global --append gitlab-domains git.wayne.edu', $readme);
+        self::assertStringContainsString('composer config --global gitlab-token.git.wayne.edu "<your-token>"', $readme);
+        self::assertStringContainsString("composer config --global gitlab-token.git.wayne.edu '<your-token>'", $readme);
+        self::assertStringContainsString('Then run this command again.', $readme);
+        // The old fetch-by-curl instructions are gone with Suggest mode.
+        self::assertStringNotContainsString('curl --fail', $readme);
+        self::assertStringNotContainsString('$env:GITLAB_TOKEN', $readme);
+        self::assertStringNotContainsString('git clone https://git.wayne.edu/enterprise-apps/playbook.git', $readme);
 
         // The section sits before the Handbook section, which stays last.
         $sectionPos = strpos($readme, '## WSU values (PLAYBOOK)');
@@ -466,6 +481,8 @@ final class RawGeneratorTest extends TestCase
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
         self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        // The token is only sent to git.wayne.edu, never to Packagist.
+        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
         // The default wiring stays in place under Require mode.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
 
@@ -581,7 +598,7 @@ final class RawGeneratorTest extends TestCase
     /**
      * Generate an app from the real templates/raw dir and return the target.
      */
-    private function generateFromRealTemplate(PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): string
+    private function generateFromRealTemplate(PlaybookMode $playbook = PlaybookMode::Require, bool $advisor = true): string
     {
         $target = $this->makeTempDir();
         (new RawGenerator(__DIR__ . '/../templates/raw'))->generate($target, 'My Cool App', [], $playbook, $advisor);
