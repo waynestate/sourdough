@@ -8,7 +8,7 @@ The README and the Markdown twin of every page, joined. The index is https://sou
 
 ## README
 
-Source: https://github.com/waynestate/sourdough/blob/HEAD/README.md
+Source: https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/README.md
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
 
@@ -16,11 +16,15 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Every loaf gets proofed before it ships.
 
-Front page: [`site/index.html`](https://github.com/waynestate/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
+Front page: [`site/index.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
 
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
-This repository is published from Wayne State University's internal GitLab and mirrored here. Changes land there first; Wayne State developers open issues and merge requests on the internal project.
+### Where the code lives
+
+The canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it.
+Open issues and merge requests on nougat, not on the mirrors.
+This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
 
 Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
@@ -163,7 +167,7 @@ The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` c
 
 ### Testing
 
-Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/sourdough/blob/HEAD/MAINTAINING.md).
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/MAINTAINING.md).
 
 From the repo root:
 
@@ -175,7 +179,7 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
-The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](https://github.com/waynestate/sourdough/blob/HEAD/MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 ` runs it in one line.
+The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 ` runs it in one line.
 
 ### CI
 
