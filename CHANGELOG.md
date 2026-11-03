@@ -21,6 +21,7 @@ Versioning once 1.0 is out.
 - Fixed: the laravel-blade-vue template ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app no longer fails on the missing Vite manifest before `npm run build` has run.
 - Changed: the smoke gate runs `php artisan migrate` like the Next steps, and the Laravel template READMEs show `migrate` for local and `migrate --force` for deploys.
 - Fixed: the Playbook wiring no longer drops a template's own composer config keys.
+- Fixed: the raw template ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
 
 ## 0.1.5 (2026-11-03)
 
