@@ -106,6 +106,34 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertStringContainsString('VITE_APP_NAME="${APP_NAME}"', $env);
     }
 
+    /**
+     * SESAME requires a non-empty fake.username when the driver is fake, so
+     * the config carries a default that matches the hardcoded display name;
+     * otherwise a fresh app with nothing in its environment cannot boot.
+     */
+    public function testFakeDriverBootsWithNoEnvironment(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/sesame.php');
+
+        self::assertStringContainsString("env('SESAME_FAKE_USERNAME', 'jane.doe')", $config);
+    }
+
+    /**
+     * Squire's health.php and oracle-check.php ship verbatim from the SQUIRE
+     * package (squire-copy:check keeps them byte-identical), so the generated
+     * app's Pint config must skip them; otherwise composer ci fails on their
+     * foreign style, as the E2E smoke found for laravel-blade.
+     */
+    public function testPintSkipsTheVerbatimSquireFiles(): void
+    {
+        $target = $this->generate();
+        $pint = json_decode((string) file_get_contents($target . '/pint.json'), true);
+
+        self::assertContains('health.php', $pint['notPath']);
+        self::assertContains('oracle-check.php', $pint['notPath']);
+    }
+
     public function testRemovesTheSkeletonViteConfigJs(): void
     {
         // The fixture skeleton is trimmed; copy it and give it the

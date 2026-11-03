@@ -14,3 +14,22 @@ jobs:
     with:
       php-versions: '["8.3","8.4","8.5"]'
       ci-command: composer ci
+
+  # Smoke gate: bake each shape for real and run the generated app's own
+  # checks (see MAINTAINING.md, "Smoke gate"). A shape may only be claimed
+  # when its gate is green. allow_failure: true until the lead has seen
+  # every shape green once; flip to false after.
+  smoke:
+    allow_failure: true
+    strategy:
+      fail-fast: false
+      matrix:
+        shape: [raw, blade, inertia]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the recipe
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Smoke the ${{ matrix.shape }} shape
+        run: |
+          docker build -q -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh ${{ matrix.shape }}
