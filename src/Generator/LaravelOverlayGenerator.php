@@ -92,6 +92,7 @@ abstract class LaravelOverlayGenerator
         $this->copyOverlay($targetDir, $name, $slug);
         $this->mergeComposerOverlay($targetDir);
         $this->appendEnvAdditions($targetDir);
+        $this->applyAppName($targetDir, $name, $slug);
 
         $this->support->installSquireFiles($targetDir, 'laravel');
         $this->support->applyPlaybook($targetDir, $playbook);
@@ -237,6 +238,70 @@ abstract class LaravelOverlayGenerator
 
         if (false === file_put_contents($envPath, $existing . "\n" . $additions)) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $envPath));
+        }
+    }
+
+    /**
+     * Apply the app name to the places a fresh Laravel skeleton still says
+     * laravel/laravel and Laravel, where WELD applies it by hand:
+     * composer.json's name becomes app/<slug> (an application is not a
+     * published package) and its description names the app; .env.example's
+     * APP_NAME line becomes the name, quoted when it carries a space; and
+     * config/app.php's default follows it. A missing file or a pattern that
+     * does not match is skipped; the bake never fails on it.
+     *
+     * @throws \RuntimeException when a file cannot be written
+     */
+    private function applyAppName(string $targetDir, string $name, string $slug): void
+    {
+        $composerPath = $targetDir . '/composer.json';
+        if (is_file($composerPath)) {
+            $content = file_get_contents($composerPath);
+            if (false !== $content) {
+                try {
+                    $composer = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException) {
+                    $composer = null;
+                }
+                if (is_array($composer)) {
+                    // An application is not a published package: its name is
+                    // app/<slug>, not a vendor namespace.
+                    $composer['name'] = 'app/' . $slug;
+                    $composer['description'] = sprintf('%s, a Wayne State app baked from Sourdough.', $name);
+                    $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    if (false !== $encoded && false === file_put_contents($composerPath, $encoded . "\n")) {
+                        throw new \RuntimeException(sprintf('Could not write "%s".', $composerPath));
+                    }
+                }
+            }
+        }
+
+        $envPath = $targetDir . '/.env.example';
+        if (is_file($envPath)) {
+            $content = file_get_contents($envPath);
+            if (false !== $content) {
+                $value = str_contains($name, ' ') ? '"' . $name . '"' : $name;
+                $updated = preg_replace('/^APP_NAME=Laravel$/m', 'APP_NAME=' . $value, $content, 1);
+                if (null !== $updated && $updated !== $content && false === file_put_contents($envPath, $updated)) {
+                    throw new \RuntimeException(sprintf('Could not write "%s".', $envPath));
+                }
+            }
+        }
+
+        $configPath = $targetDir . '/config/app.php';
+        if (is_file($configPath)) {
+            $content = file_get_contents($configPath);
+            if (false !== $content) {
+                $escaped = str_replace(['\\', "'"], ['\\\\', "\\'"], $name);
+                $updated = str_replace(
+                    "'name' => env('APP_NAME', 'Laravel')",
+                    "'name' => env('APP_NAME', '" . $escaped . "')",
+                    $content,
+                );
+                if ($updated !== $content && false === file_put_contents($configPath, $updated)) {
+                    throw new \RuntimeException(sprintf('Could not write "%s".', $configPath));
+                }
+            }
         }
     }
 
