@@ -92,7 +92,7 @@ Out of the oven · 0.1
 
 The crumb
 
-A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config and `/up`, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan serve`.
+A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config and `/up`, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
 
 Seeded loaf
 

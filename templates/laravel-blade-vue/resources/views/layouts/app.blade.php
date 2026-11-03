@@ -31,7 +31,7 @@
 
                     <div class="wsu-app-bar__end">
                         @if($signedInUser)
-                            <span class="wsu-app-bar__user">{{ $signedInUser->name }}</span>
+                            <span class="wsu-app-bar__user">{{ $signedInUser['name'] }}</span>
                         @endif
                     </div>
                 </div>

@@ -296,10 +296,12 @@ final class NewCommand extends Command
         if (Permutation::LaravelBlade === $permutation) {
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');
+            $output->writeln('  php artisan migrate');
             $output->writeln('  php artisan serve');
         } elseif (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');
+            $output->writeln('  php artisan migrate');
             $output->writeln('  npm install');
             $output->writeln('  npm run build');
             $output->writeln('  php artisan serve');
