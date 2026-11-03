@@ -2,7 +2,7 @@
 # smoke-shape.sh: bake one Sourdough shape for real and run the generated
 # app's own checks. A shape may only be claimed when this gate is green.
 #
-# Usage: smoke-shape.sh <raw|blade|inertia>
+# Usage: smoke-shape.sh <raw|blade|blade-vue|inertia>
 #
 # Environment:
 #   SMOKE_REPO  checkout of this repository to read from (default /repo)
@@ -10,15 +10,16 @@
 #               (default: a fresh mktemp -d, removed on exit)
 #   SMOKE_KEEP  set to 1 to keep the scratch dir behind for inspection
 #
-# Needs php 8.5, composer 2 and (for blade and inertia) node 22 on PATH, plus
+# Needs php 8.5, composer 2 and (for blade, blade-vue and inertia) node 22 on
+# PATH, plus
 # network access for Composer and npm. No credentials, no Oracle connection.
 set -u
 
 shape=${1:-}
 case "$shape" in
-    raw | blade | inertia) ;;
+    raw | blade | blade-vue | inertia) ;;
     *)
-        echo "usage: smoke-shape.sh <raw|blade|inertia>" >&2
+        echo "usage: smoke-shape.sh <raw|blade|blade-vue|inertia>" >&2
         exit 2
         ;;
 esac
@@ -129,6 +130,9 @@ case "$shape" in
     blade)
         step "sourdough new blade" php "$src/bin/sourdough" new "$work/app" --laravel --no-advisor --no-input
         ;;
+    blade-vue)
+        step "sourdough new blade-vue" php "$src/bin/sourdough" new "$work/app" --laravel --vue --no-advisor --no-input
+        ;;
     inertia)
         step "sourdough new inertia" php "$src/bin/sourdough" new "$work/app" --inertia --no-advisor --no-input
         ;;
@@ -145,6 +149,15 @@ case "$shape" in
         step "composer install" composer install --no-interaction --no-progress
         step "cp .env.example .env" cp .env.example .env
         step "php artisan key:generate" php artisan key:generate
+        step "php artisan test" php artisan test
+        step "composer ci" composer ci
+        ;;
+    blade-vue)
+        step "composer install" composer install --no-interaction --no-progress
+        step "cp .env.example .env" cp .env.example .env
+        step "php artisan key:generate" php artisan key:generate
+        step "npm install" npm install --no-audit --no-fund
+        step "npm run build" npm run build
         step "php artisan test" php artisan test
         step "composer ci" composer ci
         ;;

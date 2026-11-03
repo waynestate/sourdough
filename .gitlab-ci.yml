@@ -72,6 +72,11 @@ smoke-blade:
   script:
     - sh scripts/smoke-shape.sh blade
 
+smoke-blade-vue:
+  extends: .smoke-base
+  script:
+    - sh scripts/smoke-shape.sh blade-vue
+
 smoke-inertia:
   extends: .smoke-base
   script:

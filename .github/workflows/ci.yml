@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shape: [raw, blade, inertia]
+        shape: [raw, blade, blade-vue, inertia]
     runs-on: ubuntu-latest
     steps:
       - name: Check out the recipe
