@@ -52,6 +52,40 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 - **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
 - Green means `composer ci` passed on all three PHP versions on both.
 
+## Smoke gate
+
+The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
+
+- `raw`: `composer install` and `composer ci`
+- `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate` and `php artisan test`
+- `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
+
+Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
+
+Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
+
+Linux and macOS:
+
+```
+docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+docker run --rm -v "$PWD:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh <shape>
+```
+
+Windows PowerShell:
+
+```
+.\scripts\smoke-shape.ps1 <shape>
+```
+
+The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run.
+
+Two environment variables control the scratch space:
+
+- `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
+- `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
+
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+
 ## Refreshing the Squire templates
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
