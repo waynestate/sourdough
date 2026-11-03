@@ -1,12 +1,12 @@
 # PREFLIGHT components, pinned to released Preflight tags.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.1.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       proctor_command: vendor/bin/proctor check --format=codequality
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.1.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       test_command: vendor/bin/phpunit
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.1.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       working_dir: .
