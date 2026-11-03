@@ -485,6 +485,8 @@ final class RawGeneratorTest extends TestCase
         self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
         // The token is only sent to git.wayne.edu, never to Packagist.
         self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
+        // The template's own config keys survive the merge.
+        self::assertSame(['phpstan/extension-installer' => true], $composer['config']['allow-plugins']);
         // The default wiring stays in place under Require mode.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
 
