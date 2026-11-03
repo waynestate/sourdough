@@ -2,8 +2,8 @@
     "require": {
         "inertiajs/inertia-laravel": "^2.0",
         "tightenco/ziggy": "^2.4",
-        "waynestate/helmet": "^0.2",
-        "waynestate/sesame": "^0.2",
+        "waynestate/helmet": "^0.3",
+        "waynestate/sesame": "^0.4",
         "yajra/laravel-oci8": "^13.14"
     },
     "config": {
@@ -19,7 +19,7 @@
         "waynestate/advisor": "^0.1",
         "waynestate/creed": "^0.1",
         "waynestate/pinstripe": "^0.1",
-        "waynestate/proctor": "^0.2"
+        "waynestate/proctor": "^0.4"
     },
     "scripts": {
         "ci": [
