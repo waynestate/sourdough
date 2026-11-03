@@ -219,8 +219,11 @@ final class GeneratorSupport
      * Add the Playbook wiring to the app's composer.json: a suggest entry in
      * every mode, and in Require mode the VCS repository (after authors,
      * where composer.json convention puts it), the package under require,
-     * and the gitlab-domains config entry that lets composer read
-     * git.wayne.edu with the developer's token.
+     * the gitlab-domains config entry that lets composer read
+     * git.wayne.edu with the developer's token, and a `playbook` script
+     * (with its scripts-descriptions entry) that shows whether Playbook is
+     * installed. Existing scripts keep their order; playbook goes last, and
+     * an existing playbook entry is left alone.
      *
      * @throws \RuntimeException when the file is not valid JSON or cannot be written
      */
@@ -289,6 +292,27 @@ final class GeneratorSupport
                 $withConfig['config'] = $config;
             }
             $composer = $withConfig;
+
+            // The app gets a composer playbook script that shows whether
+            // Playbook is installed. Existing scripts keep their order and
+            // an existing playbook entry is left alone.
+            $scripts = $composer['scripts'] ?? [];
+            if (!is_array($scripts)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable scripts section.', $path));
+            }
+            if (!array_key_exists('playbook', $scripts)) {
+                $scripts['playbook'] = '@composer show ' . RawGenerator::PLAYBOOK_PACKAGE . ' --no-interaction';
+            }
+            $composer['scripts'] = $scripts;
+
+            $descriptions = $composer['scripts-descriptions'] ?? [];
+            if (!is_array($descriptions)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable scripts-descriptions section.', $path));
+            }
+            if (!array_key_exists('playbook', $descriptions)) {
+                $descriptions['playbook'] = 'Check that Playbook (WSU shared values) is installed';
+            }
+            $composer['scripts-descriptions'] = $descriptions;
         }
 
         $suggest = $composer['suggest'] ?? [];
