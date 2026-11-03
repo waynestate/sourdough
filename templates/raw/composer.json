@@ -16,21 +16,35 @@
     "require-dev": {
         "phpunit/phpunit": "^11.5",
         "waynestate/advisor": "^0.1",
+        "waynestate/pinstripe": "^0.1",
         "waynestate/proctor": "^0.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "scripts": {
         "test": "phpunit",
+        "lint": "pint --test",
+        "fix": "pint",
+        "analyse": "phpstan analyse",
         "proctor": "proctor check",
         "ci": [
             "@test",
+            "@lint",
+            "@analyse",
             "@proctor",
             "composer audit"
         ]
     },
     "scripts-descriptions": {
         "test": "Run the PHPUnit test suite.",
+        "lint": "Check the code style with Pint (Pinstripe's per preset).",
+        "fix": "Fix the code style with Pint (Pinstripe's per preset).",
+        "analyse": "Analyse the code with PHPStan (Pinstripe's raw preset, level 8).",
         "proctor": "Run PROCTOR's stack checks against the app.",
-        "ci": "Run the full local gate: tests, PROCTOR and composer audit."
+        "ci": "Run the full local gate: tests, Pint, PHPStan, PROCTOR and composer audit."
     },
     "autoload": {
         "psr-4": {
