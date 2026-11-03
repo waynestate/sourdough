@@ -12,12 +12,18 @@ dev server:
 cp .env.example .env
 composer install
 php artisan key:generate
-php artisan migrate --force
+php artisan migrate
 php artisan serve
 ```
 
 Open http://localhost:8000. Locally the app signs in with SESAME's fake
 driver (`SESAME_DRIVER=fake`).
+
+## Deploying
+
+On the server, run `php artisan migrate --force` as part of the release.
+Plain `php artisan migrate` is for your laptop; the deploy step keeps the
+flag because a live database refuses plain migrations.
 
 ## Sign-in
 
