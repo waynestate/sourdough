@@ -10,6 +10,11 @@ Versioning once 1.0 is out.
 
 - Fixed: the GitHub CI workflow was rejected as invalid (every run failed with "workflow file issue") because the smoke job used GitLab's `allow_failure`; it now uses `continue-on-error`.
 - Fixed: the sourdough command now works after composer global require (bin/sourdough also looks for the autoloader three folders up, where a dependency install keeps it).
+- Fixed: the Laravel Next steps now run `php artisan migrate` after `php artisan key:generate` (all three Laravel shapes), so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.
+- Fixed: the Blade and Blade + Vue islands views read the signed-in user as an array (`$user['name']`), because SESAME's `Sesame::user()` returns an array, not an object; the dashboard and the layout no longer crash after sign-in.
+- Fixed: the laravel-blade template ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)` like the laravel-inertia one, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
+- Fixed: the Oracle check command in the laravel-blade and laravel-inertia templates compares in Pint's non-Yoda order (`$script === null`), so a freshly baked app passes its own `composer ci` on the first run.
+- Fixed: the laravel-blade-vue template ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app no longer fails on the missing Vite manifest before `npm run build` has run.
 
 ## 0.1.5 (2026-11-03)
 

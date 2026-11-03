@@ -69,6 +69,9 @@ final class LaravelFirstRunTest extends TestCase
         yield 'inertia' => [['--inertia' => true]];
     }
 
+    /**
+     * @param array<string, bool> $flags
+     */
     #[DataProvider('laravelShapes')]
     public function testNextStepsMigrateAfterKeyGenerate(array $flags): void
     {
