@@ -5,6 +5,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: the raw template ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), `waynestate/pinstripe` in require-dev with the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
+- Changed: the raw template's code passes both of Pinstripe's tools: per-preset style fixes in `Oracle`, `OracleException`, `public/index.php` and `OracleTest`, precise closure and binds types in `Oracle`, a false guard for `oci_error()` results, and the connect-failure branch reporting the last driver error instead of passing the failed connection as its source. A freshly baked raw app passes its own checks.
 - Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).
 - Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.
 

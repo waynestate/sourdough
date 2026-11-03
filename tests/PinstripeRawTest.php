@@ -84,7 +84,9 @@ final class PinstripeRawTest extends TestCase
     public function testBakedAppFailsPintWhenTheStyleIsBroken(): void
     {
         $app = $this->bakeWithToolchain();
-        file_put_contents($app . '/src/StyleBreak.php', <<<'PHP'
+        file_put_contents(
+            $app . '/src/StyleBreak.php',
+            <<<'PHP'
 <?php
 
 declare(strict_types=1);
@@ -96,7 +98,7 @@ use DateTimeImmutable;
 class StyleBreak
 {
 }
-PHP
+PHP,
         );
 
         [$exit, $output] = $this->runPint($app, ['--test']);
@@ -116,7 +118,9 @@ PHP
     public function testBakedAppFailsPhpStanOnATypeError(): void
     {
         $app = $this->bakeWithToolchain();
-        file_put_contents($app . '/src/TypeBreak.php', <<<'PHP'
+        file_put_contents(
+            $app . '/src/TypeBreak.php',
+            <<<'PHP'
 <?php
 
 declare(strict_types=1);
@@ -127,7 +131,7 @@ function type_break(int $count): string
 {
     return $count;
 }
-PHP
+PHP,
         );
 
         [$exit, $output] = $this->runPhpStan($app);

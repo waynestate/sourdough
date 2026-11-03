@@ -24,6 +24,19 @@ php -S localhost:8000 -t public
 Open http://localhost:8000. Locally the app signs in with SESAME's fake
 driver.
 
+## Checks
+
+The app ships with Pinstripe's coding standard wired in. After
+`composer install`:
+
+- `composer lint` checks the code style with Pint, on the per preset.
+  `composer fix` applies the fixes instead.
+- `composer analyse` runs PHPStan at level 8 over `src/` and `public/`.
+
+`composer ci` runs the test suite, both checks, PROCTOR and
+`composer audit`, in that order. A well-kneaded starter passes all of
+them.
+
 ## Sign-in
 
 The app signs in with SESAME. In development (when `APP_ENV` is not

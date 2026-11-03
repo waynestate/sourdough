@@ -26,7 +26,7 @@ The canonical repository is on nougat: [enterprise-apps/sourdough](https://nouga
 Open issues and merge requests on nougat, not on the mirrors.
 This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
 
-Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 <div align="center">
 
