@@ -11,6 +11,7 @@ Versioning once 1.0 is out.
 - Added: `sourdough new --inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `npm install`, `npm run build`, `php artisan serve`. Three of the five loaves bake now.
 - Added: the raw template ships `scripts` (`test`, `proctor`, `ci`) and `scripts-descriptions`, so a generated raw app can run its own gate locally with `composer ci`.
 - Added: generated apps ship ADVISOR by default. `waynestate/advisor` lands in `require-dev` (raw template and the laravel-blade overlay), `.mcp.json` is git-ignored, the README gains an "ADVISOR" section, and the Next steps print `php vendor/bin/advisor install --client=claude --write`. `--no-advisor` skips all of it and records the choice in the manifest.
+- Added: the smoke gate (`scripts/smoke-shape.sh`, `scripts/smoke-shape.ps1`, `scripts/smoke.Dockerfile`) bakes a shape with this checkout's own CLI and runs the generated app's own checks; CI runs one job per shape, all `allow_failure: true` until seen green once.
 
 ### Changed
 
@@ -30,6 +31,7 @@ Versioning once 1.0 is out.
 - Fixed: the plan printed after `sourdough new --laravel` no longer carries the "(not available in this release)" suffix; only the permutations that really refuse keep it.
 - Fixed: the generated Laravel + Blade app passes its own `composer ci`. The template's Oracle command, Oracle error helper and bootstrap are Pint-clean, and Pint skips the two Squire-owned root scripts (`health.php`, `oracle-check.php`) through `notPath`.
 - Fixed: the agent-ready site twins (`site/index.md`, `site/llms-full.txt`) are resynced with the README, so the `site:agent-ready-check` step of `composer ci` passes.
+- Fixed: the laravel-inertia template boots a fresh app out of the box: `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe` so the fake driver has a non-empty username, and Pint skips the two verbatim Squire files (`health.php`, `oracle-check.php`) through `notPath`.
 
 ## 0.1.4 (2026-10-29)
 

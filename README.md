@@ -183,6 +183,8 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
+The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+
 ## CI
 
 Strongly recommended: a git.wayne.edu instance runner.
