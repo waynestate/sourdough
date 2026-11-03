@@ -149,6 +149,7 @@ case "$shape" in
         step "composer install" composer install --no-interaction --no-progress
         step "cp .env.example .env" cp .env.example .env
         step "php artisan key:generate" php artisan key:generate
+        step "php artisan migrate" php artisan migrate
         step "php artisan test" php artisan test
         step "composer ci" composer ci
         ;;
@@ -156,6 +157,7 @@ case "$shape" in
         step "composer install" composer install --no-interaction --no-progress
         step "cp .env.example .env" cp .env.example .env
         step "php artisan key:generate" php artisan key:generate
+        step "php artisan migrate" php artisan migrate
         step "npm install" npm install --no-audit --no-fund
         step "npm run build" npm run build
         step "php artisan test" php artisan test
@@ -165,6 +167,7 @@ case "$shape" in
         step "composer install" composer install --no-interaction --no-progress
         step "cp .env.example .env" cp .env.example .env
         step "php artisan key:generate" php artisan key:generate
+        step "php artisan migrate" php artisan migrate
         step "npm install" npm install --no-audit --no-fund
         step "npm run build" npm run build
         step "npm run typecheck" npm run typecheck

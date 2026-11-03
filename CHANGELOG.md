@@ -15,6 +15,7 @@ Versioning once 1.0 is out.
 - Fixed: the laravel-blade template ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)` like the laravel-inertia one, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
 - Fixed: the Oracle check command in the laravel-blade and laravel-inertia templates compares in Pint's non-Yoda order (`$script === null`), so a freshly baked app passes its own `composer ci` on the first run.
 - Fixed: the laravel-blade-vue template ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app no longer fails on the missing Vite manifest before `npm run build` has run.
+- Changed: the smoke gate runs `php artisan migrate` like the Next steps, and the Laravel template READMEs show `migrate` for local and `migrate --force` for deploys.
 
 ## 0.1.5 (2026-11-03)
 
