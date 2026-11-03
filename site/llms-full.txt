@@ -34,6 +34,8 @@ Sourdough is the app starter for the WSU stack. One command scaffolds a new app 
 composer global require waynestate/sourdough
 ```
 
+After `composer global require`, the `sourdough` command lives in `composer global config bin-dir --absolute`; put that directory on your PATH.
+
 Or scaffold without installing, with `composer create-project waynestate/sourdough`.
 
 ### Usage
