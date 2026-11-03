@@ -17,13 +17,17 @@ final class PlaybookAccess
 
     public const HOST = 'git.wayne.edu';
 
-    /** @var \Closure(array $argv, array $env, int $timeoutSeconds): array{0: int, 1: string} */
+    /** @var \Closure(list<string>, array<string, string>, int): array{0: int, 1: string} */
     private \Closure $run;
 
+    /** @var array<string, string> */
     private array $env;
 
     private int $timeout;
 
+    /**
+     * @param array<string, string>|null $env
+     */
     public function __construct(?\Closure $run = null, ?array $env = null, int $timeoutSeconds = 8)
     {
         $this->run = $run ?? $this->defaultRun(...);
@@ -88,6 +92,9 @@ final class PlaybookAccess
         ];
     }
 
+    /**
+     * @param array<string, string> $env
+     */
     public static function isCi(array $env): bool
     {
         foreach (['CI', 'GITLAB_CI', 'GITHUB_ACTIONS', 'SOURDOUGH_NO_INTERACTION', 'COMPOSER_NO_INTERACTION'] as $key) {
@@ -132,6 +139,9 @@ final class PlaybookAccess
     /**
      * Run a command without a shell, capture stdout and stderr together,
      * and give up after the timeout.
+     *
+     * @param list<string> $argv
+     * @param array<string, string> $env
      *
      * @return array{0: int, 1: string}
      */
@@ -191,7 +201,7 @@ final class PlaybookAccess
             return true;
         }
 
-        foreach ($this->authJsonDirs() as $dir) {
+        foreach ($this->authJsonDirs($this->env) as $dir) {
             $file = $dir . '/auth.json';
             if (!is_file($file)) {
                 continue;
@@ -223,12 +233,16 @@ final class PlaybookAccess
     }
 
     /**
+     * The constructor takes a plain array, so the checks below also
+     * defend against non-string values at runtime.
+     *
+     * @param array<string, mixed> $env
+     *
      * @return list<string>
      */
-    private function authJsonDirs(): array
+    private function authJsonDirs(array $env): array
     {
         $dirs = [];
-        $env = $this->env;
 
         $composerHome = $env['COMPOSER_HOME'] ?? '';
         if (is_string($composerHome) && $composerHome !== '') {

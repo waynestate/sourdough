@@ -12,7 +12,7 @@ use Waynestate\Sourdough\PlaybookAccess;
 
 final class PlaybookAccessTest extends TestCase
 {
-    /** @var list<array{argv: list<string>, env: array<string, mixed>}> */
+    /** @var list<array{argv: list<string>, env: array<string, string>}> */
     private array $calls = [];
 
     /** @var list<string> */
@@ -186,6 +186,8 @@ final class PlaybookAccessTest extends TestCase
         $this->calls = [];
 
         return function (array $argv, array $env, int $timeoutSeconds) use ($results): array {
+            /** @var list<string> $argv */
+            /** @var array<string, string> $env */
             $this->calls[] = ['argv' => $argv, 'env' => $env];
 
             return $results[$argv[0] ?? ''] ?? [1, ''];
@@ -204,6 +206,8 @@ final class PlaybookAccessTest extends TestCase
     /**
      * An env with no trace of the real machine's Composer setup, so no
      * real auth.json can leak into a test.
+     *
+     * @return array<string, string>
      */
     private function cleanEnv(): array
     {
