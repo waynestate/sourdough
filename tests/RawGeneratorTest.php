@@ -492,6 +492,37 @@ final class RawGeneratorTest extends TestCase
         self::assertSame('^0.4', $composer['require']['waynestate/sesame']);
     }
 
+    public function testRequireModeAddsComposerPlaybookScript(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::Require);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('@composer show waynestate/playbook --no-interaction', $composer['scripts']['playbook']);
+        self::assertSame('Check that Playbook (WSU shared values) is installed', $composer['scripts-descriptions']['playbook']);
+    }
+
+    public function testComposerPlaybookScriptKeepsExistingScripts(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::Require);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // The template's own scripts stay, in their order, with playbook appended last.
+        self::assertSame(['test', 'proctor', 'ci', 'playbook'], array_keys($composer['scripts']));
+        self::assertSame('phpunit', $composer['scripts']['test']);
+        self::assertSame('proctor check', $composer['scripts']['proctor']);
+        self::assertSame(['@test', '@proctor', 'composer audit'], $composer['scripts']['ci']);
+        self::assertSame('@composer show waynestate/playbook --no-interaction', $composer['scripts']['playbook']);
+    }
+
+    public function testNoPlaybookModeAddsNoPlaybookScript(): void
+    {
+        $target = $this->generateFromRealTemplate(PlaybookMode::None);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayNotHasKey('playbook', $composer['scripts'] ?? []);
+        self::assertArrayNotHasKey('playbook', $composer['scripts-descriptions'] ?? []);
+    }
+
     public function testNoneModeLeavesTheAppWithoutPlaybook(): void
     {
         $target = $this->generateFromRealTemplate(PlaybookMode::None);

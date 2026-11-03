@@ -391,15 +391,24 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertStringNotContainsString('ADVISOR', $readme);
     }
 
+    public function testBladeRequireModeAddsComposerPlaybookScript(): void
+    {
+        $target = $this->generate(true, PlaybookMode::Require);
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('@composer show waynestate/playbook --no-interaction', $composer['scripts']['playbook']);
+        self::assertSame('Check that Playbook (WSU shared values) is installed', $composer['scripts-descriptions']['playbook']);
+    }
+
     private function generator(): LaravelBladeGenerator
     {
         return new LaravelBladeGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));
     }
 
-    private function generate(bool $advisor = true): string
+    private function generate(bool $advisor = true, PlaybookMode $playbook = PlaybookMode::Suggest): string
     {
         $target = $this->makeTempDir();
-        $this->generator()->generate($target, 'My Cool App', [], PlaybookMode::Suggest, $advisor);
+        $this->generator()->generate($target, 'My Cool App', [], $playbook, $advisor);
 
         return $target;
     }
