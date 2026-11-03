@@ -106,6 +106,23 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertStringContainsString('VITE_APP_NAME="${APP_NAME}"', $env);
     }
 
+    public function testRemovesTheSkeletonViteConfigJs(): void
+    {
+        // The fixture skeleton is trimmed; copy it and give it the
+        // vite.config.js a fresh Laravel skeleton would carry.
+        $skeleton = $this->makeTempDir();
+        $this->copyDir(__DIR__ . '/fixtures/laravel-skeleton', $skeleton);
+        file_put_contents($skeleton . '/vite.config.js', "export default {};\n");
+
+        $target = $this->makeTempDir();
+        (new LaravelInertiaGenerator(new FixtureSkeletonSource($skeleton)))
+            ->generate($target, 'My Cool App', [], PlaybookMode::Suggest, true);
+
+        // The skeleton's JS config is gone; the overlay's TS config stands.
+        self::assertFileDoesNotExist($target . '/vite.config.js');
+        self::assertFileExists($target . '/vite.config.ts');
+    }
+
     public function testInstallsTheSquireLaravelFiles(): void
     {
         $target = $this->generate();
@@ -257,6 +274,22 @@ final class LaravelInertiaGeneratorTest extends TestCase
         }
 
         return $files;
+    }
+
+    private function copyDir(string $from, string $to): void
+    {
+        mkdir($to, 0777, true);
+        foreach (scandir($from) ?: [] as $entry) {
+            if ('.' === $entry || '..' === $entry) {
+                continue;
+            }
+            $path = $from . '/' . $entry;
+            if (is_dir($path)) {
+                $this->copyDir($path, $to . '/' . $entry);
+            } else {
+                copy($path, $to . '/' . $entry);
+            }
+        }
     }
 
     private function removeDir(string $dir): void

@@ -36,9 +36,7 @@ final class OracleErrors
         1017 => 'Oracle refused the username or password. Check ORACLE_USERNAME and ORACLE_PASSWORD.',
     ];
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * The plain sentence for this failure, or null when it is not an Oracle
@@ -54,7 +52,7 @@ final class OracleErrors
 
         $code = self::oraCode($message);
 
-        if (null === $code) {
+        if ($code === null) {
             return null;
         }
 
@@ -62,7 +60,7 @@ final class OracleErrors
             return self::SENTENCES[$code];
         }
 
-        if (1031 === $code || 942 === $code) {
+        if ($code === 1031 || $code === 942) {
             return sprintf(self::PERMISSION, $code);
         }
 
@@ -99,7 +97,7 @@ final class OracleErrors
         foreach ($matches[1] as $digits) {
             $code = (int) $digits;
 
-            if (isset(self::SENTENCES[$code]) || 1031 === $code || 942 === $code) {
+            if (isset(self::SENTENCES[$code]) || $code === 1031 || $code === 942) {
                 return $code;
             }
         }
