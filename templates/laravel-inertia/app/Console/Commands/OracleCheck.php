@@ -34,7 +34,7 @@ class OracleCheck extends Command
             }
         }
 
-        if (null === $script) {
+        if ($script === null) {
             $this->line('The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.');
 
             return self::SUCCESS;
