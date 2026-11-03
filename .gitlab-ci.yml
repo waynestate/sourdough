@@ -34,3 +34,45 @@ composer-ci:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
+
+# Smoke gate: bake each shape for real and run the generated app's own checks
+# (see MAINTAINING.md, "Smoke gate"). A shape may only be claimed when its
+# gate is green. The runner has no Docker daemon, so the script runs directly
+# in a php image with Composer and Node 22 installed at job start.
+# allow_failure: true until the lead has seen every shape green once; flip to false after.
+.smoke-base:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.5-cli-trixie
+  allow_failure: true
+  variables:
+    SMOKE_REPO: $CI_PROJECT_DIR
+  before_script:
+    - apt-get update -qq && apt-get install -y --no-install-recommends ca-certificates curl git xz-utils
+    - curl -fsSL https://getcomposer.org/installer | php --install-dir=/usr/local/bin --filename=composer
+    - |
+      arch="$(dpkg --print-architecture)"
+      case "$arch" in
+        amd64) node_arch=x64 ;;
+        arm64) node_arch=arm64 ;;
+        *) echo "Unsupported architecture: $arch" && exit 1 ;;
+      esac
+      curl -fsSL "https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-${node_arch}.tar.xz" -o /tmp/node.tar.xz
+      mkdir -p /opt/node
+      tar -xJf /tmp/node.tar.xz -C /opt/node --strip-components=1
+      ln -sf /opt/node/bin/node /usr/local/bin/node
+      ln -sf /opt/node/bin/npm /usr/local/bin/npm
+      ln -sf /opt/node/bin/npx /usr/local/bin/npx
+
+smoke-raw:
+  extends: .smoke-base
+  script:
+    - sh scripts/smoke-shape.sh raw
+
+smoke-blade:
+  extends: .smoke-base
+  script:
+    - sh scripts/smoke-shape.sh blade
+
+smoke-inertia:
+  extends: .smoke-base
+  script:
+    - sh scripts/smoke-shape.sh inertia
