@@ -59,14 +59,14 @@ final class LaravelBladeGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The stack's runtime packages land in require...
-        self::assertSame('^0.2', $composer['require']['waynestate/sesame']);
-        self::assertSame('^0.2', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.4', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.3', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/creed']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/pinstripe']);
-        self::assertSame('^0.2', $composer['require-dev']['waynestate/proctor']);
+        self::assertSame('^0.4', $composer['require-dev']['waynestate/proctor']);
         // ...and the scripts join the skeleton's own.
         self::assertIsArray($composer['scripts']['ci']);
         self::assertContains('phpstan analyse --memory-limit=1G', $composer['scripts']['ci']);

@@ -382,6 +382,18 @@ final class RawGeneratorTest extends TestCase
         self::assertArrayHasKey('scripts-descriptions', $composer);
     }
 
+    public function testBakedGitlabCiPinsPreflightToTheReleaseSha(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
+
+        // PROCTOR 0.4's preflight-pinned check wants a 40-hex SHA, so the
+        // components pin Preflight's release commit, with the tag in a
+        // trailing comment.
+        self::assertStringContainsString('79029cc2300702d0d450c42cc699e12af1b731f8', $ci);
+        self::assertStringNotContainsString('@0.1.0', $ci);
+    }
+
     public function testGeneratedAppShipsItsPhpunitFiles(): void
     {
         $target = $this->generateFromRealTemplate();
@@ -459,8 +471,8 @@ final class RawGeneratorTest extends TestCase
 
         // The rest of the require section is untouched.
         self::assertSame('^8.3', $composer['require']['php']);
-        self::assertSame('^0.2', $composer['require']['waynestate/helmet']);
-        self::assertSame('^0.2', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.3', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.4', $composer['require']['waynestate/sesame']);
     }
 
     public function testNoneModeLeavesTheAppWithoutPlaybook(): void
