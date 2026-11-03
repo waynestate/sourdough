@@ -21,3 +21,13 @@ proctor-root:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer proctor
+
+# ZIGGY's route list ships inside the Vite bundle, not an inline script, so
+# the committed resources/js/ziggy.* must match the routes. Regenerate and
+# fail on any diff.
+ziggy:
+  image: composer:2.10.3
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - composer ziggy
+    - git diff --exit-code resources/js/ziggy.*

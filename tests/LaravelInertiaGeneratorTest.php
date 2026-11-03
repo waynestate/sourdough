@@ -207,6 +207,16 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertContains('oracle-check.php', $pint['notPath']);
     }
 
+    public function testGeneratedCiHasTheZiggyJob(): void
+    {
+        $target = $this->generate();
+        $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
+
+        // The job regenerates the committed route list and fails on drift.
+        self::assertStringContainsString('ziggy:', $ci);
+        self::assertStringContainsString('git diff --exit-code resources/js/ziggy.*', $ci);
+    }
+
     public function testRemovesTheSkeletonViteConfigJs(): void
     {
         // The fixture skeleton is trimmed; copy it and give it the
