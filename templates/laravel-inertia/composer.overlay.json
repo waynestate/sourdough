@@ -7,6 +7,9 @@
         "yajra/laravel-oci8": "^13.14"
     },
     "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        },
         "platform": {
             "ext-oci8": "3.4.1"
         }

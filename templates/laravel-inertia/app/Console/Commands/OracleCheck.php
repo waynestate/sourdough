@@ -24,7 +24,7 @@ class OracleCheck extends Command
     {
         $script = base_path('deploy/oracle-check.php');
 
-        if (!is_file($script)) {
+        if (! is_file($script)) {
             $this->line('The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.');
 
             return self::SUCCESS;
@@ -37,6 +37,6 @@ class OracleCheck extends Command
 
         $exitCode = $process->getExitCode();
 
-        return null === $exitCode ? self::FAILURE : $exitCode;
+        return $exitCode === null ? self::FAILURE : $exitCode;
     }
 }
