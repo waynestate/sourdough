@@ -9,6 +9,11 @@ use Waynestate\Sourdough\Command\NewCommand;
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_file($autoload)) {
+    // A dependency install (composer global require) keeps the autoloader
+    // three folders up, at the root of the global vendor dir.
+    $autoload = __DIR__ . '/../../../autoload.php';
+}
+if (!is_file($autoload)) {
     fwrite(STDERR, "vendor/autoload.php not found. Run `composer install` first.\n");
     exit(2);
 }

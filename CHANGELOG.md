@@ -6,6 +6,7 @@ Versioning once 1.0 is out.
 ## Unreleased
 
 - Fixed: the GitHub CI workflow was rejected as invalid (every run failed with "workflow file issue") because the smoke job used GitLab's `allow_failure`; it now uses `continue-on-error`.
+- Fixed: the sourdough command now works after composer global require (bin/sourdough also looks for the autoloader three folders up, where a dependency install keeps it).
 
 ## 0.1.5 (2026-11-03)
 
