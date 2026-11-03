@@ -165,7 +165,7 @@ Stack: `Not yet`. PROCTOR's `php-floor` check will catch an out-of-date floor in
 Include Preflight components with an exact version. GitLab supports a commit SHA, a tag or a branch. Its guidance is to pin to a SHA, or to a release tag from a maintainer you trust, and to avoid `~latest`. Why: an unpinned component changes your pipeline without a commit in your repo.
 Second pass: re-checked against the GitLab page. It says to pin to a commit SHA (preferred) or a release tag, to trust tags only from a maintainer you trust, to avoid `latest`, and to review changes before moving a pin. It also says component inputs are validated and variables are not, so pass settings as `inputs`. Components have been generally available since GitLab 17.0.
 Sources: [S16].
-Stack: `Documented`. the stack design notes says the pipeline includes Preflight components "pinned by tag". Tags can be moved by whoever owns the project, so decide whether a SHA is worth the extra upkeep.
+Stack: `Partly enforced`. Baked apps now include the Preflight components pinned to the commit SHA of the 0.1.4 release tag, with the tag in a trailing comment; PROCTOR 0.4 warns on a bare tag. Moving a pin is a deliberate commit.
 
 ### 4.4 Keep configuration in the environment and out of the template
 Commit `.env.example` with names and safe placeholders, never `.env`. Templates hold no secrets, no real hostnames and no per-environment branches. A good test: could the generated repo be published right now without leaking anything? Why: config that varies per deploy belongs outside the code.
