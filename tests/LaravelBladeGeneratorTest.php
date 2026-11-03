@@ -176,6 +176,25 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertStringContainsString("'[oracle] '", $bootstrap);
     }
 
+    public function testOracleCheckFindsTheKitAtTheRootOrInDeploy(): void
+    {
+        $target = $this->generate();
+        $command = (string) file_get_contents($target . '/app/Console/Commands/OracleCheck.php');
+
+        // It names both homes, the app root first, and keeps the message
+        // for when neither is there.
+        self::assertStringContainsString("base_path('oracle-check.php')", $command);
+        self::assertStringContainsString("base_path('deploy/oracle-check.php')", $command);
+        self::assertLessThan(
+            strpos($command, "base_path('deploy/oracle-check.php')"),
+            strpos($command, "base_path('oracle-check.php')"),
+        );
+        self::assertStringContainsString(
+            'The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.',
+            $command,
+        );
+    }
+
     public function testAppendsTheEnvAdditions(): void
     {
         $target = $this->generate();

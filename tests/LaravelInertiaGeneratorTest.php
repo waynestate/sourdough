@@ -234,6 +234,56 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertFileExists($target . '/vite.config.ts');
     }
 
+    public function testDropsSkeletonLeftovers(): void
+    {
+        // The fixture skeleton is trimmed; copy it and give it the three
+        // leftovers a fresh Laravel skeleton carries (welcome.blade.php is
+        // already in the fixture).
+        $skeleton = $this->makeTempDir();
+        $this->copyDir(__DIR__ . '/fixtures/laravel-skeleton', $skeleton);
+        file_put_contents($skeleton . '/vite.config.js', "export default {};\n");
+        mkdir($skeleton . '/resources/js', 0777, true);
+        file_put_contents($skeleton . '/resources/js/app.js', "// the skeleton's stub entry point\n");
+
+        $target = $this->makeTempDir();
+        (new LaravelInertiaGenerator(new FixtureSkeletonSource($skeleton)))
+            ->generate($target, 'My Cool App', [], PlaybookMode::Suggest, true);
+
+        // None of the three leftovers survives...
+        self::assertFileDoesNotExist($target . '/vite.config.js');
+        self::assertFileDoesNotExist($target . '/resources/js/app.js');
+        self::assertFileDoesNotExist($target . '/resources/views/welcome.blade.php');
+        // ...and the overlay's TypeScript front end stands.
+        self::assertFileExists($target . '/vite.config.ts');
+        self::assertFileExists($target . '/resources/js/app.ts');
+
+        // The manifest was written after the drop, so every path it lists
+        // exists on disk.
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach (array_keys($manifest['files']) as $path) {
+            self::assertFileExists($target . '/' . $path, (string) $path);
+        }
+    }
+
+    public function testOracleCheckFindsTheKitAtTheRootOrInDeploy(): void
+    {
+        $target = $this->generate();
+        $command = (string) file_get_contents($target . '/app/Console/Commands/OracleCheck.php');
+
+        // It names both homes, the app root first, and keeps the message
+        // for when neither is there.
+        self::assertStringContainsString("base_path('oracle-check.php')", $command);
+        self::assertStringContainsString("base_path('deploy/oracle-check.php')", $command);
+        self::assertLessThan(
+            strpos($command, "base_path('deploy/oracle-check.php')"),
+            strpos($command, "base_path('oracle-check.php')"),
+        );
+        self::assertStringContainsString(
+            'The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.',
+            $command,
+        );
+    }
+
     public function testInstallsTheSquireLaravelFiles(): void
     {
         $target = $this->generate();

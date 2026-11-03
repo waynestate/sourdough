@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Generator;
 
-use Waynestate\Sourdough\PlaybookMode;
-
 /**
  * Generate a Laravel + Inertia/Vue app: the laravel-inertia overlay over a
  * fresh Laravel skeleton. The overlay ships the Vue front end (pages,
  * layouts, components, the Vite build) and wires Inertia and Ziggy into
- * the composer.json merge. See LaravelOverlayGenerator for the shared
- * steps.
+ * the composer.json merge. The skeleton's JS leftovers are dropped before
+ * the manifest is written (see removeSkeletonLeftovers). See
+ * LaravelOverlayGenerator for the shared steps.
  */
 final class LaravelInertiaGenerator extends LaravelOverlayGenerator
 {
@@ -30,17 +29,25 @@ final class LaravelInertiaGenerator extends LaravelOverlayGenerator
     /**
      * {@inheritDoc}
      *
-     * After the shared steps, the skeleton's vite.config.js is removed when
-     * it survived the overlay: next to the overlay's vite.config.ts it
-     * breaks npm run build, and the TypeScript file wins.
+     * The Inertia shape builds its front end from resources/js/app.ts with
+     * the overlay's vite.config.ts, so the skeleton's JS twins are dead
+     * weight: vite.config.js next to the TypeScript config breaks
+     * npm run build, resources/js/app.js is never imported, and
+     * welcome.blade.php names the never-built app.js while no route
+     * renders it. They are dropped here, before the manifest is written,
+     * so the manifest never lists a file that is gone.
      */
-    public function generate(string $targetDir, string $name, array $answers = [], PlaybookMode $playbook = PlaybookMode::Suggest, bool $advisor = true): void
+    protected function removeSkeletonLeftovers(string $targetDir): void
     {
-        parent::generate($targetDir, $name, $answers, $playbook, $advisor);
-
-        $jsConfig = $targetDir . '/vite.config.js';
-        if (is_file($jsConfig)) {
-            @unlink($jsConfig);
+        foreach ([
+            'vite.config.js',
+            'resources/js/app.js',
+            'resources/views/welcome.blade.php',
+        ] as $leftover) {
+            $path = $targetDir . '/' . $leftover;
+            if (is_file($path)) {
+                @unlink($path);
+            }
         }
     }
 }

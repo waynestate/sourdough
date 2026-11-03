@@ -84,6 +84,14 @@ abstract class LaravelOverlayGenerator
     abstract protected function templateName(): string;
 
     /**
+     * Drop skeleton files this shape does not use. Called after the overlay
+     * copy and before the manifest is written, so the manifest never lists
+     * a file that is gone. The default keeps everything: most shapes use
+     * the skeleton's resources/js/app.js and its views as-is.
+     */
+    protected function removeSkeletonLeftovers(string $targetDir): void {}
+
+    /**
      * Generate the app named $name into $targetDir.
      *
      * @param array<string, string|bool> $answers  each option the user chose, recorded in the manifest
@@ -117,6 +125,8 @@ abstract class LaravelOverlayGenerator
         foreach ($this->overlayDirs() as $overlayDir) {
             $this->copyOverlay($targetDir, $name, $slug, $overlayDir);
         }
+
+        $this->removeSkeletonLeftovers($targetDir);
 
         foreach ($this->overlayDirs() as $overlayDir) {
             $this->mergeComposerOverlay($targetDir, $overlayDir);

@@ -31,6 +31,8 @@ Versioning once 1.0 is out.
 
 ### Fixed
 
+- Fixed: the laravel-inertia bake drops the skeleton leftovers before the manifest is written: `vite.config.js` (next to the overlay's `vite.config.ts` it breaks `npm run build`), the dead `resources/js/app.js` stub, and `resources/views/welcome.blade.php` (no route renders it); the manifest no longer lists a file that is gone.
+- Fixed: `php artisan oracle:check` finds the kit where it lives, in both the laravel-blade and the laravel-inertia templates: `oracle-check.php` at the app root (Squire's Laravel layout) first, then `deploy/oracle-check.php` (WELD's home).
 - Fixed: `composer install` in a freshly baked Laravel + Blade app no longer stops at the plugin gate; the overlay allows `phpstan/extension-installer` next to the pinned `ext-oci8`.
 - Fixed: the laravel-inertia overlay now passes a real run of a generated app. The overlay allows `phpstan/extension-installer` in composer config so `composer install` succeeds, the appended SESAME and HELMET env keys ship commented out (except `SESAME_DRIVER=fake`) so package defaults hold instead of being overridden by empty values, the generator removes the skeleton's `vite.config.js` so it no longer sits next to the overlay's `vite.config.ts` and breaks `npm run build`, and the Oracle command, Oracle error helper and bootstrap are Pint-clean like their Blade twins.
 - Fixed: a fresh Laravel + Blade app boots with nothing in its environment. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe` (SESAME wants a non-empty fake username), and the appended SESAME and HELMET env keys ship commented out so their defaults hold instead of being overridden by empty values.

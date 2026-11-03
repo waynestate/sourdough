@@ -10,9 +10,9 @@ use Symfony\Component\Process\Process;
 /**
  * Check the Oracle settings and connection, in plain language.
  *
- * The check itself lives in deploy/oracle-check.php, which Squire ships
- * with the deploy files; this command only runs it with the app's current
- * environment and shows what it says.
+ * The check itself is the oracle-check.php that Squire ships with the
+ * deploy files; this command only finds it, runs it with the app's
+ * current environment, and shows what it says.
  */
 class OracleCheck extends Command
 {
@@ -22,9 +22,19 @@ class OracleCheck extends Command
 
     public function handle(): int
     {
-        $script = base_path('deploy/oracle-check.php');
+        // A reversible default: where the kit lives is the user's decision.
+        // Squire's Laravel layout ships it at the app root, WELD keeps it
+        // under deploy/. Look at the root first, then deploy/.
+        $script = null;
+        foreach ([base_path('oracle-check.php'), base_path('deploy/oracle-check.php')] as $candidate) {
+            if (is_file($candidate)) {
+                $script = $candidate;
 
-        if (! is_file($script)) {
+                break;
+            }
+        }
+
+        if (null === $script) {
             $this->line('The Oracle check file is not here yet. Run "vendor/bin/squire update" to get it.');
 
             return self::SUCCESS;
