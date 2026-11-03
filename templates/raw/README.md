@@ -33,6 +33,10 @@ The app ships with Pinstripe's coding standard wired in. After
   `composer fix` applies the fixes instead.
 - `composer analyse` runs PHPStan at level 8 over `src/` and `public/`.
 
+`stubs/wayne-ui.php` tells PHPStan about the run-time WayneUI functions,
+which come from the fetched `public/wayne-ui.php` and are not in the
+template.
+
 `composer ci` runs the test suite, both checks, PROCTOR and
 `composer audit`, in that order. A well-kneaded starter passes all of
 them.

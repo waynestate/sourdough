@@ -10,3 +10,7 @@ parameters:
     paths:
         - src
         - public
+    # The run-time WayneUI functions come from the fetched public/wayne-ui.php,
+    # which is not part of the template; PHPStan learns them from the stub.
+    scanFiles:
+        - stubs/wayne-ui.php
