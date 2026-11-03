@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-use function Waynestate\Helmet\helmet_boot;
 use Waynestate\Sesame\Config;
 use Waynestate\Sesame\DriverFactory;
 use Waynestate\Sesame\Identity;
 use Waynestate\Sesame\Sesame;
 use Waynestate\Sesame\Session\NativeSession;
 use Waynestate\Sesame\UserResolver;
+
+use function Waynestate\Helmet\helmet_boot;
 
 // Read the environment once, at the top. Everything below uses $appEnv.
 // .env.example sets APP_ENV=local; production sets APP_ENV=production.

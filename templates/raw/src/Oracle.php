@@ -57,7 +57,7 @@ final class Oracle
     /** @var array<string, string> */
     private array $settings;
 
-    /** @var \Closure(string, array): array */
+    /** @var \Closure(string, array<string, mixed>): list<array<string, mixed>> */
     private \Closure $connector;
 
     /**
@@ -65,7 +65,7 @@ final class Oracle
      * connects and nothing is validated until the first query().
      *
      * @param array<string, mixed> $env
-     * @param (callable(string, array): array)|null $connector runs the SQL; null uses the OCI8 driver
+     * @param (callable(string, array<string, mixed>): list<array<string, mixed>>)|null $connector runs the SQL; null uses the OCI8 driver
      */
     public static function fromEnv(array $env, ?callable $connector = null): self
     {
@@ -82,7 +82,7 @@ final class Oracle
      * Run $sql with named binds and return the rows, each row an array of
      * column name to value. Bind names may carry a leading colon or not.
      *
-     * @param array<string, mixed> $binds
+     * @param array<int|string, mixed> $binds
      * @return list<array<string, mixed>>
      *
      * @throws OracleException when a setting is empty or the driver is missing
@@ -105,14 +105,14 @@ final class Oracle
 
     /**
      * @param array<string, string> $settings
-     * @param (callable(string, array): array)|null $connector
+     * @param (callable(string, array<string, mixed>): list<array<string, mixed>>)|null $connector
      */
     private function __construct(array $settings, ?callable $connector)
     {
         $this->settings = $settings;
         $this->connector = $connector !== null
             ? \Closure::fromCallable($connector)
-            : fn (string $sql, array $binds): array => $this->runWithOci8($sql, $binds);
+            : fn(string $sql, array $binds) => $this->runWithOci8($sql, $binds);
     }
 
     /**
@@ -155,13 +155,15 @@ final class Oracle
 
         $connection = oci_connect($this->settings['ORACLE_USERNAME'], $this->settings['ORACLE_PASSWORD'], $this->descriptor());
         if (false === $connection) {
-            throw $this->failure(oci_error($connection));
+            // No argument: report the last driver error. The failed
+            // connection is not a valid source for oci_error().
+            throw $this->failure(oci_error());
         }
 
         try {
             $statement = oci_parse($connection, $sql);
             if (false === $statement) {
-            throw $this->failure(oci_error());
+                throw $this->failure(oci_error());
             }
 
             // oci_bind_by_name binds by reference: bind each array slot, never the
@@ -178,7 +180,18 @@ final class Oracle
             $rowCount = 0;
             oci_fetch_all($statement, $rows, 0, $rowCount, OCI_FETCHSTATEMENT_BY_ROW | OCI_ASSOC);
 
-            return $rows;
+            // oci_fetch_all fills $rows row by row; rebuild each row as a
+            // plain column-name-to-value array so the return type holds.
+            $namedRows = [];
+            foreach ($rows as $row) {
+                $namedRow = [];
+                foreach ((array) $row as $column => $value) {
+                    $namedRow[(string) $column] = $value;
+                }
+                $namedRows[] = $namedRow;
+            }
+
+            return $namedRows;
         } finally {
             oci_close($connection);
         }
@@ -203,10 +216,14 @@ final class Oracle
      * driver's own text is never echoed, because it can carry the connect
      * descriptor.
      *
-     * @param array<string, mixed> $error the array oci_error() returns
+     * @param array<string, mixed>|false $error the array oci_error() returns, or false
      */
-    private function failure(array $error): \Throwable
+    private function failure(array|false $error): \Throwable
     {
+        if (false === $error) {
+            return new OracleException(self::UNKNOWN);
+        }
+
         $code = is_numeric($error['code'] ?? null) ? (int) $error['code'] : null;
 
         if (null === $code) {

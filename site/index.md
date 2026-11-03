@@ -62,7 +62,8 @@ Out of the oven · 0.1
 The crumb
 
 - `public/index.php` HELMET boots first, then SESAME signs you in
-- `composer.json` helmet and sesame, with proctor for dev
+- `composer.json` helmet and sesame, with pinstripe and proctor for dev
+- `pint.json` and `phpstan.neon` Pinstripe's standard: Pint on the per preset, PHPStan at level 8
 - `.gitlab-ci.yml` Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit
 - `build.sh` and `scripts/release.sh` Squire's Citadel deploy files
 - `.env.example` and `README.md` seeded: yours from day one
@@ -256,7 +257,7 @@ Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.

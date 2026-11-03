@@ -377,8 +377,10 @@ final class RawGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertSame('phpunit', $composer['scripts']['test']);
+        self::assertSame('pint --test', $composer['scripts']['lint']);
+        self::assertSame('phpstan analyse', $composer['scripts']['analyse']);
         self::assertSame('proctor check', $composer['scripts']['proctor']);
-        self::assertSame(['@test', '@proctor', 'composer audit'], $composer['scripts']['ci']);
+        self::assertSame(['@test', '@lint', '@analyse', '@proctor', 'composer audit'], $composer['scripts']['ci']);
         self::assertArrayHasKey('scripts-descriptions', $composer);
     }
 

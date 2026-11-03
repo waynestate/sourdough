@@ -76,7 +76,7 @@ final class OracleTest extends TestCase
         $this->expectException(OracleException::class);
         $this->expectExceptionMessage($name . " is empty. Set it in the app's environment settings (on Citadel, the dashboard).");
 
-        Oracle::fromEnv($env, fn () => [])
+        Oracle::fromEnv($env, fn() => [])
             ->query('SELECT 1 FROM dual');
     }
 
@@ -117,7 +117,7 @@ final class OracleTest extends TestCase
         ];
 
         try {
-            Oracle::fromEnv($env, fn () => [])
+            Oracle::fromEnv($env, fn() => [])
                 ->query('SELECT 1 FROM dual');
             self::fail('Expected an OracleException');
         } catch (OracleException $e) {
