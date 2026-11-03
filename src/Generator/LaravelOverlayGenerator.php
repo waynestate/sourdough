@@ -15,6 +15,12 @@ use Waynestate\Sourdough\PlaybookMode;
  * written. Subclasses pick the overlay dir and the manifest's template
  * name (laravel-blade, laravel-inertia, ...).
  *
+ * A subclass may layer a second overlay dir over the first: the
+ * laravel-blade-vue shape layers the islands front end (package.json,
+ * vite.config.js, resources/js, the island views) over the laravel-blade
+ * overlay. Each overlay's control files are applied when it ships them, in
+ * copy order, so a layered overlay can stay silent where the first speaks.
+ *
  * The skeleton source defaults to ComposerSkeletonSource, which runs
  * `composer create-project laravel/laravel`; tests use FixtureSkeletonSource
  * with the checked-in fixture, so they never touch the network.
@@ -50,8 +56,25 @@ abstract class LaravelOverlayGenerator
         private readonly string $templateDir,
         private readonly SkeletonSource $skeleton = new ComposerSkeletonSource(),
         private readonly string $squireDir = __DIR__ . '/../../templates/squire',
+        private readonly ?string $secondaryDir = null,
     ) {
         $this->support = new GeneratorSupport($squireDir);
+    }
+
+    /**
+     * The overlay dirs in copy order: the primary overlay, then the
+     * secondary one when the subclass layered one on top.
+     *
+     * @return list<string>
+     */
+    private function overlayDirs(): array
+    {
+        $dirs = [$this->templateDir];
+        if (null !== $this->secondaryDir) {
+            $dirs[] = $this->secondaryDir;
+        }
+
+        return $dirs;
     }
 
     /**
@@ -82,16 +105,24 @@ abstract class LaravelOverlayGenerator
             ));
         }
 
-        if (!is_dir($this->templateDir)) {
-            throw new \RuntimeException(sprintf('The template directory "%s" does not exist.', $this->templateDir));
+        foreach ($this->overlayDirs() as $overlayDir) {
+            if (!is_dir($overlayDir)) {
+                throw new \RuntimeException(sprintf('The template directory "%s" does not exist.', $overlayDir));
+            }
         }
 
         $this->support->refuseNonEmptyTarget($targetDir);
         $this->skeleton->create($targetDir);
 
-        $this->copyOverlay($targetDir, $name, $slug);
-        $this->mergeComposerOverlay($targetDir);
-        $this->appendEnvAdditions($targetDir);
+        foreach ($this->overlayDirs() as $overlayDir) {
+            $this->copyOverlay($targetDir, $name, $slug, $overlayDir);
+        }
+
+        foreach ($this->overlayDirs() as $overlayDir) {
+            $this->mergeComposerOverlay($targetDir, $overlayDir);
+            $this->appendEnvAdditions($targetDir, $overlayDir);
+        }
+
         $this->applyAppName($targetDir, $name, $slug);
 
         $this->support->installSquireFiles($targetDir, 'laravel');
@@ -103,18 +134,18 @@ abstract class LaravelOverlayGenerator
     }
 
     /**
-     * Copy the overlay tree over the skeleton, replacing files, with
+     * Copy one overlay tree over the skeleton, replacing files, with
      * {{app_name}} and {{app_slug}} replaced in contents and names. The two
      * control files (composer.overlay.json and env-additions.txt) stay out
      * of the app; they are applied by the next two steps.
      *
      * @throws \RuntimeException when a file cannot be read or written
      */
-    private function copyOverlay(string $targetDir, string $name, string $slug): void
+    private function copyOverlay(string $targetDir, string $name, string $slug, string $overlayDir): void
     {
         $replacements = ['{{app_name}}' => $name, '{{app_slug}}' => $slug];
 
-        foreach (scandir($this->templateDir) ?: [] as $item) {
+        foreach (scandir($overlayDir) ?: [] as $item) {
             if ('.' === $item || '..' === $item) {
                 continue;
             }
@@ -123,7 +154,7 @@ abstract class LaravelOverlayGenerator
                 continue;
             }
 
-            $fromPath = $this->templateDir . DIRECTORY_SEPARATOR . $item;
+            $fromPath = $overlayDir . DIRECTORY_SEPARATOR . $item;
 
             if (is_dir($fromPath)) {
                 // copyDir copies the contents of its first argument into its
@@ -145,18 +176,24 @@ abstract class LaravelOverlayGenerator
     }
 
     /**
-     * Merge composer.overlay.json into the app's composer.json: the
-     * require and require-dev entries are added (the overlay wins a clash),
-     * the scripts keys are added, and config is deep-merged so the app keeps
-     * its own config (a platform.php pin, plugin allowances) while the
-     * overlay wins a clash on the same key. Written pretty-printed with
-     * unescaped slashes and a trailing newline.
+     * Merge one overlay's composer.overlay.json into the app's
+     * composer.json: the require and require-dev entries are added (the
+     * overlay wins a clash), the scripts keys are added, and config is
+     * deep-merged so the app keeps its own config (a platform.php pin,
+     * plugin allowances) while the overlay wins a clash on the same key.
+     * Written pretty-printed with unescaped slashes and a trailing newline.
+     * An overlay that ships no control file is skipped.
      *
      * @throws \RuntimeException when a file cannot be read, parsed or written
      */
-    private function mergeComposerOverlay(string $targetDir): void
+    private function mergeComposerOverlay(string $targetDir, string $overlayDir): void
     {
-        $overlay = $this->readJson($this->templateDir . '/composer.overlay.json');
+        $overlayPath = $overlayDir . '/composer.overlay.json';
+        if (!is_file($overlayPath)) {
+            return;
+        }
+
+        $overlay = $this->readJson($overlayPath);
 
         $composerPath = $targetDir . '/composer.json';
         $content = file_get_contents($composerPath);
@@ -213,14 +250,19 @@ abstract class LaravelOverlayGenerator
     }
 
     /**
-     * Append env-additions.txt to the app's .env.example, separated from
-     * the skeleton's lines by a blank line.
+     * Append one overlay's env-additions.txt to the app's .env.example,
+     * separated from the skeleton's lines by a blank line. An overlay that
+     * ships no control file is skipped.
      *
      * @throws \RuntimeException when a file cannot be read or written
      */
-    private function appendEnvAdditions(string $targetDir): void
+    private function appendEnvAdditions(string $targetDir, string $overlayDir): void
     {
-        $additionsPath = $this->templateDir . '/env-additions.txt';
+        $additionsPath = $overlayDir . '/env-additions.txt';
+        if (!is_file($additionsPath)) {
+            return;
+        }
+
         $additions = file_get_contents($additionsPath);
         if (false === $additions) {
             throw new \RuntimeException(sprintf('Could not read "%s".', $additionsPath));
