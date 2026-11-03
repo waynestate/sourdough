@@ -107,6 +107,38 @@ final class LaravelInertiaGeneratorTest extends TestCase
     }
 
     /**
+     * Citadel's shared MySQL 5.6 caps index keys at 767 bytes, so the
+     * template pins Laravel's default string column length at 191; a fresh
+     * app must ship that provider or its migrations break on Citadel.
+     */
+    public function testShipsTheCitadelStringLength(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Providers/AppServiceProvider.php');
+        self::assertStringContainsString(
+            'Schema::defaultStringLength(191)',
+            (string) file_get_contents($target . '/app/Providers/AppServiceProvider.php'),
+        );
+    }
+
+    /**
+     * composer ci runs in a bare container without Node, so the template's
+     * TestCase writes a stub Vite manifest before each test; view-rendering
+     * tests cannot boot without it.
+     */
+    public function testShipsATestCaseThatWritesAViteManifest(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/tests/TestCase.php');
+        self::assertStringContainsString(
+            'build/manifest.json',
+            (string) file_get_contents($target . '/tests/TestCase.php'),
+        );
+    }
+
+    /**
      * SESAME requires a non-empty fake.username when the driver is fake, so
      * the config carries a default that matches the hardcoded display name;
      * otherwise a fresh app with nothing in its environment cannot boot.
