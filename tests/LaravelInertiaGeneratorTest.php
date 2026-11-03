@@ -106,6 +106,19 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertStringContainsString('VITE_APP_NAME="${APP_NAME}"', $env);
     }
 
+    /**
+     * SESAME requires a non-empty fake.username when the driver is fake, so
+     * the config carries a default that matches the hardcoded display name;
+     * otherwise a fresh app with nothing in its environment cannot boot.
+     */
+    public function testFakeDriverBootsWithNoEnvironment(): void
+    {
+        $target = $this->generate();
+        $config = (string) file_get_contents($target . '/config/sesame.php');
+
+        self::assertStringContainsString("env('SESAME_FAKE_USERNAME', 'jane.doe')", $config);
+    }
+
     public function testRemovesTheSkeletonViteConfigJs(): void
     {
         // The fixture skeleton is trimmed; copy it and give it the
