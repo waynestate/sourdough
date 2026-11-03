@@ -84,12 +84,13 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
-    public function testLaravelBladeVuePlanSaysNotAvailableInThisRelease(): void
+    public function testLaravelBladeVuePlanIsGeneratable(): void
     {
         $plan = Plan::forPermutation(Permutation::LaravelBladeVue, '/tmp/demo', false, false);
 
         self::assertSame([
-            'Create the Laravel + Blade + Vue islands app in /tmp/demo (not available in this release)',
+            'Create the Laravel + Blade + Vue islands app in /tmp/demo',
+            'Wire ADVISOR into the app',
         ], $plan->steps);
     }
 

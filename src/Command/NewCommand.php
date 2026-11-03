@@ -15,6 +15,7 @@ use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\DescribeException;
 use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
+use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Generator\SkeletonSource;
@@ -239,7 +240,7 @@ final class NewCommand extends Command
             return 0;
         }
 
-        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation && Permutation::LaravelInertia !== $permutation) {
+        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation && Permutation::LaravelBladeVue !== $permutation && Permutation::LaravelInertia !== $permutation) {
             $this->printPlan($output, $plan);
             $this->errorOutput($output)->writeln('not available in this release');
             return 1;
@@ -268,6 +269,9 @@ final class NewCommand extends Command
             if (Permutation::LaravelBlade === $permutation) {
                 (new LaravelBladeGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
                     ->generate($dir, $name, $answers, $playbook, $advisor);
+            } elseif (Permutation::LaravelBladeVue === $permutation) {
+                (new LaravelBladeVueGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
+                    ->generate($dir, $name, $answers, $playbook, $advisor);
             } elseif (Permutation::LaravelInertia === $permutation) {
                 (new LaravelInertiaGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
                     ->generate($dir, $name, $answers, $playbook, $advisor);
@@ -293,7 +297,7 @@ final class NewCommand extends Command
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');
             $output->writeln('  php artisan serve');
-        } elseif (Permutation::LaravelInertia === $permutation) {
+        } elseif (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
             $output->writeln('  cp .env.example .env');
             $output->writeln('  php artisan key:generate');
             $output->writeln('  npm install');

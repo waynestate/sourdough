@@ -264,21 +264,42 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('--raw and --laravel are mutually exclusive', $tester->getDisplay());
     }
 
-    public function testUnavailableShapeExitsOneAndWritesNothing(): void
+    public function testLaravelBladeVueGeneratesWithTheFixtureSource(): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
 
-        $tester = new CommandTester($this->createCommand());
+        $tester = new CommandTester($this->createCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
         $exit = $tester->execute([
             'dir' => $target,
             '--laravel' => true,
             '--vue' => true,
         ]);
 
-        self::assertSame(1, $exit);
-        self::assertDirectoryDoesNotExist($target);
-        self::assertStringContainsString('not available in this release', $tester->getDisplay());
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/.sourdough/manifest.json');
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('laravel-blade-vue', $manifest['template']);
+        self::assertTrue($manifest['answers']['laravel']);
+        self::assertTrue($manifest['answers']['vue']);
+
+        // The blade overlay replaced the skeleton's files and the islands
+        // front end ships over it.
+        self::assertFileExists($target . '/routes/web.php');
+        self::assertFileExists($target . '/resources/views/dashboard.blade.php');
+        self::assertFileExists($target . '/package.json');
+        self::assertFileExists($target . '/vite.config.js');
+        self::assertFileExists($target . '/resources/js/app.js');
+
+        // The Next steps suit the islands shape: build the front end before
+        // serving.
+        self::assertStringContainsString('cp .env.example .env', $tester->getDisplay());
+        self::assertStringContainsString('php artisan key:generate', $tester->getDisplay());
+        self::assertStringContainsString('npm install', $tester->getDisplay());
+        self::assertStringContainsString('npm run build', $tester->getDisplay());
+        self::assertStringContainsString('php artisan serve', $tester->getDisplay());
+        self::assertStringNotContainsString('php -S localhost:8000', $tester->getDisplay());
     }
 
     public function testInertiaGeneratesWithTheFixtureSource(): void

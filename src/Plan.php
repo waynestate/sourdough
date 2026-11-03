@@ -9,9 +9,10 @@ namespace Waynestate\Sourdough;
  *
  * The plan is built from the permutation, the target dir, the local
  * runtime flags (--sail/--docker) and whether ADVISOR is wired in
- * (--no-advisor opts out). In 0.1 the raw, Laravel + Blade and
- * Laravel + Inertia/Vue permutations are generated; the generation step
- * for the others says "not available in this release".
+ * (--no-advisor opts out). In 0.1 the raw, Laravel + Blade, Laravel +
+ * Blade + Vue islands and Laravel + Inertia/Vue permutations are
+ * generated; the generation step for the others says "not available in
+ * this release".
  */
 final class Plan
 {
@@ -39,7 +40,7 @@ final class Plan
 
         $steps = [];
 
-        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade || $permutation === Permutation::LaravelInertia;
+        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade || $permutation === Permutation::LaravelBladeVue || $permutation === Permutation::LaravelInertia;
 
         if ($permutation === Permutation::Raw) {
             $steps[] = sprintf('Copy the raw template into %s', $dir);
