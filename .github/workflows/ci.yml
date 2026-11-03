@@ -17,10 +17,10 @@ jobs:
 
   # Smoke gate: bake each shape for real and run the generated app's own
   # checks (see MAINTAINING.md, "Smoke gate"). A shape may only be claimed
-  # when its gate is green. allow_failure: true until the lead has seen
+  # when its gate is green. continue-on-error: true until the lead has seen
   # every shape green once; flip to false after.
   smoke:
-    allow_failure: true
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
