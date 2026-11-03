@@ -1,12 +1,12 @@
 # .
 
-> Sourdough makes a new raw PHP app for Wayne State with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's Citadel deploy files already in it. The Laravel shapes come in a later release.
+> Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
 
 Every page below is Markdown. The HTML pages send the same Markdown to a client that asks for `text/markdown`. Written by Squire's agent-ready kit from the README and the pages; do not edit.
 
 ## Pages
 
-- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough makes a new raw PHP app for Wayne State with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's Citadel deploy files already in it. The Laravel shapes come in a later release.
+- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
 
 ## Prompts
 
