@@ -56,6 +56,7 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 
 - `raw`: `composer install` and `composer ci`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate` and `php artisan test`
+- `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
 
 Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
@@ -82,7 +83,7 @@ Two environment variables control the scratch space:
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ## Refreshing the Squire templates
 
