@@ -16,6 +16,8 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Every loaf gets proofed before it ships.
 
+Documentation: the [docs site](site/docs/index.html) is built from [`docs/`](docs/) by Squire's docs builder; `composer docs` rebuilds it and `composer docs:check` fails when it is stale.
+
 Front page: [`site/index.html`](site/index.html), a static page you can open in a browser or serve from `site/`.
 
 On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.

@@ -16,6 +16,8 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Every loaf gets proofed before it ships.
 
+Documentation: the [docs site](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs` rebuilds it and `composer docs:check` fails when it is stale.
+
 Front page: [`site/index.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
 
 On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
