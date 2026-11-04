@@ -13,13 +13,17 @@ curl -o public/wayne-ui.php \
 
 To move to a newer WayneUI release, change the version in the URL above and run the fetch again.
 
-Set the environment (see `.env.example`; the app defaults to production when
-`APP_ENV` is unset), then install the dependencies and start the server:
+Install the dependencies and start the server:
 
 ```bash
 composer install
-php -S localhost:8000 -t public
+composer serve
 ```
+
+`composer serve` sets `APP_ENV=local` for you, so the app signs in with
+SESAME's fake driver; a plain `php -S localhost:8000 -t public` would boot
+as production instead, because the front controller defaults `APP_ENV` to
+production when it is unset.
 
 Open http://localhost:8000. The front controller serves one home page: any
 path but `/` answers `404` with a link back home, instead of rendering the
