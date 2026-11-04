@@ -5,4 +5,40 @@ description: Bake your first app with sourdough new, follow its Next steps, and 
 
 # Quick start
 
-STUB: this page is written in a later batch.
+From a machine where `sourdough` is installed (see [Install](../install.md)), bake an app and prove it.
+
+## Steps
+
+1. Scaffold the app.
+
+   ```
+   sourdough new my-app
+   ```
+
+   Expected: exit code `0` (done). The `my-app` directory appears with a Wayne State app in it: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already wired in. Sourdough prints Next steps for the new app.
+
+2. Run the app's own checks.
+
+   From inside `my-app/`:
+
+   ```
+   composer ci
+   ```
+
+   Expected: exit code `0`. A freshly baked app passes its own `composer ci` on the first run.
+
+## What you built
+
+- A Wayne State app with the stack already wired in: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components.
+- Playbook wiring by default: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section.
+- ADVISOR in `require-dev`, a git-ignored `.mcp.json`, and an "ADVISOR" README section.
+- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+
+## Next steps
+
+- Follow the app's printed Next steps: they point at `composer playbook` once dependencies are in, and at `php vendor/bin/advisor install --client=claude --write` for ADVISOR.
+- [Pick a shape](shapes.md): the permutations, from raw PHP to Laravel plus Inertia/Vue.
+- [Describe a plan](describe-a-plan.md): describe what the app does and let a model plan it.
+- [The manifest](manifest.md): what the manifest records, and `sourdough manifest --check`.
+- [CI](ci.md): set up the generated app's CI; a git.wayne.edu instance runner is strongly recommended.
+- [Commands](../reference/commands.md): every flag and option.
