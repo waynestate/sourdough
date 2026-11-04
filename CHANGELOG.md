@@ -5,7 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
-- Changed: `--sail` and `--docker` are accepted for every permutation but refuse in this release: the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything. The old raw-only error ("`--sail` and `--docker` are for the Laravel paths") is gone; both flags are planned, not shape-specific.
+- Changed: `--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
 - Added: the raw template's `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
 - Fixed: the raw front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. `/up` stays HELMET's and answers first.
 
