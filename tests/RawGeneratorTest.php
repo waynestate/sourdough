@@ -511,10 +511,10 @@ final class RawGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The template's own scripts stay, in their order, with playbook appended last.
-        self::assertSame(['test', 'proctor', 'ci', 'playbook'], array_keys($composer['scripts']));
+        self::assertSame(['test', 'lint', 'fix', 'analyse', 'proctor', 'ci', 'playbook'], array_keys($composer['scripts']));
         self::assertSame('phpunit', $composer['scripts']['test']);
         self::assertSame('proctor check', $composer['scripts']['proctor']);
-        self::assertSame(['@test', '@proctor', 'composer audit'], $composer['scripts']['ci']);
+        self::assertSame(['@test', '@lint', '@analyse', '@proctor', 'composer audit'], $composer['scripts']['ci']);
         self::assertSame('@composer show waynestate/playbook --no-interaction', $composer['scripts']['playbook']);
     }
 
