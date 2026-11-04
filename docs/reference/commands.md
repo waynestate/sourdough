@@ -25,8 +25,8 @@ sourdough new [dir] [options]
 | `--laravel` | use the Laravel base |
 | `--vue` | add a Vue front end |
 | `--inertia` | use Inertia/Vue (implies `--laravel`) |
-| `--sail` | use Laravel Sail for the local runtime (Laravel paths) |
-| `--docker` | use a Docker image for the local runtime (Laravel paths) |
+| `--sail` | use Laravel Sail for the local runtime (not available in this release; planned) |
+| `--docker` | use a Docker image for the local runtime (not available in this release; planned) |
 | `--dry-run` | print the plan and write nothing |
 | `--name` | app name (default: the basename of `<dir>`) |
 | `--no-input` | never prompt (Sourdough 0.1 has no prompts) |
@@ -37,6 +37,9 @@ sourdough new [dir] [options]
 | `--playbook` | kept for compatibility: Playbook is now the default |
 | `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
 | `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |
+
+> [!NOTE]
+> `--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
 
 ### Exit codes
 

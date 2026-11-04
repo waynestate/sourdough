@@ -11,7 +11,7 @@ description: "What Sourdough bakes: install, flags, permutations, plans, the man
 
 **Feed it and it grows.**
 
-A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 Every loaf gets proofed before it ships. Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
