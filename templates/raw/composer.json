@@ -26,6 +26,11 @@
     },
     "scripts": {
         "test": "phpunit",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@putenv APP_ENV=local",
+            "@php -S localhost:8000 -t public"
+        ],
         "lint": "pint --test",
         "fix": "pint",
         "analyse": "phpstan analyse",
@@ -40,6 +45,7 @@
     },
     "scripts-descriptions": {
         "test": "Run the PHPUnit test suite.",
+        "serve": "Start the local dev server on http://localhost:8000 with APP_ENV=local, so SESAME uses its fake driver.",
         "lint": "Check the code style with Pint (Pinstripe's per preset).",
         "fix": "Fix the code style with Pint (Pinstripe's per preset).",
         "analyse": "Analyse the code with PHPStan (Pinstripe's raw preset, level 8).",

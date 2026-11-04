@@ -327,7 +327,7 @@ Baker's percentages, roughly. The parts are Composer packages, so `composer upda
 | 1 Oven | [Preflight](https://preflight.apps.wayne.edu/) | CI from `.gitlab-ci.yml`: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, and a Composer audit. |
 | 1 Basket | Release script | `build.sh` and `scripts/release.sh` come from Squire and run on Citadel at build and release time. Off Citadel, the app reads the same environment variables on OpenShift, Coolify or raw Docker. |
 
-Bake at `php -S localhost:8000 -t public` until golden.
+Bake at `composer serve` until golden.
 
 Pinned above the bench
 
@@ -384,7 +384,7 @@ curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8
 # 4. Install and serve
 composer install
 php vendor/bin/advisor install --client=claude --write
-php -S localhost:8000 -t public
+composer serve
 ```
 
 **macOS**
@@ -402,7 +402,7 @@ curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/way
 # 4. Install and serve
 composer install
 php vendor/bin/advisor install --client=claude --write
-php -S localhost:8000 -t public
+composer serve
 ```
 
 **Linux**
@@ -420,7 +420,7 @@ curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/way
 # 4. Install and serve
 composer install
 php vendor/bin/advisor install --client=claude --write
-php -S localhost:8000 -t public
+composer serve
 ```
 
 ADVISOR answers questions about the stack from inside your AI assistant; skip it with `sourdough new --no-advisor`.
@@ -453,7 +453,7 @@ Task:
 2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
 3. Bake the app with `sourdough new my-app --raw`, using the folder name I give you in place of my-app, and change into it.
 4. Fetch WayneUI's standalone file once. Windows (PowerShell): `curl.exe -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`. macOS and Linux: `curl -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`.
-5. Run `composer install`, then wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then `php -S localhost:8000 -t public`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+5. Run `composer install`, then wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then `composer serve`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:

@@ -5,6 +5,9 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Fixed: raw apps start with `composer serve`. The old `php -S localhost:8000 -t public` line booted the app as production, because the raw front controller defaults `APP_ENV` to production when it is unset. The raw template's new `serve` script disables Composer's process timeout, sets `APP_ENV=local` cross-platform with `@putenv`, then starts `php -S localhost:8000 -t public`, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at `composer serve` now.
+- Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into `public/wayne-ui.php`, starts the app with `APP_ENV=local` on `127.0.0.1:8099` and expects `/` 200, `/nope` 404 and `/up` 200. Every shape now bakes with `--no-playbook`, because Playbook is required by default and its private package cannot be installed credential-free.
+
 - Changed: `--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
 - Added: the raw template's `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
 - Fixed: the raw front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. `/up` stays HELMET's and answers first.

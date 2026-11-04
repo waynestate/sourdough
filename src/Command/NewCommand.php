@@ -360,7 +360,9 @@ final class NewCommand extends Command
             $output->writeln('  npm run build');
             $output->writeln('  php artisan serve');
         } else {
-            $output->writeln('  php -S localhost:8000 -t public');
+            // composer serve sets APP_ENV=local for the raw app, which has no
+            // .env loader; a plain php -S would boot as production.
+            $output->writeln('  composer serve');
         }
 
         if (PlaybookMode::Suggest === $playbook) {
