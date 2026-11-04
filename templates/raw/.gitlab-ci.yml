@@ -10,3 +10,11 @@ include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       working_dir: .
+
+# composer ci is the contract: one job runs the whole "ci" script from
+# composer.json, so PROCTOR sees an explicit composer ci in the pipeline.
+composer-ci:
+  image: composer:2.10.3
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - composer ci

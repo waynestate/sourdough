@@ -21,8 +21,9 @@ composer install
 php -S localhost:8000 -t public
 ```
 
-Open http://localhost:8000. Locally the app signs in with SESAME's fake
-driver.
+Open http://localhost:8000. The front controller serves one home page: any
+path but `/` answers `404` with a link back home, instead of rendering the
+home page again. Locally the app signs in with SESAME's fake driver.
 
 ## Checks
 
@@ -40,6 +41,12 @@ template.
 `composer ci` runs the test suite, both checks, PROCTOR and
 `composer audit`, in that order. A well-kneaded starter passes all of
 them.
+
+The GitLab pipeline (`.gitlab-ci.yml`) carries the same checks: the Preflight
+components for PROCTOR, the test suite on PHP 8.3, 8.4 and 8.5,
+`composer audit`, and one `composer-ci` job that runs `composer install`
+followed by `composer ci`, so PROCTOR sees an explicit `composer ci` in the
+pipeline.
 
 ## Sign-in
 

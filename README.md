@@ -60,8 +60,8 @@ Options:
 - `--laravel` use the Laravel base
 - `--vue` add a Vue front end
 - `--inertia` use Inertia/Vue (implies `--laravel`)
-- `--sail` use Laravel Sail for the local runtime (Laravel paths)
-- `--docker` use a Docker image for the local runtime (Laravel paths)
+- `--sail` use Laravel Sail for the local runtime (not available in this release; planned)
+- `--docker` use a Docker image for the local runtime (not available in this release; planned)
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
 - `--no-input` never prompt (Sourdough 0.1 has no prompts)
