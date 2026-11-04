@@ -574,8 +574,15 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
 - Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.
+- Fixed: raw apps start with `composer serve`. The old `php -S localhost:8000 -t public` line booted the app as production, because the raw front controller defaults `APP_ENV` to production when it is unset. The raw template's new `serve` script disables Composer's process timeout, sets `APP_ENV=local` cross-platform with `@putenv`, then starts `php -S localhost:8000 -t public`, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at `composer serve` now.
+- Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into `public/wayne-ui.php`, starts the app with `APP_ENV=local` on `127.0.0.1:8099` and expects `/` 200, `/nope` 404 and `/up` 200. Every shape now bakes with `--no-playbook`, because Playbook is required by default and its private package cannot be installed credential-free.
+- Changed: `--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
+- Added: the raw template's `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
+- Fixed: the raw front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. `/up` stays HELMET's and answers first.
 - Added: generated apps in Require mode get a `composer playbook` script (`@composer show waynestate/playbook --no-interaction`) with its `scripts-descriptions` entry, so you can check any time whether Playbook (WSU shared values) is installed. Existing scripts keep their order and `playbook` is appended last; an existing `playbook` script is left alone.
 - Changed: `sourdough new` now requires `waynestate/playbook` in every app it bakes: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends the token to git.wayne.edu, the `.env.example` block, and a README section with the access how-to. The command checks read access before writing anything (a Composer credential, then a direct git probe) and refuses with exit `1` until the developer can read the package; an unreachable git.wayne.edu generates with a warning, and non-interactive and CI runs skip the check. `--playbook` stays as a no-op for old scripts, and `--no-playbook` is for CI and automated tests only.
+- Added: the raw template ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), `waynestate/pinstripe` in require-dev with the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
+- Changed: the raw template's code passes both of Pinstripe's tools: per-preset style fixes in `Oracle`, `OracleException`, `public/index.php` and `OracleTest`, precise closure and binds types in `Oracle`, a false guard for `oci_error()` results, and the connect-failure branch reporting the last driver error instead of passing the failed connection as its source. A freshly baked raw app passes its own checks.
 - Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).
 - Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.
 - Changed: new apps now get HELMET `^0.3`, SESAME `^0.4` and PROCTOR `^0.4`, and their `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment) because PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA.
@@ -587,6 +594,9 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Fixed: the Oracle check command in the laravel-blade and laravel-inertia templates compares in Pint's non-Yoda order (`$script === null`), so a freshly baked app passes its own `composer ci` on the first run.
 - Fixed: the laravel-blade-vue template ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app no longer fails on the missing Vite manifest before `npm run build` has run.
 - Changed: the smoke gate runs `php artisan migrate` like the Next steps, and the Laravel template READMEs show `migrate` for local and `migrate --force` for deploys.
+- Added: the front page's main nav links the docs site.
+- Fixed: the Playbook wiring no longer drops a template's own composer config keys.
+- Fixed: the raw template ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
 
 ### 0.1.5 (2026-11-03)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-5-2026-11-03)
 
@@ -683,134 +693,108 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ---
 
-Source: https://sourdough.apps.wayne.edu/docs/
+Source: https://sourdough.apps.wayne.edu/docs/guides/ci.html
 
-[![Sourdough: dough in a jar, risen past its gold band](https://sourdough.apps.wayne.edu/docs/readme/hero.jpg)](https://sourdough.apps.wayne.edu/index.html)
+## CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#ci)
 
-## Sourdough[#](https://sourdough.apps.wayne.edu/docs/#sourdough)
+Sourdough's pipelines run one gate, `composer ci`, on both forges: the same command on GitLab and GitHub. This page covers what each pipeline runs, what green means, and where the pipelines should run. For what the gate contains, continue to [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
-![php](https://sourdough.apps.wayne.edu/docs/readme/badges/php.svg) ![license](https://sourdough.apps.wayne.edu/docs/readme/badges/license.svg) ![exit codes](https://sourdough.apps.wayne.edu/docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+Tip
 
-**Feed it and it grows.**
+Strongly recommended: a git.wayne.edu instance runner.
 
-A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
+### On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
-Checks: `composer ci` (the same command runs on GitLab and GitHub).
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
 
-Every loaf gets proofed before it ships.
+### On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
-Front page: [`site/index.html`](https://sourdough.apps.wayne.edu/index.html), a static page you can open in a browser or serve from `site/`.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
 
-On Citadel it is served by the raw-PHP deploy layer in `deploy/`: a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+### What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 
-### Where the code lives[#](https://sourdough.apps.wayne.edu/docs/#where-the-code-lives)
+Green means `composer ci` passed on all three PHP versions on both.
 
-The canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
+### The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
-Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
-![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
+### On the bench[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
 
-The proofing log from the front page: what goes into the tub when you run `sourdough new`, and the day-to-day check that keeps it alive.
+![Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard](https://sourdough.apps.wayne.edu/docs/readme/gallery.jpg)
 
-### Install[#](https://sourdough.apps.wayne.edu/docs/#install)
+### The recipe card[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-recipe-card)
 
-```
-composer global require waynestate/sourdough
-```
+![Sourdough brand board: the starter jar mark, palette and type](https://sourdough.apps.wayne.edu/docs/readme/board.jpg)
 
-After `composer global require`, the `sourdough` command lives in `composer global config bin-dir --absolute`; put that directory on your PATH.
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#related)
 
-Or scaffold without installing, with `composer create-project waynestate/sourdough`.
+- [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
+- [Same kitchen, many ovens](https://sourdough.apps.wayne.edu/docs/guides/ovens.html)
+- [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)
+- [Maintaining](https://sourdough.apps.wayne.edu/docs/maintaining.html)
 
-### Usage[#](https://sourdough.apps.wayne.edu/docs/#usage)
+---
 
-```
-sourdough new [dir] [options]
-```
+Source: https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html
 
-`dir` is the directory to create the app in. It is required unless you use `--describe`.
+## Describe a plan[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-a-plan)
 
-Options:
+Instead of choosing flags, describe what the app does in a sentence and let an OpenAI-compatible model plan it. This page covers the command, the model configuration, the plan format, and the steps a plan becomes; when you have a plan you trust, save it to a file and generate with `--plan`.
 
-- `--raw` use the raw PHP base
-- `--laravel` use the Laravel base
-- `--vue` add a Vue front end
-- `--inertia` use Inertia/Vue (implies `--laravel`)
-- `--sail` use Laravel Sail for the local runtime (Laravel paths)
-- `--docker` use a Docker image for the local runtime (Laravel paths)
-- `--dry-run` print the plan and write nothing
-- `--name` app name (default: the basename of `<dir>`)
-- `--no-input` never prompt (Sourdough 0.1 has no prompts)
-- `--json` with `--dry-run`, print the plan as JSON
-- `--describe "<sentence>"` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
-- `--plan-only` with `--describe`, print the plan as JSON and write nothing
-- `--plan <file>` a ready-made plan file (JSON matching `resources/plan.schema.json`)
-- `--playbook` kept for compatibility: Playbook is now the default
-- `--no-playbook` skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook)
-- `--no-advisor` skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section)
+### Describe it in a sentence[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-it-in-a-sentence)
 
-Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
-
-By default the generated app requires `waynestate/playbook` (WSU's private shared-values package on git.wayne.edu): the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access. Before writing anything, `sourdough new` checks that this machine can read the package (a Composer credential, then a direct git probe); without read access it refuses with exit `1` and prints the how-to, and if it cannot reach git.wayne.edu it still generates the app but warns that `composer install` will need the connection. Non-interactive runs and CI environments skip the check. `--dry-run` runs the check but never refuses, and its JSON plan carries a `playbook` key with the mode, the access status and the probe that answered. After generation the Next steps point at `composer playbook`. `--playbook` is kept for compatibility and changes nothing; `--no-playbook` skips all of it. The two flags together are refused with exit `1`.
-
-Generated apps ship with ADVISOR wired in by default: `waynestate/advisor` lands in `require-dev`, `.mcp.json` is git-ignored (a client config starts a program for whoever opens the project), and the README gains an "ADVISOR" section. The Next steps print the install line once dependencies are in:
-
-```
-php vendor/bin/advisor install --client=claude --write
-```
-
-`--no-advisor` skips all of it.
-
-The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
-
-### Permutations[#](https://sourdough.apps.wayne.edu/docs/#permutations)
-
-| Flags | Permutation |
-| --- | --- |
-| (none) or `--raw` | Raw PHP with WayneUI's standalone path |
-| `--raw --vue` | Raw PHP + Vue SPA over JSON |
-| `--laravel` | Laravel + Blade |
-| `--laravel --vue` | Laravel + Blade + Vue islands |
-| `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
-
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
-
-Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
-
-### Describe a plan[#](https://sourdough.apps.wayne.edu/docs/#describe-a-plan)
-
-Instead of choosing flags, describe what the app does and let a model plan it:
-
-```
+```bash
 sourdough new --describe "A blog with posts and comments"
 ```
 
 Sourdough asks an OpenAI-compatible model for a plan, validates it against `resources/plan.schema.json`, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to `--plan=<file>` (exit `1`). You write the plan yourself and pass it in.
 
-To see the plan as JSON without writing anything:
+The model does the work but never gates. When an answer fails, Sourdough retries once, telling the model why the previous answer was not valid. If the second answer fails too, the command stops with:
 
+```text
+The model could not produce a valid plan. Write the plan yourself and pass it with --plan=<file>.
 ```
+
+### See the plan without writing anything[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#see-the-plan-without-writing-anything)
+
+```bash
 sourdough new --describe "A blog with posts and comments" --plan-only
 ```
 
+### Pass a ready-made plan[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#pass-a-ready-made-plan)
+
 Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with `--plan`:
 
-```
+```bash
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A missing file, or a file that is not valid JSON matching the schema, is refused with the reason printed.
 
-#### Model configuration[#](https://sourdough.apps.wayne.edu/docs/#model-configuration)
+### Model configuration[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#model-configuration)
 
 `--describe` needs three environment variables (no defaults, no key in code):
 
-- `SOURDOUGH_LLM_BASE_URL` the OpenAI-compatible endpoint, including the API path (usually `/v1`)
-- `SOURDOUGH_LLM_API_KEY` the API key
-- `SOURDOUGH_LLM_MODEL` the model name
+| Variable | Meaning |
+| --- | --- |
+| `SOURDOUGH_LLM_BASE_URL` | the OpenAI-compatible endpoint, including the API path (usually `/v1`) |
+| `SOURDOUGH_LLM_API_KEY` | the API key |
+| `SOURDOUGH_LLM_MODEL` | the model name |
 
 Any OpenAI-compatible endpoint works: a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.
+
+Warning
+
+`SOURDOUGH_LLM_API_KEY` is a credential. Set it in your environment and keep it out of the repository; Sourdough reads it from the environment and keeps no key in code.
+
+If a variable is missing, the command names it and points you at the alternative:
+
+```text
+The SOURDOUGH_LLM_MODEL environment variable is not set. Set it, or pass a ready-made plan with --plan=<file>.
+```
+
+### What a plan looks like[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#what-a-plan-looks-like)
 
 A plan is a small JSON object:
 
@@ -834,29 +818,489 @@ A plan is a small JSON object:
 
 `permutation`, `parts`, and `name` are required; `models` and `pages` are optional. `parts` is a subset of `sesame`, `helmet`, `proctor`, and `preflight`.
 
-### The manifest[#](https://sourdough.apps.wayne.edu/docs/#the-manifest)
+### The steps a plan produces[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-steps-a-plan-produces)
 
-Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+The plan becomes a list of plain steps, built from the permutation, the target dir, the local runtime flags (`--sail` and `--docker`) and whether ADVISOR is wired in (`--no-advisor` opts out). For the raw shape the steps are:
 
-The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
+- `Copy the raw template into <dir>`
+- `Replace {{app_name}} and {{app_slug}} in file names and contents`
+
+The Laravel shapes get a step to create the app in the target dir, suffixed with ` (not available in this release)` for the permutations this release does not generate. Generatable permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime` and `--docker` adds `Use Docker for the local runtime`.
+
+Note
+
+`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP. Combining them with a raw permutation is refused.
+
+In 0.1 the raw, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue permutations are generated; the generation step for the others says "not available in this release".
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#related)
+
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/every-os.html
+
+## Every developer, every operating system[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#every-developer-every-operating-system)
+
+Sourdough is one PHP command, so it works on Windows, macOS, and Linux: the same `sourdough new` invocation, the same flags, the same output, no matter which OS you sit at. This page covers why that holds and the practices that keep generated apps portable across all three systems. If you are baking an app, start with [Quick start](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html) and come back here when a coworker on another OS hits a snag.
+
+### One PHP command, three operating systems[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#one-php-command-three-operating-systems)
+
+Because the CLI is a single PHP command, there is no per-OS build and no shell dependency in the happy path. Developer scripts follow the same rule: a script that developers run ships as a `.ps1` and a `.sh` that do the same thing, or is one PHP command. Prefer the single PHP command when the logic is more than a few lines. Windows never needs bash or WSL to run the CLI.
+
+### Line endings travel with the repo[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#line-endings-travel-with-the-repo)
+
+Every generated app ships a `.gitattributes` with `* text=auto eol=lf`, and sets `.ps1`, `.bat` and `.cmd` to CRLF. The file travels with the repo and gives every contributor the same rules, which beats the per-user `core.autocrlf` setting. Anything that runs on Citadel must be LF, so the checks fail when `build.sh`, release scripts or `deployments/*` contain CRLF, and when two paths differ only by case: macOS and Windows ignore case and Citadel does not, so an app can work on every laptop and break on deploy.
+
+### Native paths for each OS[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#native-paths-for-each-os)
+
+Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS get bash (`.sh`), written for macOS's stock bash 3.2 and BSD tools. Be aware that PowerShell's default policy on Windows clients can block scripts that were downloaded from the internet (Microsoft calls the policy defense in depth, not a security boundary). Scripts the generator writes locally are not affected, but the docs should say what to do if a script is blocked. Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex`; that is a pattern WSU docs should not copy.
+
+### Subprocesses as argument arrays[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#subprocesses-as-argument-arrays)
+
+Whenever Sourdough runs Composer, npm, git or Docker, it passes the command as an array of arguments, never as a shell string. That accepts paths with spaces and Windows drive letters, keeps quoting differences between PowerShell and bash out of the picture, and skips shell parsing of a directory name on Linux and macOS. Set timeouts on every subprocess.
+
+Windows has a catch. When the target is a `.bat` or `.cmd` file, Windows starts `cmd.exe`, which splits arguments by its own rules, and callers must escape for it; Composer and npm are usually `.bat` or `.cmd` shims on Windows. PHP's array form of `proc_open` had a command injection on Windows, and its first fix was incomplete; the fixes are in PHP 8.1.29, 8.2.20 and 8.3.8, and the stack's PHP floor already rules out the unpatched builds. So: keep the array form; where you can, run `php.exe` with `composer.phar` and `node.exe` with npm's JavaScript entry point instead of the shims; never pass user-chosen text (an app name, a path) to a shim; and validate names before they reach a command line.
+
+### More than one local runtime[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#more-than-one-local-runtime)
+
+Offer more than one local runtime, and be honest about Sail on Windows. Sail is Laravel's Docker development environment; on Windows it needs WSL2 and its `sail` script is shell. Docker's own advice for WSL2 is to keep source code inside the Linux file system, because bind mounts from the Windows side are slower and do not deliver file-change events. So the routes are: Docker Compose with a Citadel-parity image as the route that works natively on every OS, Sail as an option where it fits, and plain PHP with Composer. Laravel's docs also offer Herd, a native macOS and Windows environment with PHP, Nginx, Node and the `laravel` CLI.
+
+Note
+
+Treat Sail as a development tool. Its compose file and images are for local work; do not reuse them as the production image, because they carry dev tools, ports and defaults that a production container should not.
+
+### Docker images the safe way[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#docker-images-the-safe-way)
+
+If Sourdough generates a Dockerfile: pin the base image to an exact version (a digest is stronger), use a multi-stage build, run as a non-root user with a fixed UID, add a `.dockerignore`, never leave secrets in a layer, and rebuild regularly with `--pull`. State the CPU architecture: the images are x86-64 only as far as is known, so Apple Silicon users run them under emulation. Pinning to a digest also opts you out of automatic security fixes, so pair the pin with a scheduled update.
+
+### Test on all three systems[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#test-on-all-three-systems)
+
+Run the generator and the generated app's tests on Windows, macOS and Linux, or run a written smoke test before each minor release. Path, newline and shell bugs only appear on the system you did not test.
+
+### Templates as archives[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#templates-as-archives)
+
+Fetch templates as Composer dist archives, not with `git clone --recurse-submodules`. A carriage return in a submodule path turned into code execution during a recursive clone in a Git vulnerability, fixed across many releases and listed as exploited by CISA. Name the Git floor for developers and keep Git current. Composer 2.10 no longer falls back from dist to source by default, which helps here.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#related)
+
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [Building on Laravel](https://sourdough.apps.wayne.edu/docs/guides/laravel.html)
+- [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
+- [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html
+
+## Keeping apps current[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keeping-apps-current)
+
+A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how to check for drift today, and how the planned `sourdough feed` will merge template updates in without clobbering your changes. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app and run the check in CI, then read on.
+
+### Record where the app came from[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#record-where-the-app-came-from)
+
+Every app carries a `.sourdough/manifest.json` recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded`. Other tools do the same: Copier writes `.copier-answers.yml`, and cruft writes `.cruft.json`. Without this record there is nothing to compare against, so no update is possible.
+
+Warning
+
+Do not hand-edit the manifest. It is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own.
+
+[The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html) has the full key list and the managed/seeded split.
+
+### Check for drift[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#check-for-drift)
 
 Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app to list the managed files that have drifted from the manifest:
 
-```
+```bash
 sourdough manifest --check
 ```
 
-Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours. Wire the check into CI so an app that falls behind the template fails the pipeline instead of surfacing as drift later; that is what makes a starter "fed". Copier's `copier check-update` is the same idea: `--quiet` makes it exit 2 when an update exists, and `--output-format json` gives machines the answer.
 
-Commit the manifest. It's the record that keeps `feed` honest.
+### The planned feed: a merge, not an overwrite[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#the-planned-feed-a-merge-not-an-overwrite)
+
+The planned `sourdough feed` regenerates the project from the new template version, compares, and applies the difference on top of your changes as a three-way merge. It needs only git on your machine: it records the template commit an app came from and applies template changes with `git apply --3way`. It requires a clean git state first (Copier recommends a clean `git status` but does not enforce it, so the feed enforces it), marks conflicts with inline markers or `.rej` files, and a hook or CI check blocks a commit containing leftover markers. A merge keeps your work; an overwrite would not.
+
+### Versioned template releases[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#versioned-template-releases)
+
+Tag template releases with semantic versions, and put a short "what changed, what to do" entry in the changelog for each. Copier picks the newest tag by default. An update tool is only as good as the history it can read.
+
+### Compatibility CI[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#compatibility-ci)
+
+On every change to Sourdough, and on every release of WayneUI, SESAME, HELMET and PROCTOR, generate each permutation, install it and run its own tests and the PROCTOR check. Run it on a schedule (nightly), not only on changes, covering PHP 8.4 and 8.5 and the current and previous Laravel major. The starter is the place where all the stack libraries meet, so it is where a break shows first. A starter with no commits still rots, because the things it depends on keep moving.
+
+### Keep templates thin[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keep-templates-thin)
+
+Put shared behavior in libraries, not in the template. Code that lives in SESAME, HELMET and PROCTOR updates with `composer update`, so only the glue lives in the template and the merge stays small. Other universities ship starters the same way: a Composer package plus an install command. A new site installs it with `composer require` and `php artisan starterkit:install`, and an existing site can require the library without publishing the project files. This is the core-plus-adapters rule applied to the starter itself.
+
+### Owners, windows and sunsets[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#owners-windows-and-sunsets)
+
+Starters die quietly. The React team deprecated Create React App on 2025-02-14, saying it had no active maintainers, and installing it now prints a warning that points at current frameworks. Laravel replaced Breeze and Jetstream with new kits when Laravel 12 shipped. Each permutation should name an owner, tie its support window to the framework and PHP end dates, run the scheduled build, and have the check print a deprecation notice with the migration note.
+
+### Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#refreshing-the-squire-templates)
+
+The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into the Sourdough repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
+
+```bash
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
+```
+
+Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. From the installed package the same refresh is `composer squire-copy:sync`, verified by `composer squire-copy:check` (part of `composer ci`). Until `feed` exists, apps generated earlier pick up template changes by hand.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#related)
+
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+- [Building on Laravel](https://sourdough.apps.wayne.edu/docs/guides/laravel.html)
+- [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/laravel.html
+
+## Building on Laravel[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#building-on-laravel)
+
+This page covers what a Laravel bake adds over the raw base and the practices that keep Laravel shapes sound. Start by picking your shape on [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for what the bake gives you and how to keep it healthy.
+
+A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sourdough new --laravel` starts from Composer's official installer and layers the stack on top, so the app inherits Laravel's upgrades to the skeleton.
+
+### What a Laravel bake adds[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#what-a-laravel-bake-adds)
+
+- `--laravel` bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
+- `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
+- `--inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.
+
+Four of the five permutations generate in 0.1. The last one, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+
+### Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
+
+For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. `composer create-project laravel/laravel` picks the newest major, which is right. The installer also accepts a community starter kit published on Packagist:
+
+```bash
+laravel new my-app --using=vendor/kit
+```
+
+A kit declares its environment variables in `.env.example` and its setup steps in the `post-create-project-cmd` list of its `composer.json`. There is no plain Blade kit, so the `--laravel` (Blade) and Blade-plus-Vue-islands permutations are a bare Laravel install plus Sourdough's own layer, not a vendor kit.
+
+### Local runtime: Sail or Docker[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#local-runtime-sail-or-docker)
+
+The Laravel paths take a flag for the local runtime:
+
+- `--sail` use Laravel Sail for the local runtime (Laravel paths)
+- `--docker` use a Docker image for the local runtime (Laravel paths)
+
+Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell, so it is an option where it fits, never the only Windows route. See [Every developer, every operating system](https://sourdough.apps.wayne.edu/docs/guides/every-os.html) for the full picture.
+
+### Sign-in stays SESAME[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
+
+Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.
+
+Warning
+
+A live `/register` route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.
+
+### Keep Boost current[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#keep-boost-current)
+
+For the Inertia reference path, install Laravel Boost with `--dev`, and refresh its generated guideline and skill files with `boost:update`; the Boost docs suggest running it from Composer's `post-update-cmd`. Stale agent guidance teaches an agent last year's API. Boost runs on Laravel 10 to 13 with PHP 8.1 or higher. Its docs say the generated `.mcp.json`, guideline files (`CLAUDE.md`, `AGENTS.md`, `junie/`) and `boost.json` may go in `.gitignore`, because `boost:install` and `boost:update` regenerate them; the `.ai/rules` directory (project rules recorded by agents) should be committed.
+
+Warning
+
+Boost's MCP server can run database queries and code through Tinker, so the development `.env` must point at a local database and never at the shared server.
+
+### Support windows[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#support-windows)
+
+Laravel gives each major 18 months of bug fixes and two years of security fixes. From its release notes: 11 reached the end of security fixes on 2026-03-12; 12 (PHP 8.2 to 8.5) gets security fixes until 2027-02-24; 13 (PHP 8.3 to 8.5) until 2028-03-17. Name the major in the generator's tests, so a new release cannot change output unseen, and print the end-of-security date in the generated README. Laravel 13 needs PHP 8.3, which is also the stack's floor: 8.2 security support ends 2026-12-31.
+
+### Trust the HA-Proxy, not every sender[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#trust-the-ha-proxy-not-every-sender)
+
+Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
+
+### Work on the shared MySQL 5.6[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
+
+Laravel's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported; the shared server is MySQL 5.6, which left extended support on 2021-02-28. The practical limit is the index key prefix: 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071. The Laravel templates set the 191 default with `Schema::defaultStringLength(191)` in `app/Providers/AppServiceProvider.php` and avoid JSON columns, so string columns stay inside the limit (PROCTOR `mysql56-string-default`). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
+
+### Next steps[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#next-steps)
+
+Each Laravel bake prints Next steps suited to the shape. For `--laravel`:
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+The islands and Inertia shapes add the front-end build between `migrate` and `serve`:
+
+```bash
+npm install
+npm run build
+```
+
+The bake runs `php artisan migrate` after `php artisan key:generate`, so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.
+
+### The Oracle check[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#the-oracle-check)
+
+Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with:
+
+```bash
+php artisan oracle:check
+```
+
+The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#related)
+
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+- [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
+- [Every developer, every operating system](https://sourdough.apps.wayne.edu/docs/guides/every-os.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/manifest.html
+
+## The manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-manifest)
+
+Every app Sourdough generates carries a `.sourdough/manifest.json`, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so a later `sourdough feed` can bring template updates in without clobbering what you have changed.
+
+### What it records[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#what-it-records)
+
+The manifest records the Sourdough version, the template, the answers you chose, and a sha256 hash of every file. Its keys, sorted alphabetically in the JSON:
+
+| Key | Value |
+| --- | --- |
+| `answers` | each option you chose, sorted by key |
+| `files` | every generated file with its `sha256` hash and a `class` of `managed` or `seeded` |
+| `generated_at` | the generation time, UTC |
+| `schema` | the manifest schema version, currently `1` |
+| `sourdough_version` | the Sourdough package version, or `dev` when it cannot be determined (running from a git checkout without a release tag) |
+| `template` | the template the app was generated from |
+
+The JSON is pretty-printed with sorted keys and a trailing newline, and paths use forward slashes on every OS, so two runs with the same answers differ only in `generated_at`.
+
+### Managed and seeded[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#managed-and-seeded)
+
+| Class | Who owns it |
+| --- | --- |
+| `managed` | Sourdough owns the file and will update it |
+| `seeded` | Sourdough wrote the file once; you own it now (`.env.example` and `README.md`) |
+
+The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
+
+### Check an app against its manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#check-an-app-against-its-manifest)
+
+Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app to list the managed files that have drifted from the manifest:
+
+```bash
+sourdough manifest --check
+```
+
+You can pass the app directory as an argument; the default is the current directory. The exit codes match PROCTOR:
+
+- `0` clean: `Clean: every managed file matches the manifest.`
+- `1` a managed file changed or is missing: one line per file, `changed <file>` or `missing <file>`
+- `2` tool error: no manifest in the directory, or no `--check`
+
+Seeded files are never reported. They're yours.
+
+Tip
+
+Commit `.sourdough/manifest.json` in your app. It's the record that keeps `feed` honest.
+
+### The Squire deploy files[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-squire-deploy-files)
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 
-### Testing[#](https://sourdough.apps.wayne.edu/docs/#testing)
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#related)
 
-Maintainers: how to build, test and release this project, and where its data comes from, is in [Maintaining](https://sourdough.apps.wayne.edu/docs/maintaining.html).
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html)
 
-From the repo root:
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/ovens.html
+
+## Same kitchen, many ovens[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#same-kitchen-many-ovens)
+
+Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend. This page is the cast of the kitchen: every part of the stack, with a link to its public repository.
+
+### The cast[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#the-cast)
+
+- [![WayneUI](https://sourdough.apps.wayne.edu/docs/readme/cast/wayneui.png)](https://github.com/waynestate/wayne-ui)
+- [![CREED](https://sourdough.apps.wayne.edu/docs/readme/cast/creed.png)](https://github.com/waynestate/creed)
+- [![PROCTOR](https://sourdough.apps.wayne.edu/docs/readme/cast/proctor.png)](https://github.com/waynestate/proctor)
+- [![SESAME](https://sourdough.apps.wayne.edu/docs/readme/cast/sesame.png)](https://github.com/waynestate/sesame)
+- [![HELMET](https://sourdough.apps.wayne.edu/docs/readme/cast/helmet.png)](https://github.com/waynestate/helmet)
+- [![Sourdough](https://sourdough.apps.wayne.edu/docs/readme/cast/sourdough.png)](https://github.com/waynestate/sourdough)
+- [![Squire](https://sourdough.apps.wayne.edu/docs/readme/cast/squire.png)](https://github.com/waynestate/squire)
+- [![Preflight](https://sourdough.apps.wayne.edu/docs/readme/cast/preflight.png)](https://github.com/waynestate/preflight)
+- [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe)
+- [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster)
+- [![Rollcall](https://sourdough.apps.wayne.edu/docs/readme/cast/rollcall.png)](https://github.com/waynestate/rollcall)
+- [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://github.com/waynestate/drawbridge)
+- [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor)
+- [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#related)
+
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)
+- [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html)
+- [Overview](https://sourdough.apps.wayne.edu/docs/index.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/quick-start.html
+
+## Quick start[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#quick-start)
+
+From a machine where `sourdough` is installed (see [Install](https://sourdough.apps.wayne.edu/docs/install.html)), bake an app and prove it.
+
+### Steps[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#steps)
+
+1. Scaffold the app.
+   ```
+   sourdough new my-app
+   ```
+   Expected: exit code `0` (done). The `my-app` directory appears with a Wayne State app in it: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already wired in. Sourdough prints Next steps for the new app.
+2. Run the app's own checks.
+   From inside `my-app/`:
+   ```
+   composer ci
+   ```
+   Expected: exit code `0`. A freshly baked app passes its own `composer ci` on the first run.
+
+### What you built[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#what-you-built)
+
+- A Wayne State app with the stack already wired in: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components.
+- Playbook wiring by default: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section.
+- ADVISOR in `require-dev`, a git-ignored `.mcp.json`, and an "ADVISOR" README section.
+- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+
+### Next steps[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#next-steps)
+
+- Follow the app's printed Next steps: they point at `composer playbook` once dependencies are in, and at `php vendor/bin/advisor install --client=claude --write` for ADVISOR.
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html): the permutations, from raw PHP to Laravel plus Inertia/Vue.
+- [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html): describe what the app does and let a model plan it.
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html): what the manifest records, and `sourdough manifest --check`.
+- [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html): set up the generated app's CI; a git.wayne.edu instance runner is strongly recommended.
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html): every flag and option.
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/shapes.html
+
+## Pick a shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#pick-a-shape)
+
+A starter in a jar is only potential until you give it a shape: pick the permutation below, then run `sourdough new` with the matching flags. If you would rather describe the app in a sentence and let a model plan it, continue to [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html).
+
+![Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard](https://sourdough.apps.wayne.edu/docs/readme/gallery.jpg)
+
+### The five permutations[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-five-permutations)
+
+| Flags | Permutation |
+| --- | --- |
+| (none) or `--raw` | Raw PHP with WayneUI's standalone path |
+| `--raw --vue` | Raw PHP + Vue SPA over JSON |
+| `--laravel` | Laravel + Blade |
+| `--laravel --vue` | Laravel + Blade + Vue islands |
+| `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
+
+Warning
+
+`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+
+Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
+
+```bash
+sourdough new my-app --raw
+```
+
+```bash
+sourdough new my-app --raw --vue
+```
+
+```bash
+sourdough new my-app --laravel
+```
+
+```bash
+sourdough new my-app --laravel --vue
+```
+
+```bash
+sourdough new my-app --inertia
+```
+
+### The template directories[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-template-directories)
+
+Each shape bakes from a directory in `templates/`:
+
+| Template directory | Shape |
+| --- | --- |
+| `raw/` | Raw PHP with WayneUI's standalone path |
+| `laravel-blade/` | Laravel + Blade |
+| `laravel-blade-vue/` | Laravel + Blade + Vue islands |
+| `laravel-inertia/` | Laravel + Inertia/Vue |
+
+`squire/` holds Squire's exported deploy files. Squire owns them; Sourdough installs them as-is into every app and records them in the manifest, so you never edit them by hand.
+
+The raw template also carries its own checks:
+
+- Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), with `waynestate/pinstripe` in require-dev and the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
+- An explicit `composer-ci` job in `.gitlab-ci.yml` (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
+- `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`.
+- A front controller that answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
+
+### Oracle in every shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#oracle-in-every-shape)
+
+Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#related)
+
+- [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html)
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/testing.html
+
+## Testing[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#testing)
+
+This page is the proofing bench: how to run Sourdough's own checks day to day, and how to fire the smoke gate that bakes a shape for real before it may be claimed. Like any starter, Sourdough needs regular feeding, or it goes flat. For the wider runbook, continue to [Maintaining](https://sourdough.apps.wayne.edu/docs/maintaining.html).
+
+Note
+
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://sourdough.apps.wayne.edu/docs/maintaining.html).
+
+### Day-to-day commands[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#day-to-day-commands)
+
+| Task | Command |
+| --- | --- |
+| Install | `composer install` |
+| All checks (what CI runs) | `composer ci` |
+| Only the tests | `composer test` |
+| Fix code style | `composer fix` |
+| Check the Squire copy | `composer squire-copy:check` |
+| Refresh the Squire copy | `composer squire-copy:sync`, then commit `templates/squire/` |
+| Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
+
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+
+### With only Docker[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#with-only-docker)
+
+The same lines work in PowerShell and sh:
+
+```
+docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
+```
+
+### From the repo root[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#from-the-repo-root)
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2 composer install --no-interaction
@@ -866,11 +1310,165 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
-The smoke gate bakes a shape for real and runs the generated app's own checks; see the [Smoke gate](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate) section of Maintaining for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+### The smoke gate[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#the-smoke-gate)
 
-### CI[#](https://sourdough.apps.wayne.edu/docs/#ci)
+The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
 
-Strongly recommended: a git.wayne.edu instance runner.
+- `raw`: `composer install` and `composer ci`
+- `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
+- `blade-vue`: the blade steps plus `npm install` and `npm run build`
+- `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
+
+Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
+
+Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
+
+```bash
+docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+docker run --rm -v "$PWD:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh <shape>
+```
+
+```powershell
+.\scripts\smoke-shape.ps1 <shape>
+```
+
+The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+
+Two environment variables control the scratch space:
+
+- `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
+- `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
+
+Note
+
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#related)
+
+- [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html)
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [Same kitchen, many ovens](https://sourdough.apps.wayne.edu/docs/guides/ovens.html)
+- [Maintaining](https://sourdough.apps.wayne.edu/docs/maintaining.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html
+
+## Wiring the stack in[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#wiring-the-stack-in)
+
+Goal: know exactly what Sourdough wires into a freshly baked app, and why each piece is a default rather than an option. Read this before your first bake, and keep it at hand while you maintain an app. Like the starter it is named after, a Sourdough app only stays alive while something keeps feeding it; the wiring below is the first meal.
+
+Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+
+![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
+
+*The proofing log from the front page: what goes into the tub when you run `sourdough new`, and the day-to-day check that keeps it alive.*
+
+### What lands in every app[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#what-lands-in-every-app)
+
+Every generated app has SESAME, HELMET, PROCTOR as a dev dependency, a `.gitlab-ci.yml` that includes the Preflight components, a `/up` route that does not touch the database, and a README that points at the CREED handbook. The libraries are tagged (SESAME, HELMET with a health check, PROCTOR, Preflight templates), and `sourdough new` wires them into every generated app.
+
+Defaults decide what most apps end up doing, so the stack is wired in by default, not as an option. Laravel's own kits include sign-in, rate limiting and two-factor login out of the box for the same reason.
+
+For the Playbook and ADVISOR wiring and the flags that turn each one off, see [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html).
+
+### The release script runs the check, but do not call it the gate[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#the-release-script-runs-the-check-but-do-not-call-it-the-gate)
+
+The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check.
+
+Warning
+
+Promising a gate that does not hold is worse than having none. Nothing prevents someone from describing the script as a gate in a README.
+
+### Keep the start-up path small and boring[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#keep-the-start-up-path-small-and-boring)
+
+Generated commands should run and exit on their own, with no prompts and no network calls after install. Developers, CI and coding agents all run them, and a prompt that waits for input breaks all three.
+
+### Accessibility gate[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#accessibility-gate)
+
+The US Justice Department's Title II web rule sets WCAG 2.1 Level AA for state and local government web content. An interim final rule published on 2026-04-20 moved the first compliance date to 2027-04-26 for entities of 50,000 people or more and to 2028-04-26 for smaller ones. The standard and the ongoing duty to keep content accessible did not change. Whether and when the rule applies to a given WSU app is not decided here; ask WSU's accessibility office.
+
+For Sourdough: each permutation's generated home page and sign-in flow get an automated accessibility check in CI, including the Vue paths (focus after navigation, announced route changes); WayneUI's accessible templates are the default markup; and the "new app" page passes the same gate.
+
+Note
+
+Automated checks find only part of the problems, so the generated README should say so.
+
+### Protect deploy credentials in the generated pipeline[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#protect-deploy-credentials-in-the-generated-pipeline)
+
+GitLab's docs say masking a variable does not reliably stop a malicious user from reading it; protected variables exist only in pipelines on protected branches and tags; a pipeline for a merge request from a fork should run in the parent project only after review, because malicious code can compromise masked and protected variables; and sensitive values belong in an external secrets manager. A project's job-token allowlist includes only the project itself by default, and GitLab calls disabling it a security risk. From GitLab 19.0 job tokens use the JWT format by default, and the legacy format is available only until 20.0. Which GitLab version WSU runs was not checked.
+
+The generated `.gitlab-ci.yml` should therefore:
+
+- run deploy jobs only on a protected branch or tag with protected variables
+- put no secrets in component `inputs`
+- leave the job-token allowlist on
+- add other projects to it by name when the pipeline must fetch from them
+
+Danger
+
+Sensitive values belong in an external secrets manager. Put no secrets in component `inputs`, and run deploy jobs only on a protected branch or tag with protected variables.
+
+### Where the code lives[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#where-the-code-lives)
+
+The canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#related)
+
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Plan format](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/
+
+[![Sourdough: dough in a jar, risen past its gold band](https://sourdough.apps.wayne.edu/docs/readme/hero.jpg)](https://sourdough.apps.wayne.edu/index.html)
+
+## Sourdough[#](https://sourdough.apps.wayne.edu/docs/#sourdough)
+
+![php](https://sourdough.apps.wayne.edu/docs/readme/badges/php.svg) ![license](https://sourdough.apps.wayne.edu/docs/readme/badges/license.svg) ![exit codes](https://sourdough.apps.wayne.edu/docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+
+**Feed it and it grows.**
+
+A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+
+Every loaf gets proofed before it ships. Checks: `composer ci` (the same command runs on GitLab and GitHub).
+
+![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
+
+The proofing log from the front page: what goes into the tub when you run `sourdough new`, and the day-to-day check that keeps it alive.
+
+### Install[#](https://sourdough.apps.wayne.edu/docs/#install)
+
+```
+composer global require waynestate/sourdough
+```
+
+After `composer global require`, the `sourdough` command lives in `composer global config bin-dir --absolute`; put that directory on your PATH. Or scaffold without installing, with `composer create-project waynestate/sourdough`. The full instructions are on [Install](https://sourdough.apps.wayne.edu/docs/install.html).
+
+### First run[#](https://sourdough.apps.wayne.edu/docs/#first-run)
+
+```
+sourdough new my-app
+```
+
+Expected: exit code `0` (done), a `my-app` directory holding a Wayne State app with the stack wired in, and Next steps printed for it. Then run the app's own gate from inside `my-app/`:
+
+```
+composer ci
+```
+
+The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html).
+
+### Pick your path[#](https://sourdough.apps.wayne.edu/docs/#pick-your-path)
+
+- [Quick start](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html): bake your first app and run its checks.
+- [Install](https://sourdough.apps.wayne.edu/docs/install.html): what the machine needs, and the two ways to get Sourdough.
+- [Reference](https://sourdough.apps.wayne.edu/docs/reference/commands.html): every command and option, the plan format, the templates.
+
+### Status[#](https://sourdough.apps.wayne.edu/docs/#status)
+
+Version 0.1.5 (2026-11-03), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 **On the bench: the five loaves and the feeding schedule**
 
@@ -885,6 +1483,58 @@ Strongly recommended: a git.wayne.edu instance runner.
 [![WayneUI](https://sourdough.apps.wayne.edu/docs/readme/cast/wayneui.png)](https://github.com/waynestate/wayne-ui) [![CREED](https://sourdough.apps.wayne.edu/docs/readme/cast/creed.png)](https://github.com/waynestate/creed) [![PROCTOR](https://sourdough.apps.wayne.edu/docs/readme/cast/proctor.png)](https://github.com/waynestate/proctor) [![SESAME](https://sourdough.apps.wayne.edu/docs/readme/cast/sesame.png)](https://github.com/waynestate/sesame) [![HELMET](https://sourdough.apps.wayne.edu/docs/readme/cast/helmet.png)](https://github.com/waynestate/helmet) [![Sourdough](https://sourdough.apps.wayne.edu/docs/readme/cast/sourdough.png)](https://github.com/waynestate/sourdough) [![Squire](https://sourdough.apps.wayne.edu/docs/readme/cast/squire.png)](https://github.com/waynestate/squire) [![Preflight](https://sourdough.apps.wayne.edu/docs/readme/cast/preflight.png)](https://github.com/waynestate/preflight) [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe) [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster) [![Rollcall](https://sourdough.apps.wayne.edu/docs/readme/cast/rollcall.png)](https://github.com/waynestate/rollcall) [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://github.com/waynestate/drawbridge) [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor) [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
 
 Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend.
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/install.html
+
+## Install[#](https://sourdough.apps.wayne.edu/docs/install.html#install)
+
+Sourdough is one PHP command, so it works on Windows, macOS, and Linux.
+
+### Requirements[#](https://sourdough.apps.wayne.edu/docs/install.html#requirements)
+
+- PHP 8.3 or newer (`^8.3` in `composer.json`).
+- Composer, for the install lines below.
+- No PHP extensions are declared in `composer.json`.
+
+Where the code lives: the canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. Nougat is the starter culture; the mirrors are just slices.
+
+### Install[#](https://sourdough.apps.wayne.edu/docs/install.html#install-1)
+
+Two ways in: install the `sourdough` command on your machine, or scaffold without installing.
+
+```bash
+composer global require waynestate/sourdough
+```
+
+```bash
+composer create-project waynestate/sourdough
+```
+
+Note
+
+After `composer global require`, the `sourdough` command lives in `composer global config bin-dir --absolute`; put that directory on your PATH.
+
+### Verify[#](https://sourdough.apps.wayne.edu/docs/install.html#verify)
+
+```bash
+sourdough --version
+```
+
+Expected:
+
+```
+Sourdough 0.1.5
+```
+
+The CLI is a Symfony Console application named Sourdough, version 0.1.5 (`bin/sourdough`), so `--version` prints the name and the version.
+
+### Next steps[#](https://sourdough.apps.wayne.edu/docs/install.html#next-steps)
+
+- [Quick start](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html): bake your first app and run its checks.
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html): choose the permutation your app needs.
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html): every flag `sourdough new` accepts.
 
 ---
 
@@ -1003,3 +1653,742 @@ If every app should have something, it goes in Sourdough's templates. If only th
 ### Who maintains it[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)
 
 Adam Perkins, Wayne State University Enterprise Applications. Internal runbook (accounts, tokens, mirrors, deploy access): ask Enterprise Applications.
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/reference/commands.html
+
+## Commands[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#commands)
+
+Reference for the `sourdough` CLI: every command, argument, option and exit code, exactly as the sources define them. For the JSON plan behind `--describe` and `--plan`, see [Plan format](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html).
+
+### sourdough new[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-new)
+
+Make a new Wayne State app with the stack already wired in.
+
+```
+sourdough new [dir] [options]
+```
+
+`dir` is the directory to create the app in. It is required unless you use `--describe`.
+
+#### Options[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#options)
+
+| Option | Meaning |
+| --- | --- |
+| `--raw` | use the raw PHP base |
+| `--laravel` | use the Laravel base |
+| `--vue` | add a Vue front end |
+| `--inertia` | use Inertia/Vue (implies `--laravel`) |
+| `--sail` | use Laravel Sail for the local runtime (not available in this release; planned) |
+| `--docker` | use a Docker image for the local runtime (not available in this release; planned) |
+| `--dry-run` | print the plan and write nothing |
+| `--name` | app name (default: the basename of `<dir>`) |
+| `--no-input` | never prompt (Sourdough 0.1 has no prompts) |
+| `--json` | with `--dry-run`, print the plan as JSON |
+| `--describe "<sentence>"` | describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars) |
+| `--plan-only` | with `--describe`, print the plan as JSON and write nothing |
+| `--plan <file>` | a ready-made plan file (JSON matching `resources/plan.schema.json`) |
+| `--playbook` | kept for compatibility: Playbook is now the default |
+| `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
+| `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |
+
+Note
+
+`--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
+
+#### Exit codes[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes)
+
+Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
+
+| Refused case | Exact message | Exit |
+| --- | --- | --- |
+| `--describe` and `--plan` together | `--describe and --plan are mutually exclusive.` | `1` |
+| `--playbook` and `--no-playbook` together | `--playbook and --no-playbook are mutually exclusive.` | `1` |
+| `--plan-only` without `--describe` | `--plan-only is only available with --describe.` | `1` |
+| `dir` missing without `--describe` | `The dir argument is required unless you use --describe.` | `1` |
+| no read access to Playbook | `You need read access to Playbook (a private package on git.wayne.edu) to make a Wayne State app.` plus the how-to | `1` |
+| `--json` without `--dry-run` | `--json is only available with --dry-run.` | `2` |
+| the model could not be reached (`--describe`) | `The model could not be reached:` plus the underlying error | `2` |
+
+Other refusals, all exit `1`: invalid flags, a non-empty target, a permutation that is not available in this release (the plan is printed first, then `not available in this release`), a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
+
+#### Playbook access check[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#playbook-access-check)
+
+By default the generated app requires `waynestate/playbook` (WSU's private shared-values package on git.wayne.edu): the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access.
+
+Before writing anything, `sourdough new` checks that this machine can read the package (a Composer credential, then a direct git probe):
+
+| Situation | Behavior |
+| --- | --- |
+| no read access | refuses with exit `1` and prints the how-to |
+| git.wayne.edu unreachable | still generates the app, but warns that `composer install` will need the connection |
+| non-interactive run or CI environment | skips the check |
+| `--dry-run` | runs the check but never refuses; the JSON plan carries a `playbook` key with the mode, the access status and the probe that answered |
+
+After generation the Next steps point at `composer playbook`. `--playbook` is kept for compatibility and changes nothing; `--no-playbook` skips all of it. The two flags together are refused with exit `1`.
+
+#### ADVISOR wiring[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#advisor-wiring)
+
+Generated apps ship with ADVISOR wired in by default: `waynestate/advisor` lands in `require-dev`, `.mcp.json` is git-ignored (a client config starts a program for whoever opens the project), and the README gains an "ADVISOR" section. The Next steps print the install line once dependencies are in:
+
+```
+php vendor/bin/advisor install --client=claude --write
+```
+
+`--no-advisor` skips all of it.
+
+#### App name validation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#app-name-validation)
+
+The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
+
+#### Next steps printed after generation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#next-steps-printed-after-generation)
+
+| Shape | Steps |
+| --- | --- |
+| Raw PHP | `cd <dir>`, `composer install`, `composer serve` |
+| Laravel + Blade | `cd <dir>`, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve` |
+| Laravel + Blade + Vue islands | the Laravel + Blade steps plus `npm install` and `npm run build` |
+| Laravel + Inertia/Vue | the Laravel + Blade steps plus `npm install` and `npm run build` |
+
+With ADVISOR wired in, `php vendor/bin/advisor install --client=claude --write` is printed after `composer install`. With Playbook required, the output ends with: `WSU values: Playbook installs with composer install. Check it any time with: composer playbook`.
+
+### sourdough manifest[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-manifest)
+
+Check a generated app against its Sourdough manifest.
+
+```
+sourdough manifest [dir] [--check]
+```
+
+| Argument or option | Meaning |
+| --- | --- |
+| `dir` | the app directory to check (default: the current directory) |
+| `--check` | list managed files that changed or are missing; exit 1 when anything changed |
+
+Without `--check` the command answers "Use `sourdough manifest --check` to check the app against its manifest." and exits `2`.
+
+Exit codes: `0` clean, `1` changed or missing, `2` tool error.
+
+| Output | Meaning |
+| --- | --- |
+| `Clean: every managed file matches the manifest.` | every managed file matches the manifest |
+| `changed <file>` | a managed file changed |
+| `missing <file>` | a managed file is missing |
+
+Seeded files are never reported: the app owns them.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#related)
+
+- [Plan format](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html)
+- [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/reference/plan-format.html
+
+## Plan format[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#plan-format)
+
+Reference for the JSON plan that `sourdough new --describe` asks a model for and `sourdough new --plan <file>` reads back. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html).
+
+### The plan object[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-plan-object)
+
+A plan is a small JSON object:
+
+```json
+{
+    "permutation": "raw",
+    "parts": ["sesame", "helmet"],
+    "name": "my-app",
+    "models": [
+        {
+            "name": "Post",
+            "fields": [
+                { "name": "title", "type": "string" },
+                { "name": "body", "type": "text" }
+            ]
+        }
+    ],
+    "pages": ["/", "/posts"]
+}
+```
+
+`permutation`, `parts`, and `name` are required; `models` and `pages` are optional.
+
+| Key | Required | Values |
+| --- | --- | --- |
+| `permutation` | yes | one of the five permutation values below |
+| `parts` | yes | a subset of `sesame`, `helmet`, `proctor`, and `preflight` |
+| `name` | yes | the app name |
+| `models` | no | a list of model objects |
+| `pages` | no | a list of page paths, such as `/` and `/posts` |
+
+When a plan is printed as JSON, empty `models` and `pages` are omitted.
+
+#### Permutation values[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#permutation-values)
+
+| Value | Flags | Name |
+| --- | --- | --- |
+| `raw` | (none) or `--raw` | Raw PHP with WayneUI's standalone path |
+| `raw-vue` | `--raw --vue` | Raw PHP + Vue SPA over JSON |
+| `laravel-blade` | `--laravel` | Laravel + Blade |
+| `laravel-blade-vue` | `--laravel --vue` | Laravel + Blade + Vue islands |
+| `laravel-inertia` | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
+
+Flag resolution, from `src/Permutation.php`:
+
+- `--inertia` implies `--laravel`: Inertia here means Laravel.
+- `--raw` and `--laravel` are mutually exclusive: pick one base.
+- `--vue` is not needed with `--inertia`: Inertia already means Vue.
+- Combinations that make no sense are refused with an error that names the five shapes and their flags.
+
+In 0.1 the `raw`, `laravel-blade`, `laravel-blade-vue` and `laravel-inertia` permutations generate; the generation step for the others says "not available in this release".
+
+#### Parts[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#parts)
+
+From `src/Part.php`, the stack parts a Sourdough app is wired with:
+
+| Value | Part |
+| --- | --- |
+| `sesame` | SESAME (auth) |
+| `helmet` | HELMET (baseline runtime) |
+| `proctor` | PROCTOR (checks) |
+| `preflight` | the Preflight CI components |
+
+A plan's `parts` is a subset of these.
+
+#### Models[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#models)
+
+Each model object has a `name` and a `fields` list; each field has a `name` and a `type`, both strings, as in the example above.
+
+#### Pages[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#pages)
+
+A list of strings, such as `["/", "/posts"]`.
+
+### Getting a plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#getting-a-plan)
+
+Instead of choosing flags, describe what the app does and let a model plan it:
+
+```
+sourdough new --describe "A blog with posts and comments"
+```
+
+Sourdough asks an OpenAI-compatible model for a plan, validates it against `resources/plan.schema.json`, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to `--plan=<file>` (exit `1`). You write the plan yourself and pass it in.
+
+To see the plan as JSON without writing anything:
+
+```
+sourdough new --describe "A blog with posts and comments" --plan-only
+```
+
+Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with `--plan`:
+
+```
+sourdough new my-app --plan plan.json
+```
+
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+
+#### Model configuration[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#model-configuration)
+
+`--describe` needs three environment variables (no defaults, no key in code):
+
+| Variable | Meaning |
+| --- | --- |
+| `SOURDOUGH_LLM_BASE_URL` | the OpenAI-compatible endpoint, including the API path (usually `/v1`) |
+| `SOURDOUGH_LLM_API_KEY` | the API key |
+| `SOURDOUGH_LLM_MODEL` | the model name |
+
+Any OpenAI-compatible endpoint works: a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.
+
+Danger
+
+`SOURDOUGH_LLM_API_KEY` is a secret. It has no default, and there is no key in code: set it in the environment for the run.
+
+### The steps plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-steps-plan)
+
+The app plan is the what: permutation, parts, name, models, pages. The steps plan in `src/Plan.php` is the how, that is, what `sourdough new` will do, and `--dry-run` prints it. It carries the permutation, the target dir, and a list of steps:
+
+| Condition | Step |
+| --- | --- |
+| raw permutation | `Copy the raw template into <dir>` |
+| raw permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
+| any other permutation | `Create the <label> app in <dir>`, with ` (not available in this release)` appended when the permutation does not generate |
+| ADVISOR wired in, permutation generates | `Wire ADVISOR into the app` |
+| `--sail` | `Use Sail for the local runtime` |
+| `--docker` | `Use Docker for the local runtime` |
+
+`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP, and combining either flag with a raw permutation is refused.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#related)
+
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/reference/templates.html
+
+## Templates[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#templates)
+
+Reference for the template directories under `templates/`: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for the exact values.
+
+Five jars on the shelf, four of them full in 0.1: the fifth (`--raw --vue`) is still proofing.
+
+![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
+
+### The template directories[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-template-directories)
+
+| Directory | Shape | Status in 0.1 |
+| --- | --- | --- |
+| `raw/` | Raw PHP with WayneUI's standalone path | generates |
+| `laravel-blade/` | Laravel + Blade | generates |
+| `laravel-blade-vue/` | Laravel + Blade + Vue islands | generates |
+| `laravel-inertia/` | Laravel + Inertia/Vue | generates |
+| `squire/` | Squire's exported deploy files, not a shape | installed as-is into every app |
+
+The flags that select a shape:
+
+| Flags | Permutation |
+| --- | --- |
+| (none) or `--raw` | Raw PHP with WayneUI's standalone path |
+| `--raw --vue` | Raw PHP + Vue SPA over JSON |
+| `--laravel` | Laravel + Blade |
+| `--laravel --vue` | Laravel + Blade + Vue islands |
+| `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
+
+`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+
+Bake commands for the four shapes that generate:
+
+```bash
+sourdough new my-app --raw
+```
+
+```bash
+sourdough new my-app --laravel
+```
+
+```bash
+sourdough new my-app --laravel --vue
+```
+
+```bash
+sourdough new my-app --inertia
+```
+
+### What each template carries[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#what-each-template-carries)
+
+#### raw/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw)
+
+- Pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
+- Ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), with `waynestate/pinstripe` in require-dev and the extension-installer plugin allowed.
+- Ships `scripts` (`test`, `lint`, `fix`, `analyse`, `proctor`, `ci`) and `scripts-descriptions`, so a generated raw app can run its own gate locally with `composer ci`, which runs test, lint, analyse, proctor and audit in that order.
+- Its `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
+- Ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
+- The front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
+- Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
+- Oracle: raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
+
+#### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
+
+- A fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
+- Ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)`, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
+- The views read the signed-in user as an array (`$user['name']`), because SESAME's `Sesame::user()` returns an array, not an object.
+- Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
+
+#### laravel-blade-vue/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade-vue)
+
+- The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
+- Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
+- Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
+
+#### laravel-inertia/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
+
+- The same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.
+- Ships `AppServiceProvider` (string length 191 for Citadel's MySQL 5.6) and a `tests/TestCase.php` that writes a stub Vite manifest, so view tests boot without a build.
+- The `.gitlab-ci.yml` carries the `ziggy` job: it regenerates `resources/js/ziggy.*` and fails on any diff, so the route list that ships inside the Vite bundle always matches the routes.
+- The overlay allows `phpstan/extension-installer`; the appended SESAME and HELMET env keys ship commented out (except `SESAME_DRIVER=fake`) so package defaults hold instead of being overridden by empty values. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe`, so the fake driver has a non-empty username.
+- Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
+
+### Shared wiring in every app[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#shared-wiring-in-every-app)
+
+| Part | What lands in the app |
+| --- | --- |
+| Stack packages | HELMET `^0.3`, SESAME `^0.4`, PROCTOR `^0.4` |
+| Playbook | `waynestate/playbook` in `require`, the VCS repository, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access |
+| ADVISOR | `waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored (a client config starts a program for whoever opens the project), a README "ADVISOR" section; install with `php vendor/bin/advisor install --client=claude --write` |
+| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment), because PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA |
+| Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
+| Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
+
+Seeded files are `.env.example` and `README.md`: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record a later `sourdough feed` refreshes. See [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html).
+
+Note
+
+`--playbook` is kept for compatibility and changes nothing; `--no-playbook` skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. `--no-advisor` skips the ADVISOR wiring.
+
+### The Squire-owned copy (`templates/squire/`)[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-squire-owned-copy-templates-squire)
+
+The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
+
+| Command | What it does |
+| --- | --- |
+| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.4`) |
+| `composer squire-copy:check` | exits 1 when the committed copy has drifted; part of `composer ci` |
+
+When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
+
+```
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
+```
+
+Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line.
+
+### Rules the generator applies[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#rules-the-generator-applies)
+
+From the best-practices notes, section 1 (Generating a project):
+
+| Rule | What it requires | Stack today |
+| --- | --- | --- |
+| Make the permutation an explicit, validated input | take the permutation from flags (`--raw`, `--vue`, `--laravel`, `--inertia`) and refuse combinations that make no sense, such as `--inertia` without `--laravel` | Documented; step 1 plans tests for every row and for the invalid combinations |
+| Offer `--dry-run`, and make it write nothing | print the plan (files, packages, commands) and change nothing on disk | Documented; step 1 plans a test that `--dry-run` writes nothing |
+| Refuse a non-empty target | refuse to generate into a directory that already has files; if overwriting is ever allowed, require a `--force` flag and prompt only when the session is interactive | Documented; there is no `--force` design yet |
+| Use exit codes that scripts can rely on | 0 on success and distinct non-zero codes for the main failure modes, documented; PROCTOR uses 0 pass, 1 fail, 2 tool error | Not yet; pick one meaning for 2 across the stack before Sourdough ships |
+| Keep output friendly to people and to machines | results to stdout and logs, warnings and errors to stderr, `--json` for the plan, color off when output is not a terminal, when `NO_COLOR` is set, or with `--no-color`, prompt only when stdin is a terminal, and `--no-input` so CI and agents never hang | Not yet |
+| Test the generator on every permutation, in temp directories | generate each permutation into a temp directory and compare the result with a stored snapshot; test commands through a tester class rather than a real terminal | Documented; Laravel paths need the network, so their tests run in a pipeline job instead of the unit suite |
+| Treat names, paths and templates as untrusted input | check `<dir>` and any app or vendor name against an allow-list before the value reaches a file name, a `composer.json` or a command line; refuse any write whose resolved path falls outside the target directory; keep templates as data: placeholder substitution only, with no code in a template running during generation | Enforced for names: `RawGenerator::assertValidName()` checks every name (letter or number first; then letters, numbers, spaces, dots, dashes and underscores; at most 63 characters) before generation touches the disk, and the test suite generates with hostile names (quotes, backslash, newline, NUL byte, `{{app_slug}}`, path traversal, 64 characters, empty, dashes only, leading dash or dot, a Unicode look-alike), asserting the exception and an absent or empty target dir. Paths stay inside the target by construction: the slug is `[a-z0-9-]` only and every write path is built under the target dir |
+| Make the "new app" page and the CLI one engine | the page calls the same plan code as `sourdough new --dry-run --json`, shows the equivalent command, validates on the server with the rules above, and returns the same archive the CLI would write; a snapshot test compares the two | Documented for the page itself; Not yet for the shared-engine rule |
+
+Note
+
+The untrusted-input rule exists because scaffolders have turned template content into code execution before: Backstage's scaffolder let anyone who could edit a registered template run code on the host (CVE-2023-35926, fixed in 1.15.0), and Copier refuses templates that use tasks, migrations or Jinja extensions unless the caller passes `--trust`.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#related)
+
+- [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Plan format](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html)
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+- [Troubleshooting](https://sourdough.apps.wayne.edu/docs/troubleshooting.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/troubleshooting.html
+
+## Troubleshooting[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#troubleshooting)
+
+What to do when a bake is refused or a check fails. Each symptom below names the cause, the fix, and a command that checks the result. Start with the exit code: `0` done, `1` refused, `2` tool error. A starter that refuses loudly is easier to feed than one that fails quietly.
+
+### Exit code 1: the bake was refused[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#exit-code-1-the-bake-was-refused)
+
+#### `--raw --vue` prints the plan, then exits 1[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#raw-vue-prints-the-plan-then-exits-1)
+
+Cause: Raw PHP + Vue SPA over JSON is the one permutation that does not generate in 0.1. Sourdough prints the plan first, then `not available in this release`; a later step adds it.
+
+Fix: pick one of the four shapes that bake in 0.1 (`--raw`, `--laravel`, `--laravel --vue`, `--inertia`), or keep the printed plan for the release that ships the fifth loaf.
+
+Check:
+
+```bash
+sourdough new my-app --raw --dry-run
+```
+
+Exits 0 and writes nothing.
+
+#### `sourdough new` refuses before writing anything: no read access to Playbook[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook)
+
+Cause: by default the generated app requires `waynestate/playbook`, WSU's private shared-values package on git.wayne.edu. Before writing anything, `sourdough new` checks that this machine can read the package (a Composer credential, then a direct git probe); without read access it refuses with exit `1` and prints the how-to.
+
+Fix: follow the printed how-to to get read access, then rerun the same command.
+
+Check:
+
+```bash
+sourdough new my-app --dry-run --json
+```
+
+`--dry-run` runs the check but never refuses, and its JSON plan carries a `playbook` key with the mode, the access status and the probe that answered. Once the app exists, `composer playbook` (the script `@composer show waynestate/playbook --no-interaction`) shows whether Playbook is installed.
+
+Warning
+
+`--no-playbook` skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook.
+
+#### git.wayne.edu is unreachable during the access check[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#git-wayne-edu-is-unreachable-during-the-access-check)
+
+Cause: the Playbook access check cannot reach git.wayne.edu. Sourdough still generates the app, but warns that `composer install` will need the connection.
+
+Fix: restore the connection to git.wayne.edu, then install the app's dependencies.
+
+Check:
+
+```bash
+composer install
+```
+
+Run it in the generated app; it completes without the Playbook fetch failing.
+
+#### `--playbook` and `--no-playbook` together[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#playbook-and-no-playbook-together)
+
+Cause: the two flags are mutually exclusive and are refused with exit `1`. `--playbook` is kept for compatibility and changes nothing, because Playbook is now the default.
+
+Fix: drop one of the flags.
+
+Check:
+
+```bash
+sourdough new my-app --dry-run
+```
+
+Exits 0 and prints the plan.
+
+#### An invalid flag, a non-empty target, or a bad app name[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#an-invalid-flag-a-non-empty-target-or-a-bad-app-name)
+
+Cause: exit `1` also covers invalid flags, a non-empty target (Sourdough refuses to generate into a directory that already has files), and an app name that fails validation. The name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
+
+Fix: correct the flags, point `dir` at an empty directory, and rename the app to something the allow-list accepts.
+
+Check:
+
+```bash
+sourdough new my-app --dry-run
+```
+
+Prints the plan and writes nothing.
+
+#### The model gave up (`--describe`)[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#the-model-gave-up-describe)
+
+Cause: if the answer from the model is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to `--plan=<file>` (exit `1`).
+
+Fix: write the plan yourself and pass it in:
+
+```bash
+sourdough new my-app --plan plan.json
+```
+
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+
+Check: the same command exits 0 when the plan is valid.
+
+### Exit code 2: a tool error[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#exit-code-2-a-tool-error)
+
+#### `sourdough manifest` without `--check` [#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-manifest-without-check)
+
+Cause: without `--check` the command answers "Use `sourdough manifest --check` to check the app against its manifest." and exits `2`. A missing manifest in the directory is also a tool error (exit `2`).
+
+Fix: run the command with `--check`, inside the generated app (or pass the app directory as an argument).
+
+Check:
+
+```bash
+sourdough manifest --check
+```
+
+Exits 0 and prints `Clean: every managed file matches the manifest.`
+
+#### `--json` without `--dry-run` [#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#json-without-dry-run)
+
+Cause: `--json` is only available with `--dry-run`; without it the command exits `2`.
+
+Fix: add `--dry-run`.
+
+Check:
+
+```bash
+sourdough new my-app --dry-run --json
+```
+
+Prints the plan as JSON.
+
+#### The model could not be reached (`--describe`)[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#the-model-could-not-be-reached-describe)
+
+Cause: `--describe` needs the `SOURDOUGH_LLM_BASE_URL`, `SOURDOUGH_LLM_API_KEY` and `SOURDOUGH_LLM_MODEL` environment variables (no defaults, no key in code) and a reachable OpenAI-compatible endpoint. When the endpoint cannot be reached, the command prints `The model could not be reached:` plus the underlying error and exits `2`.
+
+Fix: set the three variables and point them at a working endpoint (a hosted API, a local server, or WarriorGPT), then rerun. Any OpenAI-compatible endpoint works; Sourdough only needs the base URL, key, and model.
+
+Check:
+
+```bash
+sourdough new --describe "A blog with posts and comments" --plan-only
+```
+
+Prints the plan as JSON without writing anything.
+
+### Drift: the manifest and the Squire copy[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#drift-the-manifest-and-the-squire-copy)
+
+#### `sourdough manifest --check` exits 1 in a generated app[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-manifest-check-exits-1-in-a-generated-app)
+
+Cause: a managed file changed or is missing. The output lists one line per file, `changed <file>` or `missing <file>`. Seeded files (`.env.example` and `README.md`) are never reported: they're yours.
+
+Fix: managed files belong to Sourdough, so do not edit them by hand. Until `feed` ships, apps generated earlier pick up template changes by hand; restore the drifted file from your version control, or regenerate the app.
+
+Check:
+
+```bash
+sourdough manifest --check
+```
+
+Exits 0 when every managed file matches the manifest.
+
+Tip
+
+Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it. It's the record that keeps `feed` honest.
+
+#### There is no `sourdough update` yet[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#there-is-no-sourdough-update-yet)
+
+Cause: the update story (`.sourdough.json`, `sourdough check`, a merging `sourdough update`, tagged template releases) is still a gap for the backlog, so there is no command that brings an app forward to a newer template. Until `feed` ships, `sourdough manifest --check` is the gate.
+
+Fix: run the check to see what drifted, and bring template changes into the app by hand.
+
+Check:
+
+```bash
+sourdough manifest --check
+```
+
+Lists the managed files that have drifted from the manifest.
+
+#### `composer squire-copy:check` exits 1 (maintainers of Sourdough)[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#composer-squire-copy-check-exits-1-maintainers-of-sourdough)
+
+Cause: the committed copy at `templates/squire/` has drifted from a fresh export from the installed `waynestate/squire` package. The check is part of `composer ci`.
+
+Fix: rewrite the copy from the installed package, then commit `templates/squire/`:
+
+```bash
+composer squire-copy:sync
+```
+
+Check:
+
+```bash
+composer squire-copy:check
+```
+
+Exits 0 when the committed copy matches.
+
+#### PROCTOR's `preflight-pinned` check warns on a bare tag[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#proctor-s-preflight-pinned-check-warns-on-a-bare-tag)
+
+Cause: PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA and warns on a bare tag. New apps pin the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment).
+
+Fix: pin the Preflight component includes to the release SHA, not the tag. Moving a pin is a deliberate commit.
+
+Check:
+
+```bash
+composer ci
+```
+
+Run it in the generated app; the PROCTOR check passes.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#related)
+
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html)
+- [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
+- [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
+- [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/upgrading.html
+
+## Upgrading[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrading)
+
+How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: the `.sourdough/manifest.json` in each app is the record a later `sourdough feed` will use, and until `feed` ships, apps pick up template changes by hand. See [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html).
+
+### Upgrade the CLI[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrade-the-cli)
+
+```bash
+composer global require waynestate/sourdough
+```
+
+```bash
+composer create-project waynestate/sourdough
+```
+
+Verify with:
+
+```bash
+sourdough --version
+```
+
+Expected for the current release:
+
+```
+Sourdough 0.1.5
+```
+
+Then read the section for the version you are moving to.
+
+### 0.1.5 (2026-11-03)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-5-2026-11-03)
+
+**Breaking:** none. Three more loaves join the bench: `sourdough new --laravel` (Laravel + Blade), `sourdough new --inertia` (Laravel + Inertia/Vue) and `sourdough new --laravel --vue` (Laravel + Blade + Vue islands) now bake, so four of the five shapes generate. New bakes also carry ADVISOR by default (`waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored, a README "ADVISOR" section); pass `--no-advisor` to skip it. The raw template pins WayneUI 2.0.8 instead of fetching the floating `main` branch copy, and the Squire copy comes from Squire 0.4.0 (dev dependency `^0.4`).
+
+**Deprecated:** none.
+
+**Steps:** upgrade the CLI with `composer global require waynestate/sourdough`. For maintainers of this repository, run `composer install` to pick up Squire 0.4.0, then `composer squire-copy:check`. `--name` on the Laravel bakes now reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package), `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.1.5`. Bake a shape and run its Next steps, for example `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve` for the Laravel shapes.
+
+### 0.1.4 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-4-2026-10-29)
+
+**Breaking:** for maintainers of this repository, the Squire template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev dependency, `^0.2`) instead of a Squire checkout: `composer squire-copy:sync` rewrites the copy from `vendor/waynestate/squire`, and `composer squire-copy:check` (now part of `composer ci`) exits 1 when the committed copy has drifted. Generated apps require SESAME `^0.2` (Entra sign-in).
+
+**Deprecated:** none.
+
+**Steps:** run `composer install` to pick up the new dev dependency, then `composer squire-copy:check`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.1.4`; `composer ci` is green; and `sourdough new my-app --laravel --inertia --dry-run` is accepted (the flag pair was fixed in this release).
+
+### 0.1.3 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-3-2026-10-29)
+
+**Breaking:** none.
+
+**Deprecated:** none.
+
+**Steps:** upgrade the CLI. `sourdough new` now wires Playbook into generated apps: by default the app's `composer.json` gets a `suggest` for `waynestate/playbook`, `.env.example` lists the seven WSU shared setting names, the README gains a "WSU values (PLAYBOOK)" section, and the command prints a hint line pointing at it. `--playbook` adds the VCS repository and requires `waynestate/playbook` `^0.1`; `--no-playbook` skips all of it; the two flags together are refused with exit 1.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.1.3`; bake with `sourdough new my-app --raw --dry-run` and inspect the plan for the Playbook entries.
+
+### 0.1.2 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-2-2026-10-29)
+
+**Breaking:** none declared. Two behaviors tighten for new bakes: the raw template now requires HELMET `^0.2` and PROCTOR `^0.2` (SESAME stays at `^0.1` until it cuts 0.2), and app names that fail validation are refused with exit 1 and write nothing.
+
+**Deprecated:** none.
+
+**Steps:** upgrade the CLI. If a script passed an unusual name before, rename it: the name must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.1.2`; `sourdough new my-app --raw --dry-run` prints the plan, and a hostile name (for example one with a slash or over 63 characters) is refused with exit 1 and writes nothing.
+
+### 0.1.1 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-1-2026-10-29)
+
+**Breaking:** none.
+
+**Deprecated:** none.
+
+**Steps:** run `composer install` to pick up the new dev dependency `waynestate/pinstripe` `^0.1`. PHPStan and Pint now take their settings from Pinstripe instead of a hand copy: `phpstan.neon` includes the raw preset, and `pint.json` extends the per preset. Same cut, off the rack.
+
+**How to verify:** `composer lint` (Pint) and `composer analyse` (PHPStan) pass, and `composer ci` is green.
+
+### 0.1.0 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-0-2026-10-29)
+
+**Breaking:** the raw template's own `deployments/release.sh` and `deployments/release.ps1` were removed; the release steps now come from SQUIRE. The raw app installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
+
+**Deprecated:** none.
+
+**Steps:** run `composer install`. For maintainers of this repository, mount a Squire checkout (or set `SQUIRE_PATH`, default `/squire`) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The SQUIRE template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch).
+
+**How to verify:** `composer squire-copy:check` exits 0 when the copy matches a fresh export from the SQUIRE checkout.
+
+Tip
+
+Commit `.sourdough/manifest.json` in every app you bake. It is the record that keeps `feed` honest, and the thing a future `sourdough update` will merge against.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#related)
+
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html)
+- [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
+- [Troubleshooting](https://sourdough.apps.wayne.edu/docs/troubleshooting.html)
+- [Changelog](https://sourdough.apps.wayne.edu/docs/changelog.html)

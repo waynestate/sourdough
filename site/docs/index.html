@@ -21,154 +21,38 @@
 <div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
     <summary>Menu</summary>
-    <nav class="docs-nav" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../docs/index.html" aria-current="page">Overview</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
+    <nav class="docs-nav" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../docs/index.html" aria-current="page">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li><a href="../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../docs/guides/manifest.html">The manifest</a></li><li><a href="../docs/guides/testing.html">Testing</a></li><li><a href="../docs/guides/ci.html">CI</a></li><li><a href="../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/plan-format.html">Plan format</a></li><li><a href="../docs/reference/templates.html">Templates</a></li></ul></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../docs/upgrading.html">Upgrading</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
   </details>
-  <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../docs/index.html" aria-current="page">Overview</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
+  <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../docs/index.html" aria-current="page">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li><a href="../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../docs/guides/manifest.html">The manifest</a></li><li><a href="../docs/guides/testing.html">Testing</a></li><li><a href="../docs/guides/ci.html">CI</a></li><li><a href="../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/plan-format.html">Plan format</a></li><li><a href="../docs/reference/templates.html">Templates</a></li></ul></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../docs/upgrading.html">Upgrading</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><p><a href="../index.html"><img src="readme/hero.jpg" alt="Sourdough: dough in a jar, risen past its gold band" /></a></p>
 <h1 id="sourdough">Sourdough<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough">#</a></h1>
 <p><img src="readme/badges/php.svg" alt="php" /> <img src="readme/badges/license.svg" alt="license" /> <img src="readme/badges/exit-codes.svg" alt="exit codes" /> <a rel="noopener" href="https://github.com/waynestate/sourdough/actions/workflows/ci.yml"><img src="https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg" alt="GitHub CI" /></a></p>
 <p><strong>Feed it and it grows.</strong></p>
-<p>A starter you feed: <code>sourdough new</code> makes a Wayne State app with the stack already wired in.</p>
-<p>Checks: <code>composer ci</code> (the same command runs on GitLab and GitHub).</p>
-<p>Every loaf gets proofed before it ships.</p>
-<p>Front page: <a href="../index.html"><code>site/index.html</code></a>, a static page you can open in a browser or serve from <code>site/</code>.</p>
-<p>On Citadel it is served by the raw-PHP deploy layer in <code>deploy/</code>: a Squire kit whose front controller serves <code>site/</code> behind HELMET's security headers. For local development, keep serving <code>site/</code> directly.</p>
-<h2 id="where-the-code-lives">Where the code lives<a class="docs-heading-link" aria-label="Link to this section" href="#where-the-code-lives">#</a></h2>
-<p>The canonical repository is on nougat: <a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">enterprise-apps/sourdough</a>. git.wayne.edu and GitHub (<a rel="noopener" href="https://github.com/waynestate/sourdough">waynestate/sourdough</a>) are read-only mirrors of it.
-Open issues and merge requests on nougat, not on the mirrors.
-This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.</p>
-<p>Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.</p>
+<p>A starter you feed: <code>sourdough new</code> makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.</p>
+<p>Every loaf gets proofed before it ships. Checks: <code>composer ci</code> (the same command runs on GitLab and GitHub).</p>
 <p><img src="readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
 <p><sub>The proofing log from the front page: what goes into the tub when you run <code>sourdough new</code>, and the day-to-day check that keeps it alive.</sub></p>
 <h2 id="install">Install<a class="docs-heading-link" aria-label="Link to this section" href="#install">#</a></h2>
 <pre><code>composer global require waynestate/sourdough
 </code></pre>
-<p>After <code>composer global require</code>, the <code>sourdough</code> command lives in <code>composer global config bin-dir --absolute</code>; put that directory on your PATH.</p>
-<p>Or scaffold without installing, with <code>composer create-project waynestate/sourdough</code>.</p>
-<h2 id="usage">Usage<a class="docs-heading-link" aria-label="Link to this section" href="#usage">#</a></h2>
-<pre><code>sourdough new [dir] [options]
+<p>After <code>composer global require</code>, the <code>sourdough</code> command lives in <code>composer global config bin-dir --absolute</code>; put that directory on your PATH. Or scaffold without installing, with <code>composer create-project waynestate/sourdough</code>. The full instructions are on <a href="install.html">Install</a>.</p>
+<h2 id="first-run">First run<a class="docs-heading-link" aria-label="Link to this section" href="#first-run">#</a></h2>
+<pre><code>sourdough new my-app
 </code></pre>
-<p><code>dir</code> is the directory to create the app in. It is required unless you use <code>--describe</code>.</p>
-<p>Options:</p>
+<p>Expected: exit code <code>0</code> (done), a <code>my-app</code> directory holding a Wayne State app with the stack wired in, and Next steps printed for it. Then run the app's own gate from inside <code>my-app/</code>:</p>
+<pre><code>composer ci
+</code></pre>
+<p>The step-by-step version is the <a href="guides/quick-start.html">Quick start</a>.</p>
+<h2 id="pick-your-path">Pick your path<a class="docs-heading-link" aria-label="Link to this section" href="#pick-your-path">#</a></h2>
 <ul>
-<li><code>--raw</code> use the raw PHP base</li>
-<li><code>--laravel</code> use the Laravel base</li>
-<li><code>--vue</code> add a Vue front end</li>
-<li><code>--inertia</code> use Inertia/Vue (implies <code>--laravel</code>)</li>
-<li><code>--sail</code> use Laravel Sail for the local runtime (Laravel paths)</li>
-<li><code>--docker</code> use a Docker image for the local runtime (Laravel paths)</li>
-<li><code>--dry-run</code> print the plan and write nothing</li>
-<li><code>--name</code> app name (default: the basename of <code>&lt;dir&gt;</code>)</li>
-<li><code>--no-input</code> never prompt (Sourdough 0.1 has no prompts)</li>
-<li><code>--json</code> with <code>--dry-run</code>, print the plan as JSON</li>
-<li><code>--describe &quot;&lt;sentence&gt;&quot;</code> describe what the app does; a model plans it (needs the <code>SOURDOUGH_LLM_*</code> env vars)</li>
-<li><code>--plan-only</code> with <code>--describe</code>, print the plan as JSON and write nothing</li>
-<li><code>--plan &lt;file&gt;</code> a ready-made plan file (JSON matching <code>resources/plan.schema.json</code>)</li>
-<li><code>--playbook</code> kept for compatibility: Playbook is now the default</li>
-<li><code>--no-playbook</code> skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook)</li>
-<li><code>--no-advisor</code> skip the ADVISOR wiring (no <code>require-dev</code> entry, no <code>.mcp.json</code> git-ignore, no README section)</li>
+<li><a href="guides/quick-start.html">Quick start</a>: bake your first app and run its checks.</li>
+<li><a href="install.html">Install</a>: what the machine needs, and the two ways to get Sourdough.</li>
+<li><a href="reference/commands.html">Reference</a>: every command and option, the plan format, the templates.</li>
 </ul>
-<p>Exit codes: <code>0</code> done, <code>1</code> refused (invalid flags, non-empty target, not available, model gave up), <code>2</code> tool error.</p>
-<p>By default the generated app requires <code>waynestate/playbook</code> (WSU's private shared-values package on git.wayne.edu): the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends your token to git.wayne.edu, the seven setting names in <code>.env.example</code>, a <code>composer playbook</code> script that shows whether Playbook is installed, and a &quot;WSU values (PLAYBOOK)&quot; README section that explains how to get read access. Before writing anything, <code>sourdough new</code> checks that this machine can read the package (a Composer credential, then a direct git probe); without read access it refuses with exit <code>1</code> and prints the how-to, and if it cannot reach git.wayne.edu it still generates the app but warns that <code>composer install</code> will need the connection. Non-interactive runs and CI environments skip the check. <code>--dry-run</code> runs the check but never refuses, and its JSON plan carries a <code>playbook</code> key with the mode, the access status and the probe that answered. After generation the Next steps point at <code>composer playbook</code>. <code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips all of it. The two flags together are refused with exit <code>1</code>.</p>
-<p>Generated apps ship with ADVISOR wired in by default: <code>waynestate/advisor</code> lands in <code>require-dev</code>, <code>.mcp.json</code> is git-ignored (a client config starts a program for whoever opens the project), and the README gains an &quot;ADVISOR&quot; section. The Next steps print the install line once dependencies are in:</p>
-<pre><code>php vendor/bin/advisor install --client=claude --write
-</code></pre>
-<p><code>--no-advisor</code> skips all of it.</p>
-<p>The app name (from <code>--name</code>, from the plan, or from the basename of <code>&lt;dir&gt;</code>) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.</p>
-<h2 id="permutations">Permutations<a class="docs-heading-link" aria-label="Link to this section" href="#permutations">#</a></h2>
-<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
-<thead>
-<tr>
-<th>Flags</th>
-<th>Permutation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>(none) or <code>--raw</code></td>
-<td>Raw PHP with WayneUI's standalone path</td>
-</tr>
-<tr>
-<td><code>--raw --vue</code></td>
-<td>Raw PHP + Vue SPA over JSON</td>
-</tr>
-<tr>
-<td><code>--laravel</code></td>
-<td>Laravel + Blade</td>
-</tr>
-<tr>
-<td><code>--laravel --vue</code></td>
-<td>Laravel + Blade + Vue islands</td>
-</tr>
-<tr>
-<td><code>--laravel --inertia</code> (or <code>--inertia</code>)</td>
-<td>Laravel + Inertia/Vue</td>
-</tr>
-</tbody>
-</table></div>
-<p><code>--raw</code>, <code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code> generate in 0.1. The last permutation, <code>--raw --vue</code>, prints the plan and exits <code>1</code> with &quot;not available in this release&quot;; a later step adds it.</p>
-<p>Oracle is wired but dormant in every generated app. The settings <code>ORACLE_USERNAME</code>, <code>ORACLE_PASSWORD</code>, and either <code>ORACLE_TNS</code> or <code>ORACLE_HOST</code>, <code>ORACLE_PORT</code>, <code>ORACLE_SERVICE_NAME</code> ship commented out in <code>.env.example</code>; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with <code>php artisan oracle:check</code>, and raw PHP apps run queries through the <code>App\Oracle</code> helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: <code>oracle-check.php</code> at the app root, where Squire's Laravel layout ships it, first, then <code>deploy/oracle-check.php</code>.</p>
-<h2 id="describe-a-plan">Describe a plan<a class="docs-heading-link" aria-label="Link to this section" href="#describe-a-plan">#</a></h2>
-<p>Instead of choosing flags, describe what the app does and let a model plan it:</p>
-<pre><code>sourdough new --describe &quot;A blog with posts and comments&quot;
-</code></pre>
-<p>Sourdough asks an OpenAI-compatible model for a plan, validates it against <code>resources/plan.schema.json</code>, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>). You write the plan yourself and pass it in.</p>
-<p>To see the plan as JSON without writing anything:</p>
-<pre><code>sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
-</code></pre>
-<p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
-<pre><code>sourdough new my-app --plan plan.json
-</code></pre>
-<p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.</p>
-<h3 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h3>
-<p><code>--describe</code> needs three environment variables (no defaults, no key in code):</p>
-<ul>
-<li><code>SOURDOUGH_LLM_BASE_URL</code> the OpenAI-compatible endpoint, including the API path (usually <code>/v1</code>)</li>
-<li><code>SOURDOUGH_LLM_API_KEY</code> the API key</li>
-<li><code>SOURDOUGH_LLM_MODEL</code> the model name</li>
-</ul>
-<p>Any OpenAI-compatible endpoint works: a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.</p>
-<p>A plan is a small JSON object:</p>
-<pre><code class="language-json">{
-    &quot;permutation&quot;: &quot;raw&quot;,
-    &quot;parts&quot;: [&quot;sesame&quot;, &quot;helmet&quot;],
-    &quot;name&quot;: &quot;my-app&quot;,
-    &quot;models&quot;: [
-        {
-            &quot;name&quot;: &quot;Post&quot;,
-            &quot;fields&quot;: [
-                { &quot;name&quot;: &quot;title&quot;, &quot;type&quot;: &quot;string&quot; },
-                { &quot;name&quot;: &quot;body&quot;, &quot;type&quot;: &quot;text&quot; }
-            ]
-        }
-    ],
-    &quot;pages&quot;: [&quot;/&quot;, &quot;/posts&quot;]
-}
-</code></pre>
-<p><code>permutation</code>, <code>parts</code>, and <code>name</code> are required; <code>models</code> and <code>pages</code> are optional. <code>parts</code> is a subset of <code>sesame</code>, <code>helmet</code>, <code>proctor</code>, and <code>preflight</code>.</p>
-<h2 id="the-manifest">The manifest<a class="docs-heading-link" aria-label="Link to this section" href="#the-manifest">#</a></h2>
-<p>Every app Sourdough generates carries a <code>.sourdough/manifest.json</code> recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> (Sourdough owns it and will update it) or <code>seeded</code> (Sourdough wrote it once and you own it now: <code>.env.example</code> and <code>README.md</code>).</p>
-<p>The manifest is the starter's memory: it remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own. A later <code>sourdough feed</code> reads it to bring template updates into your app without clobbering what you've changed.</p>
-<p>Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate. Run it in your app to list the managed files that have drifted from the manifest:</p>
-<pre><code>sourdough manifest --check
-</code></pre>
-<p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours.</p>
-<p>Commit the manifest. It's the record that keeps <code>feed</code> honest.</p>
-<p>The deploy files in your app (<code>build.sh</code>, <code>scripts/release.sh</code>, the <code>.squire/</code> config, and their friends) come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run <code>composer squire-copy:sync</code>, which rewrites the copy from the installed <code>waynestate/squire</code> package, then verify it with <code>composer squire-copy:check</code> (part of <code>composer ci</code>).</p>
-<h2 id="testing">Testing<a class="docs-heading-link" aria-label="Link to this section" href="#testing">#</a></h2>
-<p>Maintainers: how to build, test and release this project, and where its data comes from, is in <a href="maintaining.html">Maintaining</a>.</p>
-<p>From the repo root:</p>
-<pre><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer install --no-interaction
-docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.3-cli vendor/bin/phpunit
-docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli vendor/bin/phpunit
-docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer validate --strict
-docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
-</code></pre>
-<p>The smoke gate bakes a shape for real and runs the generated app's own checks; see the <a href="maintaining.html#smoke-gate">Smoke gate</a> section of Maintaining for the full recipe. On Windows, <code>.\scripts\smoke-shape.ps1 &lt;shape&gt;</code> runs it in one line.</p>
-<h2 id="ci">CI<a class="docs-heading-link" aria-label="Link to this section" href="#ci">#</a></h2>
-<p>Strongly recommended: a git.wayne.edu instance runner.</p>
+<h2 id="status">Status<a class="docs-heading-link" aria-label="Link to this section" href="#status">#</a></h2>
+<p>Version 0.1.5 (2026-11-03), MIT license. Agents: this site ships <a rel="noopener" href="https://sourdough.apps.wayne.edu/llms.txt">llms.txt</a> for LLM readers.</p>
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>
 <img src="readme/gallery.jpg" alt="Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard">
@@ -195,9 +79,9 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough
 <p><sub>Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend.</sub></p>
 </article>
     </main>
-    <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link docs-pager__link--next" href="../docs/agent-ready.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Agent ready</span></a></nav>
+    <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link docs-pager__link--next" href="../docs/install.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Install</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#where-the-code-lives">Where the code lives</a></li><li class="docs-toc__item"><a href="#install">Install</a></li><li class="docs-toc__item"><a href="#usage">Usage</a></li><li class="docs-toc__item"><a href="#permutations">Permutations</a></li><li class="docs-toc__item"><a href="#describe-a-plan">Describe a plan</a></li><li class="docs-toc__item--sub"><a href="#model-configuration">Model configuration</a></li><li class="docs-toc__item"><a href="#the-manifest">The manifest</a></li><li class="docs-toc__item"><a href="#testing">Testing</a></li><li class="docs-toc__item"><a href="#ci">CI</a></li><li class="docs-toc__item"><a href="#same-kitchen-many-ovens">Same kitchen, many ovens</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#install">Install</a></li><li class="docs-toc__item"><a href="#first-run">First run</a></li><li class="docs-toc__item"><a href="#pick-your-path">Pick your path</a></li><li class="docs-toc__item"><a href="#status">Status</a></li><li class="docs-toc__item"><a href="#same-kitchen-many-ovens">Same kitchen, many ovens</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.5</span></span>
