@@ -38,6 +38,9 @@ final class RuntimeFlagsTest extends TestCase
         yield 'inertia + sail' => [['--inertia', '--sail'], 'Use Sail for the local runtime'];
     }
 
+    /**
+     * @param list<string> $flags
+     */
     #[DataProvider('runtimeFlagCombos')]
     public function testRuntimeFlagsRefuseAfterPrintingThePlan(array $flags, string $planStep): void
     {

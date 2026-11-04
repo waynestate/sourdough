@@ -305,12 +305,6 @@ final class NewCommand extends Command
         $this->printPlan($output, $plan);
 
         $answers = $flags;
-        if ($sail) {
-            $answers['sail'] = true;
-        }
-        if ($docker) {
-            $answers['docker'] = true;
-        }
         if (PlaybookMode::Require === $playbook) {
             $answers['playbook'] = true;
         }
