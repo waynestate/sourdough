@@ -298,7 +298,8 @@
               <p class="crumb__title">The crumb</p>
               <ul class="crumb__list">
                 <li><code>public/index.php</code> HELMET boots first, then SESAME signs you in</li>
-                <li><code>composer.json</code> helmet and sesame, with proctor for dev</li>
+                <li><code>composer.json</code> helmet and sesame, with pinstripe and proctor for dev</li>
+                <li><code>pint.json</code> and <code>phpstan.neon</code> Pinstripe's standard: Pint on the per preset, PHPStan at level 8</li>
                 <li><code>.gitlab-ci.yml</code> Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
                 <li><code>build.sh</code> and <code>scripts/release.sh</code> Squire's Citadel deploy files</li>
                 <li><code>.env.example</code> and <code>README.md</code> seeded: yours from day one</li>
@@ -616,7 +617,7 @@ php -S localhost:8000 -t public</pre>
               <p class="ar-prompt__desc">Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.

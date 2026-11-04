@@ -1,0 +1,16 @@
+# Pinstripe owns the level and the ignore hygiene: level 8, and every
+# ignore needs a comment. It ships in require-dev, so the include below
+# resolves for every app this template bakes. Point at
+# vendor/waynestate/pinstripe/phpstan/strict.neon instead to take the
+# strict cut.
+includes:
+    - vendor/waynestate/pinstripe/phpstan/raw.neon
+
+parameters:
+    paths:
+        - src
+        - public
+    # The run-time WayneUI functions come from the fetched public/wayne-ui.php,
+    # which is not part of the template; PHPStan learns them from the stub.
+    scanFiles:
+        - stubs/wayne-ui.php

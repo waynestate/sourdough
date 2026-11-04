@@ -487,7 +487,7 @@ final class NewCommandTest extends TestCase
         ], $composer['repositories']);
         // Composer must be told git.wayne.edu is a GitLab host or the token
         // is never sent to it.
-        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+        self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
         // The default wiring stays in place under --playbook.
         self::assertSame("WSU's shared values; private, git.wayne.edu", $composer['suggest']['waynestate/playbook']);
 
@@ -580,7 +580,7 @@ final class NewCommandTest extends TestCase
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
-        self::assertSame(['gitlab-domains' => ['git.wayne.edu']], $composer['config']);
+        self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
     }
 
     public function testPlaybookOfflineWarnsAndGenerates(): void

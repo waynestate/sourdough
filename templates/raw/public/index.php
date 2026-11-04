@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-use function Waynestate\Helmet\helmet_boot;
 use Waynestate\Sesame\Config;
 use Waynestate\Sesame\DriverFactory;
 use Waynestate\Sesame\Identity;
 use Waynestate\Sesame\Sesame;
 use Waynestate\Sesame\Session\NativeSession;
 use Waynestate\Sesame\UserResolver;
+
+use function Waynestate\Helmet\helmet_boot;
 
 // Read the environment once, at the top. Everything below uses $appEnv.
 // .env.example sets APP_ENV=local; production sets APP_ENV=production.
@@ -135,6 +136,13 @@ $sesame = new Sesame(
 sesame($sesame);
 $user = sesame_user() ?? sesame_login();
 
+// One home page per app: any path but / is a 404, not the home page again.
+// /up is HELMET's and answers before any of this runs.
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+if ('/' !== $path) {
+    http_response_code(404);
+}
+
 // WayneUI's standalone file. Fetch the pinned 2.0.8 release copy once:
 //   curl -o public/wayne-ui.php \
 //     https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
@@ -149,9 +157,15 @@ echo wsu_shell_start([
 ]);
 ?>
 
+<?php if ('/' === $path): ?>
 <p class="wsu-prose">
     {{app_name}} is running.
 </p>
+<?php else: ?>
+<p class="wsu-prose">
+    That page does not exist. <a href="/">Back to {{app_name}}</a>.
+</p>
+<?php endif; ?>
 
 <?php
 echo wsu_shell_end();

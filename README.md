@@ -26,7 +26,7 @@ The canonical repository is on nougat: [enterprise-apps/sourdough](https://nouga
 Open issues and merge requests on nougat, not on the mirrors.
 This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
 
-Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 <div align="center">
 
@@ -60,8 +60,8 @@ Options:
 - `--laravel` use the Laravel base
 - `--vue` add a Vue front end
 - `--inertia` use Inertia/Vue (implies `--laravel`)
-- `--sail` use Laravel Sail for the local runtime (Laravel paths)
-- `--docker` use a Docker image for the local runtime (Laravel paths)
+- `--sail` use Laravel Sail for the local runtime (not available in this release; planned)
+- `--docker` use a Docker image for the local runtime (not available in this release; planned)
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
 - `--no-input` never prompt (Sourdough 0.1 has no prompts)

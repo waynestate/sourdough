@@ -11,6 +11,4 @@ namespace App;
  * driver's own text, so a connect descriptor, username or password cannot
  * leak into an error page or a log line.
  */
-class OracleException extends \RuntimeException
-{
-}
+class OracleException extends \RuntimeException {}

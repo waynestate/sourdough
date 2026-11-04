@@ -6,8 +6,14 @@ Versioning once 1.0 is out.
 ## Unreleased
 
 - Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.
+- Changed: `--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
+- Added: the raw template's `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
+- Fixed: the raw front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. `/up` stays HELMET's and answers first.
+
 - Added: generated apps in Require mode get a `composer playbook` script (`@composer show waynestate/playbook --no-interaction`) with its `scripts-descriptions` entry, so you can check any time whether Playbook (WSU shared values) is installed. Existing scripts keep their order and `playbook` is appended last; an existing `playbook` script is left alone.
 - Changed: `sourdough new` now requires `waynestate/playbook` in every app it bakes: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends the token to git.wayne.edu, the `.env.example` block, and a README section with the access how-to. The command checks read access before writing anything (a Composer credential, then a direct git probe) and refuses with exit `1` until the developer can read the package; an unreachable git.wayne.edu generates with a warning, and non-interactive and CI runs skip the check. `--playbook` stays as a no-op for old scripts, and `--no-playbook` is for CI and automated tests only.
+- Added: the raw template ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), `waynestate/pinstripe` in require-dev with the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
+- Changed: the raw template's code passes both of Pinstripe's tools: per-preset style fixes in `Oracle`, `OracleException`, `public/index.php` and `OracleTest`, precise closure and binds types in `Oracle`, a false guard for `oci_error()` results, and the connect-failure branch reporting the last driver error instead of passing the failed connection as its source. A freshly baked raw app passes its own checks.
 - Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).
 - Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.
 - Changed: new apps now get HELMET `^0.3`, SESAME `^0.4` and PROCTOR `^0.4`, and their `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment) because PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA.
@@ -20,6 +26,8 @@ Versioning once 1.0 is out.
 - Fixed: the laravel-blade-vue template ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app no longer fails on the missing Vite manifest before `npm run build` has run.
 - Changed: the smoke gate runs `php artisan migrate` like the Next steps, and the Laravel template READMEs show `migrate` for local and `migrate --force` for deploys.
 - Added: the front page's main nav links the docs site.
+- Fixed: the Playbook wiring no longer drops a template's own composer config keys.
+- Fixed: the raw template ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
 
 ## 0.1.5 (2026-11-03)
 
