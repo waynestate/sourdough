@@ -90,7 +90,7 @@ The app name (from `--name`, from the plan, or from the basename of `<dir>`) mus
 
 | Shape | Steps |
 |---|---|
-| Raw PHP | `cd <dir>`, `composer install`, `php -S localhost:8000 -t public` |
+| Raw PHP | `cd <dir>`, `composer install`, `composer serve` |
 | Laravel + Blade | `cd <dir>`, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve` |
 | Laravel + Blade + Vue islands | the Laravel + Blade steps plus `npm install` and `npm run build` |
 | Laravel + Inertia/Vue | the Laravel + Blade steps plus `npm install` and `npm run build` |
