@@ -7,6 +7,10 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 ## Pages
 
 - [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
+- [Agent ready | Sourdough docs](https://sourdough.apps.wayne.edu/docs/agent-ready.md): How the Sourdough site serves coding agents: Markdown twins, llms.txt and the two prompts for your agent.
+- [Changelog | Sourdough docs](https://sourdough.apps.wayne.edu/docs/changelog.md): All notable changes to this project.
+- [Overview | Sourdough docs](https://sourdough.apps.wayne.edu/docs/index.md): What Sourdough bakes: install, flags, permutations, plans, the manifest and the checks.
+- [Maintaining | Sourdough docs](https://sourdough.apps.wayne.edu/docs/maintaining.md): How to build, test, release and keep Sourdough alive: the commands, CI, the smoke gate and the release steps.
 
 ## Prompts
 

@@ -42,7 +42,7 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
 
 ## CI
 
@@ -117,7 +117,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 
 ## Things that trip people up
 
-- In 0.1 `--raw` and `--laravel` generate; the other permutations exit 1 for now.
+- In 0.1 four of the five shapes generate; `--raw --vue` prints the plan and exits 1 for now.
 - Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
 
 ## Who maintains it

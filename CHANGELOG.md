@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.
 - Added: generated apps in Require mode get a `composer playbook` script (`@composer show waynestate/playbook --no-interaction`) with its `scripts-descriptions` entry, so you can check any time whether Playbook (WSU shared values) is installed. Existing scripts keep their order and `playbook` is appended last; an existing `playbook` script is left alone.
 - Changed: `sourdough new` now requires `waynestate/playbook` in every app it bakes: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends the token to git.wayne.edu, the `.env.example` block, and a README section with the access how-to. The command checks read access before writing anything (a Composer credential, then a direct git probe) and refuses with exit `1` until the developer can read the package; an unreachable git.wayne.edu generates with a warning, and non-interactive and CI runs skip the check. `--playbook` stays as a no-op for old scripts, and `--no-playbook` is for CI and automated tests only.
 - Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).

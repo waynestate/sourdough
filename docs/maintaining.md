@@ -1,0 +1,131 @@
+---
+title: "Maintaining"
+description: "How to build, test, release and keep Sourdough alive: the commands, CI, the smoke gate and the release steps."
+---
+
+# MAINTAINING: feeding the starter
+
+How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired
+in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, plus `manifest`.
+Planned: `adopt` and `feed`. Like any starter, it
+needs regular feeding, or it goes flat.
+
+## What Sourdough is and what it depends on
+
+- `waynestate/sourdough` on Packagist, with the CLI `bin/sourdough`.
+- Runtime dependencies: `symfony/console`, `symfony/http-client`, `justinrainbow/json-schema`, `openai-php/client`
+  (only for `new --describe`, which can ask an OpenAI-compatible model for a plan; optional). No other stack package
+  at runtime.
+- **Generated apps** require `waynestate/helmet`, `waynestate/sesame` and `waynestate/proctor` from Packagist.
+- **It carries a copy of Squire's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`,
+  `catalog.json`, `manifest.json`). Squire owns those files; Sourdough never hand-edits them. `composer squire-copy:sync`
+  rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.4`), and
+  `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
+- The planned `feed` will need only git on the developer's machine: it records the template commit an app came from
+  and applies template changes with `git apply --3way`.
+
+## Where it lives
+
+Development happens on nougat, the canonical repository ([enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough)). This GitHub repository and git.wayne.edu are read-only mirrors: `main` and tags are copied automatically. Changes, issues and merge requests go to nougat. Nobody pushes to the mirrors.
+
+## Build and test
+
+| Task | Command |
+|---|---|
+| Install | `composer install` |
+| All checks (what CI runs) | `composer ci` |
+| Only the tests | `composer test` |
+| Fix code style | `composer fix` |
+| Check the Squire copy | `composer squire-copy:check` |
+| Refresh the Squire copy | `composer squire-copy:sync`, then commit `templates/squire/` |
+| Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
+
+With only Docker (the same lines work in PowerShell and sh):
+
+```
+docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
+```
+
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+
+## CI
+
+- **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
+- Green means `composer ci` passed on all three PHP versions on both.
+
+## Smoke gate
+
+The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
+
+- `raw`: `composer install` and `composer ci`
+- `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
+- `blade-vue`: the blade steps plus `npm install` and `npm run build`
+- `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
+
+Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
+
+Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
+
+Linux and macOS:
+
+```
+docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+docker run --rm -v "$PWD:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh <shape>
+```
+
+Windows PowerShell:
+
+```
+.\scripts\smoke-shape.ps1 <shape>
+```
+
+The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run.
+
+Two environment variables control the scratch space:
+
+- `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
+- `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
+
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+
+## Refreshing the Squire templates
+
+When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
+
+```
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
+```
+
+Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Until `feed` exists, apps
+generated earlier pick up template changes by hand.
+
+## What belongs here
+
+If every app should have something, it goes in Sourdough's templates. If only the Laravel + Inertia/Vue shape (WELD)
+should have it, it lives in WELD. Version rules belong to CREED, checks to PROCTOR, Citadel scripts to Squire.
+
+## Releasing
+
+1. Move the lines under `## Unreleased` in `CHANGELOG.md` to a new `## X.Y.Z (YYYY-MM-DD)` heading.
+2. `composer ci` and the Squire copy check green locally, then both pipelines green for that commit.
+3. Run a secrets scan of the history and check that nothing internal (server names, people, IDs) is in the tree.
+4. Tag `X.Y.Z` (no `v`) on nougat. The mirror carries the tag to GitHub, and Packagist picks it up from there.
+5. A release needs a maintainer's approval. Never move or delete a published tag.
+
+## The front page
+
+`site/` is the static front page, for `https://sourdough.apps.wayne.edu/` on Citadel, served through a small raw-PHP
+`deploy/` layer generated with Squire.
+
+## Things that trip people up
+
+- In 0.1 four of the five shapes generate; `--raw --vue` prints the plan and exits 1 for now.
+- Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
+
+## Who maintains it
+
+Adam Perkins, Wayne State University Enterprise Applications. Internal runbook (accounts, tokens, mirrors, deploy
+access): ask Enterprise Applications.

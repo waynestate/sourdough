@@ -1,0 +1,28 @@
+{
+    "title": "Sourdough",
+    "source": "https://nougat.snu.gs/enterprise-apps/sourdough",
+    "mirrors": [
+        {
+            "title": "GitHub",
+            "url": "https://github.com/waynestate/sourdough"
+        }
+    ],
+    "items": [
+        {
+            "path": "index",
+            "title": "Overview"
+        },
+        {
+            "path": "agent-ready",
+            "title": "Agent ready"
+        },
+        {
+            "path": "maintaining",
+            "title": "Maintaining"
+        },
+        {
+            "path": "changelog",
+            "title": "Changelog"
+        }
+    ]
+}

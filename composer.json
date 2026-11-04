@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.32",
+        "league/commonmark": "^2.10",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5",
         "waynestate/pinstripe": "^0.1",
@@ -57,10 +58,13 @@
             "@analyse",
             "@squire-copy:check",
             "@site:agent-ready-check",
+            "@docs:check",
             "@composer audit"
         ],
         "site:agent-ready": "php bin/agent-ready.php",
         "site:agent-ready-check": "php bin/agent-ready.php --check",
+        "docs:build": "php bin/docs-site.php",
+        "docs:check": "php bin/docs-site.php --check",
         "test": "phpunit",
         "lint": "pint --test",
         "fix": "pint",
@@ -69,11 +73,13 @@
         "squire-copy:check": "php bin/sync-squire --check"
     },
     "scripts-descriptions": {
-        "ci": "The full CI gate: validate, tests, Pint, PHPStan, Squire copy check, agent-ready files, audit. Same command on GitLab and GitHub.",
+        "ci": "The full CI gate: validate, tests, Pint, PHPStan, Squire copy check, agent-ready files, docs site, audit. Same command on GitLab and GitHub.",
         "squire-copy:sync": "Rewrite templates/squire/ from the installed SQUIRE package (vendor/waynestate/squire). Run it when SQUIRE moves on, then commit the result.",
         "squire-copy:check": "Check that templates/squire/ still matches a fresh export from the installed SQUIRE package (vendor/waynestate/squire). Exits 1 on drift; exits 2 when the package is not installed.",
         "site:agent-ready": "Rewrite the Markdown twins, llms.txt, llms-full.txt, robots.txt and sitemap.xml in site/ (Squire's agent-ready kit).",
-        "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here."
+        "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here.",
+        "docs:build": "Build the docs site in site/docs/ from the pages in docs/ (Squire's docs-site kit), including the generated changelog page.",
+        "docs:check": "Fail when the generated docs site in site/docs/ or docs/changelog.md drifts from docs/, or a page, image or link fails the builder's checks."
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
