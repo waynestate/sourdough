@@ -9,16 +9,99 @@
     ],
     "items": [
         {
-            "path": "index",
-            "title": "Overview"
+            "title": "Getting Started",
+            "items": [
+                {
+                    "path": "index",
+                    "title": "Overview"
+                },
+                {
+                    "path": "install",
+                    "title": "Install"
+                },
+                {
+                    "path": "guides/quick-start",
+                    "title": "Quick start"
+                }
+            ]
+        },
+        {
+            "title": "Guides",
+            "items": [
+                {
+                    "path": "guides/shapes",
+                    "title": "Pick a shape"
+                },
+                {
+                    "path": "guides/describe-a-plan",
+                    "title": "Describe a plan"
+                },
+                {
+                    "path": "guides/manifest",
+                    "title": "The manifest"
+                },
+                {
+                    "path": "guides/testing",
+                    "title": "Testing"
+                },
+                {
+                    "path": "guides/ci",
+                    "title": "CI"
+                },
+                {
+                    "path": "guides/ovens",
+                    "title": "Same kitchen, many ovens"
+                },
+                {
+                    "path": "guides/laravel",
+                    "title": "Building on Laravel"
+                },
+                {
+                    "path": "guides/keeping-current",
+                    "title": "Keeping apps current"
+                },
+                {
+                    "path": "guides/every-os",
+                    "title": "Every developer, every operating system"
+                },
+                {
+                    "path": "guides/wiring-the-stack",
+                    "title": "Wiring the stack in"
+                }
+            ]
+        },
+        {
+            "title": "Reference",
+            "items": [
+                {
+                    "path": "reference/commands",
+                    "title": "Commands"
+                },
+                {
+                    "path": "reference/plan-format",
+                    "title": "Plan format"
+                },
+                {
+                    "path": "reference/templates",
+                    "title": "Templates"
+                }
+            ]
+        },
+        {
+            "path": "maintaining",
+            "title": "Maintaining"
         },
         {
             "path": "agent-ready",
             "title": "Agent ready"
         },
         {
-            "path": "maintaining",
-            "title": "Maintaining"
+            "path": "troubleshooting",
+            "title": "Troubleshooting"
+        },
+        {
+            "path": "upgrading",
+            "title": "Upgrading"
         },
         {
             "path": "changelog",
