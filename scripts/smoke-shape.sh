@@ -10,9 +10,9 @@
 #               (default: a fresh mktemp -d, removed on exit)
 #   SMOKE_KEEP  set to 1 to keep the scratch dir behind for inspection
 #
-# Needs php 8.5, composer 2 and (for blade, blade-vue and inertia) node 22 on
-# PATH, plus
-# network access for Composer and npm. No credentials, no Oracle connection.
+# Needs php 8.5, composer 2, (for raw) curl and (for blade, blade-vue and
+# inertia) node 22 on PATH, plus network access for Composer, npm and the
+# WayneUI release download. No credentials, no Oracle connection.
 set -u
 
 shape=${1:-}
@@ -49,12 +49,21 @@ if [ "$shape" != raw ]; then
         fi
     done
 fi
+if [ "$shape" = raw ]; then
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "FAIL preflight: curl is not on PATH"
+        exit 1
+    fi
+fi
 
 php -v | head -n 1
 composer --version
 if [ "$shape" != raw ]; then
     node --version
     npm --version
+fi
+if [ "$shape" = raw ]; then
+    curl --version | head -n 1
 fi
 
 keep=1
@@ -121,20 +130,22 @@ mkdir -p "$COMPOSER_HOME"
 dir=$src
 step "sourdough composer install" composer install --no-interaction --no-progress
 
-# 2. Bake the shape for real, with this checkout's own CLI.
+# 2. Bake the shape for real, with this checkout's own CLI. Playbook is the
+# default wiring, but its package is private on git.wayne.edu and this gate
+# runs credential-free, so every bake passes --no-playbook.
 dir=$work
 case "$shape" in
     raw)
-        step "sourdough new raw" php "$src/bin/sourdough" new "$work/app" --raw --no-advisor --no-input
+        step "sourdough new raw" php "$src/bin/sourdough" new "$work/app" --raw --no-advisor --no-playbook --no-input
         ;;
     blade)
-        step "sourdough new blade" php "$src/bin/sourdough" new "$work/app" --laravel --no-advisor --no-input
+        step "sourdough new blade" php "$src/bin/sourdough" new "$work/app" --laravel --no-advisor --no-playbook --no-input
         ;;
     blade-vue)
-        step "sourdough new blade-vue" php "$src/bin/sourdough" new "$work/app" --laravel --vue --no-advisor --no-input
+        step "sourdough new blade-vue" php "$src/bin/sourdough" new "$work/app" --laravel --vue --no-advisor --no-playbook --no-input
         ;;
     inertia)
-        step "sourdough new inertia" php "$src/bin/sourdough" new "$work/app" --inertia --no-advisor --no-input
+        step "sourdough new inertia" php "$src/bin/sourdough" new "$work/app" --inertia --no-advisor --no-playbook --no-input
         ;;
 esac
 
@@ -144,6 +155,66 @@ case "$shape" in
     raw)
         step "composer install" composer install --no-interaction --no-progress
         step "composer ci" composer ci
+
+        # Live check: a baked raw app must actually serve. The front
+        # controller defaults APP_ENV to production when it is unset, so the
+        # server runs with APP_ENV=local, where SESAME uses its fake driver.
+        #
+        # public/wayne-ui.php is fetched once, as the app's README says. The
+        # release URL is pinned in templates/raw/public/index.php; read it
+        # from there so the gate and the template cannot drift apart.
+        wayne_url=$(sed -n 's#.*\(https://wayneui\.apps\.wayne\.edu/v2/releases/[0-9][0-9.]*\/wayne-ui\.php\).*#\1#p' "$repo/templates/raw/public/index.php" 2>/dev/null | head -n 1)
+        if [ -z "$wayne_url" ]; then
+            # Fallback: the pinned 2.0.8 release copy.
+            wayne_url='https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php'
+        fi
+        step "fetch WayneUI" curl -fsSL -o public/wayne-ui.php "$wayne_url"
+
+        n=$((n + 1))
+        log=$logs/$n.log
+        # Absolute docroot: the gate's own cwd is not the app dir.
+        APP_ENV=local php -S 127.0.0.1:8099 -t "$dir/public" >"$log" 2>&1 &
+        server_pid=$!
+
+        up=''
+        i=0
+        while [ "$i" -lt 10 ]; do
+            if curl -s -o /dev/null "http://127.0.0.1:8099/up"; then
+                up=1
+                break
+            fi
+            i=$((i + 1))
+            sleep 1
+        done
+        if [ -z "$up" ]; then
+            echo "FAIL raw server answers /up within 10s"
+            echo "--- tail of raw server ($log) ---"
+            tail -n 40 "$log"
+            kill "$server_pid" 2>/dev/null
+            exit 1
+        fi
+        echo "ok raw server answers /up within 10s"
+
+        check_raw_http() {
+            label=$1
+            path=$2
+            want=$3
+            got=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8099$path")
+            if [ "$got" = "$want" ]; then
+                echo "ok $label"
+                return 0
+            fi
+            echo "FAIL $label: got $got, want $want"
+            echo "--- tail of raw server ($log) ---"
+            tail -n 40 "$log"
+            kill "$server_pid" 2>/dev/null
+            exit 1
+        }
+        check_raw_http "raw GET / answers 200" "/" 200
+        check_raw_http "raw GET /nope answers 404" "/nope" 404
+        check_raw_http "raw GET /up answers 200" "/up" 200
+
+        kill "$server_pid" 2>/dev/null
         ;;
     blade)
         step "composer install" composer install --no-interaction --no-progress
