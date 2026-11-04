@@ -58,8 +58,8 @@ final class NewCommand extends Command
             ->addOption('laravel', null, InputOption::VALUE_NONE, 'Laravel + Blade.')
             ->addOption('vue', null, InputOption::VALUE_NONE, 'Add a Vue front end (SPA over JSON, or islands with --laravel).')
             ->addOption('inertia', null, InputOption::VALUE_NONE, 'Use Inertia/Vue (implies --laravel).')
-            ->addOption('sail', null, InputOption::VALUE_NONE, 'Use Sail for the local runtime (Laravel paths only).')
-            ->addOption('docker', null, InputOption::VALUE_NONE, 'Use Docker for the local runtime (Laravel paths only).')
+            ->addOption('sail', null, InputOption::VALUE_NONE, 'Use Sail for the local runtime (not available in this release; planned).')
+            ->addOption('docker', null, InputOption::VALUE_NONE, 'Use Docker for the local runtime (not available in this release; planned).')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the plan and write nothing.')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The app name (default: the basename of dir).')
             ->addOption('no-input', null, InputOption::VALUE_NONE, 'Never prompt. Sourdough 0.1 has no prompts, so this is accepted and documented.')
@@ -228,6 +228,16 @@ final class NewCommand extends Command
             $plan = Plan::forPermutation($permutation, $dir, $sail, $docker, $advisor);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
+            return 1;
+        }
+
+        // --sail and --docker are accepted but not built yet: the plan shows
+        // the requested step, then the run refuses before writing anything.
+        // A dry run refuses too, so a preview matches the real outcome.
+        if ($sail || $docker) {
+            $this->printPlan($output, $plan);
+            $this->errorOutput($output)->writeln('not available in this release');
+
             return 1;
         }
 
