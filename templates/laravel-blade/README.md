@@ -19,6 +19,12 @@ php artisan serve
 Open http://localhost:8000. Locally the app signs in with SESAME's fake
 driver (`SESAME_DRIVER=fake`).
 
+## Tests
+
+`composer test` runs Pest. Write new tests in Pest. `tests/Pest.php` binds
+Feature tests to the app and a fresh database. Tests take their environment
+from `phpunit.xml`, never a `.env` file.
+
 ## Deploying
 
 On the server, run `php artisan migrate --force` as part of the release.

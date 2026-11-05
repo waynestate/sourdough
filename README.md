@@ -193,6 +193,10 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 
 The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
 
+### Tests in the apps it bakes
+
+The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests take their environment from `phpunit.xml` and never read a `.env` file. The raw PHP shape is unchanged. Write new tests in Pest.
+
 ## CI
 
 Strongly recommended: a git.wayne.edu instance runner.

@@ -23,6 +23,12 @@ driver (`SESAME_DRIVER=fake`). While developing the front end, run
 `npm run dev` in a second terminal; it watches the sources and rebuilds
 as you edit.
 
+## Tests
+
+`composer test` runs Pest. Write new tests in Pest. `tests/Pest.php` binds
+Feature tests to the app and a fresh database. Tests take their environment
+from `phpunit.xml`, never a `.env` file.
+
 ## Deploying
 
 On the server, run `php artisan migrate --force` as part of the release.
