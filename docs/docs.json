@@ -1,0 +1,6 @@
+{
+    "theme": {
+        "css": "theme/sourdough.css",
+        "header": "_header.html"
+    }
+}

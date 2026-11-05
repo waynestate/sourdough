@@ -60,10 +60,14 @@ Each step prints `ok`; the first `FAIL` stops the run and shows the command's ta
 
 Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
 
+linux
+
 ```bash
 docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
 docker run --rm -v "$PWD:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh <shape>
 ```
+
+windows
 
 ```powershell
 .\scripts\smoke-shape.ps1 <shape>
