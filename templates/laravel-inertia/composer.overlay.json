@@ -8,6 +8,7 @@
     },
     "config": {
         "allow-plugins": {
+            "pestphp/pest-plugin": true,
             "phpstan/extension-installer": true
         },
         "platform": {
@@ -16,6 +17,8 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.13",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
         "waynestate/advisor": "^0.1",
         "waynestate/creed": "^0.1",
         "waynestate/pinstripe": "^0.1",
@@ -24,12 +27,13 @@
     "scripts": {
         "ci": [
             "@composer validate --strict",
-            "phpunit",
+            "pest",
             "pint --test",
             "phpstan analyse --memory-limit=1G",
             "@composer audit"
         ],
         "proctor": "proctor check --policy=vendor/waynestate/creed/policy/policy.json",
+        "test": "pest",
         "ziggy": "php artisan ziggy:generate --types"
     }
 }
