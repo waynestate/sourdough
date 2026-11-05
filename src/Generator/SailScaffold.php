@@ -257,6 +257,8 @@ COMPOSE;
             }
         }
 
+        $needsNewline = '' !== $content && !str_ends_with($content, "\n");
+
         $appended = [];
         foreach (self::ENV_SETTINGS as $key => $value) {
             $line = $key . '=' . $value;
@@ -277,7 +279,7 @@ COMPOSE;
         }
 
         if ([] !== $appended) {
-            if ('' !== $content && !str_ends_with($content, "\n")) {
+            if ($needsNewline) {
                 $content .= "\n";
             }
             $content .= implode("\n", $appended) . "\n";
