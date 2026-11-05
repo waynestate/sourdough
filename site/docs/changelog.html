@@ -45,7 +45,7 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
-<p>Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (<code>tests/Pest.php</code>, a Pest example test, <code>composer test</code> and <code>composer ci</code> run Pest, PHPUnit tests unchanged, tests never read a <code>.env</code> file); the raw shape is unchanged.</p>
+<p>Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (<code>tests/Pest.php</code>, a Pest example test, <code>composer test</code> and <code>composer ci</code> run Pest, PHPUnit tests unchanged, tests read <code>.env</code>, or <code>.env.example</code> when there is no <code>.env</code>); the raw shape is unchanged.</p>
 </li>
 <li>
 <p>Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: <code>docs/_header.html</code>, <code>docs/theme/sourdough.css</code> and a <code>theme</code> key in <code>docs/docs.json</code>; the kit's <code>docs.css</code> is unchanged.</p>

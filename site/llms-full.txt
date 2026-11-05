@@ -187,7 +187,7 @@ The smoke gate bakes a shape for real and runs the generated app's own checks; s
 
 #### Tests in the apps it bakes
 
-The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests take their environment from `phpunit.xml` and never read a `.env` file. The raw PHP shape is unchanged. Write new tests in Pest.
+The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests read `.env` when it exists, otherwise `.env.example`, on top of `phpunit.xml`. The raw PHP shape is unchanged. Write new tests in Pest.
 
 ### CI
 
@@ -579,7 +579,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
-- Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests never read a `.env` file); the raw shape is unchanged.
+- Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests read `.env`, or `.env.example` when there is no `.env`); the raw shape is unchanged.
 - Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: `docs/_header.html`, `docs/theme/sourdough.css` and a `theme` key in `docs/docs.json`; the kit's `docs.css` is unchanged.
 - Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.
 - Fixed: raw apps start with `composer serve`. The old `php -S localhost:8000 -t public` line booted the app as production, because the raw front controller defaults `APP_ENV` to production when it is unset. The raw template's new `serve` script disables Composer's process timeout, sets `APP_ENV=local` cross-platform with `@putenv`, then starts `php -S localhost:8000 -t public`, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at `composer serve` now.

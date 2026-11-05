@@ -195,7 +195,7 @@ The smoke gate bakes a shape for real and runs the generated app's own checks; s
 
 ### Tests in the apps it bakes
 
-The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests take their environment from `phpunit.xml` and never read a `.env` file. The raw PHP shape is unchanged. Write new tests in Pest.
+The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests read `.env` when it exists, otherwise `.env.example`, on top of `phpunit.xml`. The raw PHP shape is unchanged. Write new tests in Pest.
 
 ## CI
 

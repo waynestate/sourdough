@@ -10,7 +10,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
-- Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests never read a `.env` file); the raw shape is unchanged.
+- Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests read `.env`, or `.env.example` when there is no `.env`); the raw shape is unchanged.
 - Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: `docs/_header.html`, `docs/theme/sourdough.css` and a `theme` key in `docs/docs.json`; the kit's `docs.css` is unchanged.
 
 - Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.

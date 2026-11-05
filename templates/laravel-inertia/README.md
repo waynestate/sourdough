@@ -26,8 +26,8 @@ as you edit.
 ## Tests
 
 `composer test` runs Pest. Write new tests in Pest. `tests/Pest.php` binds
-Feature tests to the app and a fresh database. Tests take their environment
-from `phpunit.xml`, never a `.env` file.
+Feature tests to the app and a fresh database. Tests read `.env` when it exists,
+otherwise `.env.example`, on top of `phpunit.xml`.
 
 ## Deploying
 
