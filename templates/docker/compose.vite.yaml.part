@@ -1,0 +1,9 @@
+    vite:
+        build:
+            context: .
+            target: dev
+        command: ['npm', 'run', 'dev', '--', '--host', '0.0.0.0']
+        ports:
+            - '${VITE_PORT:-5173}:5173'
+        volumes:
+            - '.:/app'
