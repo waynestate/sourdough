@@ -1,0 +1,24 @@
+<!--
+  The docs pages wear the front page's header (site/index.html): the starter jar, the name in Caprasimo, the same
+  main menu and the gold ticket. The docs builder puts the header element below in place of its generic one on every
+  page, rewrites the relative links (written as if from site/) to the page's depth, fills {{version}} and marks the
+  Docs link aria-current. Styles: docs/theme/sourdough.css. Keep the links in step with the front page's menu.
+  Same bakery, back room: the recipes are kept here.
+-->
+<header class="site-header">
+  <div class="wsu-container site-header__inner">
+    <a class="brand" href="index.html">
+      <img src="brand/sourdough-avatar-256.png" width="36" height="36" alt="">
+      <span class="brand__name">{{project}}</span>
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="docs/index.html">Docs</a>
+      <a href="index.html#proof-title">The proof</a>
+      <a href="index.html#loaves-title">Loaves</a>
+      <a href="index.html#feeding-title">Feeding</a>
+      <a href="index.html#start-title">Quick start</a>
+      <a href="index.html#agents-title">Agents</a>
+    </nav>
+    <span class="ticket" title="Sourdough version">No. {{version}}</span>
+  </div>
+</header>

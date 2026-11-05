@@ -1,0 +1,1114 @@
+/* ============================================================================
+   Sourdough docs theme (2026-11-05).
+
+   The docs are the bakery's back room, where the recipes are kept. Same
+   flour-dusted cream paper as the front page (site/assets/sourdough.css),
+   the same header (jar, Caprasimo name, menu, gold ticket), Caprasimo titles
+   in WSU green, the baker's Kalam hand for labels, the dark recipe terminal
+   with its gold Copy pill for every command, the recipe card for tables,
+   baker's notes for callouts, and the deep green footer. Nothing new was
+   invented here: every value comes from the front page's tokens.
+
+   How it gets onto the pages: docs/docs.json "theme" names this file and
+   docs/_header.html. The docs builder copies this file to
+   site/docs/theme/sourdough.css and links it after the kit's docs.css, so the
+   --dk-* tokens and the rules below win without !important. The kit's
+   docs.css stays byte for byte Squire's.
+
+   The front page has no dark mode, so the dark set is derived from its
+   chalkboard: slate ground, chalk text, gold chalk for links and labels.
+   The bakery after closing time; the starter keeps working.
+
+   File map: 1. fonts and tokens  2. frame  3. header  4. sidebar and menu
+             5. article  6. code and tabs  7. tables, callouts, details
+             8. toc, pager, footer  9. dark  10. responsive
+             11. motion (no-preference only)  12. print
+   ========================================================================== */
+
+/* ---------------------------------------------------- 1. fonts and tokens */
+
+@font-face {
+  font-family: "Caprasimo";
+  src: url("../../assets/fonts/caprasimo-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Kalam";
+  src: url("../../assets/fonts/kalam-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Kalam";
+  src: url("../../assets/fonts/kalam-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  /* The front page's palette, under the same names. */
+  --sd-green: #0c5449;
+  --sd-green-deep: #073a32;
+  --sd-gold: #ffcc33;
+  --sd-gold-chalk: #ffd866;
+  --sd-cream: #f4f1ea;
+  --sd-flour: #fffdf8;
+  --sd-card: #fffefa;           /* the recipe card's stock */
+  --sd-kraft: #e8d4ab;
+  --sd-bake: #8a4f1f;           /* dark crust: warnings */
+  --sd-burnt: #8a2b14;          /* left in too long: danger */
+  --sd-ink: #1d2925;            /* 13:1 on cream */
+  --sd-muted: #4c5853;          /* 6.6:1 on cream */
+  --sd-brown-ink: #5a3a1c;      /* 8.5:1 on cream, for the hand notes */
+  --sd-slate: #1f2c28;
+  --sd-chalk: #eeece4;
+  --sd-chalk-dim: #b3bfb9;
+  --sd-term: #16231f;
+  --sd-term-ink: #e7ece9;
+  --sd-display: "Caprasimo", "Cooper Black", Georgia, serif;
+  --sd-hand: "Kalam", "Comic Sans MS", cursive;
+  --sd-body: var(--wsu-font-family-body, Lato, Calibri, "Helvetica Neue", Arial, sans-serif);
+  --sd-ease-rise: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sd-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sd-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 16px 34px -20px rgba(74, 46, 18, 0.5);
+  --sd-card-shadow: 0 24px 40px -28px rgba(74, 46, 18, 0.6), 0 2px 0 rgba(138, 79, 31, 0.12);
+
+  /* Roles, so the dark set below only swaps values. */
+  --sd-title: var(--sd-green);
+  --sd-head: var(--sd-green-deep);
+  --sd-hand-ink: var(--sd-brown-ink);
+  --sd-dash: rgba(138, 79, 31, 0.28);       /* the dashed baker's rules */
+  --sd-highlight: rgba(255, 204, 51, 0.55); /* the eyebrow's gold marker */
+  --sd-current: rgba(255, 204, 51, 0.35);   /* the selected tab's gold */
+  --sd-current-bar: var(--sd-green);
+  --sd-header-bg: rgba(255, 253, 248, 0.6);
+  --sd-surface: var(--sd-flour);
+  --sd-surface-line: rgba(138, 79, 31, 0.22);
+  --sd-code-ink: var(--sd-green-deep);
+  --sd-note: var(--sd-green);
+  --sd-tip: var(--sd-brown-ink);
+  --sd-tip-bar: var(--sd-gold);
+  --sd-warning: var(--sd-bake);
+  --sd-bullet: var(--sd-bake);
+  --sd-danger: var(--sd-burnt);
+  --sd-footer-bg: var(--sd-green-deep);
+  --sd-footer-ink: var(--sd-cream);
+
+  /* The kit's tokens, set from the palette above. */
+  --dk-bg: var(--sd-cream);
+  --dk-ink: var(--sd-ink);
+  --dk-muted: var(--sd-muted);
+  --dk-rule: #d6c6b0;
+  --dk-accent: var(--sd-green);
+  --dk-on-accent: #ffffff;
+  --dk-note: var(--sd-note);
+  --dk-tip: var(--sd-tip);
+  --dk-warning: var(--sd-warning);
+  --dk-danger: var(--sd-danger);
+  --dk-code-bg: #e5e5dc;
+  --dk-display: var(--sd-display);
+  --dk-mono: var(--wsu-font-family-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --dk-radius: 14px;
+  --dk-focus: var(--sd-green);
+  --dk-focus-w: 3px;
+  --dk-focus-o: 3px;
+  --dk-sidebar: 15.5rem;
+  --dk-prose-max: 46rem;
+  --dk-gap: 1.75rem;
+
+  /* The header's container lines up with the docs layout below it. */
+  --wsu-size-content-max: 100rem;
+  --wsu-size-gutter: var(--dk-gap);
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------- 2. frame */
+
+html {
+  background: var(--dk-bg);
+}
+
+/* Paper with a little flour in it: the front page's grain and specks. */
+body {
+  margin: 0;
+  color: var(--dk-ink);
+  font-family: var(--sd-body);
+  background-color: var(--dk-bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.8) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 63% 41%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 81% 77%, rgba(255, 255, 255, 0.8) 0 1.4px, transparent 2px);
+  background-size: 220px 220px, 97px 113px, 71px 89px, 131px 101px;
+}
+
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: var(--dk-focus-w) solid var(--dk-focus);
+  outline-offset: var(--dk-focus-o);
+}
+
+/* -------------------------------------------------------------- 3. header */
+
+/* The front page's header, as is: a flour-white strip over a dashed edge. */
+.site-header {
+  position: relative;
+  z-index: 5;
+  background: var(--sd-header-bg);
+  border-bottom: 2px dashed var(--sd-dash);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-sizing: border-box;
+  min-height: 4rem;
+}
+
+.brand {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--sd-title);
+  text-decoration: none;
+}
+
+.brand__name {
+  font-family: var(--sd-display);
+  font-size: 1.45rem;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-inline-start: auto;
+}
+
+/* Bold menu links with a gold underline that bakes in from the left. */
+.site-nav a {
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dk-ink);
+  text-decoration: none;
+  background: linear-gradient(var(--sd-gold), var(--sd-gold)) left bottom / 0 3px no-repeat;
+}
+
+.site-nav a:hover {
+  background-size: 100% 3px;
+}
+
+/* You are here: the Docs link keeps its gold underline and a green one under it. */
+.site-nav a[aria-current="page"] {
+  color: var(--sd-title);
+  background-image:
+    linear-gradient(var(--sd-gold), var(--sd-gold)),
+    linear-gradient(var(--sd-current-bar), var(--sd-current-bar));
+  background-position: left bottom 3px, left bottom;
+  background-size: 100% 3px, 100% 2px;
+}
+
+/* The torn gold ticket with the version on it. */
+.ticket {
+  flex-shrink: 0;
+  font-family: var(--sd-hand);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--sd-ink);
+  background: var(--sd-gold);
+  padding: 0.15rem 0.7rem 0.1rem;
+  border-radius: 4px;
+  transform: rotate(3deg);
+  mask:
+    radial-gradient(circle at 0 50%, transparent 5px, #000 5.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 5px, #000 5.5px) right / 51% 100% no-repeat;
+}
+
+/* --------------------------------------------------- 4. sidebar and menu */
+
+.docs-layout {
+  gap: 1.5rem clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
+  padding-block: 2.5rem 3rem;
+  padding-inline: var(--dk-gap);
+}
+
+/* Group labels in the baker's hand, over the eyebrow's gold marker. */
+.docs-nav__label {
+  display: inline-block;
+  margin: 1.5rem 0 0.4rem;
+  padding-inline: 0.15em;
+  font-family: var(--sd-hand);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sd-hand-ink);
+  background: linear-gradient(transparent 62%, var(--sd-highlight) 62% 88%, transparent 88%);
+  transform: rotate(-1.5deg);
+}
+
+.docs-nav__list > li:first-child > .docs-nav__label {
+  margin-top: 0;
+}
+
+/* Group lists are plain <ul> inside the kit's list: no bullets, no indent. */
+.docs-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A group's pages hang off a dashed rule, so the pages after it read as their own. */
+.docs-nav__group > ul {
+  margin-inline-start: 0.35rem;
+  padding-inline-start: 0.45rem;
+  border-inline-start: 2px dashed var(--sd-dash);
+}
+
+.docs-nav__group + li:not(.docs-nav__group) {
+  margin-top: 1rem;
+}
+
+.docs-nav a {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.97rem;
+  line-height: 1.35;
+  color: var(--dk-ink);
+  border-radius: 10px;
+}
+
+.docs-nav a:hover {
+  color: var(--sd-head);
+  background: var(--sd-current);
+}
+
+/* The current page: the quick start's selected tab, turned on its side. */
+.docs-nav a[aria-current="page"] {
+  font-weight: 700;
+  color: var(--sd-head);
+  background: var(--sd-current);
+  box-shadow: inset 4px 0 0 var(--sd-current-bar);
+  border-radius: 0 10px 10px 0;
+}
+
+/* On a phone the docs menu is the feed button: flour pill, green edge, a ledge under it. */
+.docs-menu summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  min-height: 2.9rem;
+  padding: 0.6rem 1.25rem;
+  font: 700 1rem/1 var(--sd-body);
+  color: var(--sd-green-deep);
+  background: var(--sd-flour);
+  border: 2px solid var(--sd-green-deep);
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--sd-green-deep);
+  list-style: none;
+}
+
+.docs-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-menu summary::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -2px;
+}
+
+.docs-menu[open] summary::after {
+  rotate: 225deg;
+  translate: 0 2px;
+}
+
+.docs-menu[open] > .docs-nav {
+  padding: 1rem 0.25rem 0.5rem;
+}
+
+/* ------------------------------------------------------------- 5. article */
+
+.docs-article {
+  font-family: var(--sd-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--dk-ink);
+}
+
+.docs-article h1,
+.docs-article h2,
+.docs-article h3 {
+  font-family: var(--sd-display);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+}
+
+/* The title is the loaf: Caprasimo in green, over the header's dashed edge. */
+.docs-article h1 {
+  margin: 0 0 1.75rem;
+  padding-bottom: 0.9rem;
+  font-size: clamp(2.5rem, 1.8rem + 2.6vw, 3.6rem);
+  line-height: 1.05;
+  color: var(--sd-title);
+  border-bottom: 2px dashed var(--sd-dash);
+}
+
+.docs-article h2 {
+  margin: 2.75rem 0 0.9rem;
+  padding-bottom: 0.4rem;
+  font-size: clamp(1.65rem, 1.35rem + 1vw, 2.1rem);
+  line-height: 1.1;
+  color: var(--sd-title);
+  border-bottom: 2px dashed var(--sd-dash);
+}
+
+.docs-article h3 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--sd-head);
+}
+
+.docs-article :is(h1, h2, h3) code {
+  font-size: 0.72em;
+  vertical-align: 0.08em;
+}
+
+.docs-heading-link {
+  font-family: var(--sd-body);
+  font-size: 0.7em;
+  color: var(--dk-muted);
+}
+
+.docs-article a {
+  color: var(--dk-accent);
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: 1px;
+}
+
+.docs-article a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.docs-article strong {
+  color: var(--sd-head);
+}
+
+.docs-article :is(ul, ol) {
+  padding-inline-start: 1.4rem;
+}
+
+.docs-article li {
+  margin-block: 0.3rem;
+}
+
+/* Bullets in dark crust; numbered steps in the baker's hand. */
+.docs-article ul > li::marker {
+  color: var(--sd-bullet);
+}
+
+.docs-article ol > li::marker {
+  font-family: var(--sd-hand);
+  font-weight: 700;
+  color: var(--sd-hand-ink);
+}
+
+.docs-article img {
+  max-width: 100%;
+  height: auto;
+}
+
+.docs-article p > img:only-child,
+.docs-article details img {
+  border-radius: var(--dk-radius);
+}
+
+.docs-article hr {
+  margin-block: 2.5rem;
+  border: 0;
+  border-top: 2px dashed var(--sd-dash);
+}
+
+.docs-article sub {
+  font-family: var(--sd-hand);
+  font-size: 1rem;
+  line-height: 1.4;
+  vertical-align: baseline;
+  color: var(--sd-hand-ink);
+}
+
+/* ---------------------------------------------------------- 6. code and tabs */
+
+.docs-article code {
+  padding: 0.08em 0.36em;
+  font-size: 0.88em;
+  color: var(--sd-code-ink);
+  background: var(--dk-code-bg);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+/* What you type: the front page's recipe terminal. Lines keep their shape,
+   so a long one scrolls instead of wrapping. */
+.docs-article pre {
+  margin: 1.1rem 0 1.4rem;
+  padding: 1rem 1.15rem 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--sd-term-ink);
+  background: var(--sd-term);
+  border: 0;
+  border-radius: var(--dk-radius);
+  box-shadow: 0 14px 30px -18px rgba(7, 58, 50, 0.8);
+  tab-size: 4;
+  scrollbar-color: #3b524b transparent;
+}
+
+.docs-article pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border-radius: 0;
+  overflow-wrap: normal;
+}
+
+/* With docs.js the block sits in .docs-copy: the terminal moves to the
+   wrapper and the pre stops short of a gutter, so the pill never covers a
+   command. */
+.docs-copy {
+  margin: 1.1rem 0 1.4rem;
+  background: var(--sd-term);
+  border-radius: var(--dk-radius);
+  box-shadow: 0 14px 30px -18px rgba(7, 58, 50, 0.8);
+}
+
+.docs-copy > pre {
+  margin: 0;
+  margin-inline-end: 5.5rem;
+  padding-inline-end: 0.75rem;
+  background: transparent;
+  box-shadow: none;
+  border-radius: var(--dk-radius) 0 0 var(--dk-radius);
+}
+
+/* The front page's gold Copy pill. */
+.docs-copy__button {
+  top: 0.75rem;
+  right: 0.75rem;
+  min-height: 32px;
+  padding: 0.45rem 0.9rem;
+  font: 700 0.85rem/1 var(--sd-body);
+  color: var(--sd-ink);
+  background: var(--sd-gold);
+  border: 0;
+  border-radius: 999px;
+}
+
+.docs-copy__button:hover {
+  color: var(--sd-ink);
+  background: var(--sd-gold-chalk);
+}
+
+/* On the dark terminal a green ring would vanish: gold, as on the front page. */
+.docs-copy__button:focus-visible,
+.docs-article pre:focus-visible {
+  outline: 3px solid var(--sd-gold);
+}
+
+.docs-article pre:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Code tabs: the quick start's operating system tabs, in the baker's hand. */
+.docs-tabs__tablist {
+  gap: 0.25rem;
+  margin-bottom: 0;
+  border-bottom: 2px solid var(--sd-dash);
+}
+
+.docs-tabs__tab {
+  font-family: var(--sd-hand);
+  font-size: 1.15rem;
+  color: var(--dk-muted);
+  background: none;
+  border: 0;
+  border-radius: 10px 10px 0 0;
+}
+
+.docs-tabs__tab:hover {
+  color: var(--sd-head);
+  background: var(--sd-current);
+}
+
+.docs-tabs__tab[aria-selected="true"] {
+  font-weight: 700;
+  color: var(--sd-head);
+  background: var(--sd-current);
+  box-shadow: inset 0 -4px 0 var(--sd-current-bar);
+}
+
+.docs-tabs__label {
+  font-family: var(--sd-hand);
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sd-hand-ink);
+}
+
+/* --------------------------------------------- 7. tables, callouts, details */
+
+/* Tables are the recipe card: card stock, a gold band across the top,
+   hand-written headings and dashed rows. */
+.docs-table {
+  margin: 1.5rem 0 1.75rem;
+  background: var(--sd-card);
+  border-top: 6px solid var(--sd-gold);
+  border-radius: 6px;
+  box-shadow: var(--sd-card-shadow);
+}
+
+.docs-article table {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.docs-article th {
+  font-family: var(--sd-hand);
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--sd-hand-ink);
+  border-bottom: 2px solid var(--sd-dash);
+}
+
+.docs-article th,
+.docs-article td {
+  padding: 0.7rem 0.85rem;
+  vertical-align: top;
+}
+
+.docs-article td {
+  border-bottom: 2px dashed var(--sd-dash);
+}
+
+/* A command or id keeps its shape in a cell: the column sizes to it, and it
+   only breaks if it would spill out of the table. */
+.docs-article td code {
+  overflow-wrap: break-word;
+}
+
+.docs-article tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Callouts are notes the baker pinned up: flour-white card, a colored edge,
+   the label in the baker's hand over the gold marker. */
+.docs-callout {
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.2rem 1rem;
+  color: var(--dk-ink);
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-surface-line);
+  border-left: 6px solid var(--sd-note);
+  border-radius: 6px var(--dk-radius) var(--dk-radius) 6px;
+  box-shadow: var(--sd-shadow);
+}
+
+.docs-callout__label {
+  display: inline-block;
+  margin: 0 0 0.35rem;
+  padding-inline: 0.15em;
+  font-family: var(--sd-hand);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  background: linear-gradient(transparent 62%, var(--sd-highlight) 62% 88%, transparent 88%);
+  transform: rotate(-1.5deg);
+}
+
+.docs-callout--note {
+  border-left-color: var(--sd-note);
+}
+
+.docs-callout--note .docs-callout__label {
+  color: var(--sd-note);
+}
+
+.docs-callout--tip {
+  border-left-color: var(--sd-tip-bar);
+}
+
+.docs-callout--tip .docs-callout__label {
+  color: var(--sd-tip);
+}
+
+.docs-callout--warning {
+  border-left-color: var(--sd-warning);
+}
+
+.docs-callout--warning .docs-callout__label {
+  color: var(--sd-warning);
+}
+
+.docs-callout--danger {
+  border-left-color: var(--sd-danger);
+  border-left-style: double;
+  border-left-width: 7px;
+}
+
+.docs-callout--danger .docs-callout__label {
+  color: var(--sd-danger);
+}
+
+.docs-callout :not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+/* A plain blockquote: a pencilled aside. */
+.docs-article blockquote:not(.docs-callout) {
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1.1rem;
+  color: var(--dk-muted);
+  border-left: 3px dashed var(--sd-dash);
+}
+
+.docs-article blockquote > :last-child,
+.docs-callout > :last-child {
+  margin-bottom: 0;
+}
+
+/* Details: a kraft-paper tag you lift to look underneath. */
+.docs-article details {
+  margin: 1.25rem 0;
+  padding: 0.6rem 1rem;
+  background: var(--sd-surface);
+  border: 2px dashed var(--sd-dash);
+  border-radius: 10px;
+}
+
+.docs-article summary {
+  min-height: 24px;
+  font-family: var(--sd-hand);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--sd-hand-ink);
+  cursor: pointer;
+}
+
+.docs-article details[open] > summary {
+  margin-bottom: 0.6rem;
+}
+
+/* ------------------------------------------------ 8. toc, pager, footer */
+
+.docs-toc__title {
+  display: inline-block;
+  padding-inline: 0.15em;
+  font-family: var(--sd-hand);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sd-hand-ink);
+  background: linear-gradient(transparent 62%, var(--sd-highlight) 62% 88%, transparent 88%);
+  transform: rotate(-1.5deg);
+}
+
+.docs-toc__list {
+  border-left: 2px dashed var(--sd-dash);
+}
+
+.docs-toc__item a {
+  margin-inline-start: -2px;
+  font-size: 0.93rem;
+  line-height: 1.4;
+  color: var(--dk-muted);
+  border-inline-start: 2px solid transparent;
+}
+
+.docs-toc__item a:hover {
+  color: var(--sd-head);
+  border-inline-start-color: var(--sd-gold);
+}
+
+/* Pager cards sit on the rack like the loaves. */
+.docs-pager {
+  margin-top: 3rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.docs-pager__link {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  max-width: 22rem;
+  padding: 0.85rem 1.15rem 1rem;
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-surface-line);
+  border-radius: 20px;
+  box-shadow: var(--sd-shadow);
+}
+
+.docs-pager__link--next {
+  margin-inline-start: auto;
+}
+
+.docs-pager__link:hover {
+  border-color: var(--sd-current-bar);
+}
+
+.docs-pager__dir {
+  font-family: var(--sd-hand);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--sd-hand-ink);
+}
+
+.docs-pager__title {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--sd-display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  color: var(--sd-title);
+  text-decoration: none;
+}
+
+/* The front page's deep green footer, full bleed under a centered row. */
+.docs-footer {
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 1.75rem var(--dk-gap);
+  font-size: 0.95rem;
+  color: var(--sd-footer-ink);
+  background: var(--sd-footer-bg);
+  border-top: 0;
+  box-shadow: 0 0 0 100vmax var(--sd-footer-bg);
+  clip-path: inset(0 -100vmax);
+}
+
+.docs-footer a {
+  color: var(--sd-footer-ink);
+  text-underline-offset: 0.25em;
+}
+
+.docs-footer :focus-visible {
+  outline-color: var(--sd-gold);
+}
+
+/* ---------------------------------------------------------------- 9. dark */
+
+/* Derived: the front page has no dark mode, so the docs go to the
+   chalkboard. Slate ground, chalk text, gold chalk where the light page uses
+   green; the terminal stays the same and the footer stays deep green. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sd-title: var(--sd-chalk);
+    --sd-head: var(--sd-chalk);
+    --sd-hand-ink: var(--sd-gold-chalk);
+    --sd-dash: rgba(238, 236, 228, 0.22);
+    --sd-highlight: rgba(255, 204, 51, 0.16);
+    --sd-current: rgba(255, 216, 102, 0.14);
+    --sd-current-bar: var(--sd-gold-chalk);
+    --sd-header-bg: rgba(22, 35, 31, 0.6);
+    --sd-surface: #26352f;
+    --sd-surface-line: rgba(238, 236, 228, 0.16);
+    --sd-card: #26352f;
+    --sd-code-ink: var(--sd-chalk);
+    --sd-note: #8fd0bf;
+    --sd-tip: var(--sd-gold-chalk);
+    --sd-tip-bar: var(--sd-gold-chalk);
+    --sd-warning: #f0b47e;
+    --sd-bullet: #f0b47e;
+    --sd-danger: #ff9f8a;
+    --sd-shadow: 0 16px 34px -22px rgba(0, 0, 0, 0.7);
+    --sd-card-shadow: 0 24px 40px -28px rgba(0, 0, 0, 0.8);
+
+    --dk-bg: var(--sd-slate);
+    --dk-ink: var(--sd-chalk);
+    --dk-muted: var(--sd-chalk-dim);
+    --dk-rule: #3a4a44;
+    --dk-accent: var(--sd-gold-chalk);
+    --dk-on-accent: var(--sd-slate);
+    --dk-code-bg: rgba(238, 236, 228, 0.1);
+    --dk-focus: var(--sd-gold-chalk);
+
+    color-scheme: dark;
+  }
+
+  :root:not([data-theme="light"]) body {
+    background-image:
+      radial-gradient(ellipse at 18% 22%, rgba(255, 255, 255, 0.05), transparent 45%),
+      radial-gradient(ellipse at 80% 70%, rgba(255, 255, 255, 0.04), transparent 50%);
+    background-size: auto;
+    background-attachment: fixed;
+  }
+
+  :root:not([data-theme="light"]) .docs-menu summary {
+    color: var(--sd-chalk);
+    background: var(--sd-term);
+    border-color: var(--sd-gold-chalk);
+    box-shadow: 0 4px 0 var(--sd-gold-chalk);
+  }
+
+  :root:not([data-theme="light"]) .docs-footer {
+    border-top: 2px dashed rgba(238, 236, 228, 0.22);
+  }
+}
+
+:root[data-theme="dark"] {
+  --sd-title: var(--sd-chalk);
+  --sd-head: var(--sd-chalk);
+  --sd-hand-ink: var(--sd-gold-chalk);
+  --sd-dash: rgba(238, 236, 228, 0.22);
+  --sd-highlight: rgba(255, 204, 51, 0.16);
+  --sd-current: rgba(255, 216, 102, 0.14);
+  --sd-current-bar: var(--sd-gold-chalk);
+  --sd-header-bg: rgba(22, 35, 31, 0.6);
+  --sd-surface: #26352f;
+  --sd-surface-line: rgba(238, 236, 228, 0.16);
+  --sd-card: #26352f;
+  --sd-code-ink: var(--sd-chalk);
+  --sd-note: #8fd0bf;
+  --sd-tip: var(--sd-gold-chalk);
+  --sd-tip-bar: var(--sd-gold-chalk);
+  --sd-warning: #f0b47e;
+  --sd-bullet: #f0b47e;
+  --sd-danger: #ff9f8a;
+  --sd-shadow: 0 16px 34px -22px rgba(0, 0, 0, 0.7);
+  --sd-card-shadow: 0 24px 40px -28px rgba(0, 0, 0, 0.8);
+
+  --dk-bg: var(--sd-slate);
+  --dk-ink: var(--sd-chalk);
+  --dk-muted: var(--sd-chalk-dim);
+  --dk-rule: #3a4a44;
+  --dk-accent: var(--sd-gold-chalk);
+  --dk-on-accent: var(--sd-slate);
+  --dk-code-bg: rgba(238, 236, 228, 0.1);
+  --dk-focus: var(--sd-gold-chalk);
+
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body {
+  background-image:
+    radial-gradient(ellipse at 18% 22%, rgba(255, 255, 255, 0.05), transparent 45%),
+    radial-gradient(ellipse at 80% 70%, rgba(255, 255, 255, 0.04), transparent 50%);
+  background-size: auto;
+  background-attachment: fixed;
+}
+
+:root[data-theme="dark"] .docs-menu summary {
+  color: var(--sd-chalk);
+  background: var(--sd-term);
+  border-color: var(--sd-gold-chalk);
+  box-shadow: 0 4px 0 var(--sd-gold-chalk);
+}
+
+:root[data-theme="dark"] .docs-footer {
+  border-top: 2px dashed rgba(238, 236, 228, 0.22);
+}
+
+/* --------------------------------------------------------- 10. responsive */
+
+@media (min-width: 760px) {
+  /* The sidebar stays on the bench while the page scrolls. */
+  .docs-nav--sidebar {
+    position: sticky;
+    top: 1.25rem;
+    max-height: calc(100vh - 2.5rem);
+    overflow-y: auto;
+    padding-inline-end: 0.25rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .docs-layout--toc .docs-toc {
+    top: 1.25rem;
+  }
+}
+
+/* As on the front page: the menu tightens, then gives way to the ticket.
+   The docs menu below the header carries the pages. */
+@media (max-width: 1000px) {
+  .site-nav {
+    gap: 0.25rem 0.9rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .site-nav a:not([aria-current="page"]) {
+    display: none;
+  }
+
+  .ticket {
+    margin-inline-start: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --dk-gap: 1rem;
+  }
+
+  .docs-layout {
+    padding-block-start: 1.25rem;
+  }
+
+  .docs-article h1 {
+    font-size: clamp(2.1rem, 1.5rem + 3vw, 2.5rem);
+  }
+
+  /* No room for a gutter: the pill takes a band above the code instead, as
+     the front page's recipe does on a phone. */
+  .docs-article pre {
+    font-size: 0.8125rem;
+  }
+
+  .docs-copy > pre {
+    margin-inline-end: 0;
+    padding-block-start: 3rem;
+    padding-inline-end: 1rem;
+    border-radius: var(--dk-radius);
+  }
+
+  .docs-pager {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .docs-pager__link {
+    max-width: none;
+  }
+
+  .docs-article th {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 400px) {
+  .brand__name {
+    font-size: 1.3rem;
+  }
+
+  .brand img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* ------------------------------------------- 11. motion (no-preference) */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* The jar tips on hover, as on the front page. */
+  .brand img {
+    transition: transform 0.4s var(--sd-ease-rise);
+  }
+
+  .brand:hover img {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .site-nav a {
+    transition: background-size 0.3s var(--sd-ease-out);
+  }
+
+  /* The title proofs once as the page lands: it rises out of the dough. */
+  .docs-article h1 {
+    animation: sd-rise 0.9s var(--sd-ease-rise) 0.05s both;
+    transform-origin: 0 100%;
+  }
+
+  .docs-pager__link {
+    transition: transform 0.35s var(--sd-ease-rise), border-color 0.2s;
+  }
+
+  .docs-pager__link:hover {
+    transform: translateY(-4px) rotate(-0.4deg);
+  }
+
+  .docs-copy__button {
+    transition: transform 0.25s var(--sd-ease-rise), background-color 0.15s;
+  }
+
+  .docs-copy__button:hover {
+    transform: translateY(-2px) rotate(-2deg);
+  }
+
+  .docs-copy__button:active {
+    transform: scale(0.95);
+  }
+
+  .docs-nav a,
+  .docs-tabs__tab {
+    transition: background-color 0.15s, color 0.15s;
+  }
+}
+
+@keyframes sd-rise {
+  0% { opacity: 0; transform: translateY(0.3em) scale(1, 0.9); }
+  60% { opacity: 1; transform: translateY(-0.04em) scale(1, 1.02); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* -------------------------------------------------------------- 12. print */
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .site-nav,
+  .ticket {
+    display: none;
+  }
+
+  .docs-article pre,
+  .docs-copy {
+    color: var(--sd-ink);
+    background: #ffffff;
+    border: 1px solid #d6c6b0;
+    box-shadow: none;
+  }
+
+  .docs-copy > pre {
+    margin-inline-end: 0;
+    white-space: pre-wrap;
+  }
+
+  .docs-copy__button {
+    display: none;
+  }
+
+  .docs-footer {
+    color: var(--sd-ink);
+    background: #ffffff;
+    box-shadow: none;
+    clip-path: none;
+  }
+
+  .docs-footer a {
+    color: var(--sd-ink);
+  }
+}
