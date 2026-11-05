@@ -229,6 +229,69 @@ final class DockerScaffoldTest extends TestCase
     }
 
     /**
+     * The real binary with --docker: a dry run prints the plan (with the
+     * docker step) on stdout, exits 0 and writes nothing. These run the
+     * real binary so stdout and stderr stay separate, where scripts can
+     * read them.
+     */
+    public function testRealBinaryDryRunPrintsTheDockerStepAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        [$exit, $stdout, $stderr] = $this->runNew($target, ['--laravel', '--docker', '--dry-run']);
+
+        self::assertSame(0, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
+        // The plan lands on stdout, including the requested step.
+        self::assertStringContainsString('Permutation:', $stdout);
+        self::assertStringContainsString('Use Docker for the local runtime', $stdout);
+        // A dry run writes nothing.
+        self::assertDirectoryDoesNotExist($target);
+    }
+
+    /**
+     * The real binary refuses --sail and --docker together: exit 1, the
+     * message on stderr, nothing written.
+     */
+    public function testRealBinaryRefusesSailAndDockerTogether(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        [$exit, $stdout, $stderr] = $this->runNew($target, ['--laravel', '--sail', '--docker', '--dry-run']);
+
+        self::assertSame(1, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
+        self::assertStringContainsString('Choose one of --sail or --docker', $stderr);
+        self::assertDirectoryDoesNotExist($target);
+    }
+
+    /**
+     * Run `sourdough new` with the given flags against the real binary and
+     * capture stdout and stderr separately.
+     *
+     * @param list<string> $flags
+     *
+     * @return array{0: int, 1: string, 2: string}
+     */
+    private function runNew(string $target, array $flags): array
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $pipes = [];
+        $argv = array_merge([PHP_BINARY, __DIR__ . '/../bin/sourdough', 'new', $target], $flags);
+        $process = proc_open($argv, $descriptors, $pipes);
+        self::assertIsResource($process);
+        fclose($pipes[0]);
+        $stdout = (string) stream_get_contents($pipes[1]);
+        $stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        return [proc_close($process), $stdout, $stderr];
+    }
+
+    /**
      * The structural stand-in for a YAML parse: the top-level volumes:
      * block appears exactly once at column 0 and declares app-mysql.
      */
@@ -245,7 +308,9 @@ final class DockerScaffoldTest extends TestCase
     private function makeAppDir(): string
     {
         $dir = $this->makeTempDir();
-        file_put_contents($dir . '/composer.json', <<<'JSON'
+        file_put_contents(
+            $dir . '/composer.json',
+            <<<'JSON'
 {
     "name": "app/test-app",
     "description": "A test app.",
@@ -259,16 +324,18 @@ final class DockerScaffoldTest extends TestCase
         "test": "Run the tests."
     }
 }
-JSON
-);
-        file_put_contents($dir . '/.env.example', <<<ENV
+JSON,
+        );
+        file_put_contents(
+            $dir . '/.env.example',
+            <<<ENV
 APP_ENV=local
 APP_NAME="Test App"
 DB_CONNECTION=sqlite
 # DB_HOST=127.0.0.1
 SESAME_DRIVER=fake
-ENV
-);
+ENV,
+        );
 
         return $dir;
     }

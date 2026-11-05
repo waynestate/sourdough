@@ -65,7 +65,7 @@ final class Plan
         }
 
         if ($docker) {
-            $steps[] = 'Use Docker for the local runtime';
+            $steps[] = 'Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)';
         }
 
         return new self($permutation, $dir, $steps);

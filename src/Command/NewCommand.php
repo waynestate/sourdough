@@ -14,6 +14,7 @@ use Waynestate\Sourdough\AppPlan;
 use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\DescribeException;
 use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
+use Waynestate\Sourdough\Generator\DockerScaffold;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
@@ -60,7 +61,7 @@ final class NewCommand extends Command
             ->addOption('vue', null, InputOption::VALUE_NONE, 'Add a Vue front end (SPA over JSON, or islands with --laravel).')
             ->addOption('inertia', null, InputOption::VALUE_NONE, 'Use Inertia/Vue (implies --laravel).')
             ->addOption('sail', null, InputOption::VALUE_NONE, 'Run the Laravel app on Sail for local work (compose.yaml; needs WSL2 on Windows).')
-            ->addOption('docker', null, InputOption::VALUE_NONE, 'Use Docker for the local runtime (not available in this release; planned).')
+            ->addOption('docker', null, InputOption::VALUE_NONE, 'Generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64).')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the plan and write nothing.')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The app name (default: the basename of dir).')
             ->addOption('no-input', null, InputOption::VALUE_NONE, 'Never prompt. Sourdough 0.1 has no prompts, so this is accepted and documented.')
@@ -232,16 +233,6 @@ final class NewCommand extends Command
             return 1;
         }
 
-        // --docker is accepted but not built yet: the plan shows the
-        // requested step, then the run refuses before writing anything.
-        // A dry run refuses too, so a preview matches the real outcome.
-        if ($docker) {
-            $this->printPlan($output, $plan);
-            $this->errorOutput($output)->writeln('not available in this release');
-
-            return 1;
-        }
-
         if ($dryRun) {
             // A dry run still checks access, so the developer learns about a
             // missing Playbook read before they commit to the real run. It
@@ -330,6 +321,16 @@ final class NewCommand extends Command
                 (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             }
 
+            // The app's own Docker setup lands on the generated Laravel app
+            // after the shape is baked: a two-target Dockerfile pinned by
+            // digest, a compose.yaml (with a vite service for the Vue and
+            // Inertia shapes), the dev-up/dev-down/dev-shell scripts and the
+            // database settings in .env.example. A raw bake with --docker
+            // never reaches here; Plan refuses it first.
+            if ($docker) {
+                (new DockerScaffold())->apply($dir, Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation);
+            }
+
             // Sail lands on the generated Laravel app after the shape is
             // baked: composer.json gets laravel/sail, plus compose.yaml, the
             // .env.example lines and the README section. A raw bake with
@@ -356,7 +357,15 @@ final class NewCommand extends Command
         if ($advisor) {
             $output->writeln('  php vendor/bin/advisor install --client=claude --write');
         }
-        if (Permutation::LaravelBlade === $permutation) {
+        if ($docker) {
+            $output->writeln('  cp .env.example .env');
+            $output->writeln('  composer dev-up');
+            $output->writeln('  docker compose exec app php artisan key:generate');
+            $output->writeln('  docker compose exec app php artisan migrate');
+            if (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
+                $output->writeln('  (Vite runs as its own service on port 5173)');
+            }
+        } elseif (Permutation::LaravelBlade === $permutation) {
             if ($sail) {
                 $output->writeln('  cp .env.example .env');
                 $output->writeln('  ./vendor/bin/sail up -d');

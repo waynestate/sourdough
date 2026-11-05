@@ -71,7 +71,7 @@ final class PlanTest extends TestCase
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
-            'Use Docker for the local runtime',
+            'Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)',
         ], $plan->steps);
     }
 
