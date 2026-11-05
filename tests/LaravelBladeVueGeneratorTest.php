@@ -106,6 +106,34 @@ final class LaravelBladeVueGeneratorTest extends TestCase
         self::assertSame('^8.3', $composer['require']['php']);
     }
 
+    public function testShipsPestInheritedFromTheBladeOverlay(): void
+    {
+        $target = $this->generate();
+        $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // The blade overlay ships the Pest wiring; the islands layer has no
+        // composer.overlay.json of its own.
+        self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
+        self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);
+        self::assertContains('pest', $composer['scripts']['ci']);
+        self::assertNotContains('phpunit', $composer['scripts']['ci']);
+        self::assertSame('pest', $composer['scripts']['test']);
+        self::assertTrue($composer['config']['allow-plugins']['pestphp/pest-plugin']);
+
+        // The Pest wiring lands through the blade overlay too: Feature tests
+        // get the app and a fresh database, and the TestCase boots without
+        // reading a .env file (tests take their environment from phpunit.xml).
+        self::assertFileExists($target . '/tests/Pest.php');
+        self::assertFileExists($target . '/tests/Support/SkipEnvFile.php');
+        self::assertStringContainsString('SkipEnvFile', (string) file_get_contents($target . '/tests/TestCase.php'));
+
+        // The islands layer swaps the example test for one that fakes the
+        // Vite manifest.
+        $example = (string) file_get_contents($target . '/tests/Feature/ExampleTest.php');
+        self::assertStringContainsString("it('returns a successful response'", $example);
+        self::assertStringContainsString('$this->withoutVite();', $example);
+    }
+
     public function testWritesTheManifestWithTheIslandsTemplateName(): void
     {
         $target = $this->generate();

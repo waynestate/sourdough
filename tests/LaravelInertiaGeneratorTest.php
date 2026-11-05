@@ -76,8 +76,14 @@ final class LaravelInertiaGeneratorTest extends TestCase
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
+        // ...and Pest is the test runner for new tests...
+        self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
+        self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);
         // ...and the scripts join the skeleton's own.
         self::assertIsArray($composer['scripts']['ci']);
+        self::assertContains('pest', $composer['scripts']['ci']);
+        self::assertNotContains('phpunit', $composer['scripts']['ci']);
+        self::assertSame('pest', $composer['scripts']['test']);
         self::assertContains('phpstan analyse --memory-limit=1G', $composer['scripts']['ci']);
         self::assertSame(
             'proctor check --policy=vendor/waynestate/creed/policy/policy.json',
@@ -89,6 +95,35 @@ final class LaravelInertiaGeneratorTest extends TestCase
         // The skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
+    }
+
+    public function testShipsPestForNewTests(): void
+    {
+        $target = $this->generate();
+
+        // Feature tests get the app and a fresh database through Pest...
+        self::assertFileExists($target . '/tests/Pest.php');
+        self::assertStringContainsString(
+            "pest()->extend(TestCase::class)->use(RefreshDatabase::class)->in('Feature');",
+            (string) file_get_contents($target . '/tests/Pest.php'),
+        );
+
+        // ...and the TestCase boots the app without reading a .env file:
+        // tests take their environment from phpunit.xml, and Pest reports
+        // phpdotenv's suppressed read of a missing .env as a warning.
+        self::assertFileExists($target . '/tests/Support/SkipEnvFile.php');
+        $testCase = (string) file_get_contents($target . '/tests/TestCase.php');
+        self::assertStringContainsString('SkipEnvFile', $testCase);
+        self::assertStringContainsString('createApplication', $testCase);
+        // The Vite manifest stub for the bare CI container stays.
+        self::assertStringContainsString('build/manifest.json', $testCase);
+
+        // The skeleton's PHPUnit feature example is replaced by a Pest one.
+        self::assertFileExists($target . '/tests/Feature/ExampleTest.php');
+        self::assertStringContainsString(
+            "it('returns a successful response'",
+            (string) file_get_contents($target . '/tests/Feature/ExampleTest.php'),
+        );
     }
 
     public function testAppendsTheEnvAdditions(): void
