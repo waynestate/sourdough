@@ -45,6 +45,9 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
+<p>Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (<code>tests/Pest.php</code>, a Pest example test, <code>composer test</code> and <code>composer ci</code> run Pest, PHPUnit tests unchanged, tests never read a <code>.env</code> file); the raw shape is unchanged.</p>
+</li>
+<li>
 <p>Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: <code>docs/_header.html</code>, <code>docs/theme/sourdough.css</code> and a <code>theme</code> key in <code>docs/docs.json</code>; the kit's <code>docs.css</code> is unchanged.</p>
 </li>
 <li>
@@ -57,7 +60,10 @@ Versioning once 1.0 is out.</p>
 <p>Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into <code>public/wayne-ui.php</code>, starts the app with <code>APP_ENV=local</code> on <code>127.0.0.1:8099</code> and expects <code>/</code> 200, <code>/nope</code> 404 and <code>/up</code> 200. Every shape now bakes with <code>--no-playbook</code>, because Playbook is required by default and its private package cannot be installed credential-free.</p>
 </li>
 <li>
-<p>Changed: <code>--sail</code> and <code>--docker</code> are planned features that refuse in this release. For the Laravel shapes (<code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code>) the plan still builds and prints, then the command writes &quot;not available in this release&quot; to stderr and exits <code>1</code> without writing anything; a <code>--dry-run</code> refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: &quot;<code>--sail</code> and <code>--docker</code> are for the Laravel paths: the raw paths run on plain PHP.&quot;</p>
+<p>Added: <code>--docker</code> generates the app's own Docker setup for the Laravel shapes (<code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code>): a two-target <code>Dockerfile</code> (dev and prod) whose base images are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64, a <code>compose.yaml</code> with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a <code>.dockerignore</code>, the PHP ini files the image copies in, the <code>composer dev-up</code>, <code>dev-down</code> and <code>dev-shell</code> scripts, the database settings in <code>.env.example</code>, and a &quot;Run it locally with Docker&quot; README section. It works natively on Windows, macOS and Linux (no WSL2 needed). Playbook credentials reach a production build only as a BuildKit secret, never a build arg, and the <code>FROM</code> lines are the single place to swap in SQUIRE's Citadel-parity image when it exists.</p>
+</li>
+<li>
+<p>Added: <code>--sail</code> generates a Sail setup (compose.yaml, laravel/sail) for the Laravel shapes.</p>
 </li>
 <li>
 <p>Added: the raw template's <code>.gitlab-ci.yml</code> runs an explicit <code>composer-ci</code> job (<code>composer install</code>, then <code>composer ci</code>), mirroring the Laravel overlay, so PROCTOR sees a <code>composer ci</code> in the pipeline instead of warning that no job runs it.</p>
