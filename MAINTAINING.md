@@ -42,7 +42,7 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The baked Laravel apps run Pest 4 (PHP 8.3 floor) while Sourdough's own suite stays PHPUnit.
 
 ## CI
 
