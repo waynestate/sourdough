@@ -240,6 +240,65 @@ final class SailScaffoldTest extends TestCase
     }
 
     /**
+     * The real binary, with --laravel --sail --dry-run: exit 0, the plan on
+     * stdout carries the Sail step, and nothing is written.
+     */
+    public function testRealBinarySailDryRunPrintsThePlanAndWritesNothing(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        [$exit, $stdout, $stderr] = $this->runNew($target, ['--laravel', '--sail', '--dry-run']);
+
+        self::assertSame(0, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
+        self::assertStringContainsString('Permutation:', $stdout);
+        self::assertStringContainsString('Use Sail for the local runtime', $stdout);
+        self::assertDirectoryDoesNotExist($target);
+    }
+
+    /**
+     * The real binary refuses --sail and --docker together: exit 1, the
+     * reason on stderr, nothing written.
+     */
+    public function testRealBinaryRefusesSailAndDockerTogether(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+        [$exit, $stdout, $stderr] = $this->runNew($target, ['--laravel', '--sail', '--docker', '--dry-run']);
+
+        self::assertSame(1, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
+        self::assertStringContainsString('Choose one of --sail or --docker', $stderr);
+        self::assertDirectoryDoesNotExist($target);
+    }
+
+    /**
+     * Run `sourdough new` with the given flags against the real binary and
+     * capture stdout and stderr separately.
+     *
+     * @param list<string> $flags
+     *
+     * @return array{0: int, 1: string, 2: string}
+     */
+    private function runNew(string $target, array $flags): array
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $pipes = [];
+        $argv = array_merge([PHP_BINARY, __DIR__ . '/../bin/sourdough', 'new', $target], $flags);
+        $process = proc_open($argv, $descriptors, $pipes);
+        self::assertIsResource($process);
+        fclose($pipes[0]);
+        $stdout = (string) stream_get_contents($pipes[1]);
+        $stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        return [proc_close($process), $stdout, $stderr];
+    }
+
+    /**
      * Seed the dir with a minimal app composer.json: require-dev on
      * purpose unsorted, so the sort has something to do.
      */

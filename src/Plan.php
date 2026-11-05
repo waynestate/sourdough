@@ -26,10 +26,14 @@ final class Plan
     ) {}
 
     /**
-     * @throws \InvalidArgumentException when --sail or --docker is combined with a raw permutation
+     * @throws \InvalidArgumentException when --sail and --docker are both set, or when --sail or --docker is combined with a raw permutation
      */
     public static function forPermutation(Permutation $permutation, string $dir, bool $sail, bool $docker, bool $advisor = true): self
     {
+        if ($sail && $docker) {
+            throw new \InvalidArgumentException('Choose one of --sail or --docker, not both.');
+        }
+
         $isRaw = $permutation === Permutation::Raw || $permutation === Permutation::RawVue;
 
         if ($isRaw && ($sail || $docker)) {
@@ -57,7 +61,7 @@ final class Plan
         }
 
         if ($sail) {
-            $steps[] = 'Use Sail for the local runtime';
+            $steps[] = 'Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)';
         }
 
         if ($docker) {

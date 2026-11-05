@@ -60,7 +60,7 @@ final class PlanTest extends TestCase
         self::assertSame([
             'Create the Laravel + Blade app in /tmp/demo',
             'Wire ADVISOR into the app',
-            'Use Sail for the local runtime',
+            'Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)',
         ], $plan->steps);
     }
 

@@ -8,9 +8,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * --sail and --docker are accepted but not built yet. The command prints the
- * plan (with the requested step) and then refuses with "not available in this
- * release" on stderr, exit 1, writing nothing. A dry run refuses the same way.
+ * --docker is accepted but not built yet. The command prints the plan (with
+ * the requested step) and then refuses with "not available in this release"
+ * on stderr, exit 1, writing nothing. A dry run refuses the same way.
  *
  * These run the real binary so stdout and stderr stay separate: the plan must
  * land on stdout and the refusal on stderr, where scripts can read it.
@@ -33,9 +33,7 @@ final class RuntimeFlagsTest extends TestCase
      */
     public static function runtimeFlagCombos(): iterable
     {
-        yield 'laravel + sail' => [['--laravel', '--sail'], 'Use Sail for the local runtime'];
         yield 'laravel + docker' => [['--laravel', '--docker'], 'Use Docker for the local runtime'];
-        yield 'inertia + sail' => [['--inertia', '--sail'], 'Use Sail for the local runtime'];
     }
 
     /**
@@ -55,19 +53,6 @@ final class RuntimeFlagsTest extends TestCase
         // The refusal goes to stderr.
         self::assertStringContainsString('not available in this release', $stderr);
         // Nothing is written.
-        self::assertDirectoryDoesNotExist($target);
-    }
-
-    public function testDryRunWithARuntimeFlagPrintsThePlanAndRefuses(): void
-    {
-        $parent = $this->makeTempDir();
-        $target = $parent . '/demo';
-        [$exit, $stdout, $stderr] = $this->runNew($target, ['--laravel', '--sail', '--dry-run']);
-
-        self::assertSame(1, $exit, "stdout: {$stdout}\nstderr: {$stderr}");
-        self::assertStringContainsString('Permutation:', $stdout);
-        self::assertStringContainsString('Use Sail for the local runtime', $stdout);
-        self::assertStringContainsString('not available in this release', $stderr);
         self::assertDirectoryDoesNotExist($target);
     }
 

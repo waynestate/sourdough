@@ -18,6 +18,7 @@ use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
+use Waynestate\Sourdough\Generator\SailScaffold;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
@@ -58,7 +59,7 @@ final class NewCommand extends Command
             ->addOption('laravel', null, InputOption::VALUE_NONE, 'Laravel + Blade.')
             ->addOption('vue', null, InputOption::VALUE_NONE, 'Add a Vue front end (SPA over JSON, or islands with --laravel).')
             ->addOption('inertia', null, InputOption::VALUE_NONE, 'Use Inertia/Vue (implies --laravel).')
-            ->addOption('sail', null, InputOption::VALUE_NONE, 'Use Sail for the local runtime (not available in this release; planned).')
+            ->addOption('sail', null, InputOption::VALUE_NONE, 'Run the Laravel app on Sail for local work (compose.yaml; needs WSL2 on Windows).')
             ->addOption('docker', null, InputOption::VALUE_NONE, 'Use Docker for the local runtime (not available in this release; planned).')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the plan and write nothing.')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The app name (default: the basename of dir).')
@@ -231,10 +232,10 @@ final class NewCommand extends Command
             return 1;
         }
 
-        // --sail and --docker are accepted but not built yet: the plan shows
-        // the requested step, then the run refuses before writing anything.
+        // --docker is accepted but not built yet: the plan shows the
+        // requested step, then the run refuses before writing anything.
         // A dry run refuses too, so a preview matches the real outcome.
-        if ($sail || $docker) {
+        if ($docker) {
             $this->printPlan($output, $plan);
             $this->errorOutput($output)->writeln('not available in this release');
 
@@ -328,6 +329,14 @@ final class NewCommand extends Command
             } else {
                 (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             }
+
+            // Sail lands on the generated Laravel app after the shape is
+            // baked: composer.json gets laravel/sail, plus compose.yaml, the
+            // .env.example lines and the README section. A raw bake with
+            // --sail never reaches here; Plan refuses it first.
+            if ($sail) {
+                (new SailScaffold())->apply($dir);
+            }
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
@@ -348,17 +357,35 @@ final class NewCommand extends Command
             $output->writeln('  php vendor/bin/advisor install --client=claude --write');
         }
         if (Permutation::LaravelBlade === $permutation) {
-            $output->writeln('  cp .env.example .env');
-            $output->writeln('  php artisan key:generate');
-            $output->writeln('  php artisan migrate');
-            $output->writeln('  php artisan serve');
+            if ($sail) {
+                $output->writeln('  cp .env.example .env');
+                $output->writeln('  ./vendor/bin/sail up -d');
+                $output->writeln('  ./vendor/bin/sail artisan key:generate');
+                $output->writeln('  ./vendor/bin/sail artisan migrate');
+                $output->writeln('  (Windows: run sail from WSL2, or use --docker)');
+            } else {
+                $output->writeln('  cp .env.example .env');
+                $output->writeln('  php artisan key:generate');
+                $output->writeln('  php artisan migrate');
+                $output->writeln('  php artisan serve');
+            }
         } elseif (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
-            $output->writeln('  cp .env.example .env');
-            $output->writeln('  php artisan key:generate');
-            $output->writeln('  php artisan migrate');
-            $output->writeln('  npm install');
-            $output->writeln('  npm run build');
-            $output->writeln('  php artisan serve');
+            if ($sail) {
+                $output->writeln('  cp .env.example .env');
+                $output->writeln('  ./vendor/bin/sail up -d');
+                $output->writeln('  ./vendor/bin/sail artisan key:generate');
+                $output->writeln('  ./vendor/bin/sail artisan migrate');
+                $output->writeln('  ./vendor/bin/sail npm install');
+                $output->writeln('  ./vendor/bin/sail npm run dev');
+                $output->writeln('  (Windows: run sail from WSL2, or use --docker)');
+            } else {
+                $output->writeln('  cp .env.example .env');
+                $output->writeln('  php artisan key:generate');
+                $output->writeln('  php artisan migrate');
+                $output->writeln('  npm install');
+                $output->writeln('  npm run build');
+                $output->writeln('  php artisan serve');
+            }
         } else {
             // composer serve sets APP_ENV=local for the raw app, which has no
             // .env loader; a plain php -S would boot as production.
