@@ -11,9 +11,8 @@ use Tests\Support\SkipEnvFile;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Boot the app without reading a .env file: tests take their environment from phpunit.xml. Pest reports
-     * phpdotenv's suppressed read of a missing .env as a warning (PHPUnit does not), so this skips it. The framework's
-     * cached-config and cached-routes branches are left out because the suite does not use them.
+     * Boot the app with its real environment: tests read .env when present, otherwise .env.example, and never a
+     * missing file (Pest reports phpdotenv's suppressed read of a missing .env as a warning, PHPUnit does not).
      */
     public function createApplication()
     {
