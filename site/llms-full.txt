@@ -16,7 +16,7 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Every loaf gets proofed before it ships.
 
-Documentation: the [docs site](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs` rebuilds it and `composer docs:check` fails when it is stale.
+Documentation: the [docs site](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs` rebuilds it and `composer docs:check` fails when it is stale. The docs pages wear the front page's header, menu, palette and fonts: edit [`docs/_header.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/_header.html) and [`docs/theme/sourdough.css`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/theme/sourdough.css) (named by the `theme` key in `docs/docs.json`), never the kit's `docs.css`.
 
 Front page: [`site/index.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
 
@@ -575,6 +575,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: `docs/_header.html`, `docs/theme/sourdough.css` and a `theme` key in `docs/docs.json`; the kit's `docs.css` is unchanged.
 - Added: the docs site in `site/docs/` is built by the shared Squire docs-site builder (`bin/docs-site.php`) from the pages in `docs/`, and `composer ci` checks it with `@docs:check`.
 - Fixed: raw apps start with `composer serve`. The old `php -S localhost:8000 -t public` line booted the app as production, because the raw front controller defaults `APP_ENV` to production when it is unset. The raw template's new `serve` script disables Composer's process timeout, sets `APP_ENV=local` cross-platform with `@putenv`, then starts `php -S localhost:8000 -t public`, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at `composer serve` now.
 - Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into `public/wayne-ui.php`, starts the app with `APP_ENV=local` on `127.0.0.1:8099` and expects `/` 200, `/nope` 404 and `/up` 200. Every shape now bakes with `--no-playbook`, because Playbook is required by default and its private package cannot be installed credential-free.
@@ -1325,10 +1326,14 @@ Each step prints `ok`; the first `FAIL` stops the run and shows the command's ta
 
 Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
 
+linux
+
 ```bash
 docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
 docker run --rm -v "$PWD:/repo:ro" -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh <shape>
 ```
+
+windows
 
 ```powershell
 .\scripts\smoke-shape.ps1 <shape>
@@ -1963,9 +1968,13 @@ The flags that select a shape:
 
 Bake commands for the four shapes that generate:
 
+raw
+
 ```bash
 sourdough new my-app --raw
 ```
+
+laravel
 
 ```bash
 sourdough new my-app --laravel

@@ -38,9 +38,13 @@ The flags that select a shape:
 
 Bake commands for the four shapes that generate:
 
+raw
+
 ```bash
 sourdough new my-app --raw
 ```
+
+laravel
 
 ```bash
 sourdough new my-app --laravel
