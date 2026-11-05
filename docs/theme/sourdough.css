@@ -97,6 +97,7 @@
   --sd-danger: var(--sd-burnt);
   --sd-footer-bg: var(--sd-green-deep);
   --sd-footer-ink: var(--sd-cream);
+  --sd-term-edge: transparent;     /* the terminal needs an edge on slate only */
 
   /* The kit's tokens, set from the palette above. */
   --dk-bg: var(--sd-cream);
@@ -472,7 +473,7 @@ body {
   line-height: 1.7;
   color: var(--sd-term-ink);
   background: var(--sd-term);
-  border: 0;
+  border: 1px solid var(--sd-term-edge);
   border-radius: var(--dk-radius);
   box-shadow: 0 14px 30px -18px rgba(7, 58, 50, 0.8);
   tab-size: 4;
@@ -493,6 +494,7 @@ body {
    command. */
 .docs-copy {
   margin: 1.1rem 0 1.4rem;
+  border: 1px solid var(--sd-term-edge);
   background: var(--sd-term);
   border-radius: var(--dk-radius);
   box-shadow: 0 14px 30px -18px rgba(7, 58, 50, 0.8);
@@ -503,6 +505,7 @@ body {
   margin-inline-end: 5.5rem;
   padding-inline-end: 0.75rem;
   background: transparent;
+  border: 0;
   box-shadow: none;
   border-radius: var(--dk-radius) 0 0 var(--dk-radius);
 }
@@ -735,7 +738,11 @@ body {
   border-left: 2px dashed var(--sd-dash);
 }
 
-.docs-toc__item a {
+/* Sub items carry only the --sub class, so the rules name the list, not the item. */
+.docs-toc__list a {
+  display: block;
+  padding: 0.25rem 0.75rem;
+  text-decoration: none;
   margin-inline-start: -2px;
   font-size: 0.93rem;
   line-height: 1.4;
@@ -743,7 +750,12 @@ body {
   border-inline-start: 2px solid transparent;
 }
 
-.docs-toc__item a:hover {
+.docs-toc__item--sub a {
+  padding-inline-start: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.docs-toc__list a:hover {
   color: var(--sd-head);
   border-inline-start-color: var(--sd-gold);
 }
@@ -849,6 +861,7 @@ body {
     --dk-on-accent: var(--sd-slate);
     --dk-code-bg: rgba(238, 236, 228, 0.1);
     --dk-focus: var(--sd-gold-chalk);
+    --sd-term-edge: rgba(238, 236, 228, 0.14);
 
     color-scheme: dark;
   }
@@ -903,6 +916,7 @@ body {
   --dk-on-accent: var(--sd-slate);
   --dk-code-bg: rgba(238, 236, 228, 0.1);
   --dk-focus: var(--sd-gold-chalk);
+  --sd-term-edge: rgba(238, 236, 228, 0.14);
 
   color-scheme: dark;
 }
