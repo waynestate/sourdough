@@ -62,8 +62,8 @@ Options:
 - `--laravel` use the Laravel base
 - `--vue` add a Vue front end
 - `--inertia` use Inertia/Vue (implies `--laravel`)
-- `--sail` use Laravel Sail for the local runtime (not available in this release; planned)
-- `--docker` use a Docker image for the local runtime (not available in this release; planned)
+- `--sail` run the Laravel app on Sail for local work: compose.yaml and laravel/sail in require-dev, MySQL 8.4 LTS; needs WSL2 on Windows, where `--docker` is the route that works natively
+- `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in SQUIRE's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
 - `--no-input` never prompt (Sourdough 0.1 has no prompts)

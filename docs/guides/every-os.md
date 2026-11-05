@@ -34,7 +34,7 @@ Offer more than one local runtime, and be honest about Sail on Windows. Sail is 
 
 ## Docker images the safe way
 
-If Sourdough generates a Dockerfile: pin the base image to an exact version (a digest is stronger), use a multi-stage build, run as a non-root user with a fixed UID, add a `.dockerignore`, never leave secrets in a layer, and rebuild regularly with `--pull`. State the CPU architecture: the images are x86-64 only as far as is known, so Apple Silicon users run them under emulation. Pinning to a digest also opts you out of automatic security fixes, so pair the pin with a scheduled update.
+If Sourdough generates a Dockerfile: pin the base image to an exact version (a digest is stronger), use a multi-stage build, run as a non-root user with a fixed UID, add a `.dockerignore`, never leave secrets in a layer, and rebuild regularly with `--pull`. State the CPU architecture: the base images behind `--docker` are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64 and Apple Silicon users do not run under emulation. Pinning to a digest also opts you out of automatic security fixes, so pair the pin with a scheduled update.
 
 ## Test on all three systems
 

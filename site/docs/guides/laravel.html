@@ -42,12 +42,16 @@
 </code></pre>
 <p>A kit declares its environment variables in <code>.env.example</code> and its setup steps in the <code>post-create-project-cmd</code> list of its <code>composer.json</code>. There is no plain Blade kit, so the <code>--laravel</code> (Blade) and Blade-plus-Vue-islands permutations are a bare Laravel install plus Sourdough's own layer, not a vendor kit.</p>
 <h2 id="local-runtime-sail-or-docker">Local runtime: Sail or Docker<a class="docs-heading-link" aria-label="Link to this section" href="#local-runtime-sail-or-docker">#</a></h2>
-<p>The Laravel paths take a flag for the local runtime:</p>
+<p>The Laravel paths take a flag for the local runtime, and the two are mutually exclusive: together they are refused with <code>Choose one of --sail or --docker, not both.</code></p>
 <ul>
-<li><code>--sail</code> use Laravel Sail for the local runtime (Laravel paths)</li>
-<li><code>--docker</code> use a Docker image for the local runtime (Laravel paths)</li>
+<li><code>--sail</code> runs the app on Laravel Sail. The bake adds <code>laravel/sail</code> to require-dev, writes a <code>compose.yaml</code>, sets the database settings in <code>.env.example</code> and appends a &quot;Run it locally with Sail&quot; README section. The database is MySQL 8.4 LTS.</li>
+<li><code>--docker</code> writes the app's own Docker setup after the shape is baked: a two-target <code>Dockerfile</code> (dev and prod) whose base images are pinned by manifest-list digest, a <code>compose.yaml</code> with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a <code>.dockerignore</code>, the PHP ini files the image copies in, the <code>composer dev-up</code>, <code>dev-down</code> and <code>dev-shell</code> scripts, the database settings in <code>.env.example</code>, and a &quot;Run it locally with Docker&quot; README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64.</li>
 </ul>
-<p>Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its <code>sail</code> script is shell, so it is an option where it fits, never the only Windows route. See <a href="./every-os.html">Every developer, every operating system</a> for the full picture.</p>
+<p>Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its <code>sail</code> script is shell, so it is an option where it fits, never the only Windows route; <code>--docker</code> is the route that works natively. See <a href="./every-os.html">Every developer, every operating system</a> for the full picture.</p>
+<p>With <code>--docker</code>, the production build takes Playbook's credentials as a BuildKit secret, never a build arg:</p>
+<pre><code class="language-bash">docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
+</code></pre>
+<p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the single place to swap in SQUIRE's Citadel-parity image when it exists.</p>
 <h2 id="sign-in-stays-sesame">Sign-in stays SESAME<a class="docs-heading-link" aria-label="Link to this section" href="#sign-in-stays-sesame">#</a></h2>
 <p>Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>A live <code>/register</code> route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.</p></aside>

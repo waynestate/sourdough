@@ -134,8 +134,8 @@ The app plan is the what: permutation, parts, name, models, pages. The steps pla
 | raw permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
 | any other permutation | `Create the <label> app in <dir>`, with ` (not available in this release)` appended when the permutation does not generate |
 | ADVISOR wired in, permutation generates | `Wire ADVISOR into the app` |
-| `--sail` | `Use Sail for the local runtime` |
-| `--docker` | `Use Docker for the local runtime` |
+| `--sail` | `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` |
+| `--docker` | `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)` |
 
 `--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP, and combining either flag with a raw permutation is refused.
 

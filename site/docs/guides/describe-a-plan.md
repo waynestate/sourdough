@@ -93,7 +93,7 @@ The plan becomes a list of plain steps, built from the permutation, the target d
 - `Copy the raw template into <dir>`
 - `Replace {{app_name}} and {{app_slug}} in file names and contents`
 
-The Laravel shapes get a step to create the app in the target dir, suffixed with ` (not available in this release)` for the permutations this release does not generate. Generatable permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime` and `--docker` adds `Use Docker for the local runtime`.
+The Laravel shapes get a step to create the app in the target dir, suffixed with ` (not available in this release)` for the permutations this release does not generate. Generatable permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` and `--docker` adds `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)`. The two flags are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
 Note
 

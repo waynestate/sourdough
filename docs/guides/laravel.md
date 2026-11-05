@@ -29,12 +29,20 @@ A kit declares its environment variables in `.env.example` and its setup steps i
 
 ## Local runtime: Sail or Docker
 
-The Laravel paths take a flag for the local runtime:
+The Laravel paths take a flag for the local runtime, and the two are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
-- `--sail` use Laravel Sail for the local runtime (Laravel paths)
-- `--docker` use a Docker image for the local runtime (Laravel paths)
+- `--sail` runs the app on Laravel Sail. The bake adds `laravel/sail` to require-dev, writes a `compose.yaml`, sets the database settings in `.env.example` and appends a "Run it locally with Sail" README section. The database is MySQL 8.4 LTS.
+- `--docker` writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64.
 
-Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell, so it is an option where it fits, never the only Windows route. See [Every developer, every operating system](./every-os.md) for the full picture.
+Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell, so it is an option where it fits, never the only Windows route; `--docker` is the route that works natively. See [Every developer, every operating system](./every-os.md) for the full picture.
+
+With `--docker`, the production build takes Playbook's credentials as a BuildKit secret, never a build arg:
+
+```bash
+docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
+```
+
+The `FROM` lines in the generated `Dockerfile` are the single place to swap in SQUIRE's Citadel-parity image when it exists.
 
 ## Sign-in stays SESAME
 

@@ -28,8 +28,8 @@ sourdough new [dir] [options]
 | `--laravel` | use the Laravel base |
 | `--vue` | add a Vue front end |
 | `--inertia` | use Inertia/Vue (implies `--laravel`) |
-| `--sail` | use Laravel Sail for the local runtime (not available in this release; planned) |
-| `--docker` | use a Docker image for the local runtime (not available in this release; planned) |
+| `--sail` | run the Laravel app on Sail for local work (compose.yaml; needs WSL2 on Windows) |
+| `--docker` | generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64) |
 | `--dry-run` | print the plan and write nothing |
 | `--name` | app name (default: the basename of `<dir>`) |
 | `--no-input` | never prompt (Sourdough 0.1 has no prompts) |
@@ -43,7 +43,7 @@ sourdough new [dir] [options]
 
 Note
 
-`--sail` and `--docker` are planned features that refuse in this release. For the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) the plan still builds and prints, then the command writes "not available in this release" to stderr and exits `1` without writing anything; a `--dry-run` refuses the same way, so the preview matches the real run. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
+`--sail` and `--docker` are both real for the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) and mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.` (exit `1`). With `--sail` the app runs on Laravel Sail: `laravel/sail` in require-dev, a `compose.yaml`, the database settings in `.env.example` and a README section; the database is MySQL 8.4 LTS. On Windows, Sail needs WSL2, and `--docker` is the route that works natively. With `--docker` Sourdough writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64. Playbook credentials reach a production build only as a BuildKit secret, never a build arg. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
 
 ### Exit codes[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes)
 
@@ -52,6 +52,8 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 | Refused case | Exact message | Exit |
 | --- | --- | --- |
 | `--describe` and `--plan` together | `--describe and --plan are mutually exclusive.` | `1` |
+| `--sail` and `--docker` together | `Choose one of --sail or --docker, not both.` | `1` |
+| `--sail` or `--docker` with a raw permutation | `--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.` | `1` |
 | `--playbook` and `--no-playbook` together | `--playbook and --no-playbook are mutually exclusive.` | `1` |
 | `--plan-only` without `--describe` | `--plan-only is only available with --describe.` | `1` |
 | `dir` missing without `--describe` | `The dir argument is required unless you use --describe.` | `1` |
@@ -98,6 +100,8 @@ The app name (from `--name`, from the plan, or from the basename of `<dir>`) mus
 | Laravel + Blade | `cd <dir>`, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve` |
 | Laravel + Blade + Vue islands | the Laravel + Blade steps plus `npm install` and `npm run build` |
 | Laravel + Inertia/Vue | the Laravel + Blade steps plus `npm install` and `npm run build` |
+| any Laravel shape with `--sail` | `cd <dir>`, `composer install`, `cp .env.example .env`, `./vendor/bin/sail up -d`, `./vendor/bin/sail artisan key:generate`, `./vendor/bin/sail artisan migrate`, `(Windows: run sail from WSL2, or use --docker)`; the Vue and Inertia shapes add `./vendor/bin/sail npm install` and `./vendor/bin/sail npm run dev` |
+| any Laravel shape with `--docker` | `cd <dir>`, `composer install`, `cp .env.example .env`, `composer dev-up`, `docker compose exec app php artisan key:generate`, `docker compose exec app php artisan migrate`; the Vue and Inertia shapes end with `(Vite runs as its own service on port 5173)` |
 
 With ADVISOR wired in, `php vendor/bin/advisor install --client=claude --write` is printed after `composer install`. With Playbook required, the output ends with: `WSU values: Playbook installs with composer install. Check it any time with: composer playbook`.
 

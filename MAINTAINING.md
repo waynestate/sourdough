@@ -87,6 +87,17 @@ Two environment variables control the scratch space:
 
 On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
+## The local runtime output (Sail and Docker)
+
+The `--sail` and `--docker` output is checked by tests only: `tests/SailScaffoldTest.php` and `tests/DockerScaffoldTest.php` assert on the files each scaffold writes, including real-binary runs through `bin/sourdough`. No Docker daemon is part of the default gate, so a bake with `--docker` is not proven to boot here. The plan is to add Docker smoke runs to the smoke gate once it can drive a compose stack (build the app image, start MySQL, run `php artisan migrate` and expect `/up` 200); until then the docs claim what the tests prove.
+
+The base images in `templates/docker/Dockerfile` are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64. To bump a pin:
+
+1. Run `docker buildx imagetools inspect <tag>` for the tag you want (for example `php:8.5-cli-trixie`) and copy the manifest-list digest, the `sha256:` value on the top `Digest:` line, not the per-architecture digests listed below it.
+2. Replace the digest on the matching `FROM` line, add a CHANGELOG line, and commit.
+
+A digest pin never moves on its own, so schedule these bumps (for example when a new patch release lands on the line) to pick up security fixes inside the image.
+
 ## Refreshing the Squire templates
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
