@@ -2,7 +2,14 @@
         build:
             context: .
             target: dev
-        command: ['npm', 'run', 'dev', '--', '--host', '0.0.0.0']
+        # LARAVEL_SAIL makes laravel-vite-plugin listen on 0.0.0.0 inside the
+        # container and write http://localhost:5173 to public/hot, an address
+        # the browser on the host can reach. Handing Vite a host of 0.0.0.0
+        # instead put that address in the hot file, and every page loaded
+        # blank.
+        command: ['npm', 'run', 'dev']
+        environment:
+            LARAVEL_SAIL: '1'
         ports:
             - '${VITE_PORT:-5173}:5173'
         volumes:

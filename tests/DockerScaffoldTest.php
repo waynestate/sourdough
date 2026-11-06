@@ -100,6 +100,24 @@ final class DockerScaffoldTest extends TestCase
         $this->assertYamlStructureHolds($compose);
     }
 
+    /**
+     * `npm run dev -- --host 0.0.0.0` made laravel-vite-plugin write
+     * http://0.0.0.0:5173 to public/hot, which the host's browser cannot load,
+     * so every page rendered blank. LARAVEL_SAIL makes the plugin listen on
+     * every address and still hand the browser localhost.
+     */
+    public function testViteServiceHandsTheBrowserLocalhost(): void
+    {
+        $target = $this->makeAppDir();
+        (new DockerScaffold())->apply($target, true);
+        $compose = (string) file_get_contents($target . '/compose.yaml');
+
+        self::assertStringContainsString("command: ['npm', 'run', 'dev']", $compose);
+        self::assertStringContainsString("LARAVEL_SAIL: '1'", $compose);
+        self::assertStringNotContainsString('--host', $compose);
+        $this->assertYamlStructureHolds($compose);
+    }
+
     public function testDockerignoreListsEnvAndVendor(): void
     {
         $target = $this->makeAppDir();

@@ -6,6 +6,9 @@ include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
+      # The example tests are Pest files, and PHPUnit refuses to load them
+      # ("Please run ./vendor/bin/pest instead"). Pest runs PHPUnit classes too.
+      test_command: vendor/bin/pest
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
 
 composer-ci:

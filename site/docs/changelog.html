@@ -46,6 +46,18 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
+<p>Fixed: the Laravel shapes' (Blade, Blade + Vue, Inertia) <code>.gitlab-ci.yml</code> runs the php-test matrix with <code>vendor/bin/pest</code>. The Preflight component defaults to <code>vendor/bin/phpunit</code>, which refuses the Pest example tests (&quot;Please run ./vendor/bin/pest instead&quot;), so every job in the matrix crashed with exit 255. Pest runs the PHPUnit class tests too.</p>
+</li>
+<li>
+<p>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) load their pages. The service ran <code>npm run dev -- --host 0.0.0.0</code>, so laravel-vite-plugin wrote <code>http://0.0.0.0:5173</code> to <code>public/hot</code> and the browser got a blank page; it now runs <code>npm run dev</code> with <code>LARAVEL_SAIL=1</code>, which listens on every address and writes <code>http://localhost:5173</code>.</p>
+</li>
+<li>
+<p>Added: the Laravel shapes refuse to boot production on the tests' dummy APP_KEY (<code>app/Support/DummyAppKey.php</code>, called from <code>AppServiceProvider::boot()</code>), and <code>tests/Support/SkipEnvFile.php</code> hands the tests that one dummy key (base64 of 32 zero bytes) when nothing else sets one. WELD ships the same files.</p>
+</li>
+<li>
+<p>Fixed: a freshly baked Laravel app passes its own <code>pint --test</code> again: the Pest example tests are written out over several lines and <code>tests/Support/SkipEnvFile.php</code> uses imports and Laravel's operator order, so <code>composer ci</code> no longer fails on the template's own style.</p>
+</li>
+<li>
 <p>Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).</p>
 </li>
 <li>

@@ -468,6 +468,34 @@ final class LaravelInertiaGeneratorTest extends TestCase
         return new LaravelInertiaGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));
     }
 
+    /**
+     * The template's example tests are Pest files, and PHPUnit refuses to
+     * load them ("Please run ./vendor/bin/pest instead"), so the php-test
+     * matrix must run Pest. It runs the PHPUnit class tests too.
+     */
+    public function testGeneratedPhpTestMatrixRunsPest(): void
+    {
+        $target = $this->generate();
+        $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
+
+        self::assertStringContainsString('test_command: vendor/bin/pest', $ci);
+        self::assertStringNotContainsString('vendor/bin/phpunit', $ci);
+    }
+
+    /**
+     * Every app refuses to boot production on the tests' dummy APP_KEY.
+     */
+    public function testShipsTheDummyAppKeyGuard(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Support/DummyAppKey.php');
+        self::assertStringContainsString(
+            'DummyAppKey::refuseIn(',
+            (string) file_get_contents($target . '/app/Providers/AppServiceProvider.php'),
+        );
+    }
+
     private function generate(bool $advisor = true): string
     {
         $target = $this->makeTempDir();

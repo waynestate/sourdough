@@ -187,7 +187,7 @@ The smoke gate bakes a shape for real and runs the generated app's own checks; s
 
 #### Tests in the apps it bakes
 
-The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests read `.env` when it exists, otherwise `.env.example`, on top of `phpunit.xml`. The raw PHP shape is unchanged. Write new tests in Pest.
+The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests read `.env` when it exists, otherwise `.env.example`, on top of `phpunit.xml`. Their `.gitlab-ci.yml` runs the php-test matrix with `vendor/bin/pest` too, because PHPUnit refuses to load Pest files. Production refuses to boot on the tests' dummy `APP_KEY` (`app/Support/DummyAppKey.php`). The raw PHP shape is unchanged. Write new tests in Pest.
 
 ### CI
 
@@ -579,6 +579,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Fixed: the Laravel shapes' (Blade, Blade + Vue, Inertia) `.gitlab-ci.yml` runs the php-test matrix with `vendor/bin/pest`. The Preflight component defaults to `vendor/bin/phpunit`, which refuses the Pest example tests ("Please run ./vendor/bin/pest instead"), so every job in the matrix crashed with exit 255. Pest runs the PHPUnit class tests too.
+- Fixed: `--docker` apps with a vite service (Blade + Vue, Inertia) load their pages. The service ran `npm run dev -- --host 0.0.0.0`, so laravel-vite-plugin wrote `http://0.0.0.0:5173` to `public/hot` and the browser got a blank page; it now runs `npm run dev` with `LARAVEL_SAIL=1`, which listens on every address and writes `http://localhost:5173`.
+- Added: the Laravel shapes refuse to boot production on the tests' dummy APP_KEY (`app/Support/DummyAppKey.php`, called from `AppServiceProvider::boot()`), and `tests/Support/SkipEnvFile.php` hands the tests that one dummy key (base64 of 32 zero bytes) when nothing else sets one. WELD ships the same files.
+- Fixed: a freshly baked Laravel app passes its own `pint --test` again: the Pest example tests are written out over several lines and `tests/Support/SkipEnvFile.php` uses imports and Laravel's operator order, so `composer ci` no longer fails on the template's own style.
 - Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).
 - Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests read `.env`, or `.env.example` when there is no `.env`); the raw shape is unchanged.
 - Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: `docs/_header.html`, `docs/theme/sourdough.css` and a `theme` key in `docs/docs.json`; the kit's `docs.css` is unchanged.
@@ -999,7 +1003,7 @@ A kit declares its environment variables in `.env.example` and its setup steps i
 The Laravel paths take a flag for the local runtime, and the two are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
 - `--sail` runs the app on Laravel Sail. The bake adds `laravel/sail` to require-dev, writes a `compose.yaml`, sets the database settings in `.env.example` and appends a "Run it locally with Sail" README section. The database is MySQL 8.4 LTS.
-- `--docker` writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64.
+- `--docker` writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes, which runs `npm run dev` with `LARAVEL_SAIL=1` so `public/hot` says `http://localhost:5173`, an address your browser can load), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64.
 
 Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell, so it is an option where it fits, never the only Windows route; `--docker` is the route that works natively. See [Every developer, every operating system](https://sourdough.apps.wayne.edu/docs/guides/every-os.html) for the full picture.
 
