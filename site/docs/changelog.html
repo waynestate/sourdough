@@ -55,7 +55,7 @@ Versioning once 1.0 is out.</p>
 <p>Added: the Laravel shapes refuse to boot production on the tests' dummy APP_KEY (<code>app/Support/DummyAppKey.php</code>, called from <code>AppServiceProvider::boot()</code>), and <code>tests/Support/SkipEnvFile.php</code> hands the tests that one dummy key (base64 of 32 zero bytes) when nothing else sets one. WELD ships the same files.</p>
 </li>
 <li>
-<p>Fixed: the GitLab smoke jobs (raw, Blade, Blade + Vue, Inertia) failed before they started: the Composer installer's options were handed to <code>php</code> itself (<code>no argument for option -</code>). They now go after <code>--</code>, with Composer pinned to 2.10.3.</p>
+<p>Fixed: the GitLab smoke jobs (raw, Blade, Blade + Vue, Inertia) failed before they started: the Composer installer's options were handed to <code>php</code> itself (<code>no argument for option -</code>). They now go after <code>--</code>, with Composer pinned to 2.10.3, and the image gets <code>unzip</code> so Composer can unpack the locked packages.</p>
 </li>
 <li>
 <p>Fixed: a freshly baked Laravel app passes its own <code>pint --test</code> again: the Pest example tests are written out over several lines and <code>tests/Support/SkipEnvFile.php</code> uses imports and Laravel's operator order, so <code>composer ci</code> no longer fails on the template's own style.</p>
