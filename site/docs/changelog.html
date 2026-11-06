@@ -46,6 +46,12 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
+<p>Fixed: <code>--sail</code> apps answer 200 on <code>/</code> and <code>/up</code> when the checkout is one Sail's <code>sail</code> user cannot write (a Windows drive under Docker Desktop, or files a root container wrote). Every page was a 500 naming <code>tempnam()</code>, because Blade could not write <code>storage/framework/views</code>. The compose file's entrypoint now opens the app's files to that user only when it cannot write them (<code>vendor/</code>, <code>node_modules/</code> and <code>.git</code> untouched), then starts Sail as usual.</p>
+</li>
+<li>
+<p>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) serve <code>/</code> on the first <code>composer dev-up</code>. Nothing installed <code>node_modules</code>, so the vite service exited with <code>vite: not found</code> and <code>/</code> was a 500 (<code>Vite manifest not found</code>). The service now runs <code>npm install</code> when Vite is missing, then <code>npm run dev</code>.</p>
+</li>
+<li>
 <p>Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the <code>ziggy-js</code> npm package. The home page and the dashboard are new, in WayneUI's components and tokens. <code>eslint.config.js</code> refuses <code>components/ui</code> imports and the kit's helper packages, <code>.prettierrc</code> is the stack's, and a <code>frontend</code> CI job runs lint, Prettier, vue-tsc and the build.</p>
 </li>
 <li>

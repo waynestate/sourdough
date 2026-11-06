@@ -7,7 +7,7 @@ This app ships its own Docker setup. It works natively on Windows, macOS and Lin
     docker compose exec app php artisan migrate
     docker compose exec app composer test
 
-The first start also generates the application key; restart the app container (`docker compose restart app`) only if you change `.env` while it runs. It also runs the migrations on every start, so the sessions table exists.
+The first start also generates the application key; restart the app container (`docker compose restart app`) only if you change `.env` while it runs. It also runs the migrations on every start, so the sessions table exists. When the app has a vite service (the Blade + Vue and Inertia shapes), that service runs `npm install` on its first start, then the Vite dev server on port 5173; the pages load once it is up.
 
 The dev container runs as root on purpose (it is local only, and Docker Desktop bind mounts are root-owned), so files it creates, such as `vendor/`, may be root-owned on a Linux host; run `sudo chown -R "$USER" .` once if you need to edit them.
 

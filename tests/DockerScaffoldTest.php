@@ -112,9 +112,27 @@ final class DockerScaffoldTest extends TestCase
         (new DockerScaffold())->apply($target, true);
         $compose = (string) file_get_contents($target . '/compose.yaml');
 
-        self::assertStringContainsString("command: ['npm', 'run', 'dev']", $compose);
+        self::assertStringContainsString('exec npm run dev', $compose);
         self::assertStringContainsString("LARAVEL_SAIL: '1'", $compose);
         self::assertStringNotContainsString('--host', $compose);
+        $this->assertYamlStructureHolds($compose);
+    }
+
+    /**
+     * A fresh checkout has no node_modules, so `npm run dev` died with
+     * "vite: not found" and the pages had no assets. The first start installs
+     * them; later starts skip straight to Vite.
+     */
+    public function testViteServiceInstallsNodeModulesOnFirstStart(): void
+    {
+        $target = $this->makeAppDir();
+        (new DockerScaffold())->apply($target, true);
+        $compose = (string) file_get_contents($target . '/compose.yaml');
+
+        self::assertStringContainsString(
+            "command: ['sh', '-c', '[ -x node_modules/.bin/vite ] || npm install --no-audit --no-fund; exec npm run dev']",
+            $compose,
+        );
         $this->assertYamlStructureHolds($compose);
     }
 

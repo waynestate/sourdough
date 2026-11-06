@@ -6,8 +6,10 @@
         # container and write http://localhost:5173 to public/hot, an address
         # the browser on the host can reach. Handing Vite a host of 0.0.0.0
         # instead put that address in the hot file, and every page loaded
-        # blank.
-        command: ['npm', 'run', 'dev']
+        # blank. A fresh checkout has no node_modules, so the first start
+        # installs them (the app service does the same for vendor), or Vite
+        # is "not found" and the service quietly exits. No starter, no rise.
+        command: ['sh', '-c', '[ -x node_modules/.bin/vite ] || npm install --no-audit --no-fund; exec npm run dev']
         environment:
             LARAVEL_SAIL: '1'
         ports:
