@@ -46,6 +46,9 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
+<p>Added: the site accessibility gate: <code>scripts/a11y.sh</code> (Git Bash, Linux, macOS) and <code>scripts/a11y.ps1</code> (Windows) run axe-core (WCAG 2.2 AA) in Docker over every committed HTML page under <code>site/</code>, in light and dark at 360 px and 1280 px.</p>
+</li>
+<li>
 <p>Added: <code>sourdough new --raw --vue</code> bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then <code>templates/raw-vue/</code> over it: a front controller that answers JSON under <code>/api/</code> (<code>/api/me</code> returns the signed-in user, or <code>401</code> instead of sending a <code>fetch()</code> to CAS) and sends the Vue page for <code>/</code> (and for any other path, with a <code>404</code>); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from <code>@waynestate/wayne-ui-vue</code> and <code>@waynestate/wayne-ui-css</code> 2.0.8, pinned exactly as in the Inertia shape; and <code>src/Vite.php</code>, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while <code>npm run dev</code> runs (and adds it to the CSP, never in production). Its Next steps: <code>composer install</code>, <code>npm install</code>, <code>npm run build</code>, <code>composer serve</code>. The <code>--raw --vue</code> plan no longer ends in &quot;not available in this release&quot;, and a <code>smoke-raw-vue</code> CI job bakes the shape and checks <code>/</code>, <code>/api/me</code> and <code>/up</code> on a live server. All five loaves bake now.</p>
 </li>
 <li>

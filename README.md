@@ -193,6 +193,8 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 
 The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
 
+The site accessibility gate runs axe-core (WCAG 2.2 AA) over every committed page under `site/` in Docker, in light and dark at 360 px and 1280 px: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows.
+
 ### Tests in the apps it bakes
 
 The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The skeleton's PHPUnit example keeps running, `composer test` and `composer ci` run Pest, and the baked tests read `.env` when it exists, otherwise `.env.example`, on top of `phpunit.xml`. Their `.gitlab-ci.yml` runs the php-test matrix with `vendor/bin/pest` too, because PHPUnit refuses to load Pest files. Production refuses to boot on the tests' dummy `APP_KEY` (`app/Support/DummyAppKey.php`). The raw PHP shape is unchanged. Write new tests in Pest.
