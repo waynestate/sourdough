@@ -29,7 +29,7 @@ RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
 WORKDIR /app
 EXPOSE 8000
-CMD ["sh", "-c", "[ -f vendor/autoload.php ] || composer install --no-interaction; [ -f .env ] || cp .env.example .env; exec php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "[ -f vendor/autoload.php ] || composer install --no-interaction; [ -f .env ] || cp .env.example .env; grep -q '^APP_KEY=base64:' .env || php artisan key:generate --force; php artisan migrate --force; exec php artisan serve --host=0.0.0.0 --port=8000"]
 
 FROM php:8.5-apache-trixie@sha256:4cc63b3d4e05c40da73e7af5d39364ca2678ac07208919497bda3bbab975be95 AS prod
 RUN apt-get update \

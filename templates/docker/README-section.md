@@ -4,9 +4,10 @@ This app ships its own Docker setup. It works natively on Windows, macOS and Lin
 
     cp .env.example .env
     composer dev-up         # docker compose up --build; the first start runs composer install for you
-    docker compose exec app php artisan key:generate
     docker compose exec app php artisan migrate
     docker compose exec app composer test
+
+The first start also generates the application key; restart the app container (`docker compose restart app`) only if you change `.env` while it runs. It also runs the migrations on every start, so the sessions table exists.
 
 The dev container runs as root on purpose (it is local only, and Docker Desktop bind mounts are root-owned), so files it creates, such as `vendor/`, may be root-owned on a Linux host; run `sudo chown -R "$USER" .` once if you need to edit them.
 

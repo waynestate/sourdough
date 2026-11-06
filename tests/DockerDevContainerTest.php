@@ -35,6 +35,29 @@ final class DockerDevContainerTest extends TestCase
         self::assertStringContainsString('php artisan serve --host=0.0.0.0 --port=8000', $dev);
     }
 
+    /**
+     * The dev stage CMD generates the APP_KEY when it is missing and runs
+     * the migrations, both before it starts artisan serve, so the first
+     * boot serves a working app.
+     */
+    public function testDevStageCmdGeneratesKeyAndMigratesBeforeServing(): void
+    {
+        $dev = $this->devStage();
+
+        self::assertStringContainsString('APP_KEY=base64:', $dev);
+        self::assertStringContainsString('php artisan key:generate --force', $dev);
+        self::assertStringContainsString('php artisan migrate --force', $dev);
+
+        $keyPos = strpos($dev, 'php artisan key:generate --force');
+        $migratePos = strpos($dev, 'php artisan migrate --force');
+        $servePos = strpos($dev, 'exec php artisan serve');
+        self::assertIsInt($keyPos);
+        self::assertIsInt($migratePos);
+        self::assertIsInt($servePos);
+        self::assertLessThan($servePos, $keyPos);
+        self::assertLessThan($servePos, $migratePos);
+    }
+
     public function testProdStageStillRunsAsWwwData(): void
     {
         self::assertStringContainsString('USER www-data', $this->prodStage());
@@ -50,7 +73,8 @@ final class DockerDevContainerTest extends TestCase
 
         self::assertStringNotContainsString('or skip it', $readme);
         self::assertStringNotContainsString('exec app composer install', $readme);
-        self::assertStringContainsString('php artisan key:generate', $readme);
+        self::assertStringNotContainsString('exec app php artisan key:generate', $readme);
+        self::assertStringContainsString('generates the application key', $readme);
     }
 
     private function dockerfile(): string
