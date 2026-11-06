@@ -51,7 +51,7 @@
 <p>All five permutations generate in 0.1; the raw ones (<code>--raw</code>, <code>--raw --vue</code>) start from the raw base instead of a Laravel skeleton.</p>
 <h2 id="build-on-the-official-installer">Build on the official installer<a class="docs-heading-link" aria-label="Link to this section" href="#build-on-the-official-installer">#</a></h2>
 <p>For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. <code>composer create-project laravel/laravel</code> picks the newest major, which is right. The installer also accepts a community starter kit published on Packagist:</p>
-<pre><code class="language-bash">laravel new my-app --using=vendor/kit
+<pre tabindex="0"><code class="language-bash">laravel new my-app --using=vendor/kit
 </code></pre>
 <p>A kit declares its environment variables in <code>.env.example</code> and its setup steps in the <code>post-create-project-cmd</code> list of its <code>composer.json</code>. There is no plain Blade kit, so the <code>--laravel</code> (Blade) and Blade-plus-Vue-islands permutations are a bare Laravel install plus Sourdough's own layer, not a vendor kit.</p>
 <h2 id="local-runtime-sail-or-docker">Local runtime: Sail or Docker<a class="docs-heading-link" aria-label="Link to this section" href="#local-runtime-sail-or-docker">#</a></h2>
@@ -62,7 +62,7 @@
 </ul>
 <p>Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its <code>sail</code> script is shell, so it is an option where it fits, never the only Windows route; <code>--docker</code> is the route that works natively. See <a href="./every-os.html">Every developer, every operating system</a> for the full picture.</p>
 <p>With <code>--docker</code>, the production build takes Playbook's credentials as a BuildKit secret, never a build arg:</p>
-<pre><code class="language-bash">docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
+<pre tabindex="0"><code class="language-bash">docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 </code></pre>
 <p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the single place to swap in SQUIRE's Citadel-parity image when it exists.</p>
 <h2 id="sign-in-stays-sesame">Sign-in stays SESAME<a class="docs-heading-link" aria-label="Link to this section" href="#sign-in-stays-sesame">#</a></h2>
@@ -79,20 +79,20 @@
 <p>Laravel's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported; the shared server is MySQL 5.6, which left extended support on 2021-02-28. The practical limit is the index key prefix: 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071. The Laravel templates set the 191 default with <code>Schema::defaultStringLength(191)</code> in <code>app/Providers/AppServiceProvider.php</code> and avoid JSON columns, so string columns stay inside the limit (PROCTOR <code>mysql56-string-default</code>). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.</p>
 <h2 id="next-steps">Next steps<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></h2>
 <p>Each Laravel bake prints Next steps suited to the shape. For <code>--laravel</code>:</p>
-<pre><code class="language-bash">composer install
+<pre tabindex="0"><code class="language-bash">composer install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan serve
 </code></pre>
 <p>The islands and Inertia shapes add the front-end build between <code>migrate</code> and <code>serve</code>:</p>
-<pre><code class="language-bash">npm install
+<pre tabindex="0"><code class="language-bash">npm install
 npm run build
 </code></pre>
 <p>The bake runs <code>php artisan migrate</code> after <code>php artisan key:generate</code>, so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.</p>
 <h2 id="the-oracle-check">The Oracle check<a class="docs-heading-link" aria-label="Link to this section" href="#the-oracle-check">#</a></h2>
 <p>Oracle is wired but dormant in every generated app. The settings <code>ORACLE_USERNAME</code>, <code>ORACLE_PASSWORD</code>, and either <code>ORACLE_TNS</code> or <code>ORACLE_HOST</code>, <code>ORACLE_PORT</code>, <code>ORACLE_SERVICE_NAME</code> ship commented out in <code>.env.example</code>; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with:</p>
-<pre><code class="language-bash">php artisan oracle:check
+<pre tabindex="0"><code class="language-bash">php artisan oracle:check
 </code></pre>
 <p>The command finds the check file where it lives: <code>oracle-check.php</code> at the app root, where Squire's Laravel layout ships it, first, then <code>deploy/oracle-check.php</code>.</p>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>

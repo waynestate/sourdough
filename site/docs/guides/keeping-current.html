@@ -47,7 +47,7 @@
 <p><a href="./manifest.html">The manifest</a> has the full key list and the managed/seeded split.</p>
 <h2 id="check-for-drift">Check for drift<a class="docs-heading-link" aria-label="Link to this section" href="#check-for-drift">#</a></h2>
 <p>Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate. Run it in your app to list the managed files that have drifted from the manifest:</p>
-<pre><code class="language-bash">sourdough manifest --check
+<pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours. Wire the check into CI so an app that falls behind the template fails the pipeline instead of surfacing as drift later; that is what makes a starter &quot;fed&quot;. Copier's <code>copier check-update</code> is the same idea: <code>--quiet</code> makes it exit 2 when an update exists, and <code>--output-format json</code> gives machines the answer.</p>
 <h2 id="the-planned-feed-a-merge-not-an-overwrite">The planned feed: a merge, not an overwrite<a class="docs-heading-link" aria-label="Link to this section" href="#the-planned-feed-a-merge-not-an-overwrite">#</a></h2>
@@ -62,7 +62,7 @@
 <p>Starters die quietly. The React team deprecated Create React App on 2025-02-14, saying it had no active maintainers, and installing it now prints a warning that points at current frameworks. Laravel replaced Breeze and Jetstream with new kits when Laravel 12 shipped. Each permutation should name an owner, tie its support window to the framework and PHP end dates, run the scheduled build, and have the check print a deprecation notice with the migration note.</p>
 <h2 id="refreshing-the-squire-templates">Refreshing the Squire templates<a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-the-squire-templates">#</a></h2>
 <p>The deploy files in your app (<code>build.sh</code>, <code>scripts/release.sh</code>, the <code>.squire/</code> config, and their friends) come from Squire's exported copy, checked into the Sourdough repository at <code>templates/squire/</code>. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:</p>
-<pre><code class="language-bash">php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+<pre tabindex="0"><code class="language-bash">php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
 <p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. From the installed package the same refresh is <code>composer squire-copy:sync</code>, verified by <code>composer squire-copy:check</code> (part of <code>composer ci</code>). Until <code>feed</code> exists, apps generated earlier pick up template changes by hand.</p>

@@ -118,15 +118,15 @@
 </table></div>
 <p>All five permutations generate in 0.1. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
 <p>Bake commands for the five shapes:</p>
-<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
+<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --raw
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre><code class="language-bash">sourdough new my-app --raw --vue
+<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --raw --vue
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre><code class="language-bash">sourdough new my-app --laravel
+<div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --laravel
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="laravel + vue"><p class="docs-tabs__label">laravel + vue</p><pre><code class="language-bash">sourdough new my-app --laravel --vue
+<div class="docs-tabs__panel" data-tab-label="laravel + vue"><p class="docs-tabs__label">laravel + vue</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --laravel --vue
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre><code class="language-bash">sourdough new my-app --inertia
+<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --inertia
 </code></pre></div></div>
 <h2 id="what-each-template-carries">What each template carries<a class="docs-heading-link" aria-label="Link to this section" href="#what-each-template-carries">#</a></h2>
 <h3 id="raw">raw/<a class="docs-heading-link" aria-label="Link to this section" href="#raw">#</a></h3>
@@ -229,7 +229,7 @@
 </tbody>
 </table></div>
 <p>When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:</p>
-<pre><code>php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+<pre tabindex="0"><code>php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
 <p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line.</p>

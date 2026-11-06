@@ -42,18 +42,18 @@
       <article class="docs-article"><h1 id="describe-a-plan">Describe a plan<a class="docs-heading-link" aria-label="Link to this section" href="#describe-a-plan">#</a></h1>
 <p>Instead of choosing flags, describe what the app does in a sentence and let an OpenAI-compatible model plan it. This page covers the command, the model configuration, the plan format, and the steps a plan becomes; when you have a plan you trust, save it to a file and generate with <code>--plan</code>.</p>
 <h2 id="describe-it-in-a-sentence">Describe it in a sentence<a class="docs-heading-link" aria-label="Link to this section" href="#describe-it-in-a-sentence">#</a></h2>
-<pre><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot;
+<pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot;
 </code></pre>
 <p>Sourdough asks an OpenAI-compatible model for a plan, validates it against <code>resources/plan.schema.json</code>, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>). You write the plan yourself and pass it in.</p>
 <p>The model does the work but never gates. When an answer fails, Sourdough retries once, telling the model why the previous answer was not valid. If the second answer fails too, the command stops with:</p>
-<pre><code class="language-text">The model could not produce a valid plan. Write the plan yourself and pass it with --plan=&lt;file&gt;.
+<pre tabindex="0"><code class="language-text">The model could not produce a valid plan. Write the plan yourself and pass it with --plan=&lt;file&gt;.
 </code></pre>
 <h2 id="see-the-plan-without-writing-anything">See the plan without writing anything<a class="docs-heading-link" aria-label="Link to this section" href="#see-the-plan-without-writing-anything">#</a></h2>
-<pre><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
+<pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
 <h2 id="pass-a-ready-made-plan">Pass a ready-made plan<a class="docs-heading-link" aria-label="Link to this section" href="#pass-a-ready-made-plan">#</a></h2>
 <p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
-<pre><code class="language-bash">sourdough new my-app --plan plan.json
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A missing file, or a file that is not valid JSON matching the schema, is refused with the reason printed.</p>
 <h2 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h2>
@@ -83,11 +83,11 @@
 <p>Any OpenAI-compatible endpoint works: a hosted API, a local server, or WarriorGPT. Sourdough does not care about the hostname; it only needs the base URL, key, and model.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p><code>SOURDOUGH_LLM_API_KEY</code> is a credential. Set it in your environment and keep it out of the repository; Sourdough reads it from the environment and keeps no key in code.</p></aside>
 <p>If a variable is missing, the command names it and points you at the alternative:</p>
-<pre><code class="language-text">The SOURDOUGH_LLM_MODEL environment variable is not set. Set it, or pass a ready-made plan with --plan=&lt;file&gt;.
+<pre tabindex="0"><code class="language-text">The SOURDOUGH_LLM_MODEL environment variable is not set. Set it, or pass a ready-made plan with --plan=&lt;file&gt;.
 </code></pre>
 <h2 id="what-a-plan-looks-like">What a plan looks like<a class="docs-heading-link" aria-label="Link to this section" href="#what-a-plan-looks-like">#</a></h2>
 <p>A plan is a small JSON object:</p>
-<pre><code class="language-json">{
+<pre tabindex="0"><code class="language-json">{
     &quot;permutation&quot;: &quot;raw&quot;,
     &quot;parts&quot;: [&quot;sesame&quot;, &quot;helmet&quot;],
     &quot;name&quot;: &quot;my-app&quot;,

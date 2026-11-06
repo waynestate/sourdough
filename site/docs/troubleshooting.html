@@ -46,7 +46,7 @@
 <p>Cause: the raw PHP + Vue app loads its page from Vite: from <code>public/build/manifest.json</code> after <code>npm run build</code>, or from the dev server while <code>npm run dev</code> runs. A fresh bake has neither, so <code>src/Vite.php</code> refuses with that sentence instead of printing tags that point nowhere.</p>
 <p>Fix: build the front end once, or run the dev server next to <code>composer serve</code>.</p>
 <p>Check:</p>
-<pre><code class="language-bash">npm install
+<pre tabindex="0"><code class="language-bash">npm install
 npm run build
 composer serve
 </code></pre>
@@ -55,7 +55,7 @@ composer serve
 <p>Cause: by default the generated app requires <code>waynestate/playbook</code>, WSU's private shared-values package on git.wayne.edu. Before writing anything, <code>sourdough new</code> checks that this machine can read the package (a Composer credential, then a direct git probe); without read access it refuses with exit <code>1</code> and prints the how-to.</p>
 <p>Fix: follow the printed how-to to get read access, then rerun the same command.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough new my-app --dry-run --json
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run --json
 </code></pre>
 <p><code>--dry-run</code> runs the check but never refuses, and its JSON plan carries a <code>playbook</code> key with the mode, the access status and the probe that answered. Once the app exists, <code>composer playbook</code> (the script <code>@composer show waynestate/playbook --no-interaction</code>) shows whether Playbook is installed.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p><code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook.</p></aside>
@@ -63,27 +63,27 @@ composer serve
 <p>Cause: the Playbook access check cannot reach git.wayne.edu. Sourdough still generates the app, but warns that <code>composer install</code> will need the connection.</p>
 <p>Fix: restore the connection to git.wayne.edu, then install the app's dependencies.</p>
 <p>Check:</p>
-<pre><code class="language-bash">composer install
+<pre tabindex="0"><code class="language-bash">composer install
 </code></pre>
 <p>Run it in the generated app; it completes without the Playbook fetch failing.</p>
 <h3 id="playbook-and-no-playbook-together"><code>--playbook</code> and <code>--no-playbook</code> together<a class="docs-heading-link" aria-label="Link to this section" href="#playbook-and-no-playbook-together">#</a></h3>
 <p>Cause: the two flags are mutually exclusive and are refused with exit <code>1</code>. <code>--playbook</code> is kept for compatibility and changes nothing, because Playbook is now the default.</p>
 <p>Fix: drop one of the flags.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough new my-app --dry-run
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run
 </code></pre>
 <p>Exits 0 and prints the plan.</p>
 <h3 id="an-invalid-flag-a-non-empty-target-or-a-bad-app-name">An invalid flag, a non-empty target, or a bad app name<a class="docs-heading-link" aria-label="Link to this section" href="#an-invalid-flag-a-non-empty-target-or-a-bad-app-name">#</a></h3>
 <p>Cause: exit <code>1</code> also covers invalid flags, a non-empty target (Sourdough refuses to generate into a directory that already has files), and an app name that fails validation. The name (from <code>--name</code>, from the plan, or from the basename of <code>&lt;dir&gt;</code>) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.</p>
 <p>Fix: correct the flags, point <code>dir</code> at an empty directory, and rename the app to something the allow-list accepts.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough new my-app --dry-run
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run
 </code></pre>
 <p>Prints the plan and writes nothing.</p>
 <h3 id="the-model-gave-up-describe">The model gave up (<code>--describe</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-model-gave-up-describe">#</a></h3>
 <p>Cause: if the answer from the model is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>).</p>
 <p>Fix: write the plan yourself and pass it in:</p>
-<pre><code class="language-bash">sourdough new my-app --plan plan.json
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.</p>
 <p>Check: the same command exits 0 when the plan is valid.</p>
@@ -92,21 +92,21 @@ composer serve
 <p>Cause: without <code>--check</code> the command answers &quot;Use <code>sourdough manifest --check</code> to check the app against its manifest.&quot; and exits <code>2</code>. A missing manifest in the directory is also a tool error (exit <code>2</code>).</p>
 <p>Fix: run the command with <code>--check</code>, inside the generated app (or pass the app directory as an argument).</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough manifest --check
+<pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Exits 0 and prints <code>Clean: every managed file matches the manifest.</code></p>
 <h3 id="json-without-dry-run"><code>--json</code> without <code>--dry-run</code><a class="docs-heading-link" aria-label="Link to this section" href="#json-without-dry-run">#</a></h3>
 <p>Cause: <code>--json</code> is only available with <code>--dry-run</code>; without it the command exits <code>2</code>.</p>
 <p>Fix: add <code>--dry-run</code>.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough new my-app --dry-run --json
+<pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run --json
 </code></pre>
 <p>Prints the plan as JSON.</p>
 <h3 id="the-model-could-not-be-reached-describe">The model could not be reached (<code>--describe</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-model-could-not-be-reached-describe">#</a></h3>
 <p>Cause: <code>--describe</code> needs the <code>SOURDOUGH_LLM_BASE_URL</code>, <code>SOURDOUGH_LLM_API_KEY</code> and <code>SOURDOUGH_LLM_MODEL</code> environment variables (no defaults, no key in code) and a reachable OpenAI-compatible endpoint. When the endpoint cannot be reached, the command prints <code>The model could not be reached:</code> plus the underlying error and exits <code>2</code>.</p>
 <p>Fix: set the three variables and point them at a working endpoint (a hosted API, a local server, or WarriorGPT), then rerun. Any OpenAI-compatible endpoint works; Sourdough only needs the base URL, key, and model.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
+<pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
 <p>Prints the plan as JSON without writing anything.</p>
 <h2 id="drift-the-manifest-and-the-squire-copy">Drift: the manifest and the Squire copy<a class="docs-heading-link" aria-label="Link to this section" href="#drift-the-manifest-and-the-squire-copy">#</a></h2>
@@ -114,7 +114,7 @@ composer serve
 <p>Cause: a managed file changed or is missing. The output lists one line per file, <code>changed  &lt;file&gt;</code> or <code>missing  &lt;file&gt;</code>. Seeded files (<code>.env.example</code> and <code>README.md</code>) are never reported: they're yours.</p>
 <p>Fix: managed files belong to Sourdough, so do not edit them by hand. Until <code>feed</code> ships, apps generated earlier pick up template changes by hand; restore the drifted file from your version control, or regenerate the app.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough manifest --check
+<pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Exits 0 when every managed file matches the manifest.</p>
 <aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Commit <code>.sourdough/manifest.json</code> in generated apps; the planned <code>feed</code> will need it. It's the record that keeps <code>feed</code> honest.</p></aside>
@@ -122,23 +122,23 @@ composer serve
 <p>Cause: the update story (<code>.sourdough.json</code>, <code>sourdough check</code>, a merging <code>sourdough update</code>, tagged template releases) is still a gap for the backlog, so there is no command that brings an app forward to a newer template. Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate.</p>
 <p>Fix: run the check to see what drifted, and bring template changes into the app by hand.</p>
 <p>Check:</p>
-<pre><code class="language-bash">sourdough manifest --check
+<pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Lists the managed files that have drifted from the manifest.</p>
 <h3 id="composer-squire-copy-check-exits-1-maintainers-of-sourdough"><code>composer squire-copy:check</code> exits 1 (maintainers of Sourdough)<a class="docs-heading-link" aria-label="Link to this section" href="#composer-squire-copy-check-exits-1-maintainers-of-sourdough">#</a></h3>
 <p>Cause: the committed copy at <code>templates/squire/</code> has drifted from a fresh export from the installed <code>waynestate/squire</code> package. The check is part of <code>composer ci</code>.</p>
 <p>Fix: rewrite the copy from the installed package, then commit <code>templates/squire/</code>:</p>
-<pre><code class="language-bash">composer squire-copy:sync
+<pre tabindex="0"><code class="language-bash">composer squire-copy:sync
 </code></pre>
 <p>Check:</p>
-<pre><code class="language-bash">composer squire-copy:check
+<pre tabindex="0"><code class="language-bash">composer squire-copy:check
 </code></pre>
 <p>Exits 0 when the committed copy matches.</p>
 <h3 id="proctor-s-preflight-pinned-check-warns-on-a-bare-tag">PROCTOR's <code>preflight-pinned</code> check warns on a bare tag<a class="docs-heading-link" aria-label="Link to this section" href="#proctor-s-preflight-pinned-check-warns-on-a-bare-tag">#</a></h3>
 <p>Cause: PROCTOR 0.4's <code>preflight-pinned</code> check wants a 40-hex SHA and warns on a bare tag. New apps pin the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment).</p>
 <p>Fix: pin the Preflight component includes to the release SHA, not the tag. Moving a pin is a deliberate commit.</p>
 <p>Check:</p>
-<pre><code class="language-bash">composer ci
+<pre tabindex="0"><code class="language-bash">composer ci
 </code></pre>
 <p>Run it in the generated app; the PROCTOR check passes.</p>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>

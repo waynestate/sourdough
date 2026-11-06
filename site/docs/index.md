@@ -10,7 +10,7 @@ generator: Squire agent-ready
 
 # Sourdough[#](https://sourdough.apps.wayne.edu/docs/#sourdough)
 
-![php](https://sourdough.apps.wayne.edu/docs/readme/badges/php.svg) ![license](https://sourdough.apps.wayne.edu/docs/readme/badges/license.svg) ![exit codes](https://sourdough.apps.wayne.edu/docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
+![php](https://sourdough.apps.wayne.edu/docs/readme/badges/php.svg) ![license](https://sourdough.apps.wayne.edu/docs/readme/badges/license.svg) ![exit codes](https://sourdough.apps.wayne.edu/docs/readme/badges/exit-codes.svg) [GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
 
 **Feed it and it grows.**
 

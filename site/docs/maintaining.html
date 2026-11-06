@@ -100,7 +100,7 @@ and applies template changes with <code>git apply --3way</code>.</li>
 </tbody>
 </table></div>
 <p>With only Docker (the same lines work in PowerShell and sh):</p>
-<pre><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>.</p>
@@ -122,11 +122,11 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpuni
 <p>Each step prints <code>ok</code>; the first <code>FAIL</code> stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.</p>
 <p>Run it per OS. The image (<code>scripts/smoke.Dockerfile</code>) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:</p>
 <p>Linux and macOS:</p>
-<pre><code>docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+<pre tabindex="0"><code>docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
 docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh &lt;shape&gt;
 </code></pre>
 <p>Windows PowerShell:</p>
-<pre><code>.\scripts\smoke-shape.ps1 &lt;shape&gt;
+<pre tabindex="0"><code>.\scripts\smoke-shape.ps1 &lt;shape&gt;
 </code></pre>
 <p>The PowerShell wrapper builds the same image once and reuses it. Pass <code>-WorkDir &lt;dir&gt;</code> to bind a local folder to <code>/work</code> so the scratch copy, the generated app and the per-step logs survive the run.</p>
 <p>Two environment variables control the scratch space:</p>
@@ -137,7 +137,7 @@ docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdo
 <p>On CI the gate runs as one job per shape: <code>smoke</code> (matrix) on GitHub, <code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code> and <code>smoke-inertia</code> on GitLab. All are <code>allow_failure: true</code> until the lead has seen every shape green on CI once; flip them to blocking after that proof.</p>
 <h2 id="refreshing-the-squire-templates">Refreshing the Squire templates<a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-the-squire-templates">#</a></h2>
 <p>When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:</p>
-<pre><code>php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
+<pre tabindex="0"><code>php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
 <p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Until <code>feed</code> exists, apps

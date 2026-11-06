@@ -43,7 +43,7 @@
 <p>Reference for the JSON plan that <code>sourdough new --describe</code> asks a model for and <code>sourdough new --plan &lt;file&gt;</code> reads back. Every plan is validated against <code>resources/plan.schema.json</code>. For the flags that produce a plan, see <a href="commands.html">Commands</a>.</p>
 <h2 id="the-plan-object">The plan object<a class="docs-heading-link" aria-label="Link to this section" href="#the-plan-object">#</a></h2>
 <p>A plan is a small JSON object:</p>
-<pre><code class="language-json">{
+<pre tabindex="0"><code class="language-json">{
     &quot;permutation&quot;: &quot;raw&quot;,
     &quot;parts&quot;: [&quot;sesame&quot;, &quot;helmet&quot;],
     &quot;name&quot;: &quot;my-app&quot;,
@@ -177,14 +177,14 @@
 <p>A list of strings, such as <code>[&quot;/&quot;, &quot;/posts&quot;]</code>.</p>
 <h2 id="getting-a-plan">Getting a plan<a class="docs-heading-link" aria-label="Link to this section" href="#getting-a-plan">#</a></h2>
 <p>Instead of choosing flags, describe what the app does and let a model plan it:</p>
-<pre><code>sourdough new --describe &quot;A blog with posts and comments&quot;
+<pre tabindex="0"><code>sourdough new --describe &quot;A blog with posts and comments&quot;
 </code></pre>
 <p>Sourdough asks an OpenAI-compatible model for a plan, validates it against <code>resources/plan.schema.json</code>, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>). You write the plan yourself and pass it in.</p>
 <p>To see the plan as JSON without writing anything:</p>
-<pre><code>sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
+<pre tabindex="0"><code>sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
 <p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
-<pre><code>sourdough new my-app --plan plan.json
+<pre tabindex="0"><code>sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.</p>
 <h3 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h3>

@@ -75,15 +75,15 @@
 </table></div>
 <p>All five permutations generate in 0.1. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
 <p>Run <code>sourdough new</code> with the flags for the row you want. <code>dir</code> is the directory to create the app in:</p>
-<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
+<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --raw
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre><code class="language-bash">sourdough new my-app --raw --vue
+<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --raw --vue
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre><code class="language-bash">sourdough new my-app --laravel
+<div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --laravel
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="laravel + vue"><p class="docs-tabs__label">laravel + vue</p><pre><code class="language-bash">sourdough new my-app --laravel --vue
+<div class="docs-tabs__panel" data-tab-label="laravel + vue"><p class="docs-tabs__label">laravel + vue</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --laravel --vue
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre><code class="language-bash">sourdough new my-app --inertia
+<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --inertia
 </code></pre></div></div>
 <h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
 <p>Each shape bakes from a directory in <code>templates/</code>:</p>
@@ -127,7 +127,7 @@
 </ul>
 <h2 id="raw-php-vue">Raw PHP + Vue<a class="docs-heading-link" aria-label="Link to this section" href="#raw-php-vue">#</a></h2>
 <p><code>--raw --vue</code> keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under <code>/api/</code> (<code>/api/me</code> is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no <code>public/wayne-ui.php</code> to fetch. Run it with:</p>
-<pre><code class="language-bash">composer install
+<pre tabindex="0"><code class="language-bash">composer install
 npm install
 npm run build
 composer serve

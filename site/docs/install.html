@@ -50,16 +50,16 @@
 <p>Where the code lives: the canonical repository is on nougat: <a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">enterprise-apps/sourdough</a>. git.wayne.edu and GitHub (<a rel="noopener" href="https://github.com/waynestate/sourdough">waynestate/sourdough</a>) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. Nougat is the starter culture; the mirrors are just slices.</p>
 <h2 id="install-1">Install<a class="docs-heading-link" aria-label="Link to this section" href="#install-1">#</a></h2>
 <p>Two ways in: install the <code>sourdough</code> command on your machine, or scaffold without installing.</p>
-<div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre><code class="language-bash">composer global require waynestate/sourdough
+<div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre tabindex="0"><code class="language-bash">composer global require waynestate/sourdough
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="composer create-project"><p class="docs-tabs__label">composer create-project</p><pre><code class="language-bash">composer create-project waynestate/sourdough
+<div class="docs-tabs__panel" data-tab-label="composer create-project"><p class="docs-tabs__label">composer create-project</p><pre tabindex="0"><code class="language-bash">composer create-project waynestate/sourdough
 </code></pre></div></div>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>After <code>composer global require</code>, the <code>sourdough</code> command lives in <code>composer global config bin-dir --absolute</code>; put that directory on your PATH.</p></aside>
 <h2 id="verify">Verify<a class="docs-heading-link" aria-label="Link to this section" href="#verify">#</a></h2>
-<pre><code class="language-bash">sourdough --version
+<pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected:</p>
-<pre><code>Sourdough 0.1.5
+<pre tabindex="0"><code>Sourdough 0.1.5
 </code></pre>
 <p>The CLI is a Symfony Console application named Sourdough, version 0.1.5 (<code>bin/sourdough</code>), so <code>--version</code> prints the name and the version.</p>
 <h2 id="next-steps">Next steps<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></h2>

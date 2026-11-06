@@ -100,7 +100,7 @@
 <p>The manifest remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own. A later <code>sourdough feed</code> reads it to bring template updates into your app without clobbering what you've changed.</p>
 <h2 id="check-an-app-against-its-manifest">Check an app against its manifest<a class="docs-heading-link" aria-label="Link to this section" href="#check-an-app-against-its-manifest">#</a></h2>
 <p>Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate. Run it in your app to list the managed files that have drifted from the manifest:</p>
-<pre><code class="language-bash">sourdough manifest --check
+<pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>You can pass the app directory as an argument; the default is the current directory. The exit codes match PROCTOR:</p>
 <ul>

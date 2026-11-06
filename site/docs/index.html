@@ -41,21 +41,21 @@
     <main id="main">
       <article class="docs-article"><p><a href="../index.html"><img src="readme/hero.jpg" alt="Sourdough: dough in a jar, risen past its gold band" /></a></p>
 <h1 id="sourdough">Sourdough<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough">#</a></h1>
-<p><img src="readme/badges/php.svg" alt="php" /> <img src="readme/badges/license.svg" alt="license" /> <img src="readme/badges/exit-codes.svg" alt="exit codes" /> <a rel="noopener" href="https://github.com/waynestate/sourdough/actions/workflows/ci.yml"><img src="https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg" alt="GitHub CI" /></a></p>
+<p><img src="readme/badges/php.svg" alt="php" /> <img src="readme/badges/license.svg" alt="license" /> <img src="readme/badges/exit-codes.svg" alt="exit codes" /> <a rel="noopener" href="https://github.com/waynestate/sourdough/actions/workflows/ci.yml">GitHub CI</a></p>
 <p><strong>Feed it and it grows.</strong></p>
 <p>A starter you feed: <code>sourdough new</code> makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.</p>
 <p>Every loaf gets proofed before it ships. Checks: <code>composer ci</code> (the same command runs on GitLab and GitHub).</p>
 <p><img src="readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
 <p><sub>The proofing log from the front page: what goes into the tub when you run <code>sourdough new</code>, and the day-to-day check that keeps it alive.</sub></p>
 <h2 id="install">Install<a class="docs-heading-link" aria-label="Link to this section" href="#install">#</a></h2>
-<pre><code>composer global require waynestate/sourdough
+<pre tabindex="0"><code>composer global require waynestate/sourdough
 </code></pre>
 <p>After <code>composer global require</code>, the <code>sourdough</code> command lives in <code>composer global config bin-dir --absolute</code>; put that directory on your PATH. Or scaffold without installing, with <code>composer create-project waynestate/sourdough</code>. The full instructions are on <a href="install.html">Install</a>.</p>
 <h2 id="first-run">First run<a class="docs-heading-link" aria-label="Link to this section" href="#first-run">#</a></h2>
-<pre><code>sourdough new my-app
+<pre tabindex="0"><code>sourdough new my-app
 </code></pre>
 <p>Expected: exit code <code>0</code> (done), a <code>my-app</code> directory holding a Wayne State app with the stack wired in, and Next steps printed for it. Then run the app's own gate from inside <code>my-app/</code>:</p>
-<pre><code>composer ci
+<pre tabindex="0"><code>composer ci
 </code></pre>
 <p>The step-by-step version is the <a href="guides/quick-start.html">Quick start</a>.</p>
 <h2 id="pick-your-path">Pick your path<a class="docs-heading-link" aria-label="Link to this section" href="#pick-your-path">#</a></h2>

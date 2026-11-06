@@ -43,7 +43,7 @@
 <p>Reference for the <code>sourdough</code> CLI: every command, argument, option and exit code, exactly as the sources define them. For the JSON plan behind <code>--describe</code> and <code>--plan</code>, see <a href="plan-format.html">Plan format</a>.</p>
 <h2 id="sourdough-new">sourdough new<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-new">#</a></h2>
 <p>Make a new Wayne State app with the stack already wired in.</p>
-<pre><code>sourdough new [dir] [options]
+<pre tabindex="0"><code>sourdough new [dir] [options]
 </code></pre>
 <p><code>dir</code> is the directory to create the app in. It is required unless you use <code>--describe</code>.</p>
 <h3 id="options">Options<a class="docs-heading-link" aria-label="Link to this section" href="#options">#</a></h3>
@@ -213,7 +213,7 @@
 <p>After generation the Next steps point at <code>composer playbook</code>. <code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips all of it. The two flags together are refused with exit <code>1</code>.</p>
 <h3 id="advisor-wiring">ADVISOR wiring<a class="docs-heading-link" aria-label="Link to this section" href="#advisor-wiring">#</a></h3>
 <p>Generated apps ship with ADVISOR wired in by default: <code>waynestate/advisor</code> lands in <code>require-dev</code>, <code>.mcp.json</code> is git-ignored (a client config starts a program for whoever opens the project), and the README gains an &quot;ADVISOR&quot; section. The Next steps print the install line once dependencies are in:</p>
-<pre><code>php vendor/bin/advisor install --client=claude --write
+<pre tabindex="0"><code>php vendor/bin/advisor install --client=claude --write
 </code></pre>
 <p><code>--no-advisor</code> skips all of it.</p>
 <h3 id="app-name-validation">App name validation<a class="docs-heading-link" aria-label="Link to this section" href="#app-name-validation">#</a></h3>
@@ -256,7 +256,7 @@
 <p>With ADVISOR wired in, <code>php vendor/bin/advisor install --client=claude --write</code> is printed after <code>composer install</code>. With Playbook required, the output ends with: <code>WSU values: Playbook installs with composer install. Check it any time with: composer playbook</code>.</p>
 <h2 id="sourdough-manifest">sourdough manifest<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest">#</a></h2>
 <p>Check a generated app against its Sourdough manifest.</p>
-<pre><code>sourdough manifest [dir] [--check]
+<pre tabindex="0"><code>sourdough manifest [dir] [--check]
 </code></pre>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>

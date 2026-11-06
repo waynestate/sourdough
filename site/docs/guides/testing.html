@@ -84,11 +84,11 @@
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>.</p>
 <h2 id="with-only-docker">With only Docker<a class="docs-heading-link" aria-label="Link to this section" href="#with-only-docker">#</a></h2>
 <p>The same lines work in PowerShell and sh:</p>
-<pre><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
 <h2 id="from-the-repo-root">From the repo root<a class="docs-heading-link" aria-label="Link to this section" href="#from-the-repo-root">#</a></h2>
-<pre><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer install --no-interaction
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer install --no-interaction
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli vendor/bin/phpunit
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer validate --strict
@@ -105,10 +105,10 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough
 </ul>
 <p>Each step prints <code>ok</code>; the first <code>FAIL</code> stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.</p>
 <p>Run it per OS. The image (<code>scripts/smoke.Dockerfile</code>) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:</p>
-<div class="docs-tabs" data-tabs="linux|windows"><div class="docs-tabs__panel" data-tab-label="linux"><p class="docs-tabs__label">linux</p><pre><code class="language-bash">docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
+<div class="docs-tabs" data-tabs="linux|windows"><div class="docs-tabs__panel" data-tab-label="linux"><p class="docs-tabs__label">linux</p><pre tabindex="0"><code class="language-bash">docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
 docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh &lt;shape&gt;
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="windows"><p class="docs-tabs__label">windows</p><pre><code class="language-powershell">.\scripts\smoke-shape.ps1 &lt;shape&gt;
+<div class="docs-tabs__panel" data-tab-label="windows"><p class="docs-tabs__label">windows</p><pre tabindex="0"><code class="language-powershell">.\scripts\smoke-shape.ps1 &lt;shape&gt;
 </code></pre></div></div>
 <p>The PowerShell wrapper builds the same image once and reuses it. Pass <code>-WorkDir &lt;dir&gt;</code> to bind a local folder to <code>/work</code> so the scratch copy, the generated app and the per-step logs survive the run. On Windows, <code>.\scripts\smoke-shape.ps1 &lt;shape&gt;</code> runs it in one line.</p>
 <p>Two environment variables control the scratch space:</p>

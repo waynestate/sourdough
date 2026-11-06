@@ -42,15 +42,15 @@
       <article class="docs-article"><h1 id="upgrading">Upgrading<a class="docs-heading-link" aria-label="Link to this section" href="#upgrading">#</a></h1>
 <p>How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: the <code>.sourdough/manifest.json</code> in each app is the record a later <code>sourdough feed</code> will use, and until <code>feed</code> ships, apps pick up template changes by hand. See <a href="guides/keeping-current.html">Keeping apps current</a>.</p>
 <h2 id="upgrade-the-cli">Upgrade the CLI<a class="docs-heading-link" aria-label="Link to this section" href="#upgrade-the-cli">#</a></h2>
-<div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre><code class="language-bash">composer global require waynestate/sourdough
+<div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre tabindex="0"><code class="language-bash">composer global require waynestate/sourdough
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="composer create-project"><p class="docs-tabs__label">composer create-project</p><pre><code class="language-bash">composer create-project waynestate/sourdough
+<div class="docs-tabs__panel" data-tab-label="composer create-project"><p class="docs-tabs__label">composer create-project</p><pre tabindex="0"><code class="language-bash">composer create-project waynestate/sourdough
 </code></pre></div></div>
 <p>Verify with:</p>
-<pre><code class="language-bash">sourdough --version
+<pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre><code>Sourdough 0.1.5
+<pre tabindex="0"><code>Sourdough 0.1.5
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
 <h2 id="0-1-5-2026-11-03">0.1.5 (2026-11-03)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-5-2026-11-03">#</a></h2>
