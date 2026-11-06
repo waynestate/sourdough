@@ -47,7 +47,9 @@ composer-ci:
     SMOKE_REPO: $CI_PROJECT_DIR
   before_script:
     - apt-get update -qq && apt-get install -y --no-install-recommends ca-certificates curl git xz-utils
-    - curl -fsSL https://getcomposer.org/installer | php --install-dir=/usr/local/bin --filename=composer
+    # The installer's options go after `--`; without it php itself reads them
+    # and stops ("no argument for option -"), so every smoke job failed here.
+    - curl -fsSL https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.10.3
     - |
       arch="$(dpkg --print-architecture)"
       case "$arch" in
