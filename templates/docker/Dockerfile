@@ -13,7 +13,10 @@
 FROM composer:2.10.3@sha256:2cf275428757e5435a667bfc0d038b14520ca02be2b1b70d44a05c8c19e2de48 AS composer-bin
 
 FROM php:8.5-cli-trixie@sha256:9236fd373d3bcda0659cf94838a744bd79791419292958963f8c6b34a0071554 AS dev
-ENV COMPOSER_ALLOW_SUPERUSER=0
+# The dev container runs as root on purpose: it is local only, and Docker Desktop
+# bind mounts show files as root-owned, so a non-root user cannot write .env,
+# storage or bootstrap/cache.
+ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl git unzip libicu-dev libzip-dev \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql intl zip bcmath pcntl \
@@ -24,11 +27,9 @@ COPY --from=node:22.23.4-trixie /usr/local/lib/node_modules/npm /usr/local/lib/n
 RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
-RUN useradd --create-home --uid 1000 --gid 0 app
-USER app
 WORKDIR /app
 EXPOSE 8000
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "[ -f vendor/autoload.php ] || composer install --no-interaction; [ -f .env ] || cp .env.example .env; exec php artisan serve --host=0.0.0.0 --port=8000"]
 
 FROM php:8.5-apache-trixie@sha256:4cc63b3d4e05c40da73e7af5d39364ca2678ac07208919497bda3bbab975be95 AS prod
 RUN apt-get update \

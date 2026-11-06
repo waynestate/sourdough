@@ -2,12 +2,13 @@
 
 This app ships its own Docker setup. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64.
 
-    composer install        # or skip it: the container can run it
     cp .env.example .env
-    composer dev-up         # docker compose up --build
-    docker compose exec app composer install
+    composer dev-up         # docker compose up --build; the first start runs composer install for you
     docker compose exec app php artisan key:generate
     docker compose exec app php artisan migrate
+    docker compose exec app composer test
+
+The dev container runs as root on purpose (it is local only, and Docker Desktop bind mounts are root-owned), so files it creates, such as `vendor/`, may be root-owned on a Linux host; run `sudo chown -R "$USER" .` once if you need to edit them.
 
 The app is at http://localhost:8000. `composer dev-down` stops it and `composer dev-shell` opens a shell in the app container.
 
