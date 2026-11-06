@@ -69,6 +69,11 @@ smoke-raw:
   script:
     - sh scripts/smoke-shape.sh raw
 
+smoke-raw-vue:
+  extends: .smoke-base
+  script:
+    - sh scripts/smoke-shape.sh raw-vue
+
 smoke-blade:
   extends: .smoke-base
   script:

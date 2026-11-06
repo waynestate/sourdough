@@ -10,7 +10,7 @@
     step prints ok; the first FAIL stops the run with the command's tail.
 
 .PARAMETER Shape
-    Which shape to bake: raw, blade, blade-vue or inertia.
+    Which shape to bake: raw, raw-vue, blade, blade-vue or inertia.
 
 .PARAMETER WorkDir
     Optional. Bind this local directory to /work so the scratch copy, the
@@ -26,7 +26,7 @@
 #>
 param(
     [Parameter(Mandatory = $true, Position = 0)]
-    [ValidateSet('raw', 'blade', 'blade-vue', 'inertia')]
+    [ValidateSet('raw', 'raw-vue', 'blade', 'blade-vue', 'inertia')]
     [string]$Shape,
 
     [string]$WorkDir

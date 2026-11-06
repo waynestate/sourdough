@@ -2,7 +2,7 @@
 # smoke-shape.sh: bake one Sourdough shape for real and run the generated
 # app's own checks. A shape may only be claimed when this gate is green.
 #
-# Usage: smoke-shape.sh <raw|blade|blade-vue|inertia>
+# Usage: smoke-shape.sh <raw|raw-vue|blade|blade-vue|inertia>
 #
 # Environment:
 #   SMOKE_REPO  checkout of this repository to read from (default /repo)
@@ -10,16 +10,16 @@
 #               (default: a fresh mktemp -d, removed on exit)
 #   SMOKE_KEEP  set to 1 to keep the scratch dir behind for inspection
 #
-# Needs php 8.5, composer 2, (for raw) curl and (for blade, blade-vue and
-# inertia) node 22 on PATH, plus network access for Composer, npm and the
+# Needs php 8.5, composer 2, (for raw and raw-vue) curl and (for every shape
+# but raw) node 22 on PATH, plus network access for Composer, npm and the
 # WayneUI release download. No credentials, no Oracle connection.
 set -u
 
 shape=${1:-}
 case "$shape" in
-    raw | blade | blade-vue | inertia) ;;
+    raw | raw-vue | blade | blade-vue | inertia) ;;
     *)
-        echo "usage: smoke-shape.sh <raw|blade|blade-vue|inertia>" >&2
+        echo "usage: smoke-shape.sh <raw|raw-vue|blade|blade-vue|inertia>" >&2
         exit 2
         ;;
 esac
@@ -49,7 +49,7 @@ if [ "$shape" != raw ]; then
         fi
     done
 fi
-if [ "$shape" = raw ]; then
+if [ "$shape" = raw ] || [ "$shape" = raw-vue ]; then
     if ! command -v curl >/dev/null 2>&1; then
         echo "FAIL preflight: curl is not on PATH"
         exit 1
@@ -62,7 +62,7 @@ if [ "$shape" != raw ]; then
     node --version
     npm --version
 fi
-if [ "$shape" = raw ]; then
+if [ "$shape" = raw ] || [ "$shape" = raw-vue ]; then
     curl --version | head -n 1
 fi
 
@@ -137,6 +137,9 @@ dir=$work
 case "$shape" in
     raw)
         step "sourdough new raw" php "$src/bin/sourdough" new "$work/app" --raw --no-advisor --no-playbook --no-input
+        ;;
+    raw-vue)
+        step "sourdough new raw-vue" php "$src/bin/sourdough" new "$work/app" --raw --vue --no-advisor --no-playbook --no-input
         ;;
     blade)
         step "sourdough new blade" php "$src/bin/sourdough" new "$work/app" --laravel --no-advisor --no-playbook --no-input
@@ -213,6 +216,66 @@ case "$shape" in
         check_raw_http "raw GET / answers 200" "/" 200
         check_raw_http "raw GET /nope answers 404" "/nope" 404
         check_raw_http "raw GET /up answers 200" "/up" 200
+
+        kill "$server_pid" 2>/dev/null
+        ;;
+    raw-vue)
+        step "composer install" composer install --no-interaction --no-progress
+        step "composer ci" composer ci
+        step "npm install" npm install --no-audit --no-fund
+        step "npm run build" npm run build
+
+        # Live check, as for raw: APP_ENV=local so SESAME uses its fake
+        # driver. The page must load the built Vue app, and /api/me must
+        # answer JSON on the session the page started (401 without one).
+        n=$((n + 1))
+        log=$logs/$n.log
+        APP_ENV=local php -S 127.0.0.1:8099 -t "$dir/public" >"$log" 2>&1 &
+        server_pid=$!
+        jar=$work/cookies.txt
+
+        up=''
+        i=0
+        while [ "$i" -lt 10 ]; do
+            if curl -s -o /dev/null "http://127.0.0.1:8099/up"; then
+                up=1
+                break
+            fi
+            i=$((i + 1))
+            sleep 1
+        done
+        if [ -z "$up" ]; then
+            echo "FAIL raw-vue server answers /up within 10s"
+            echo "--- tail of raw-vue server ($log) ---"
+            tail -n 40 "$log"
+            kill "$server_pid" 2>/dev/null
+            exit 1
+        fi
+        echo "ok raw-vue server answers /up within 10s"
+
+        # check_vue_http LABEL PATH WANT_CODE [WANT_BODY_TEXT]
+        check_vue_http() {
+            label=$1
+            path=$2
+            want=$3
+            body=$work/body.txt
+            got=$(curl -s -L -c "$jar" -b "$jar" -o "$body" -w '%{http_code}' "http://127.0.0.1:8099$path")
+            if [ "$got" = "$want" ] && { [ -z "${4:-}" ] || grep -q -- "$4" "$body"; }; then
+                echo "ok $label"
+                return 0
+            fi
+            echo "FAIL $label: got $got, want $want${4:+ with \"$4\"}"
+            head -c 2000 "$body"
+            echo "--- tail of raw-vue server ($log) ---"
+            tail -n 40 "$log"
+            kill "$server_pid" 2>/dev/null
+            exit 1
+        }
+        check_vue_http "raw-vue GET /api/me without a session answers 401" /api/me 401 '"message"'
+        check_vue_http "raw-vue GET / answers 200 and loads the built app" / 200 'src="/build/assets/'
+        check_vue_http "raw-vue GET /api/me answers the signed-in user" /api/me 200 '"username":"jdoe"'
+        check_vue_http "raw-vue GET /nope answers 404 with the app" /nope 404 'id="app"'
+        check_vue_http "raw-vue GET /up answers 200" /up 200
 
         kill "$server_pid" 2>/dev/null
         ;;
