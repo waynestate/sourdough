@@ -22,9 +22,13 @@ Where the code lives: the canonical repository is on nougat: [enterprise-apps/so
 
 Two ways in: install the `sourdough` command on your machine, or scaffold without installing.
 
+composer global require
+
 ```bash
 composer global require waynestate/sourdough
 ```
+
+composer create-project
 
 ```bash
 composer create-project waynestate/sourdough

@@ -75,16 +75,16 @@
 </table></div>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p><code>--raw</code>, <code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code> generate in 0.1. The last permutation, <code>--raw --vue</code>, prints the plan and exits <code>1</code> with &quot;not available in this release&quot;; a later step adds it.</p></aside>
 <p>Run <code>sourdough new</code> with the flags for the row you want. <code>dir</code> is the directory to create the app in:</p>
-<pre><code class="language-bash">sourdough new my-app --raw
-</code></pre>
-<pre><code class="language-bash">sourdough new my-app --raw --vue
-</code></pre>
-<pre><code class="language-bash">sourdough new my-app --laravel
-</code></pre>
-<pre><code class="language-bash">sourdough new my-app --laravel --vue
-</code></pre>
-<pre><code class="language-bash">sourdough new my-app --inertia
-</code></pre>
+<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre><code class="language-bash">sourdough new my-app --raw --vue
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre><code class="language-bash">sourdough new my-app --laravel
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="laravel + vue"><p class="docs-tabs__label">laravel + vue</p><pre><code class="language-bash">sourdough new my-app --laravel --vue
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre><code class="language-bash">sourdough new my-app --inertia
+</code></pre></div></div>
 <h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
 <p>Each shape bakes from a directory in <code>templates/</code>:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>

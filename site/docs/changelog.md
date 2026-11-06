@@ -6,7 +6,7 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Changelog | Sourdough docs
+# Changelog[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changelog)
 
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic Versioning once 1.0 is out.
 

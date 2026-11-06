@@ -28,21 +28,31 @@ Warning
 
 Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
 
+raw
+
 ```bash
 sourdough new my-app --raw
 ```
+
+raw + vue
 
 ```bash
 sourdough new my-app --raw --vue
 ```
 
+laravel
+
 ```bash
 sourdough new my-app --laravel
 ```
 
+laravel + vue
+
 ```bash
 sourdough new my-app --laravel --vue
 ```
+
+inertia
 
 ```bash
 sourdough new my-app --inertia

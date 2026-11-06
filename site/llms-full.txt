@@ -573,7 +573,7 @@ Copy a prompt from the front page, or open it straight in your tool of choice. T
 
 Source: https://sourdough.apps.wayne.edu/docs/changelog.html
 
-## Changelog | Sourdough docs
+## Changelog[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changelog)
 
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic Versioning once 1.0 is out.
 
@@ -1233,21 +1233,31 @@ Warning
 
 Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
 
+raw
+
 ```bash
 sourdough new my-app --raw
 ```
+
+raw + vue
 
 ```bash
 sourdough new my-app --raw --vue
 ```
 
+laravel
+
 ```bash
 sourdough new my-app --laravel
 ```
 
+laravel + vue
+
 ```bash
 sourdough new my-app --laravel --vue
 ```
+
+inertia
 
 ```bash
 sourdough new my-app --inertia
@@ -1525,9 +1535,13 @@ Where the code lives: the canonical repository is on nougat: [enterprise-apps/so
 
 Two ways in: install the `sourdough` command on your machine, or scaffold without installing.
 
+composer global require
+
 ```bash
 composer global require waynestate/sourdough
 ```
+
+composer create-project
 
 ```bash
 composer create-project waynestate/sourdough
@@ -1998,9 +2012,13 @@ laravel
 sourdough new my-app --laravel
 ```
 
+laravel + vue
+
 ```bash
 sourdough new my-app --laravel --vue
 ```
+
+inertia
 
 ```bash
 sourdough new my-app --inertia
@@ -2328,9 +2346,13 @@ How to move the Sourdough CLI to a new release, and what each release changes fo
 
 ### Upgrade the CLI[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrade-the-cli)
 
+composer global require
+
 ```bash
 composer global require waynestate/sourdough
 ```
+
+composer create-project
 
 ```bash
 composer create-project waynestate/sourdough

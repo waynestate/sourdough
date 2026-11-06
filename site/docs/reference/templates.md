@@ -50,9 +50,13 @@ laravel
 sourdough new my-app --laravel
 ```
 
+laravel + vue
+
 ```bash
 sourdough new my-app --laravel --vue
 ```
+
+inertia
 
 ```bash
 sourdough new my-app --inertia

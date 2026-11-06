@@ -5,6 +5,8 @@ description: All notable changes to this project.
 
 <!-- Generated from CHANGELOG.md by bin/docs-site.php. Edit CHANGELOG.md, not this file. -->
 
+# Changelog
+
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic
 Versioning once 1.0 is out.
 

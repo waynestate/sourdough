@@ -12,9 +12,13 @@ How to move the Sourdough CLI to a new release, and what each release changes fo
 
 ## Upgrade the CLI[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrade-the-cli)
 
+composer global require
+
 ```bash
 composer global require waynestate/sourdough
 ```
+
+composer create-project
 
 ```bash
 composer create-project waynestate/sourdough
