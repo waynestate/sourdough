@@ -96,6 +96,22 @@ services:
             args:
                 WWWGROUP: '${WWWGROUP:-1000}'
         image: 'sail-__SAIL_RUNTIME__/app'
+        # Sail serves as its sail user (WWWUSER). A checkout on a Windows drive,
+        # or one written by a root container, shows up here root-owned 755, so
+        # that user cannot write storage/ and every page is a 500 that names
+        # tempnam(). Only when that user cannot write the app, open the app's
+        # files to it (vendor, node_modules and .git untouched), then start
+        # Sail as usual. On a normal Linux or macOS checkout nothing changes.
+        entrypoint:
+            - bash
+            - '-c'
+            - |
+              cd /var/www/html
+              if ! setpriv --reuid="$${WWWUSER:-1000}" --regid="$${WWWUSER:-1000}" --clear-groups sh -c 'test -w . && test -w storage/framework/views'; then
+                  echo 'sourdough: opening the app to the sail user (root-owned mount)'
+                  find . \( -path ./vendor -o -path ./node_modules -o -path ./.git \) -prune -o -exec chmod ugo+rwX {} +
+              fi
+              exec start-container
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:

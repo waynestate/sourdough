@@ -98,6 +98,30 @@ final class SailScaffoldTest extends TestCase
         self::assertStringContainsString('service_healthy', $yaml);
     }
 
+    /**
+     * A checkout Sail's user cannot write (a Windows drive, or files a root
+     * container wrote) made every page a tempnam() 500. The entrypoint opens
+     * the app to that user only when it cannot write it, skips vendor,
+     * node_modules and .git, and still hands off to Sail's start-container.
+     * The $$ keeps Compose from interpolating the variable itself.
+     */
+    public function testComposeOpensARootOwnedMountToTheSailUser(): void
+    {
+        $dir = $this->makeTempDir();
+        $this->writeComposer($dir);
+
+        (new SailScaffold())->apply($dir);
+
+        $yaml = (string) file_get_contents($dir . '/compose.yaml');
+        self::assertStringContainsString('entrypoint:', $yaml);
+        self::assertStringContainsString('setpriv --reuid="$${WWWUSER:-1000}"', $yaml);
+        self::assertStringContainsString("test -w . && test -w storage/framework/views", $yaml);
+        self::assertStringContainsString('-path ./vendor -o -path ./node_modules -o -path ./.git', $yaml);
+        self::assertStringContainsString('chmod ugo+rwX', $yaml);
+        self::assertStringContainsString('exec start-container', $yaml);
+        self::assertStringNotContainsString("\t", $yaml);
+    }
+
     public function testRefusesAnExistingComposeFile(): void
     {
         $dir = $this->makeTempDir();
