@@ -18,7 +18,7 @@ A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sour
 - `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
 - `--inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's `components/ui` imports; Ziggy routes; the stack packages; a `frontend` CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.
 
-Four of the five permutations generate in 0.1. The last one, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
 ## Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
 

@@ -7,7 +7,7 @@ description: The templates Sourdough ships, from the raw base to the Laravel ove
 
 Reference for the template directories under `templates/`: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in [Pick a shape](../guides/shapes.md), then come back here for the exact values.
 
-Five jars on the shelf, four of them full in 0.1: the fifth (`--raw --vue`) is still proofing.
+Five jars on the shelf, all five full in 0.1.
 
 ![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](../readme/proof.svg)
 
@@ -16,6 +16,7 @@ Five jars on the shelf, four of them full in 0.1: the fifth (`--raw --vue`) is s
 | Directory | Shape | Status in 0.1 |
 |---|---|---|
 | `raw/` | Raw PHP with WayneUI's standalone path | generates |
+| `raw-vue/` | Raw PHP + Vue SPA over JSON, layered over `raw/` | generates |
 | `laravel-blade/` | Laravel + Blade | generates |
 | `laravel-blade-vue/` | Laravel + Blade + Vue islands | generates |
 | `laravel-inertia/` | Laravel + Inertia/Vue | generates |
@@ -31,12 +32,16 @@ The flags that select a shape:
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
-Bake commands for the four shapes that generate:
+Bake commands for the five shapes:
 
 ```bash tab="raw"
 sourdough new my-app --raw
+```
+
+```bash tab="raw + vue"
+sourdough new my-app --raw --vue
 ```
 
 ```bash tab="laravel"
@@ -63,6 +68,17 @@ sourdough new my-app --inertia
 - The front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
 - Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
 - Oracle: raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
+
+### raw-vue/
+
+`sourdough new --raw --vue` copies `raw/` first, then `raw-vue/` over it, so the two raw shapes share the same Squire files, Pinstripe checks, Oracle helper, Playbook and ADVISOR wiring. The manifest records the template as `raw-vue`.
+
+- `public/index.php` boots HELMET, the session and SESAME exactly as `raw/` does. Paths under `/api/` answer JSON: `/api/me` returns the signed-in user (`username` and `name`), an unknown endpoint is a JSON `404`, and a request without a session is a JSON `401` instead of a redirect to CAS. `/` sends the page that loads the Vue app; any other path sends the same page with a `404`, and Vue says the page does not exist.
+- `src/Vite.php` prints the stylesheet, `modulepreload` and script tags for `resources/js/app.js` from `public/build/manifest.json` (imported chunks and their CSS included), each with HELMET's CSP nonce. While `npm run dev` runs, `public/hot` holds the dev server's origin and the helper points at it instead, and adds it to the CSP; with `APP_ENV=production` the hot file is ignored. `tests/ViteTest.php` covers both paths.
+- `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
+- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`: Squire's release script runs `npm ci` and `npm run build` once `package-lock.json` is committed.
+- Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`) to the raw pipeline.
 
 ### laravel-blade/
 

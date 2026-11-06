@@ -28,7 +28,7 @@ Green means `composer ci` passed on all three PHP versions on both.
 
 ## The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
-On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
+On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
 ## On the bench[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
 

@@ -57,6 +57,7 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 Every bake passes `--no-playbook`, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.
 
 - `raw`: `composer install`, `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` on `127.0.0.1:8099` and expect `/` 200, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
+- `raw-vue`: `composer install`, `composer ci`, `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
@@ -85,7 +86,7 @@ Two environment variables control the scratch space:
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ## The local runtime output (Sail and Docker)
 
@@ -130,7 +131,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 
 ## Things that trip people up
 
-- In 0.1 four of the five shapes generate; `--raw --vue` prints the plan and exits 1 for now.
+- In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
 
 ## Who maintains it

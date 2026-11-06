@@ -141,7 +141,7 @@
 <li><code>--vue</code> is not needed with <code>--inertia</code>: Inertia already means Vue.</li>
 <li>Combinations that make no sense are refused with an error that names the five shapes and their flags.</li>
 </ul>
-<p>In 0.1 the <code>raw</code>, <code>laravel-blade</code>, <code>laravel-blade-vue</code> and <code>laravel-inertia</code> permutations generate; the generation step for the others says &quot;not available in this release&quot;.</p>
+<p>In 0.1 all five permutations generate.</p>
 <h3 id="parts">Parts<a class="docs-heading-link" aria-label="Link to this section" href="#parts">#</a></h3>
 <p>From <code>src/Part.php</code>, the stack parts a Sourdough app is wired with:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -232,11 +232,19 @@
 <td><code>Replace {{app_name}} and {{app_slug}} in file names and contents</code></td>
 </tr>
 <tr>
-<td>any other permutation</td>
-<td><code>Create the &lt;label&gt; app in &lt;dir&gt;</code>, with <code> (not available in this release)</code> appended when the permutation does not generate</td>
+<td>raw-vue permutation</td>
+<td><code>Copy the raw template, then the raw-vue template over it, into &lt;dir&gt;</code></td>
 </tr>
 <tr>
-<td>ADVISOR wired in, permutation generates</td>
+<td>raw-vue permutation</td>
+<td><code>Replace {{app_name}} and {{app_slug}} in file names and contents</code></td>
+</tr>
+<tr>
+<td>any Laravel permutation</td>
+<td><code>Create the &lt;label&gt; app in &lt;dir&gt;</code></td>
+</tr>
+<tr>
+<td>ADVISOR wired in</td>
 <td><code>Wire ADVISOR into the app</code></td>
 </tr>
 <tr>

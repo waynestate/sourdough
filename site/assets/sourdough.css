@@ -598,7 +598,7 @@ h1, h2, h3 {
 }
 .rack {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
 }
 .loaf {
@@ -614,8 +614,6 @@ h1, h2, h3 {
 }
 .loaf:hover { transform: translateY(-4px) rotate(-0.4deg); }
 .loaf--baked {
-  grid-column: span 2;
-  flex-direction: row;
   border: 2px solid var(--sd-green);
 }
 .loaf__score {
@@ -633,7 +631,12 @@ h1, h2, h3 {
   cursor: pointer;
   color: var(--sd-brown-ink);
 }
-.loaf--baked .loaf__score { width: 44%; flex: none; border-right: 2px dashed rgba(138, 79, 31, 0.3); }
+.loaf--baked .loaf__score { border-bottom: 2px dashed rgba(138, 79, 31, 0.3); }
+/* Five loaves, two to a shelf: the odd one out gets the whole shelf, crumb beside the crust. */
+@media (min-width: 641px) {
+  .loaf--baked:last-child:nth-child(odd) { grid-column: 1 / -1; flex-direction: row; }
+  .loaf--baked:last-child:nth-child(odd) .loaf__score { width: 44%; flex: none; border-bottom: 0; border-right: 2px dashed rgba(138, 79, 31, 0.3); }
+}
 .loaf__score svg { width: min(100%, 220px); height: auto; overflow: visible; }
 .loaf--baked .loaf__score svg { width: min(100%, 300px); }
 .loaf__score svg > path:first-of-type,
@@ -665,7 +668,6 @@ h1, h2, h3 {
   border-radius: 999px;
 }
 .tag--baked { background: var(--sd-green); color: #fff; }
-.tag--soon { background: transparent; color: var(--sd-brown-ink); border: 2px dashed rgba(90, 58, 28, 0.55); }
 .cmd {
   display: flex;
   align-items: center;
@@ -726,7 +728,6 @@ h1, h2, h3 {
 .loaf.is-closed .crumb { grid-template-rows: 0fr; opacity: 0; }
 .loaf.is-closed .crumb > * { overflow: hidden; }
 .loaf.is-closed .score { stroke-dashoffset: 1; }
-.loaf:not(.loaf--baked) .loaf__score svg { max-height: 120px; }
 
 .rack__note {
   max-width: 46rem;
@@ -1115,8 +1116,6 @@ h1, h2, h3 {
 /* --------------------------------------------------------- 8. responsive */
 
 @media (max-width: 1000px) {
-  .rack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .loaf--baked { grid-column: 1 / -1; grid-row: auto; }
   .site-nav { gap: 0.9rem; }
 }
 
@@ -1141,8 +1140,6 @@ h1, h2, h3 {
 
 @media (max-width: 640px) {
   .rack { grid-template-columns: minmax(0, 1fr); }
-  .loaf--baked { flex-direction: column; }
-  .loaf--baked .loaf__score { width: 100%; border-right: 0; border-bottom: 2px dashed rgba(138, 79, 31, 0.3); }
   .jars { grid-template-columns: minmax(0, 1fr); }
   .recipe thead { display: none; }
   .recipe, .recipe tbody, .recipe tr, .recipe th, .recipe td { display: block; }

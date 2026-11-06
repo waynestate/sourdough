@@ -54,6 +54,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
 
 - `raw`: `composer install` and `composer ci`
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
@@ -82,7 +83,7 @@ Two environment variables control the scratch space:
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ## Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-the-squire-templates)
 
@@ -113,7 +114,7 @@ If every app should have something, it goes in Sourdough's templates. If only th
 
 ## Things that trip people up[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
 
-- In 0.1 four of the five shapes generate; `--raw --vue` prints the plan and exits 1 for now.
+- In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
 
 ## Who maintains it[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)

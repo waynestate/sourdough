@@ -9,19 +9,21 @@ What to do when a bake is refused or a check fails. Each symptom below names the
 
 ## Exit code 1: the bake was refused
 
-### `--raw --vue` prints the plan, then exits 1
+### A `--raw --vue` app shows "No Vite build and no dev server"
 
-Cause: Raw PHP + Vue SPA over JSON is the one permutation that does not generate in 0.1. Sourdough prints the plan first, then `not available in this release`; a later step adds it.
+Cause: the raw PHP + Vue app loads its page from Vite: from `public/build/manifest.json` after `npm run build`, or from the dev server while `npm run dev` runs. A fresh bake has neither, so `src/Vite.php` refuses with that sentence instead of printing tags that point nowhere.
 
-Fix: pick one of the four shapes that bake in 0.1 (`--raw`, `--laravel`, `--laravel --vue`, `--inertia`), or keep the printed plan for the release that ships the fifth loaf.
+Fix: build the front end once, or run the dev server next to `composer serve`.
 
 Check:
 
 ```bash
-sourdough new my-app --raw --dry-run
+npm install
+npm run build
+composer serve
 ```
 
-Exits 0 and writes nothing.
+http://localhost:8000 shows the app, and http://localhost:8000/api/me answers JSON.
 
 ### `sourdough new` refuses before writing anything: no read access to Playbook
 

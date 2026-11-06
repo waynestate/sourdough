@@ -57,7 +57,7 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 | `--json` without `--dry-run` | `--json is only available with --dry-run.` | `2` |
 | the model could not be reached (`--describe`) | `The model could not be reached:` plus the underlying error | `2` |
 
-Other refusals, all exit `1`: invalid flags, a non-empty target, a permutation that is not available in this release (the plan is printed first, then `not available in this release`), a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
+Other refusals, all exit `1`: invalid flags, a non-empty target, a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
 
 ### Playbook access check
 

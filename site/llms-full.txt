@@ -1,6 +1,6 @@
 # .: everything in one file
 
-> Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
+> Sourdough bakes all five Wayne State app shapes: raw PHP, raw PHP + Vue, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
 
 The README and the Markdown twin of every page, joined. The index is https://sourdough.apps.wayne.edu/llms.txt. Written by Squire's agent-ready kit; do not edit.
 
@@ -91,7 +91,7 @@ The app name (from `--name`, from the plan, or from the basename of ``) must sta
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
 Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
 
@@ -207,7 +207,7 @@ Feed it and it grows.
 
 Hungry. It has not been fed yet today.
 
-`sourdough new` makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. Four of the five shapes bake today; raw PHP with Vue is still proofing.
+`sourdough new` makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. All five shapes bake today, from raw PHP to Inertia.
 
 The whole recipe
 
@@ -238,7 +238,7 @@ On the cooling rack
 
 ### Five loaves, one starter
 
-These are the five app shapes the stack supports. Four of the five bake today; raw PHP with Vue is still proofing, so it prints its plan and stops with exit 1. Score a loaf to see what's inside.
+These are the five app shapes the stack supports, and all five bake today. Score a loaf to see what's inside.
 
 Country boule
 
@@ -264,13 +264,18 @@ Bâtard
 
 #### Raw PHP + Vue
 
-A Vue single-page app over JSON, on raw PHP.
+A Vue single-page app over JSON, on raw PHP. No framework, one build.
 
-Coming soon
+Out of the oven · 0.1
+
+`sourdough new my-app --raw --vue`
 
 The crumb
 
-Cut too early: still dough in the middle. In 0.1, `--raw --vue` prints its plan and stops.
+- `public/index.php` the raw boot, then JSON under `/api/` and one page for Vue
+- `resources/js/App.vue` drawn with WayneUI's Vue components, pinned at 2.0.8
+- `src/Vite.php` reads Vite's manifest, nonces every tag for HELMET
+- Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`
 
 Baguette
 
@@ -314,7 +319,7 @@ The crumb
 
 Laravel with Inertia and Vue as one app: Inertia pages rendered by Vue, Ziggy routes, the stack packages, Squire's Laravel deploy files and the manifest. [WELD](https://weld.apps.wayne.edu/) is this shape already built, with the stack's product docs and site on top; you can also bake it yourself with `--inertia`.
 
-Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags, including the one that doesn't bake yet, `--raw --vue`.
+Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags.
 
 Recipe card No. 1
 
@@ -448,7 +453,7 @@ Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes all five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -463,7 +468,7 @@ Task:
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:
-- Sourdough 0.1 bakes four of the five shapes: raw PHP (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Only --raw --vue prints a plan and stops with exit 1; never say it made an app. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
+- Sourdough 0.1 bakes all five shapes: raw PHP (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). A --raw --vue app needs npm install and npm run build before composer serve shows the page. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
 - .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
 - The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
 - Never commit .env, and never paste a secret into a prompt or a file.
@@ -579,6 +584,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Added: `sourdough new --raw --vue` bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then `templates/raw-vue/` over it: a front controller that answers JSON under `/api/` (`/api/me` returns the signed-in user, or `401` instead of sending a `fetch()` to CAS) and sends the Vue page for `/` (and for any other path, with a `404`); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from `@waynestate/wayne-ui-vue` and `@waynestate/wayne-ui-css` 2.0.8, pinned exactly as in the Inertia shape; and `src/Vite.php`, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while `npm run dev` runs (and adds it to the CSP, never in production). Its Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`. The `--raw --vue` plan no longer ends in "not available in this release", and a `smoke-raw-vue` CI job bakes the shape and checks `/`, `/api/me` and `/up` on a live server. All five loaves bake now.
 - Fixed: `--sail` apps answer 200 on `/` and `/up` when the checkout is one Sail's `sail` user cannot write (a Windows drive under Docker Desktop, or files a root container wrote). Every page was a 500 naming `tempnam()`, because Blade could not write `storage/framework/views`. The compose file's entrypoint now gives the `sail` user its `WWWUSER` uid first (so a `sail artisan` run the moment `sail up -d` returns no longer runs as the image's uid 1337 and leaves a log file the server cannot append to), opens the app's files to that user only when it cannot write them (`vendor/`, `node_modules/` and `.git` untouched), then starts Sail as usual.
 - Fixed: `--docker` apps with a vite service (Blade + Vue, Inertia) serve `/` on the first `composer dev-up`. Nothing installed `node_modules`, so the vite service exited with `vite: not found` and `/` was a 500 (`Vite manifest not found`). The service now runs `npm install` when Vite is missing, then `npm run dev`.
 - Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the `ziggy-js` npm package. The home page and the dashboard are new, in WayneUI's components and tokens. `eslint.config.js` refuses `components/ui` imports and the kit's helper packages, `.prettierrc` is the stack's, and a `frontend` CI job runs lint, Prettier, vue-tsc and the build.
@@ -736,7 +742,7 @@ Green means `composer ci` passed on all three PHP versions on both.
 
 ### The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
-On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
+On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
 ### On the bench[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
 
@@ -844,13 +850,13 @@ The plan becomes a list of plain steps, built from the permutation, the target d
 - `Copy the raw template into <dir>`
 - `Replace {{app_name}} and {{app_slug}} in file names and contents`
 
-The Laravel shapes get a step to create the app in the target dir, suffixed with ` (not available in this release)` for the permutations this release does not generate. Generatable permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` and `--docker` adds `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)`. The two flags are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
+The raw + Vue shape starts with `Copy the raw template, then the raw-vue template over it, into <dir>` and the same replace step. The Laravel shapes get one step to create the app in the target dir. Permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` and `--docker` adds `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)`. The two flags are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
 Note
 
 `--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP. Combining them with a raw permutation is refused.
 
-In 0.1 the raw, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue permutations are generated; the generation step for the others says "not available in this release".
+In 0.1 all five permutations are generated.
 
 ### Related[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#related)
 
@@ -991,7 +997,7 @@ A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sour
 - `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
 - `--inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's `components/ui` imports; Ziggy routes; the stack packages; a `frontend` CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.
 
-Four of the five permutations generate in 0.1. The last one, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
 ### Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
 
@@ -1237,9 +1243,7 @@ A starter in a jar is only potential until you give it a shape: pick the permuta
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-Warning
-
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
 Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
 
@@ -1280,6 +1284,7 @@ Each shape bakes from a directory in `templates/`:
 | Template directory | Shape |
 | --- | --- |
 | `raw/` | Raw PHP with WayneUI's standalone path |
+| `raw-vue/` | Raw PHP + Vue SPA over JSON (copied over `raw/`) |
 | `laravel-blade/` | Laravel + Blade |
 | `laravel-blade-vue/` | Laravel + Blade + Vue islands |
 | `laravel-inertia/` | Laravel + Inertia/Vue |
@@ -1292,6 +1297,19 @@ The raw template also carries its own checks:
 - An explicit `composer-ci` job in `.gitlab-ci.yml` (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
 - `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`.
 - A front controller that answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
+
+### Raw PHP + Vue[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#raw-php-vue)
+
+`--raw --vue` keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under `/api/` (`/api/me` is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no `public/wayne-ui.php` to fetch. Run it with:
+
+```bash
+composer install
+npm install
+npm run build
+composer serve
+```
+
+Run `npm run dev` in a second terminal for hot reload: `src/Vite.php` loads the app from the dev server while it runs, and from `public/build` otherwise. See [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue) for every file it adds.
 
 ### Oracle in every shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#oracle-in-every-shape)
 
@@ -1352,6 +1370,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
 
 - `raw`: `composer install` and `composer ci`
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
@@ -1382,7 +1401,7 @@ Two environment variables control the scratch space:
 
 Note
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ### Related[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#related)
 
@@ -1633,6 +1652,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
 
 - `raw`: `composer install` and `composer ci`
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
@@ -1661,7 +1681,7 @@ Two environment variables control the scratch space:
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ### Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-the-squire-templates)
 
@@ -1692,7 +1712,7 @@ If every app should have something, it goes in Sourdough's templates. If only th
 
 ### Things that trip people up[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
 
-- In 0.1 four of the five shapes generate; `--raw --vue` prints the plan and exits 1 for now.
+- In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
 
 ### Who maintains it[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)
@@ -1758,7 +1778,7 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 | `--json` without `--dry-run` | `--json is only available with --dry-run.` | `2` |
 | the model could not be reached (`--describe`) | `The model could not be reached:` plus the underlying error | `2` |
 
-Other refusals, all exit `1`: invalid flags, a non-empty target, a permutation that is not available in this release (the plan is printed first, then `not available in this release`), a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
+Other refusals, all exit `1`: invalid flags, a non-empty target, a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
 
 #### Playbook access check[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#playbook-access-check)
 
@@ -1891,7 +1911,7 @@ Flag resolution, from `src/Permutation.php`:
 - `--vue` is not needed with `--inertia`: Inertia already means Vue.
 - Combinations that make no sense are refused with an error that names the five shapes and their flags.
 
-In 0.1 the `raw`, `laravel-blade`, `laravel-blade-vue` and `laravel-inertia` permutations generate; the generation step for the others says "not available in this release".
+In 0.1 all five permutations generate.
 
 #### Parts[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#parts)
 
@@ -1962,8 +1982,10 @@ The app plan is the what: permutation, parts, name, models, pages. The steps pla
 | --- | --- |
 | raw permutation | `Copy the raw template into <dir>` |
 | raw permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
-| any other permutation | `Create the <label> app in <dir>`, with ` (not available in this release)` appended when the permutation does not generate |
-| ADVISOR wired in, permutation generates | `Wire ADVISOR into the app` |
+| raw-vue permutation | `Copy the raw template, then the raw-vue template over it, into <dir>` |
+| raw-vue permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
+| any Laravel permutation | `Create the <label> app in <dir>` |
+| ADVISOR wired in | `Wire ADVISOR into the app` |
 | `--sail` | `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` |
 | `--docker` | `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)` |
 
@@ -1982,7 +2004,7 @@ Source: https://sourdough.apps.wayne.edu/docs/reference/templates.html
 
 Reference for the template directories under `templates/`: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for the exact values.
 
-Five jars on the shelf, four of them full in 0.1: the fifth (`--raw --vue`) is still proofing.
+Five jars on the shelf, all five full in 0.1.
 
 ![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
 
@@ -1991,6 +2013,7 @@ Five jars on the shelf, four of them full in 0.1: the fifth (`--raw --vue`) is s
 | Directory | Shape | Status in 0.1 |
 | --- | --- | --- |
 | `raw/` | Raw PHP with WayneUI's standalone path | generates |
+| `raw-vue/` | Raw PHP + Vue SPA over JSON, layered over `raw/` | generates |
 | `laravel-blade/` | Laravel + Blade | generates |
 | `laravel-blade-vue/` | Laravel + Blade + Vue islands | generates |
 | `laravel-inertia/` | Laravel + Inertia/Vue | generates |
@@ -2006,14 +2029,20 @@ The flags that select a shape:
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
-Bake commands for the four shapes that generate:
+Bake commands for the five shapes:
 
 raw
 
 ```bash
 sourdough new my-app --raw
+```
+
+raw + vue
+
+```bash
+sourdough new my-app --raw --vue
 ```
 
 laravel
@@ -2046,6 +2075,17 @@ sourdough new my-app --inertia
 - The front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
 - Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
 - Oracle: raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
+
+#### raw-vue/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue)
+
+`sourdough new --raw --vue` copies `raw/` first, then `raw-vue/` over it, so the two raw shapes share the same Squire files, Pinstripe checks, Oracle helper, Playbook and ADVISOR wiring. The manifest records the template as `raw-vue`.
+
+- `public/index.php` boots HELMET, the session and SESAME exactly as `raw/` does. Paths under `/api/` answer JSON: `/api/me` returns the signed-in user (`username` and `name`), an unknown endpoint is a JSON `404`, and a request without a session is a JSON `401` instead of a redirect to CAS. `/` sends the page that loads the Vue app; any other path sends the same page with a `404`, and Vue says the page does not exist.
+- `src/Vite.php` prints the stylesheet, `modulepreload` and script tags for `resources/js/app.js` from `public/build/manifest.json` (imported chunks and their CSS included), each with HELMET's CSP nonce. While `npm run dev` runs, `public/hot` holds the dev server's origin and the helper points at it instead, and adds it to the CSP; with `APP_ENV=production` the hot file is ignored. `tests/ViteTest.php` covers both paths.
+- `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
+- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`: Squire's release script runs `npm ci` and `npm run build` once `package-lock.json` is committed.
+- Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`) to the raw pipeline.
 
 #### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
 
@@ -2140,19 +2180,21 @@ What to do when a bake is refused or a check fails. Each symptom below names the
 
 ### Exit code 1: the bake was refused[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#exit-code-1-the-bake-was-refused)
 
-#### `--raw --vue` prints the plan, then exits 1[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#raw-vue-prints-the-plan-then-exits-1)
+#### A `--raw --vue` app shows "No Vite build and no dev server"[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#a-raw-vue-app-shows-no-vite-build-and-no-dev-server)
 
-Cause: Raw PHP + Vue SPA over JSON is the one permutation that does not generate in 0.1. Sourdough prints the plan first, then `not available in this release`; a later step adds it.
+Cause: the raw PHP + Vue app loads its page from Vite: from `public/build/manifest.json` after `npm run build`, or from the dev server while `npm run dev` runs. A fresh bake has neither, so `src/Vite.php` refuses with that sentence instead of printing tags that point nowhere.
 
-Fix: pick one of the four shapes that bake in 0.1 (`--raw`, `--laravel`, `--laravel --vue`, `--inertia`), or keep the printed plan for the release that ships the fifth loaf.
+Fix: build the front end once, or run the dev server next to `composer serve`.
 
 Check:
 
 ```bash
-sourdough new my-app --raw --dry-run
+npm install
+npm run build
+composer serve
 ```
 
-Exits 0 and writes nothing.
+[http://localhost:8000](http://localhost:8000) shows the app, and [http://localhost:8000/api/me](http://localhost:8000/api/me) answers JSON.
 
 #### `sourdough new` refuses before writing anything: no read access to Playbook[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook)
 

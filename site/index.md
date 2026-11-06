@@ -1,6 +1,6 @@
 ---
 title: "Sourdough: Feed it and it grows."
-description: "Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it."
+description: "Sourdough bakes all five Wayne State app shapes: raw PHP, raw PHP + Vue, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it."
 url: https://sourdough.apps.wayne.edu/
 llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
@@ -16,7 +16,7 @@ Feed it and it grows.
 
 Hungry. It has not been fed yet today.
 
-`sourdough new` makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. Four of the five shapes bake today; raw PHP with Vue is still proofing.
+`sourdough new` makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. All five shapes bake today, from raw PHP to Inertia.
 
 The whole recipe
 
@@ -47,7 +47,7 @@ On the cooling rack
 
 ## Five loaves, one starter
 
-These are the five app shapes the stack supports. Four of the five bake today; raw PHP with Vue is still proofing, so it prints its plan and stops with exit 1. Score a loaf to see what's inside.
+These are the five app shapes the stack supports, and all five bake today. Score a loaf to see what's inside.
 
 Country boule
 
@@ -73,13 +73,18 @@ Bâtard
 
 ### Raw PHP + Vue
 
-A Vue single-page app over JSON, on raw PHP.
+A Vue single-page app over JSON, on raw PHP. No framework, one build.
 
-Coming soon
+Out of the oven · 0.1
+
+`sourdough new my-app --raw --vue`
 
 The crumb
 
-Cut too early: still dough in the middle. In 0.1, `--raw --vue` prints its plan and stops.
+- `public/index.php` the raw boot, then JSON under `/api/` and one page for Vue
+- `resources/js/App.vue` drawn with WayneUI's Vue components, pinned at 2.0.8
+- `src/Vite.php` reads Vite's manifest, nonces every tag for HELMET
+- Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`
 
 Baguette
 
@@ -123,7 +128,7 @@ The crumb
 
 Laravel with Inertia and Vue as one app: Inertia pages rendered by Vue, Ziggy routes, the stack packages, Squire's Laravel deploy files and the manifest. [WELD](https://weld.apps.wayne.edu/) is this shape already built, with the stack's product docs and site on top; you can also bake it yourself with `--inertia`.
 
-Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags, including the one that doesn't bake yet, `--raw --vue`.
+Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags.
 
 Recipe card No. 1
 
@@ -257,7 +262,7 @@ Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes all five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -272,7 +277,7 @@ Task:
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:
-- Sourdough 0.1 bakes four of the five shapes: raw PHP (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Only --raw --vue prints a plan and stops with exit 1; never say it made an app. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
+- Sourdough 0.1 bakes all five shapes: raw PHP (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). A --raw --vue app needs npm install and npm run build before composer serve shows the page. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
 - .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
 - The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
 - Never commit .env, and never paste a secret into a prompt or a file.

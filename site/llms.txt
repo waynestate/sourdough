@@ -1,12 +1,12 @@
 # .
 
-> Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
+> Sourdough bakes all five Wayne State app shapes: raw PHP, raw PHP + Vue, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
 
 Every page below is Markdown. The HTML pages send the same Markdown to a client that asks for `text/markdown`. Written by Squire's agent-ready kit from the README and the pages; do not edit.
 
 ## Pages
 
-- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
+- [Sourdough: Feed it and it grows.](https://sourdough.apps.wayne.edu/index.md): Sourdough bakes all five Wayne State app shapes: raw PHP, raw PHP + Vue, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.
 - [Agent ready | Sourdough docs](https://sourdough.apps.wayne.edu/docs/agent-ready.md): How the Sourdough site serves coding agents: Markdown twins, llms.txt and the two prompts for your agent.
 - [Changelog | Sourdough docs](https://sourdough.apps.wayne.edu/docs/changelog.md): All notable changes to this project.
 - [CI | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/ci.md): Set up the generated app's CI with the Preflight components on GitLab and GitHub, and why a git.wayne.edu instance runner is strongly recommended.

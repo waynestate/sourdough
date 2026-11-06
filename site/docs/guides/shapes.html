@@ -73,7 +73,7 @@
 </tr>
 </tbody>
 </table></div>
-<aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p><code>--raw</code>, <code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code> generate in 0.1. The last permutation, <code>--raw --vue</code>, prints the plan and exits <code>1</code> with &quot;not available in this release&quot;; a later step adds it.</p></aside>
+<p>All five permutations generate in 0.1. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
 <p>Run <code>sourdough new</code> with the flags for the row you want. <code>dir</code> is the directory to create the app in:</p>
 <div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
 </code></pre></div>
@@ -100,6 +100,10 @@
 <td>Raw PHP with WayneUI's standalone path</td>
 </tr>
 <tr>
+<td><code>raw-vue/</code></td>
+<td>Raw PHP + Vue SPA over JSON (copied over <code>raw/</code>)</td>
+</tr>
+<tr>
 <td><code>laravel-blade/</code></td>
 <td>Laravel + Blade</td>
 </tr>
@@ -121,6 +125,14 @@
 <li><code>stubs/wayne-ui.php</code>, a static-analysis stub for the run-time WayneUI functions (<code>wsu_shell_start</code>, <code>wsu_shell_end</code>) that <code>phpstan.neon</code> scans through <code>scanFiles</code>.</li>
 <li>A front controller that answers <code>404</code> for any path but <code>/</code> (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; <code>/up</code> stays HELMET's and answers first.</li>
 </ul>
+<h2 id="raw-php-vue">Raw PHP + Vue<a class="docs-heading-link" aria-label="Link to this section" href="#raw-php-vue">#</a></h2>
+<p><code>--raw --vue</code> keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under <code>/api/</code> (<code>/api/me</code> is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no <code>public/wayne-ui.php</code> to fetch. Run it with:</p>
+<pre><code class="language-bash">composer install
+npm install
+npm run build
+composer serve
+</code></pre>
+<p>Run <code>npm run dev</code> in a second terminal for hot reload: <code>src/Vite.php</code> loads the app from the dev server while it runs, and from <code>public/build</code> otherwise. See <a href="../reference/templates.html#raw-vue">Templates</a> for every file it adds.</p>
 <h2 id="oracle-in-every-shape">Oracle in every shape<a class="docs-heading-link" aria-label="Link to this section" href="#oracle-in-every-shape">#</a></h2>
 <p>Oracle is wired but dormant in every generated app. The settings <code>ORACLE_USERNAME</code>, <code>ORACLE_PASSWORD</code>, and either <code>ORACLE_TNS</code> or <code>ORACLE_HOST</code>, <code>ORACLE_PORT</code>, <code>ORACLE_SERVICE_NAME</code> ship commented out in <code>.env.example</code>; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with <code>php artisan oracle:check</code>, and raw PHP apps run queries through the <code>App\Oracle</code> helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: <code>oracle-check.php</code> at the app root, where Squire's Laravel layout ships it, first, then <code>deploy/oracle-check.php</code>.</p>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
@@ -132,7 +144,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/quick-start.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Quick start</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/describe-a-plan.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Describe a plan</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-five-permutations">The five permutations</a></li><li class="docs-toc__item"><a href="#the-template-directories">The template directories</a></li><li class="docs-toc__item"><a href="#oracle-in-every-shape">Oracle in every shape</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-five-permutations">The five permutations</a></li><li class="docs-toc__item"><a href="#the-template-directories">The template directories</a></li><li class="docs-toc__item"><a href="#raw-php-vue">Raw PHP + Vue</a></li><li class="docs-toc__item"><a href="#oracle-in-every-shape">Oracle in every shape</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.5</span></span>

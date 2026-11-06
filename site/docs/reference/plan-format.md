@@ -61,7 +61,7 @@ Flag resolution, from `src/Permutation.php`:
 - `--vue` is not needed with `--inertia`: Inertia already means Vue.
 - Combinations that make no sense are refused with an error that names the five shapes and their flags.
 
-In 0.1 the `raw`, `laravel-blade`, `laravel-blade-vue` and `laravel-inertia` permutations generate; the generation step for the others says "not available in this release".
+In 0.1 all five permutations generate.
 
 ### Parts[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#parts)
 
@@ -132,8 +132,10 @@ The app plan is the what: permutation, parts, name, models, pages. The steps pla
 | --- | --- |
 | raw permutation | `Copy the raw template into <dir>` |
 | raw permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
-| any other permutation | `Create the <label> app in <dir>`, with ` (not available in this release)` appended when the permutation does not generate |
-| ADVISOR wired in, permutation generates | `Wire ADVISOR into the app` |
+| raw-vue permutation | `Copy the raw template, then the raw-vue template over it, into <dir>` |
+| raw-vue permutation | `Replace {{app_name}} and {{app_slug}} in file names and contents` |
+| any Laravel permutation | `Create the <label> app in <dir>` |
+| ADVISOR wired in | `Wire ADVISOR into the app` |
 | `--sail` | `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` |
 | `--docker` | `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)` |
 

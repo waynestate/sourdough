@@ -41,7 +41,7 @@
     <main id="main">
       <article class="docs-article"><h1 id="templates">Templates<a class="docs-heading-link" aria-label="Link to this section" href="#templates">#</a></h1>
 <p>Reference for the template directories under <code>templates/</code>: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in <a href="../guides/shapes.html">Pick a shape</a>, then come back here for the exact values.</p>
-<p>Five jars on the shelf, four of them full in 0.1: the fifth (<code>--raw --vue</code>) is still proofing.</p>
+<p>Five jars on the shelf, all five full in 0.1.</p>
 <p><img src="../readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
 <h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -56,6 +56,11 @@
 <tr>
 <td><code>raw/</code></td>
 <td>Raw PHP with WayneUI's standalone path</td>
+<td>generates</td>
+</tr>
+<tr>
+<td><code>raw-vue/</code></td>
+<td>Raw PHP + Vue SPA over JSON, layered over <code>raw/</code></td>
 <td>generates</td>
 </tr>
 <tr>
@@ -111,9 +116,11 @@
 </tr>
 </tbody>
 </table></div>
-<p><code>--raw</code>, <code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code> generate in 0.1. The last permutation, <code>--raw --vue</code>, prints the plan and exits <code>1</code> with &quot;not available in this release&quot;; a later step adds it.</p>
-<p>Bake commands for the four shapes that generate:</p>
-<div class="docs-tabs" data-tabs="raw|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
+<p>All five permutations generate in 0.1. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
+<p>Bake commands for the five shapes:</p>
+<div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre><code class="language-bash">sourdough new my-app --raw
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="raw + vue"><p class="docs-tabs__label">raw + vue</p><pre><code class="language-bash">sourdough new my-app --raw --vue
 </code></pre></div>
 <div class="docs-tabs__panel" data-tab-label="laravel"><p class="docs-tabs__label">laravel</p><pre><code class="language-bash">sourdough new my-app --laravel
 </code></pre></div>
@@ -132,6 +139,16 @@
 <li>The front controller answers <code>404</code> for any path but <code>/</code> (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; <code>/up</code> stays HELMET's and answers first.</li>
 <li>Installs Squire's deploy files from <code>templates/squire/</code>: <code>build.sh</code>, <code>deployments/001-first-release.sh</code>, <code>scripts/release.sh</code>, <code>scripts/parity.sh</code>, <code>scripts/parity.ps1</code>, <code>health.php</code>, <code>public/up.php</code>, <code>docker-compose.squire.yml</code>, <code>.env.squire.example</code>, and the <code>.squire/</code> build context.</li>
 <li>Oracle: raw PHP apps run queries through the <code>App\Oracle</code> helper, which takes values only as binds and answers mistakes with plain sentences.</li>
+</ul>
+<h3 id="raw-vue">raw-vue/<a class="docs-heading-link" aria-label="Link to this section" href="#raw-vue">#</a></h3>
+<p><code>sourdough new --raw --vue</code> copies <code>raw/</code> first, then <code>raw-vue/</code> over it, so the two raw shapes share the same Squire files, Pinstripe checks, Oracle helper, Playbook and ADVISOR wiring. The manifest records the template as <code>raw-vue</code>.</p>
+<ul>
+<li><code>public/index.php</code> boots HELMET, the session and SESAME exactly as <code>raw/</code> does. Paths under <code>/api/</code> answer JSON: <code>/api/me</code> returns the signed-in user (<code>username</code> and <code>name</code>), an unknown endpoint is a JSON <code>404</code>, and a request without a session is a JSON <code>401</code> instead of a redirect to CAS. <code>/</code> sends the page that loads the Vue app; any other path sends the same page with a <code>404</code>, and Vue says the page does not exist.</li>
+<li><code>src/Vite.php</code> prints the stylesheet, <code>modulepreload</code> and script tags for <code>resources/js/app.js</code> from <code>public/build/manifest.json</code> (imported chunks and their CSS included), each with HELMET's CSP nonce. While <code>npm run dev</code> runs, <code>public/hot</code> holds the dev server's origin and the helper points at it instead, and adds it to the CSP; with <code>APP_ENV=production</code> the hot file is ignored. <code>tests/ViteTest.php</code> covers both paths.</li>
+<li><code>package.json</code> pins <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. <code>resources/css/app.css</code> imports WayneUI's layered <code>dist/wayne-ui.css</code>, and <code>resources/js/App.vue</code> draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).</li>
+<li><code>vite.config.js</code> builds into <code>public/build</code> with the manifest at its top, keeps <code>public/</code> (PHP's document root) out of the copy, and writes and removes <code>public/hot</code> around the dev server. <code>.gitignore</code> adds <code>/node_modules/</code>, <code>/public/build/</code> and <code>/public/hot</code>: Squire's release script runs <code>npm ci</code> and <code>npm run build</code> once <code>package-lock.json</code> is committed.</li>
+<li>Drops <code>stubs/wayne-ui.php</code> and <code>phpstan.neon</code>'s <code>scanFiles</code>: Vue draws the chrome, so there is no fetched <code>public/wayne-ui.php</code>.</li>
+<li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm install</code>, <code>npm run build</code>) to the raw pipeline.</li>
 </ul>
 <h3 id="laravel-blade">laravel-blade/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade">#</a></h3>
 <ul>
@@ -282,7 +299,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/plan-format.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Plan format</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/maintaining.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Maintaining</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-template-directories">The template directories</a></li><li class="docs-toc__item"><a href="#what-each-template-carries">What each template carries</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#raw">raw/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-blade">laravel-blade/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-blade-vue">laravel-blade-vue/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-inertia">laravel-inertia/</a></li><li class="docs-toc__item"><a href="#shared-wiring-in-every-app">Shared wiring in every app</a></li><li class="docs-toc__item"><a href="#the-squire-owned-copy-templates-squire">The Squire-owned copy (templates/squire/)</a></li><li class="docs-toc__item"><a href="#rules-the-generator-applies">Rules the generator applies</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-template-directories">The template directories</a></li><li class="docs-toc__item"><a href="#what-each-template-carries">What each template carries</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#raw">raw/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#raw-vue">raw-vue/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-blade">laravel-blade/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-blade-vue">laravel-blade-vue/</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#laravel-inertia">laravel-inertia/</a></li><li class="docs-toc__item"><a href="#shared-wiring-in-every-app">Shared wiring in every app</a></li><li class="docs-toc__item"><a href="#the-squire-owned-copy-templates-squire">The Squire-owned copy (templates/squire/)</a></li><li class="docs-toc__item"><a href="#rules-the-generator-applies">Rules the generator applies</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.5</span></span>

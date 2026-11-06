@@ -22,9 +22,7 @@ A starter in a jar is only potential until you give it a shape: pick the permuta
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-Warning
-
-`--raw`, `--laravel`, `--laravel --vue` and `--inertia` generate in 0.1. The last permutation, `--raw --vue`, prints the plan and exits `1` with "not available in this release"; a later step adds it.
+All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
 Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
 
@@ -65,6 +63,7 @@ Each shape bakes from a directory in `templates/`:
 | Template directory | Shape |
 | --- | --- |
 | `raw/` | Raw PHP with WayneUI's standalone path |
+| `raw-vue/` | Raw PHP + Vue SPA over JSON (copied over `raw/`) |
 | `laravel-blade/` | Laravel + Blade |
 | `laravel-blade-vue/` | Laravel + Blade + Vue islands |
 | `laravel-inertia/` | Laravel + Inertia/Vue |
@@ -77,6 +76,19 @@ The raw template also carries its own checks:
 - An explicit `composer-ci` job in `.gitlab-ci.yml` (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
 - `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`.
 - A front controller that answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
+
+## Raw PHP + Vue[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#raw-php-vue)
+
+`--raw --vue` keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under `/api/` (`/api/me` is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no `public/wayne-ui.php` to fetch. Run it with:
+
+```bash
+composer install
+npm install
+npm run build
+composer serve
+```
+
+Run `npm run dev` in a second terminal for hot reload: `src/Vite.php` loads the app from the dev server while it runs, and from `public/build` otherwise. See [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue) for every file it adds.
 
 ## Oracle in every shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#oracle-in-every-shape)
 

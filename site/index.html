@@ -8,7 +8,7 @@
 <meta name="stack-env" content="auto">
 <script src="assets/stack-env.js" defer></script>
 <title>Sourdough: Feed it and it grows.</title>
-<meta name="description" content="Sourdough bakes four of the five Wayne State app shapes: raw PHP, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.">
+<meta name="description" content="Sourdough bakes all five Wayne State app shapes: raw PHP, raw PHP + Vue, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue, each with SESAME sign-in, HELMET headers, PROCTOR, Preflight CI and Squire's deploy files already in it.">
 <meta name="theme-color" content="#0c5449">
 <link rel="canonical" href="https://sourdough.apps.wayne.edu/">
 <!-- For agents (ADR-0019): this page as Markdown, written by bin/agent-ready.php from Squire's kit.
@@ -108,7 +108,7 @@
       </div>
 
       <div class="hero__copy">
-        <p class="hero__blurb"><code>sourdough new</code> makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. Four of the five shapes bake today; raw PHP with Vue is still proofing.</p>
+        <p class="hero__blurb"><code>sourdough new</code> makes a Wayne State app with the stack already in it: SESAME for sign-in, HELMET for the security headers, PROCTOR and Preflight for the checks, and Squire's files for deploying to Citadel. With no flags that's a raw PHP app, and you add WayneUI's standalone file with one download. All five shapes bake today, from raw PHP to Inertia.</p>
 
         <div class="recipe-cmd">
           <p class="recipe-cmd__label">The whole recipe</p>
@@ -266,15 +266,13 @@
       <div class="section__head">
         <p class="eyebrow">On the cooling rack</p>
         <h2 id="loaves-title">Five loaves, one starter</h2>
-        <p>These are the five app shapes the stack supports. Four of the five bake today; raw PHP with Vue is still proofing, so it prints its plan and stops with exit 1. Score a loaf to see what's inside.</p>
+        <p>These are the five app shapes the stack supports, and all five bake today. Score a loaf to see what's inside.</p>
       </div>
 
       <div class="rack">
 
         <!-- Commands as documented in README.md and src/Command/NewCommand.php.
-             --raw, --laravel, --laravel --vue and --inertia generate in 0.1;
-             --raw --vue prints its plan and exits 1, so it says "coming soon"
-             and shows no command. -->
+             All five generate in 0.1. -->
         <article class="loaf loaf--baked">
           <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-raw" aria-label="Score the Raw PHP loaf: show what's baked in" data-score>
             <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
@@ -309,7 +307,7 @@
           </div>
         </article>
 
-        <article class="loaf">
+        <article class="loaf loaf--baked">
           <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-rawvue" aria-label="Score the Raw PHP + Vue loaf: show what's baked in" data-score>
             <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
               <ellipse class="loaf__shadow" cx="70" cy="80" rx="60" ry="5"/>
@@ -321,11 +319,20 @@
           <div class="loaf__body">
             <p class="loaf__kind">Bâtard</p>
             <h3>Raw PHP + Vue</h3>
-            <p class="loaf__label">A Vue single-page app over JSON, on raw PHP.</p>
-            <p><span class="tag tag--soon">Coming soon</span></p>
+            <p class="loaf__label">A Vue single-page app over JSON, on raw PHP. No framework, one build.</p>
+            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <div class="cmd">
+              <code id="cmd-rawvue">sourdough new my-app --raw --vue</code>
+              <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --raw --vue">Copy</button>
+            </div>
             <div class="crumb" id="crumb-rawvue">
               <p class="crumb__title">The crumb</p>
-              <p>Cut too early: still dough in the middle. In 0.1, <code>--raw --vue</code> prints its plan and stops.</p>
+              <ul class="crumb__list">
+                <li><code>public/index.php</code> the raw boot, then JSON under <code>/api/</code> and one page for Vue</li>
+                <li><code>resources/js/App.vue</code> drawn with WayneUI's Vue components, pinned at 2.0.8</li>
+                <li><code>src/Vite.php</code> reads Vite's manifest, nonces every tag for HELMET</li>
+                <li>Next steps: <code>composer install</code>, <code>npm install</code>, <code>npm run build</code>, <code>composer serve</code></li>
+              </ul>
             </div>
           </div>
         </article>
@@ -408,7 +415,7 @@
 
       </div>
 
-      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with every shape's flags, including the one that doesn't bake yet, <code>--raw --vue</code>.</p>
+      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with every shape's flags.</p>
     </div>
   </section>
 
@@ -617,7 +624,7 @@ composer serve</pre>
               <p class="ar-prompt__desc">Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes four of the five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes all five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -632,7 +639,7 @@ Task:
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:
-- Sourdough 0.1 bakes four of the five shapes: raw PHP (--raw or no flag), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Only --raw --vue prints a plan and stops with exit 1; never say it made an app. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
+- Sourdough 0.1 bakes all five shapes: raw PHP (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). A --raw --vue app needs npm install and npm run build before composer serve shows the page. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
 - .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
 - The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
 - Never commit .env, and never paste a secret into a prompt or a file.

@@ -89,12 +89,12 @@ The plan becomes a list of plain steps, built from the permutation, the target d
 - `Copy the raw template into <dir>`
 - `Replace {{app_name}} and {{app_slug}} in file names and contents`
 
-The Laravel shapes get a step to create the app in the target dir, suffixed with ` (not available in this release)` for the permutations this release does not generate. Generatable permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` and `--docker` adds `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)`. The two flags are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
+The raw + Vue shape starts with `Copy the raw template, then the raw-vue template over it, into <dir>` and the same replace step. The Laravel shapes get one step to create the app in the target dir. Permutations that keep ADVISOR get `Wire ADVISOR into the app`; `--sail` adds `Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)` and `--docker` adds `Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)`. The two flags are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
 > [!NOTE]
 > `--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP. Combining them with a raw permutation is refused.
 
-In 0.1 the raw, Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue permutations are generated; the generation step for the others says "not available in this release".
+In 0.1 all five permutations are generated.
 
 ## Related
 

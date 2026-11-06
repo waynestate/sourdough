@@ -48,6 +48,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
 
 - `raw`: `composer install` and `composer ci`
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
 - `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
@@ -73,7 +74,7 @@ Two environment variables control the scratch space:
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
 
 > [!NOTE]
-> On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+> On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
 
 ## Related
 
