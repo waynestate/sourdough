@@ -114,10 +114,15 @@ final class SailScaffoldTest extends TestCase
 
         $yaml = (string) file_get_contents($dir . '/compose.yaml');
         self::assertStringContainsString('entrypoint:', $yaml);
-        self::assertStringContainsString('setpriv --reuid="$${WWWUSER:-1000}"', $yaml);
-        self::assertStringContainsString("test -w . && test -w storage/framework/views", $yaml);
+        self::assertStringContainsString('uid="$${WWWUSER:-1000}"', $yaml);
+        // The uid moves before anything else, so a `sail artisan` that races
+        // the first boot never runs as the image's 1337.
+        self::assertStringContainsString('usermod -u "$$uid" sail', $yaml);
+        self::assertLessThan(strpos($yaml, 'setpriv'), strpos($yaml, 'usermod -u'));
+        self::assertStringContainsString('setpriv --reuid="$$uid" --regid="$$uid" --clear-groups', $yaml);
+        self::assertStringContainsString('find storage bootstrap/cache ! -writable', $yaml);
+        self::assertStringContainsString('chmod -R ugo+rwX storage bootstrap/cache public', $yaml);
         self::assertStringContainsString('-path ./vendor -o -path ./node_modules -o -path ./.git', $yaml);
-        self::assertStringContainsString('chmod ugo+rwX', $yaml);
         self::assertStringContainsString('exec start-container', $yaml);
         self::assertStringNotContainsString("\t", $yaml);
     }

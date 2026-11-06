@@ -99,17 +99,26 @@ services:
         # Sail serves as its sail user (WWWUSER). A checkout on a Windows drive,
         # or one written by a root container, shows up here root-owned 755, so
         # that user cannot write storage/ and every page is a 500 that names
-        # tempnam(). Only when that user cannot write the app, open the app's
-        # files to it (vendor, node_modules and .git untouched), then start
-        # Sail as usual. On a normal Linux or macOS checkout nothing changes.
+        # tempnam(). Before Sail starts: give the sail user its WWWUSER uid now
+        # (start-container does it too, but later, and a `sail artisan` typed
+        # the moment `sail up -d` returns would run as the image's uid 1337 and
+        # leave a log file nobody else can append to), then, only when that
+        # user cannot write the app, open the places Laravel writes first and
+        # the rest of the app after (vendor, node_modules and .git untouched).
+        # On a normal Linux or macOS checkout the check passes and nothing
+        # changes. Proofing the dough before it rises, basically.
         entrypoint:
             - bash
             - '-c'
             - |
               cd /var/www/html
-              if ! setpriv --reuid="$${WWWUSER:-1000}" --regid="$${WWWUSER:-1000}" --clear-groups sh -c 'test -w . && test -w storage/framework/views'; then
+              uid="$${WWWUSER:-1000}"
+              usermod -u "$$uid" sail > /dev/null 2>&1 || true
+              if setpriv --reuid="$$uid" --regid="$$uid" --clear-groups sh -c '{ find . -maxdepth 0 ! -writable; find storage bootstrap/cache ! -writable; } 2> /dev/null | grep -q .'; then
                   echo 'sourdough: opening the app to the sail user (root-owned mount)'
-                  find . \( -path ./vendor -o -path ./node_modules -o -path ./.git \) -prune -o -exec chmod ugo+rwX {} +
+                  chmod ugo+rwX . storage bootstrap/cache
+                  chmod -R ugo+rwX storage bootstrap/cache public
+                  find . \( -path ./vendor -o -path ./node_modules -o -path ./.git \) -prune -o ! -perm -o+w -exec chmod ugo+rwX {} +
               fi
               exec start-container
         extra_hosts:
