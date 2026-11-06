@@ -1,5 +1,4 @@
 import type { PageProps } from '@inertiajs/core';
-import type { LucideIcon } from 'lucide-vue-next';
 
 export interface Auth {
     user: User;
@@ -13,8 +12,8 @@ export interface BreadcrumbItem {
 export interface NavItem {
     title: string;
     href: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
+    /** A WayneUI icon: the sprite id without its `wsu-` prefix, for example `home`. */
+    icon?: string;
 }
 
 export interface SharedData extends PageProps {

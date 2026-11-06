@@ -1,49 +1,86 @@
-import { onMounted, ref } from 'vue';
+import { applyTheme, DARK, LIGHT, resolveTheme, setTheme } from '@waynestate/wayne-ui-vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-type Appearance = 'light' | 'dark' | 'system';
+export type Appearance = 'light' | 'dark' | 'system';
+
+// WayneUI owns the theme: its `wsu-theme` key, its [data-theme] attribute and
+// its .dark class. This composable is the settings page's view of that one
+// switch, so the app bar's sun and moon and the Appearance page can never
+// disagree. Light, dark, or "whatever my laptop says": three settings, one seam.
+const STORAGE_KEY = 'wsu-theme';
+
+// Before WayneUI, the starter kit kept its own `appearance` key.
+const LEGACY_KEY = 'appearance';
+
+function readAppearance(): Appearance {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === DARK) return 'dark';
+        if (stored === LIGHT) return 'light';
+    } catch {
+        // Storage is off (private browsing): the system setting applies.
+    }
+
+    return 'system';
+}
 
 export function updateTheme(value: Appearance) {
     if (value === 'system') {
-        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.documentElement.classList.toggle('dark', systemTheme === 'dark');
-    } else {
-        document.documentElement.classList.toggle('dark', value === 'dark');
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch {
+            // Nothing stored, nothing to forget.
+        }
+        applyTheme(resolveTheme());
+
+        return;
+    }
+
+    setTheme(value === 'dark' ? DARK : LIGHT);
+}
+
+/** Carry a choice made under the old `appearance` key over to WayneUI's, once. */
+function migrateLegacyChoice() {
+    try {
+        const legacy = localStorage.getItem(LEGACY_KEY);
+        if (legacy === null) return;
+
+        localStorage.removeItem(LEGACY_KEY);
+        if ((legacy === 'light' || legacy === 'dark') && localStorage.getItem(STORAGE_KEY) === null) {
+            localStorage.setItem(STORAGE_KEY, legacy === 'dark' ? DARK : LIGHT);
+        }
+    } catch {
+        // Storage is off; nothing to carry over.
     }
 }
 
-const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance | null;
-    updateTheme(currentAppearance || 'system');
-};
-
 export function initializeTheme() {
-    // Initialize theme from saved preference or default to system...
-    const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-    updateTheme(savedAppearance || 'system');
-
-    // Set up system theme change listener...
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    migrateLegacyChoice();
+    // The pre-paint script in app.blade.php has usually done this already; this
+    // covers the first load after a migration and any page without the script.
+    applyTheme(resolveTheme());
 }
 
 export function useAppearance() {
     const appearance = ref<Appearance>('system');
 
+    const sync = () => {
+        appearance.value = readAppearance();
+    };
+
     onMounted(() => {
-        initializeTheme();
+        sync();
+        // The app bar's toggle changes the theme too; follow it.
+        document.documentElement.addEventListener('wsu:themechange', sync);
+    });
 
-        const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-
-        if (savedAppearance) {
-            appearance.value = savedAppearance;
-        }
+    onBeforeUnmount(() => {
+        document.documentElement.removeEventListener('wsu:themechange', sync);
     });
 
     function updateAppearance(value: Appearance) {
-        appearance.value = value;
-        localStorage.setItem('appearance', value);
         updateTheme(value);
+        appearance.value = value;
     }
 
     return {

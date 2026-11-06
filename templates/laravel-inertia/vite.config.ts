@@ -1,8 +1,6 @@
 import vue from '@vitejs/plugin-vue';
-import autoprefixer from 'autoprefixer';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
-import tailwindcss from 'tailwindcss';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -23,11 +21,11 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/js'),
-        },
-    },
-    css: {
-        postcss: {
-            plugins: [tailwindcss, autoprefixer],
+            // WayneUI's built assets (the icon sprite and the university marks).
+            // The package's exports map does not list them, so they are reached
+            // by path; the version is whatever package-lock.json pins, so the
+            // sprite and the stylesheet can never come from two releases.
+            '@wayne-ui-assets': path.resolve(__dirname, './node_modules/@waynestate/wayne-ui-css/dist'),
         },
     },
 });

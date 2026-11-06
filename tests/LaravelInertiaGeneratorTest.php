@@ -496,6 +496,43 @@ final class LaravelInertiaGeneratorTest extends TestCase
         );
     }
 
+    /**
+     * WayneUI is the only component source (WELD's BEST_PRACTICES W2): the
+     * Inertia shape draws with WayneUI, pinned exactly, and carries none of
+     * the Tailwind kit it started from.
+     */
+    public function testDrawsWithWayneUiNotTailwind(): void
+    {
+        $target = $this->generate();
+        $package = json_decode((string) file_get_contents($target . '/package.json'), true);
+        $deps = array_merge($package['dependencies'] ?? [], $package['devDependencies'] ?? []);
+
+        self::assertSame('2.0.8', $deps['@waynestate/wayne-ui-css'] ?? null);
+        self::assertSame('2.0.8', $deps['@waynestate/wayne-ui-vue'] ?? null);
+        foreach (['tailwindcss', 'tailwind-merge', 'clsx', 'lucide-vue-next', 'prettier-plugin-tailwindcss', 'autoprefixer'] as $gone) {
+            self::assertArrayNotHasKey($gone, $deps, $gone);
+        }
+
+        self::assertFileDoesNotExist($target . '/tailwind.config.js');
+        self::assertFileDoesNotExist($target . '/resources/js/lib/utils.ts');
+        self::assertStringContainsString(
+            "@import '@waynestate/wayne-ui-css/dist/wayne-ui.css';",
+            (string) file_get_contents($target . '/resources/css/app.css'),
+        );
+        self::assertStringNotContainsString('tailwind', (string) file_get_contents($target . '/vite.config.ts'));
+        self::assertStringContainsString("'@/components/ui'", (string) file_get_contents($target . '/eslint.config.js'));
+        self::assertStringContainsString('frontend:', (string) file_get_contents($target . '/.gitlab-ci.yml'));
+
+        // No page or component reaches for a removed kit file.
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($target . '/resources/js', \FilesystemIterator::SKIP_DOTS));
+        foreach ($it as $file) {
+            $source = (string) file_get_contents((string) $file);
+            self::assertStringNotContainsString('lucide-vue-next', $source, (string) $file);
+            self::assertStringNotContainsString('@/lib/utils', $source, (string) $file);
+            self::assertStringNotContainsString('PlaceholderPattern', $source, (string) $file);
+        }
+    }
+
     private function generate(bool $advisor = true): string
     {
         $target = $this->makeTempDir();

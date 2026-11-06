@@ -46,7 +46,7 @@
 <ul>
 <li><code>--laravel</code> bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.</li>
 <li><code>--laravel --vue</code> bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a <code>resources/js/app.js</code> registry that mounts a Vue 3 app on every <code>[data-vue-island]</code> element, and a Counter island live on the dashboard view).</li>
-<li><code>--inertia</code> bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.</li>
+<li><code>--inertia</code> bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's <code>components/ui</code> imports; Ziggy routes; the stack packages; a <code>frontend</code> CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.</li>
 </ul>
 <p>Four of the five permutations generate in 0.1. The last one, <code>--raw --vue</code>, prints the plan and exits <code>1</code> with &quot;not available in this release&quot;; a later step adds it.</p>
 <h2 id="build-on-the-official-installer">Build on the official installer<a class="docs-heading-link" aria-label="Link to this section" href="#build-on-the-official-installer">#</a></h2>

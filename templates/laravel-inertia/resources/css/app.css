@@ -1,91 +1,143 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/*
+ * WayneUI is the whole design system here: its tokens, Lato, the base reset,
+ * the chrome (app bar, sidebar, drawer, footer) and the components, from the
+ * pinned @waynestate/wayne-ui-css package. Light and dark come from its
+ * [data-theme] switch, so nothing below names a color it did not define.
+ *
+ * What follows is this app's own page layout, and only that: grids and
+ * spacing for the pages that ship with the template, written in WayneUI's
+ * tokens. No second design system, no utility framework. If a rule here starts
+ * to look like a component, it belongs in WayneUI instead.
+ *
+ * The built dist file, not the package's bare entry: dist wraps base, chrome
+ * and components in WayneUI's cascade layers, and the chrome counts on them
+ * (the docked sidebar hides its close button, and the bar hides its menu
+ * button, only because chrome's layer outranks .wsu-btn). Layered also means
+ * every rule below outranks WayneUI's without a specificity fight.
+ */
+@import '@waynestate/wayne-ui-css/dist/wayne-ui.css';
 
-body,
-html {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+/* ------------------------------------------------------------- the ribbon */
+
+/*
+ * HELMET injects its environment ribbon right after <body> and leaves the
+ * styling to the app. It wears WayneUI's non-production ribbon: a labeled
+ * strip, so the environment never rests on color alone.
+ */
+.helmet-ribbon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wsu-space-1);
+    align-items: center;
+    padding: var(--wsu-space-1) var(--wsu-space-4);
+    font-size: var(--wsu-font-size-sm);
+    font-weight: var(--wsu-font-weight-bold);
+    color: var(--wsu-on-nonproduction);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: var(--wsu-font-letterSpacing-wide, 0.04em);
+    background-color: var(--wsu-nonproduction);
 }
 
-@layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 0 0% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 0 0% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 0 0% 3.9%;
-        --primary: 0 0% 9%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 0 0% 92.1%;
-        --secondary-foreground: 0 0% 9%;
-        --muted: 0 0% 96.1%;
-        --muted-foreground: 0 0% 45.1%;
-        --accent: 0 0% 96.1%;
-        --accent-foreground: 0 0% 9%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 92.8%;
-        --input: 0 0% 89.8%;
-        --ring: 0 0% 3.9%;
-        --chart-1: 12 76% 61%;
-        --chart-2: 173 58% 39%;
-        --chart-3: 197 37% 24%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
-        --sidebar-background: 0 0% 98%;
-        --sidebar-foreground: 240 5.3% 26.1%;
-        --sidebar-primary: 0 0% 10%;
-        --sidebar-primary-foreground: 0 0% 98%;
-        --sidebar-accent: 0 0% 94%;
-        --sidebar-accent-foreground: 0 0% 30%;
-        --sidebar-border: 0 0% 91%;
-        --sidebar-ring: 217.2 91.2% 59.8%;
-    }
+.helmet-ribbon-warning {
+    font-weight: var(--wsu-font-weight-regular);
+    text-transform: none;
+    letter-spacing: normal;
+}
 
-    .dark {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 6.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 84% 60%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
-        --sidebar-background: 0 0% 7%;
-        --sidebar-foreground: 0 0% 95.9%;
-        --sidebar-primary: 360, 100%, 100%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 0 0% 15.9%;
-        --sidebar-accent-foreground: 240 4.8% 95.9%;
-        --sidebar-border: 0 0% 15.9%;
-        --sidebar-ring: 217.2 91.2% 59.8%;
+/* ------------------------------------------------------------ the layouts */
+
+/* A sign-in link in the bar reads like the bar's other controls. */
+.wsu-app-bar a.wsu-app-bar__toggle {
+    text-decoration: none;
+}
+
+/* ------------------------------------------------------------------- home */
+
+.app-home {
+    display: grid;
+    gap: var(--wsu-space-5);
+    max-inline-size: 42rem;
+    padding-block: var(--wsu-space-12) var(--wsu-space-8);
+}
+
+.app-home__eyebrow {
+    margin: 0;
+    font-size: var(--wsu-font-size-sm);
+    font-weight: var(--wsu-font-weight-bold);
+    color: var(--wsu-brand);
+    text-transform: uppercase;
+    letter-spacing: var(--wsu-font-letterSpacing-caps, 0.08em);
+}
+
+.app-home__title {
+    margin: 0;
+    font-family: var(--wsu-font-family-display);
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: var(--wsu-font-weight-black);
+    line-height: 1;
+    color: var(--wsu-text);
+}
+
+.app-home__lede {
+    margin: 0;
+    font-size: var(--wsu-font-size-lg);
+    line-height: 1.6;
+}
+
+.app-home__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wsu-space-3);
+    margin-block-start: var(--wsu-space-3);
+}
+
+/* -------------------------------------------------------------- dashboard */
+
+.app-dashboard {
+    display: grid;
+    gap: var(--wsu-space-6);
+    margin-block-end: var(--wsu-space-6);
+}
+
+@media (min-width: 64rem) {
+    .app-dashboard {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-@layer base {
-    * {
-        @apply border-border;
-    }
+/* The cards in a row share one height, so their footers line up. */
+.app-dashboard > .wsu-card {
+    display: flex;
+    flex-direction: column;
+}
 
-    body {
-        @apply bg-background text-foreground;
-    }
+.app-dashboard > .wsu-card > .wsu-card__footer {
+    margin-block-start: auto;
+}
+
+.app-card-link {
+    display: inline-flex;
+    gap: var(--wsu-space-2);
+    align-items: center;
+    font-weight: var(--wsu-font-weight-bold);
+}
+
+.app-wired {
+    display: grid;
+    gap: var(--wsu-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-wired li {
+    display: flex;
+    gap: var(--wsu-space-3);
+    align-items: center;
+}
+
+.app-wired .wsu-icon {
+    flex: none;
+    color: var(--wsu-brand);
 }

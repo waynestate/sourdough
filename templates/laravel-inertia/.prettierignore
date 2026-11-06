@@ -1,0 +1,4 @@
+# Written by `composer ziggy` (php artisan ziggy:generate). The ziggy CI job
+# compares them with a fresh generation byte for byte, so Prettier keeps out.
+resources/js/ziggy.js
+resources/js/ziggy.d.ts

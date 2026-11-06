@@ -46,6 +46,12 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>
+<p>Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the <code>ziggy-js</code> npm package. The home page and the dashboard are new, in WayneUI's components and tokens. <code>eslint.config.js</code> refuses <code>components/ui</code> imports and the kit's helper packages, <code>.prettierrc</code> is the stack's, and a <code>frontend</code> CI job runs lint, Prettier, vue-tsc and the build.</p>
+</li>
+<li>
+<p>Removed: from the Inertia shape, <code>tailwind.config.js</code>, <code>cn()</code> (<code>resources/js/lib/utils.ts</code>), <code>tailwindcss</code>, <code>autoprefixer</code>, <code>tailwind-merge</code>, <code>clsx</code>, <code>lucide-vue-next</code>, <code>@vueuse/core</code>, <code>prettier-plugin-tailwindcss</code>, the Bunny Fonts link and the ten kit components they served.</p>
+</li>
+<li>
 <p>Fixed: the Laravel shapes' (Blade, Blade + Vue, Inertia) <code>.gitlab-ci.yml</code> runs the php-test matrix with <code>vendor/bin/pest</code>. The Preflight component defaults to <code>vendor/bin/phpunit</code>, which refuses the Pest example tests (&quot;Please run ./vendor/bin/pest instead&quot;), so every job in the matrix crashed with exit 255. Pest runs the PHPUnit class tests too.</p>
 </li>
 <li>
