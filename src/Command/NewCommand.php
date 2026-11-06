@@ -19,6 +19,7 @@ use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
+use Waynestate\Sourdough\Generator\RawVueGenerator;
 use Waynestate\Sourdough\Generator\SailScaffold;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
@@ -37,8 +38,7 @@ use Waynestate\Sourdough\Plan;
  * inputs and in CI, where the app is still generated with the wiring.
  *
  * Exit codes (matching PROCTOR): 0 done, 1 refused (invalid flags, no
- * Playbook access, non-empty dir, not available in this release), 2 tool
- * error.
+ * Playbook access, non-empty dir), 2 tool error.
  */
 final class NewCommand extends Command
 {
@@ -267,13 +267,8 @@ final class NewCommand extends Command
             return 0;
         }
 
-        if (Permutation::Raw !== $permutation && Permutation::LaravelBlade !== $permutation && Permutation::LaravelBladeVue !== $permutation && Permutation::LaravelInertia !== $permutation) {
-            $this->printPlan($output, $plan);
-            $this->errorOutput($output)->writeln('not available in this release');
-            return 1;
-        }
-
-        // The name is validated before the access check so a bad name never
+        // All five shapes bake, so there is no "not available" exit here any
+        // more. The name is validated before the access check so a bad name never
         // triggers a network call.
         try {
             RawGenerator::assertValidName($name);
@@ -317,6 +312,8 @@ final class NewCommand extends Command
             } elseif (Permutation::LaravelInertia === $permutation) {
                 (new LaravelInertiaGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
                     ->generate($dir, $name, $answers, $playbook, $advisor);
+            } elseif (Permutation::RawVue === $permutation) {
+                (new RawVueGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             } else {
                 (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
             }
@@ -395,6 +392,13 @@ final class NewCommand extends Command
                 $output->writeln('  npm run build');
                 $output->writeln('  php artisan serve');
             }
+        } elseif (Permutation::RawVue === $permutation) {
+            // The same composer serve as raw, after Vite has built the Vue
+            // app once; npm run dev in a second terminal adds hot reload.
+            $output->writeln('  npm install');
+            $output->writeln('  npm run build');
+            $output->writeln('  composer serve');
+            $output->writeln('  (npm run dev in a second terminal for hot reload)');
         } else {
             // composer serve sets APP_ENV=local for the raw app, which has no
             // .env loader; a plain php -S would boot as production.

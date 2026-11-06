@@ -1,0 +1,16 @@
+{
+    "name": "{{app_slug}}",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "@vitejs/plugin-vue": "^5.2.1",
+        "@waynestate/wayne-ui-css": "2.0.8",
+        "@waynestate/wayne-ui-vue": "2.0.8",
+        "vite": "^6.0.3",
+        "vue": "^3.5.13"
+    }
+}

@@ -362,7 +362,7 @@ final class NewCommandTest extends TestCase
         self::assertStringNotContainsString('php -S localhost:8000', $tester->getDisplay());
     }
 
-    public function testRawVueExitsOneAndWritesNothing(): void
+    public function testRawVueGeneratesTheVueSpa(): void
     {
         $parent = $this->makeTempDir();
         $target = $parent . '/demo';
@@ -374,9 +374,25 @@ final class NewCommandTest extends TestCase
             '--vue' => true,
         ]);
 
-        self::assertSame(1, $exit);
-        self::assertDirectoryDoesNotExist($target);
-        self::assertStringContainsString('not available in this release', $tester->getDisplay());
+        self::assertSame(0, $exit, $tester->getDisplay());
+        self::assertStringNotContainsString('not available in this release', $tester->getDisplay());
+
+        $manifest = json_decode((string) file_get_contents($target . '/.sourdough/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('raw-vue', $manifest['template']);
+        self::assertTrue($manifest['answers']['raw']);
+        self::assertTrue($manifest['answers']['vue']);
+
+        self::assertFileExists($target . '/public/index.php');
+        self::assertFileExists($target . '/src/Vite.php');
+        self::assertFileExists($target . '/resources/js/App.vue');
+        self::assertFileExists($target . '/package.json');
+
+        // Build the front end, then serve it the raw way.
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('npm install', $display);
+        self::assertStringContainsString('npm run build', $display);
+        self::assertStringContainsString('composer serve', $display);
+        self::assertStringNotContainsString('php artisan', $display);
     }
 
     public function testLaravelGeneratesWithTheFixtureSource(): void

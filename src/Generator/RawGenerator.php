@@ -105,9 +105,17 @@ final class RawGenerator
 
     private readonly GeneratorSupport $support;
 
+    /**
+     * @param string|null  $overlayDir   a second template copied over the raw one, replacing files it also ships (RawVueGenerator's raw-vue dir); null for plain raw
+     * @param string       $templateName the template name the manifest records
+     * @param list<string> $leftovers    raw template files the overlay has no use for, removed after the copy
+     */
     public function __construct(
         private readonly string $templateDir = __DIR__ . '/../../templates/raw',
         private readonly string $squireDir = __DIR__ . '/../../templates/squire',
+        private readonly ?string $overlayDir = null,
+        private readonly string $templateName = 'raw',
+        private readonly array $leftovers = [],
     ) {
         $this->support = new GeneratorSupport($squireDir);
     }
@@ -134,19 +142,27 @@ final class RawGenerator
             ));
         }
 
-        if (!is_dir($this->templateDir)) {
-            throw new \RuntimeException(sprintf('The template directory "%s" does not exist.', $this->templateDir));
+        foreach (array_filter([$this->templateDir, $this->overlayDir]) as $dir) {
+            if (!is_dir($dir)) {
+                throw new \RuntimeException(sprintf('The template directory "%s" does not exist.', $dir));
+            }
         }
 
         $this->support->refuseNonEmptyTarget($targetDir);
 
         $this->support->copyDir($this->templateDir, $targetDir, $name, $slug);
+        if (null !== $this->overlayDir) {
+            $this->support->copyDir($this->overlayDir, $targetDir, $name, $slug);
+        }
+        foreach ($this->leftovers as $leftover) {
+            $this->removeLeftover($targetDir, $leftover);
+        }
         $this->support->installSquireFiles($targetDir);
         $this->support->applyPlaybook($targetDir, $playbook);
         $this->support->applyAdvisor($targetDir, $advisor);
 
         $answers = array_merge(['name' => $name], $answers);
-        (new Manifest('raw', $answers, self::SEEDED_FILES))->write($targetDir);
+        (new Manifest($this->templateName, $answers, self::SEEDED_FILES))->write($targetDir);
     }
 
     /**
@@ -161,6 +177,25 @@ final class RawGenerator
             throw new \InvalidArgumentException(
                 'The app name must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters.',
             );
+        }
+    }
+
+    /**
+     * Remove one raw template file the overlay does not use, and its folder
+     * when that leaves it empty.
+     *
+     * @throws \RuntimeException when the file cannot be removed
+     */
+    private function removeLeftover(string $targetDir, string $relative): void
+    {
+        $path = $targetDir . '/' . $relative;
+        if (is_file($path) && !unlink($path)) {
+            throw new \RuntimeException(sprintf('Could not remove "%s".', $path));
+        }
+
+        $dir = dirname($path);
+        if ($dir !== $targetDir && is_dir($dir) && [] === array_diff(scandir($dir) ?: [], ['.', '..'])) {
+            rmdir($dir);
         }
     }
 

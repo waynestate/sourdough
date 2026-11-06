@@ -1,0 +1,98 @@
+/*
+ * WayneUI is the whole design system here: its tokens, Lato, the base reset,
+ * the chrome (app bar, footer, ribbon) and the components, from the pinned
+ * @waynestate/wayne-ui-css package. Light and dark come from its
+ * [data-theme] switch, so nothing below names a color it did not define.
+ *
+ * The built dist file, not the package's bare entry: dist wraps base, chrome
+ * and components in WayneUI's cascade layers, which the chrome counts on.
+ * Layered also means every rule below outranks WayneUI's without a
+ * specificity fight.
+ *
+ * What follows is this app's own page layout, and only that. If a rule here
+ * starts to look like a component, it belongs in WayneUI instead.
+ */
+@import '@waynestate/wayne-ui-css/dist/wayne-ui.css';
+
+/* ------------------------------------------------------------------- home */
+
+.app-home {
+    display: grid;
+    gap: var(--wsu-space-5);
+    max-inline-size: 42rem;
+    padding-block: var(--wsu-space-12) var(--wsu-space-8);
+}
+
+.app-home__eyebrow {
+    margin: 0;
+    font-size: var(--wsu-font-size-sm);
+    font-weight: var(--wsu-font-weight-bold);
+    color: var(--wsu-brand);
+    text-transform: uppercase;
+    letter-spacing: var(--wsu-font-letterSpacing-caps, 0.08em);
+}
+
+.app-home__title {
+    margin: 0;
+    font-family: var(--wsu-font-family-display);
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: var(--wsu-font-weight-black);
+    line-height: 1;
+    color: var(--wsu-text);
+}
+
+.app-home__lede {
+    margin: 0;
+    font-size: var(--wsu-font-size-lg);
+    line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ cards */
+
+.app-cards {
+    display: grid;
+    gap: var(--wsu-space-6);
+    margin-block-end: var(--wsu-space-8);
+}
+
+@media (min-width: 64rem) {
+    .app-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* The cards in a row share one height, so their footers line up. */
+.app-cards > .wsu-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-cards > .wsu-card > .wsu-card__footer {
+    margin-block-start: auto;
+}
+
+.app-card-link {
+    display: inline-flex;
+    gap: var(--wsu-space-2);
+    align-items: center;
+    font-weight: var(--wsu-font-weight-bold);
+}
+
+.app-wired {
+    display: grid;
+    gap: var(--wsu-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-wired li {
+    display: flex;
+    gap: var(--wsu-space-3);
+    align-items: center;
+}
+
+.app-wired .wsu-icon {
+    flex: none;
+    color: var(--wsu-brand);
+}

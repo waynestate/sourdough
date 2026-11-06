@@ -1,0 +1,29 @@
+# PREFLIGHT components, pinned to released Preflight tags.
+include:
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+    inputs:
+      proctor_command: vendor/bin/proctor check --format=codequality
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+    inputs:
+      php_versions: ["8.3", "8.4", "8.5"]
+      test_command: vendor/bin/phpunit
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+    inputs:
+      working_dir: .
+
+# composer ci is the contract: one job runs the whole "ci" script from
+# composer.json, so PROCTOR sees an explicit composer ci in the pipeline.
+composer-ci:
+  image: composer:2.10.3
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - composer ci
+
+# The front end: the build proves the Vue app, WayneUI's CSS and its icon
+# sprite still resolve. Commit package-lock.json and switch to npm ci for
+# repeatable installs. Multi-arch image, pinned by its list digest.
+frontend:
+  image: node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
+  script:
+    - npm install --no-audit --no-fund
+    - npm run build

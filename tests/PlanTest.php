@@ -75,12 +75,14 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
-    public function testNonGeneratablePermutationOmitsAdvisorStep(): void
+    public function testRawVuePlanLayersTheOverlayAndWiresAdvisor(): void
     {
         $plan = Plan::forPermutation(Permutation::RawVue, '/tmp/demo', false, false);
 
         self::assertSame([
-            'Create the Raw PHP + Vue SPA over JSON app in /tmp/demo (not available in this release)',
+            'Copy the raw template, then the raw-vue template over it, into /tmp/demo',
+            'Replace {{app_name}} and {{app_slug}} in file names and contents',
+            'Wire ADVISOR into the app',
         ], $plan->steps);
     }
 

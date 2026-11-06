@@ -1,0 +1,6 @@
+/vendor/
+/node_modules/
+/public/build/
+/public/hot
+.env
+.mcp.json

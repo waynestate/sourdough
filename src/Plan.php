@@ -9,10 +9,9 @@ namespace Waynestate\Sourdough;
  *
  * The plan is built from the permutation, the target dir, the local
  * runtime flags (--sail/--docker) and whether ADVISOR is wired in
- * (--no-advisor opts out). In 0.1 the raw, Laravel + Blade, Laravel +
- * Blade + Vue islands and Laravel + Inertia/Vue permutations are
- * generated; the generation step for the others says "not available in
- * this release".
+ * (--no-advisor opts out). Every permutation generates: raw and raw + Vue
+ * copy their templates, the Laravel ones create the app over a fresh
+ * Laravel skeleton.
  */
 final class Plan
 {
@@ -44,19 +43,17 @@ final class Plan
 
         $steps = [];
 
-        $generatable = $permutation === Permutation::Raw || $permutation === Permutation::LaravelBlade || $permutation === Permutation::LaravelBladeVue || $permutation === Permutation::LaravelInertia;
-
         if ($permutation === Permutation::Raw) {
             $steps[] = sprintf('Copy the raw template into %s', $dir);
             $steps[] = 'Replace {{app_name}} and {{app_slug}} in file names and contents';
+        } elseif ($permutation === Permutation::RawVue) {
+            $steps[] = sprintf('Copy the raw template, then the raw-vue template over it, into %s', $dir);
+            $steps[] = 'Replace {{app_name}} and {{app_slug}} in file names and contents';
         } else {
-            $suffix = $generatable ? '' : ' (not available in this release)';
-            $steps[] = sprintf('Create the %s app in %s%s', $permutation->label(), $dir, $suffix);
+            $steps[] = sprintf('Create the %s app in %s', $permutation->label(), $dir);
         }
 
-        // ADVISOR is wired in as part of generation, so the step only shows
-        // for the permutations this release actually generates.
-        if ($generatable && $advisor) {
+        if ($advisor) {
             $steps[] = 'Wire ADVISOR into the app';
         }
 
