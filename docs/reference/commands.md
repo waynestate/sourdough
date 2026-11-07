@@ -1,6 +1,6 @@
 ---
 title: Commands
-description: Every sourdough command and option, from sourdough new's flags to sourdough manifest --check, with their exit codes.
+description: Every sourdough command and option, from sourdough new's flags to sourdough manifest --check and sourdough feed, with their exit codes.
 ---
 
 # Commands
@@ -126,7 +126,75 @@ Exit codes: `0` clean, `1` changed or missing, `2` tool error.
 
 Seeded files are never reported: the app owns them.
 
+## sourdough feed
+
+Bring Sourdough template updates into an app without clobbering what it has changed.
+
+```
+sourdough feed [dir] [--dry-run] [--json]
+```
+
+| Argument or option | Meaning |
+|---|---|
+| `dir` | the app directory to feed (default: the current directory) |
+| `--dry-run` | print the plan and write nothing; exit `1` when feeding would change files |
+| `--json` | print the plan, or the result, as JSON |
+
+Feed bakes the app's shape again with the answers in its manifest, compares the base (what the manifest recorded), the app and the new loaf file by file, and writes the result. How it decides, and where the base comes from, is in [Keeping apps current](../guides/keeping-current.md#what-feed-does).
+
+### Plan lines
+
+One line per file that changes, `  <action>  <file> (<why>)`; files feed leaves alone are not listed.
+
+| Action | Meaning |
+|---|---|
+| `add` | new in the template (or a seeded file new to the template, where the app has none) |
+| `update` | the template changed it and the app had not: replaced |
+| `merge` | both changed it in different places: three-way merged by `git merge-file` |
+| `conflict` | both changed the same lines, there was no base to merge from, or the file is binary: marked, never overwritten |
+| `remove` | the template dropped it and the app had not changed it |
+| `keep` | the template dropped a file the app changed (it is the app's now), or changed a file the app deleted (it stays deleted) |
+
+A conflict in a text file holds git's markers, `<<<<<<< app`, `=======` and `>>>>>>> sourdough <version>`; a binary conflict leaves the template's copy next to the app's as `<file>.sourdough-new`.
+
+After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a one-line count per action, and the next steps. A real feed ends with the undo line: `To undo the whole feed: git restore . && git clean -fd (the tree was clean before it ran).`
+
+| Output | Meaning |
+|---|---|
+| `Fresh: the app already has everything Sourdough <version> bakes into a <template> app. Nothing to feed.` | nothing to do; nothing written, not even the manifest |
+| `note: Not inside a git repository: ...` | dry runs only: a real feed would refuse |
+| `note: Uncommitted changes: ...` | dry runs only: a real feed would refuse until the tree is clean |
+
+### Exit codes
+
+| Run | `0` | `1` | `2` |
+|---|---|---|---|
+| `sourdough feed` | fed cleanly, or nothing to feed | fed, with conflicts to resolve | tool error |
+| `sourdough feed --dry-run` | fresh | feeding would change files | tool error |
+
+| Tool error | Message starts with | Exit |
+|---|---|---|
+| no manifest in the directory | `No Sourdough manifest found in "<dir>".` | `2` |
+| git is not on PATH | `sourdough feed needs git on PATH` | `2` |
+| the app is not inside a git repository (real run) | `sourdough feed only runs inside a git repository` | `2` |
+| uncommitted or untracked changes (real run) | `Commit or stash your changes first` | `2` |
+| conflict markers or `.sourdough-new` copies left from the last feed | `Finish the last feed first` | `2` |
+| the manifest was written by a newer Sourdough | `This app was fed by Sourdough <version>, newer than this one` | `2` |
+| the manifest names a template this Sourdough does not bake | `The manifest names the template` | `2` |
+| the manifest lists a path outside the app | `The manifest lists an unsafe path` | `2` |
+| the bake failed (for example, Composer could not fetch the Laravel skeleton) | `sourdough feed failed:` | `2` |
+
+### JSON
+
+`--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`.
+
+### Environment
+
+- `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
+- `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
+
 ## Related
 
+- [Keeping apps current](../guides/keeping-current.md)
 - [Plan format](plan-format.md)
 - [Wiring the stack in](../guides/wiring-the-stack.md)

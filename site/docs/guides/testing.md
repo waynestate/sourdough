@@ -57,7 +57,11 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
 
+Right after the bake, every shape also proves the bake is reproducible: the gate commits the fresh app to a scratch git repository and expects `sourdough feed --dry-run` to exit 0 (nothing to feed), then drops the repository again. A loaf that comes out different every time would make every feed of it a conflict.
+
 Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
+
+`tests/FeedCommandTest.php` covers `sourdough feed` itself on every shape (and with `--sail` and `--docker`), offline, in the PHPUnit suite: an app aged to an older template, one with local edits that merge cleanly, one with a conflict, and the refusals. It needs git on PATH and skips without it.
 
 Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
 

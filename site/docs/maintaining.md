@@ -8,7 +8,7 @@ generator: Squire agent-ready
 
 # MAINTAINING: feeding the starter[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#maintaining-feeding-the-starter)
 
-How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, plus `manifest`. Planned: `adopt` and `feed`. Like any starter, it needs regular feeding, or it goes flat.
+How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, `manifest` and `feed`. Planned: `adopt`. Like any starter, it needs regular feeding, or it goes flat.
 
 ## What Sourdough is and what it depends on[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-sourdough-is-and-what-it-depends-on)
 
@@ -16,7 +16,7 @@ How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne St
 - Runtime dependencies: `symfony/console`, `symfony/http-client`, `justinrainbow/json-schema`, `openai-php/client` (only for `new --describe`, which can ask an OpenAI-compatible model for a plan; optional). No other stack package at runtime.
 - **Generated apps** require `waynestate/helmet`, `waynestate/sesame` and `waynestate/proctor` from Packagist.
 - **It carries a copy of Squire's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`). Squire owns those files; Sourdough never hand-edits them. `composer squire-copy:sync` rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.4`), and `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
-- The planned `feed` will need only git on the developer's machine: it records the template commit an app came from and applies template changes with `git apply --3way`.
+- `feed` needs only git on the developer's machine: it bakes the app's shape again with the manifest's answers and three-way merges each file with `git merge-file`, the base found by its manifest hash in `.sourdough/base/` or the app's git history (see `docs/guides/keeping-current.md`). `new` and `feed` bake through the same `Baker`, so a change to a generator reaches both.
 
 ## Where it lives[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#where-it-lives)
 
@@ -59,6 +59,8 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 - `blade-vue`: the blade steps plus `npm install` and `npm run build`
 - `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
 
+Right after the bake, every shape also proves the bake is reproducible: the gate commits the fresh app to a scratch git repository and expects `sourdough feed --dry-run` to exit 0 (nothing to feed), then drops the repository again. A shape whose bake is not stable would make every feed of it a conflict.
+
 Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
 
 Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
@@ -94,7 +96,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 ```
 
-Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Until `feed` exists, apps generated earlier pick up template changes by hand.
+Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Apps generated earlier pick up the refreshed files with their next `sourdough feed`.
 
 ## What belongs here[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
 
@@ -115,7 +117,7 @@ If every app should have something, it goes in Sourdough's templates. If only th
 ## Things that trip people up[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
 
 - In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
-- Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it.
+- Commit `.sourdough/manifest.json` (and `.sourdough/base/`) in generated apps; `feed` needs them.
 
 ## Who maintains it[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)
 

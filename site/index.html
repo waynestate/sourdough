@@ -480,7 +480,7 @@
         <div class="chalkboard__head">
           <p class="chalk-eyebrow">Pinned above the bench</p>
           <h2 id="feeding-title">Feeding schedule</h2>
-          <p>A starter you never feed goes flat. Every app Sourdough makes carries <code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how a later <code>sourdough feed</code> will know which files it can update.</p>
+          <p>A starter you never feed goes flat. Every app Sourdough makes carries <code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how <code>sourdough feed</code> knows which files it can update, and which ones you've kneaded.</p>
         </div>
 
         <ol class="schedule">
@@ -503,11 +503,16 @@
               </dl>
             </div>
           </li>
-          <li class="schedule__row schedule__row--soon" data-reveal>
+          <li class="schedule__row" data-reveal>
             <p class="schedule__when">Feeding</p>
             <div class="schedule__what">
-              <p class="chalk-soon">sourdough feed <span class="tag tag--chalk">coming soon</span></p>
-              <p>Brings template updates into your app without clobbering what you changed.</p>
+              <code class="chalk-cmd">sourdough feed</code>
+              <p>Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run <code>--dry-run</code> first, or in CI.</p>
+              <dl class="exits">
+                <div><dt>0</dt><dd>fed (or already fresh)</dd></div>
+                <div><dt>1</dt><dd>fed, with conflicts to resolve</dd></div>
+                <div><dt>2</dt><dd>no manifest, no git, or a dirty tree</dd></div>
+              </dl>
             </div>
           </li>
         </ol>
@@ -655,7 +660,7 @@ Output: what you ran and what it said, the app's files one level deep, then your
             <div>
               <p class="ar-prompt__kicker">Recipe No. 2 · An app Sourdough baked</p>
               <h3 class="ar-prompt__title" id="prompt-manifest-title">Check what has drifted in a Sourdough app</h3>
-              <p class="ar-prompt__desc">Lists the managed files that changed since Sourdough wrote them and suggests what to put back. It changes nothing.</p>
+              <p class="ar-prompt__desc">Lists the managed files that changed since Sourdough wrote them, shows what a feed would bring in, and suggests what to put back. It changes nothing.</p>
             </div>
           </header>
           <pre class="ar-prompt__text"><code>You are a coding agent checking an app that Sourdough baked, at Wayne State University. Sourdough is the app starter of WELD, the Wayne State application stack. Every app it bakes carries .sourdough/manifest.json: the Sourdough version, the template, the answers chosen, and a sha256 hash of every file it wrote, each marked managed or seeded.
@@ -669,12 +674,13 @@ Task:
 1. Run `sourdough manifest --check` at the app's root. Exit 0 is clean, 1 means a managed file changed or is missing, 2 is a tool error.
 2. For each file it reports, say what changed, as far as you can tell, and whether it looks deliberate.
 3. If ADVISOR is connected, call run_proctor_check for this app and list the findings.
-4. Change nothing. For each drifted file, propose whether to put it back or keep the change, and why.
+4. Run `sourdough feed --dry-run` and list what a feed would update, merge, add, remove or leave in conflict. Exit 0 means fresh, 1 means feeding would change files, 2 is a tool error.
+5. Change nothing. For each drifted file, propose whether to put it back or keep the change, and why. A kept change is fine: feed merges it with the template's.
 
 Constraints:
 - Seeded files (.env.example and README.md) are mine and never count as drift.
 - The deploy files come from Squire, through Sourdough. Never hand-edit them to make a check pass.
-- sourdough feed, which will bring template updates in, is not built yet. Do not promise it.
+- Never run sourdough feed without --dry-run unless I say so: a real feed writes files.
 - Ask me before you guess, and before you touch anything that deploys.
 
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.</code></pre>

@@ -40,7 +40,7 @@
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="upgrading">Upgrading<a class="docs-heading-link" aria-label="Link to this section" href="#upgrading">#</a></h1>
-<p>How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: the <code>.sourdough/manifest.json</code> in each app is the record a later <code>sourdough feed</code> will use, and until <code>feed</code> ships, apps pick up template changes by hand. See <a href="guides/keeping-current.html">Keeping apps current</a>.</p>
+<p>How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: after the upgrade, run <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, in each app to bring the new release's template changes in, merged with your own. The <code>.sourdough/manifest.json</code> in each app is the record it works from. See <a href="guides/keeping-current.html">Keeping apps current</a>.</p>
 <h2 id="upgrade-the-cli">Upgrade the CLI<a class="docs-heading-link" aria-label="Link to this section" href="#upgrade-the-cli">#</a></h2>
 <div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre tabindex="0"><code class="language-bash">composer global require waynestate/sourdough
 </code></pre></div>
@@ -88,7 +88,7 @@
 <p><strong>Deprecated:</strong> none.</p>
 <p><strong>Steps:</strong> run <code>composer install</code>. For maintainers of this repository, mount a Squire checkout (or set <code>SQUIRE_PATH</code>, default <code>/squire</code>) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The SQUIRE template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's <code>.npmrc</code> and <code>docker-compose.squire.yml</code> joined the batch).</p>
 <p><strong>How to verify:</strong> <code>composer squire-copy:check</code> exits 0 when the copy matches a fresh export from the SQUIRE checkout.</p>
-<aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Commit <code>.sourdough/manifest.json</code> in every app you bake. It is the record that keeps <code>feed</code> honest, and the thing a future <code>sourdough update</code> will merge against.</p></aside>
+<aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Commit <code>.sourdough/manifest.json</code> in every app you bake, and <code>.sourdough/base/</code> once a feed writes it. They are the record that keeps <code>feed</code> honest, and the base it merges against.</p></aside>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
 <ul>
 <li><a href="reference/commands.html">Commands</a></li>

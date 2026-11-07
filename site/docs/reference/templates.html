@@ -206,7 +206,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record a later <code>sourdough feed</code> refreshes. See <a href="../guides/manifest.html">The manifest</a>.</p>
+<p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. <code>--no-advisor</code> skips the ADVISOR wiring.</p></aside>
 <h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></h2>
 <p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>

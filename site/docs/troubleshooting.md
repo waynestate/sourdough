@@ -152,7 +152,7 @@ Prints the plan as JSON without writing anything.
 
 Cause: a managed file changed or is missing. The output lists one line per file, `changed <file>` or `missing <file>`. Seeded files (`.env.example` and `README.md`) are never reported: they're yours.
 
-Fix: managed files belong to Sourdough, so do not edit them by hand. Until `feed` ships, apps generated earlier pick up template changes by hand; restore the drifted file from your version control, or regenerate the app.
+Fix: nothing, if the change is deliberate. `sourdough feed` three-way merges your edits with the template's, so a drifted managed file is fine; the check just names the files a feed will merge rather than replace. If the change was a mistake, restore the file from your version control.
 
 Check:
 
@@ -164,21 +164,7 @@ Exits 0 when every managed file matches the manifest.
 
 Tip
 
-Commit `.sourdough/manifest.json` in generated apps; the planned `feed` will need it. It's the record that keeps `feed` honest.
-
-### There is no `sourdough update` yet[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#there-is-no-sourdough-update-yet)
-
-Cause: the update story (`.sourdough.json`, `sourdough check`, a merging `sourdough update`, tagged template releases) is still a gap for the backlog, so there is no command that brings an app forward to a newer template. Until `feed` ships, `sourdough manifest --check` is the gate.
-
-Fix: run the check to see what drifted, and bring template changes into the app by hand.
-
-Check:
-
-```bash
-sourdough manifest --check
-```
-
-Lists the managed files that have drifted from the manifest.
+Commit `.sourdough/manifest.json` (and `.sourdough/base/`, once a feed has written it) in generated apps. It's the record that keeps `feed` honest.
 
 ### `composer squire-copy:check` exits 1 (maintainers of Sourdough)[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#composer-squire-copy-check-exits-1-maintainers-of-sourdough)
 
@@ -211,6 +197,64 @@ composer ci
 ```
 
 Run it in the generated app; the PROCTOR check passes.
+
+## Feeding: sourdough feed[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#feeding-sourdough-feed)
+
+### `sourdough feed` exits 2: "Commit or stash your changes first"[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-feed-exits-2-commit-or-stash-your-changes-first)
+
+Cause: the app's git tree is not clean (a modified, staged or untracked file under the app folder). Feed only runs on a clean tree, so `git diff` shows exactly what it did and `git restore` undoes it.
+
+Fix: commit or stash your work, then feed. `--dry-run` still plans on a dirty tree, with a note.
+
+Check:
+
+```bash
+git status --porcelain
+```
+
+Prints nothing when the tree is clean.
+
+### `sourdough feed` exits 1: a conflict[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-feed-exits-1-a-conflict)
+
+Cause: you and the template changed the same lines of a file, or feed had no base to merge from (you edited the file before your first commit), so it marked both versions instead of guessing. The plan line says which.
+
+Fix: open each `conflict` file, keep what it should be, delete the `<<<<<<< app`, `=======` and `>>>>>>> sourdough <version>` lines, run your checks and commit. For a binary file, compare it with `<file>.sourdough-new`, keep one, and delete the copy.
+
+Check:
+
+```bash
+git diff --check
+```
+
+Prints nothing when no conflict markers are left.
+
+### `sourdough feed` exits 2: "Finish the last feed first"[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-feed-exits-2-finish-the-last-feed-first)
+
+Cause: a managed file still holds a marker from an earlier feed (`>>>>>>> sourdough <version>`), or a `.sourdough-new` copy is still lying around. Feeding on top of an unresolved conflict would bury it.
+
+Fix: resolve the listed files as for a conflict above, delete any `.sourdough-new` copies, commit, then feed again.
+
+Check:
+
+```bash
+sourdough feed --dry-run
+```
+
+Exits 0 or 1 (a plan) instead of 2.
+
+### `sourdough feed` exits 2: "only runs inside a git repository" or "No Sourdough manifest"[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#sourdough-feed-exits-2-only-runs-inside-a-git-repository-or-no-sourdough-manifest)
+
+Cause: feed stands on git and on the manifest `sourdough new` writes. An app outside git, or one Sourdough did not make (WELD included), cannot be fed. Writing a manifest into an existing app is `sourdough adopt`'s job, which is not built yet.
+
+Fix: `git init` and commit the app first. For an app with no manifest, there is no feed yet.
+
+Check:
+
+```bash
+sourdough manifest --check
+```
+
+Exits 0 or 1 when the app has a manifest, 2 when it has none.
 
 ## Related[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#related)
 

@@ -153,7 +153,7 @@ Pinned above the bench
 
 ## Feeding schedule
 
-A starter you never feed goes flat. Every app Sourdough makes carries `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how a later `sourdough feed` will know which files it can update.
+A starter you never feed goes flat. Every app Sourdough makes carries `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how `sourdough feed` knows which files it can update, and which ones you've kneaded.
 
 1. Bake day
    `sourdough new my-app`
@@ -165,8 +165,11 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    - **1**: a managed file changed or is missing
    - **2**: no manifest, or no `--check`
 3. Feeding
-   sourdough feed coming soon
-   Brings template updates into your app without clobbering what you changed.
+   `sourdough feed`
+   Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first, or in CI.
+   - **0**: fed (or already fresh)
+   - **1**: fed, with conflicts to resolve
+   - **2**: no manifest, no git, or a dirty tree
 
 ### Managed we keep feeding these
 
@@ -289,7 +292,7 @@ Output: what you ran and what it said, the app's files one level deep, then your
 
 ### Check what has drifted in a Sourdough app
 
-Lists the managed files that changed since Sourdough wrote them and suggests what to put back. It changes nothing.
+Lists the managed files that changed since Sourdough wrote them, shows what a feed would bring in, and suggests what to put back. It changes nothing.
 
 A prompt for your coding agent. Copy it as it stands:
 
@@ -305,12 +308,13 @@ Task:
 1. Run `sourdough manifest --check` at the app's root. Exit 0 is clean, 1 means a managed file changed or is missing, 2 is a tool error.
 2. For each file it reports, say what changed, as far as you can tell, and whether it looks deliberate.
 3. If ADVISOR is connected, call run_proctor_check for this app and list the findings.
-4. Change nothing. For each drifted file, propose whether to put it back or keep the change, and why.
+4. Run `sourdough feed --dry-run` and list what a feed would update, merge, add, remove or leave in conflict. Exit 0 means fresh, 1 means feeding would change files, 2 is a tool error.
+5. Change nothing. For each drifted file, propose whether to put it back or keep the change, and why. A kept change is fine: feed merges it with the template's.
 
 Constraints:
 - Seeded files (.env.example and README.md) are mine and never count as drift.
 - The deploy files come from Squire, through Sourdough. Never hand-edit them to make a check pass.
-- sourdough feed, which will bring template updates in, is not built yet. Do not promise it.
+- Never run sourdough feed without --dry-run unless I say so: a real feed writes files.
 - Ask me before you guess, and before you touch anything that deploys.
 
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.

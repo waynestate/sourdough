@@ -12,7 +12,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [CI | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/ci.md): Set up the generated app's CI with the Preflight components on GitLab and GitHub, and why a git.wayne.edu instance runner is strongly recommended.
 - [Describe a plan | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.md): Describe what your app does in a sentence and let an OpenAI-compatible model plan it against the plan schema.
 - [Every developer, every operating system | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/every-os.md): Why Sourdough is one PHP command, so the same workflow works on Windows, macOS and Linux for every developer.
-- [Keeping apps current | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.md): How the manifest lets a later sourdough feed bring template updates into your app without clobbering what you have changed.
+- [Keeping apps current | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.md): How sourdough feed reads the manifest and brings template updates into your app without clobbering what you have changed.
 - [Building on Laravel | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/laravel.md): What a Laravel bake adds over the raw base, including a fresh skeleton from Composer, Sail or Docker for the local runtime, artisan Next steps, and the Oracle check command.
 - [The manifest | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/manifest.md): What .sourdough/manifest.json records, how managed and seeded files differ, and how sourdough manifest --check reports drift.
 - [Same kitchen, many ovens | Sourdough docs](https://sourdough.apps.wayne.edu/docs/guides/ovens.md): Where Sourdough sits among WayneUI, CREED, PROCTOR, SESAME, HELMET, Squire, Preflight, Pinstripe, Booster, Rollcall, Drawbridge, ADVISOR and WELD.
@@ -23,7 +23,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [Overview | Sourdough docs](https://sourdough.apps.wayne.edu/docs/index.md): What Sourdough bakes: install, flags, permutations, plans, the manifest and the checks.
 - [Install | Sourdough docs](https://sourdough.apps.wayne.edu/docs/install.md): Install Sourdough with composer global require, or scaffold a project without installing it with composer create-project.
 - [Maintaining | Sourdough docs](https://sourdough.apps.wayne.edu/docs/maintaining.md): How to build, test, release and keep Sourdough alive: the commands, CI, the smoke gate and the release steps.
-- [Commands | Sourdough docs](https://sourdough.apps.wayne.edu/docs/reference/commands.md): Every sourdough command and option, from sourdough new's flags to sourdough manifest --check, with their exit codes.
+- [Commands | Sourdough docs](https://sourdough.apps.wayne.edu/docs/reference/commands.md): Every sourdough command and option, from sourdough new's flags to sourdough manifest --check and sourdough feed, with their exit codes.
 - [Plan format | Sourdough docs](https://sourdough.apps.wayne.edu/docs/reference/plan-format.md): The JSON plan format behind resources/plan.schema.json, covering required and optional keys, permutations, parts, models and pages.
 - [Templates | Sourdough docs](https://sourdough.apps.wayne.edu/docs/reference/templates.md): The templates Sourdough ships, from the raw base to the Laravel overlays, plus the Squire-owned deploy copy at templates/squire/.
 - [Troubleshooting | Sourdough docs](https://sourdough.apps.wayne.edu/docs/troubleshooting.md): What the exit codes mean when a bake is refused, Playbook cannot be read, a managed file has drifted, or a tool error stops the job.
@@ -32,7 +32,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 ## Prompts
 
 - [Get started with Sourdough](https://sourdough.apps.wayne.edu/#prompt-get-started): Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
-- [Check what has drifted in a Sourdough app](https://sourdough.apps.wayne.edu/#prompt-manifest): Lists the managed files that changed since Sourdough wrote them and suggests what to put back. It changes nothing. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
+- [Check what has drifted in a Sourdough app](https://sourdough.apps.wayne.edu/#prompt-manifest): Lists the managed files that changed since Sourdough wrote them, shows what a feed would bring in, and suggests what to put back. It changes nothing. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
 
 ## Source
 

@@ -40,7 +40,7 @@
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="the-manifest">The manifest<a class="docs-heading-link" aria-label="Link to this section" href="#the-manifest">#</a></h1>
-<p>Every app Sourdough generates carries a <code>.sourdough/manifest.json</code>, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so a later <code>sourdough feed</code> can bring template updates in without clobbering what you have changed.</p>
+<p>Every app Sourdough generates carries a <code>.sourdough/manifest.json</code>, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so <code>sourdough feed</code> can bring template updates in without clobbering what you have changed.</p>
 <h2 id="what-it-records">What it records<a class="docs-heading-link" aria-label="Link to this section" href="#what-it-records">#</a></h2>
 <p>The manifest records the Sourdough version, the template, the answers you chose, and a sha256 hash of every file. Its keys, sorted alphabetically in the JSON:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -53,15 +53,15 @@
 <tbody>
 <tr>
 <td><code>answers</code></td>
-<td>each option you chose, sorted by key</td>
+<td>each option you chose, sorted by key: the name, the shape flags, <code>sail</code> or <code>docker</code>, and the Playbook and ADVISOR choices</td>
 </tr>
 <tr>
 <td><code>files</code></td>
-<td>every generated file with its <code>sha256</code> hash and a <code>class</code> of <code>managed</code> or <code>seeded</code></td>
+<td>every generated file with its <code>sha256</code> hash and a <code>class</code> of <code>managed</code> or <code>seeded</code>, including the <code>--sail</code> and <code>--docker</code> files</td>
 </tr>
 <tr>
 <td><code>generated_at</code></td>
-<td>the generation time, UTC</td>
+<td>the generation time (or, after a feed, the time of the new bake), UTC</td>
 </tr>
 <tr>
 <td><code>schema</code></td>
@@ -97,9 +97,11 @@
 </tr>
 </tbody>
 </table></div>
-<p>The manifest remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own. A later <code>sourdough feed</code> reads it to bring template updates into your app without clobbering what you've changed.</p>
+<p>The manifest remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own. <code>sourdough feed</code> reads it to bring template updates into your app without clobbering what you've changed: see <a href="./keeping-current.html">Keeping apps current</a>.</p>
+<h2 id="after-a-feed">After a feed<a class="docs-heading-link" aria-label="Link to this section" href="#after-a-feed">#</a></h2>
+<p><code>sourdough feed</code> moves the manifest to the new base: the hashes of the loaf the installed Sourdough bakes today, and its version. Next to the manifest it keeps <code>.sourdough/base/</code>, one <code>&lt;file&gt;.base</code> per managed file you have changed, holding the template's version of that file. That is the base the next feed merges from, even when git history no longer has it. The <code>.base</code> suffix keeps a kept <code>.gitignore</code> from ignoring anything and keeps linters out. Commit the folder with the manifest, and do not edit it either.</p>
 <h2 id="check-an-app-against-its-manifest">Check an app against its manifest<a class="docs-heading-link" aria-label="Link to this section" href="#check-an-app-against-its-manifest">#</a></h2>
-<p>Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate. Run it in your app to list the managed files that have drifted from the manifest:</p>
+<p><code>sourdough manifest --check</code> lists the managed files that have drifted from the manifest, the files a feed will merge rather than replace:</p>
 <pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>You can pass the app directory as an argument; the default is the current directory. The exit codes match PROCTOR:</p>
@@ -121,7 +123,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/describe-a-plan.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Describe a plan</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/testing.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Testing</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-it-records">What it records</a></li><li class="docs-toc__item"><a href="#managed-and-seeded">Managed and seeded</a></li><li class="docs-toc__item"><a href="#check-an-app-against-its-manifest">Check an app against its manifest</a></li><li class="docs-toc__item"><a href="#the-squire-deploy-files">The Squire deploy files</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-it-records">What it records</a></li><li class="docs-toc__item"><a href="#managed-and-seeded">Managed and seeded</a></li><li class="docs-toc__item"><a href="#after-a-feed">After a feed</a></li><li class="docs-toc__item"><a href="#check-an-app-against-its-manifest">Check an app against its manifest</a></li><li class="docs-toc__item"><a href="#the-squire-deploy-files">The Squire deploy files</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>

@@ -8,7 +8,7 @@ generator: Squire agent-ready
 
 # Upgrading[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrading)
 
-How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: the `.sourdough/manifest.json` in each app is the record a later `sourdough feed` will use, and until `feed` ships, apps pick up template changes by hand. See [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html).
+How to move the Sourdough CLI to a new release, and what each release changes for the apps it bakes. Upgrading the CLI does not rewrite apps you already baked: after the upgrade, run `sourdough feed --dry-run`, then `sourdough feed`, in each app to bring the new release's template changes in, merged with your own. The `.sourdough/manifest.json` in each app is the record it works from. See [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html).
 
 ## Upgrade the CLI[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#upgrade-the-cli)
 
@@ -110,7 +110,7 @@ Then read the section for the version you are moving to.
 
 Tip
 
-Commit `.sourdough/manifest.json` in every app you bake. It is the record that keeps `feed` honest, and the thing a future `sourdough update` will merge against.
+Commit `.sourdough/manifest.json` in every app you bake, and `.sourdough/base/` once a feed writes it. They are the record that keeps `feed` honest, and the base it merges against.
 
 ## Related[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#related)
 

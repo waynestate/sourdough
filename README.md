@@ -163,9 +163,9 @@ A plan is a small JSON object:
 
 Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
 
-The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
+The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
 
-Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app to list the managed files that have drifted from the manifest:
+`sourdough manifest --check` lists the managed files that have drifted from the manifest:
 
 ```
 sourdough manifest --check
@@ -174,6 +174,29 @@ sourdough manifest --check
 Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
 
 Commit the manifest. It's the record that keeps `feed` honest.
+
+## Feeding an app
+
+`sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what you've changed. Install the new Sourdough, then, in the app, on a clean git tree:
+
+```
+sourdough feed --dry-run
+sourdough feed
+```
+
+Feed bakes your app's shape again with the answers in its manifest, then goes file by file:
+
+- a file the template did not change is left alone, whatever you did to it;
+- a managed file you never touched takes the template's new version;
+- a file you both changed is three-way merged by git (`git merge-file`), from the version Sourdough wrote last time; where you both changed the same lines, git's conflict markers go in the file (`<<<<<<< app` and `>>>>>>> sourdough <version>`), never a silent overwrite;
+- new template files are added, and files the template dropped are removed only if you never changed them;
+- seeded files (`README.md`, `.env.example`) are never touched.
+
+Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
+
+Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files, so `sourdough feed --dry-run` in CI fails the pipeline when an app falls behind its template. `--json` prints the plan for machines.
+
+Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](docs/guides/keeping-current.md). A fed starter is a happy starter.
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 

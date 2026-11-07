@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Keeping apps current | Sourdough docs</title>
-<meta name="description" content="How the manifest lets a later sourdough feed bring template updates into your app without clobbering what you have changed.">
+<meta name="description" content="How sourdough feed reads the manifest and brings template updates into your app without clobbering what you have changed.">
 <meta name="docs-version" content="0.1.6">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -40,18 +40,152 @@
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="keeping-apps-current">Keeping apps current<a class="docs-heading-link" aria-label="Link to this section" href="#keeping-apps-current">#</a></h1>
-<p>A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how to check for drift today, and how the planned <code>sourdough feed</code> will merge template updates in without clobbering your changes. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app and run the check in CI, then read on.</p>
+<p>A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how <code>sourdough feed</code> merges template updates in without clobbering your changes, and how to make CI tell you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, run <code>sourdough feed --dry-run</code> in CI, then read on.</p>
 <h2 id="record-where-the-app-came-from">Record where the app came from<a class="docs-heading-link" aria-label="Link to this section" href="#record-where-the-app-came-from">#</a></h2>
 <p>Every app carries a <code>.sourdough/manifest.json</code> recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> or <code>seeded</code>. Other tools do the same: Copier writes <code>.copier-answers.yml</code>, and cruft writes <code>.cruft.json</code>. Without this record there is nothing to compare against, so no update is possible.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>Do not hand-edit the manifest. It is the starter's memory: it remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own.</p></aside>
 <p><a href="./manifest.html">The manifest</a> has the full key list and the managed/seeded split.</p>
 <h2 id="check-for-drift">Check for drift<a class="docs-heading-link" aria-label="Link to this section" href="#check-for-drift">#</a></h2>
-<p>Until <code>feed</code> ships, <code>sourdough manifest --check</code> is the gate. Run it in your app to list the managed files that have drifted from the manifest:</p>
+<p><code>sourdough manifest --check</code> lists the managed files that have drifted from the manifest, the ones you (or someone) edited since Sourdough wrote them:</p>
 <pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
-<p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours. Wire the check into CI so an app that falls behind the template fails the pipeline instead of surfacing as drift later; that is what makes a starter &quot;fed&quot;. Copier's <code>copier check-update</code> is the same idea: <code>--quiet</code> makes it exit 2 when an update exists, and <code>--output-format json</code> gives machines the answer.</p>
-<h2 id="the-planned-feed-a-merge-not-an-overwrite">The planned feed: a merge, not an overwrite<a class="docs-heading-link" aria-label="Link to this section" href="#the-planned-feed-a-merge-not-an-overwrite">#</a></h2>
-<p>The planned <code>sourdough feed</code> regenerates the project from the new template version, compares, and applies the difference on top of your changes as a three-way merge. It needs only git on your machine: it records the template commit an app came from and applies template changes with <code>git apply --3way</code>. It requires a clean git state first (Copier recommends a clean <code>git status</code> but does not enforce it, so the feed enforces it), marks conflicts with inline markers or <code>.rej</code> files, and a hook or CI check blocks a commit containing leftover markers. A merge keeps your work; an overwrite would not.</p>
+<p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours. Drift is not wrong: <code>feed</code> merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace.</p>
+<h2 id="feed-the-app-a-merge-not-an-overwrite">Feed the app: a merge, not an overwrite<a class="docs-heading-link" aria-label="Link to this section" href="#feed-the-app-a-merge-not-an-overwrite">#</a></h2>
+<p>Upgrade the Sourdough CLI first (<a href="../upgrading.html">Upgrading</a>), then, in the app, on a clean git tree, look before you leap:</p>
+<pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
+</code></pre>
+<p>The plan lists one line per file that would change, with the reason, and writes nothing:</p>
+<pre tabindex="0"><code>Would feed the laravel-inertia app: Sourdough 0.1.5 to 0.1.6 (dry run: nothing written)
+  update    config/helmet.php (you had not changed it)
+  merge     routes/web.php (your edits kept, the template's merged in)
+  conflict  vite.config.ts (1 conflicting hunk: you and the template changed the same lines; resolve the markers)
+Would keep the template's version of 2 changed files in .sourdough/base/, so the next feed can merge from it.
+Plan: 1 update, 1 merge, 1 conflict.
+</code></pre>
+<p>Then feed it for real, and review it like any other change:</p>
+<pre tabindex="0"><code class="language-bash">sourdough feed
+git status
+git diff
+</code></pre>
+<h3 id="what-feed-does">What feed does<a class="docs-heading-link" aria-label="Link to this section" href="#what-feed-does">#</a></h3>
+<p>Feed is the update model of Copier and cruft (ADR-0014), built on plain git instead of a Python runtime:</p>
+<ol>
+<li>It reads <code>.sourdough/manifest.json</code>: the template, your answers, and a sha256 of every file Sourdough wrote last time (the base).</li>
+<li>It bakes the same shape with the same answers, with the Sourdough you have installed, into a scratch folder: the loaf <code>sourdough new</code> would bake today. <code>new</code> and <code>feed</code> bake through the same code, so the two cannot disagree.</li>
+<li>It compares the three versions of each file (the base, your app's, the new loaf's) and acts:</li>
+</ol>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>The template</th>
+<th>Your app</th>
+<th>Feed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>did not change it</td>
+<td>anything</td>
+<td>leaves it alone (no line in the plan)</td>
+</tr>
+<tr>
+<td>changed it</td>
+<td>never touched it</td>
+<td><code>update</code>: takes the template's new version</td>
+</tr>
+<tr>
+<td>changed it</td>
+<td>changed it too</td>
+<td><code>merge</code>: <code>git merge-file</code> applies the template's change on top of yours</td>
+</tr>
+<tr>
+<td>changed the same lines</td>
+<td>changed them too</td>
+<td><code>conflict</code>: git's markers in the file, <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; app</code> ... <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; sourdough &lt;version&gt;</code></td>
+</tr>
+<tr>
+<td>added it</td>
+<td>has no such file</td>
+<td><code>add</code></td>
+</tr>
+<tr>
+<td>added it</td>
+<td>has its own file there</td>
+<td><code>conflict</code>: both versions marked</td>
+</tr>
+<tr>
+<td>dropped it</td>
+<td>never touched it</td>
+<td><code>remove</code> (and its emptied folder)</td>
+</tr>
+<tr>
+<td>dropped it</td>
+<td>changed it</td>
+<td><code>keep</code>: it is yours now, and leaves the manifest</td>
+</tr>
+<tr>
+<td>changed it</td>
+<td>deleted it</td>
+<td><code>keep</code>: it stays deleted</td>
+</tr>
+</tbody>
+</table></div>
+<p>Seeded files (<code>README.md</code>, <code>.env.example</code>) are never touched; a seeded file new to the template is written only where you have none. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as <code>&lt;file&gt;.sourdough-new</code>.</p>
+<ol start="4">
+<li>It moves the manifest to the new base (the new loaf's hashes and the new Sourdough version) and keeps the template's version of every managed file you have changed in <code>.sourdough/base/&lt;file&gt;.base</code>. Commit both.</li>
+</ol>
+<h3 id="where-the-base-comes-from">Where the base comes from<a class="docs-heading-link" aria-label="Link to this section" href="#where-the-base-comes-from">#</a></h3>
+<p>A three-way merge needs the version Sourdough wrote last time. The manifest records only its hash, so feed finds the content by that hash: first in <code>.sourdough/base/</code> (kept by the previous feed), then in any commit of your app's git history (the commit right after <code>sourdough new</code> holds every file as baked). A candidate is used only when its sha256 matches the manifest, so a wrong base can never sneak in.</p>
+<p>When neither has it (you edited a file before your first commit), feed cannot tell your edits from the template's, so it does not guess: every place the two versions differ is marked as a conflict, and the lines they share stand once. Commit right after <code>sourdough new</code> and this never happens.</p>
+<h3 id="conflicts">Conflicts<a class="docs-heading-link" aria-label="Link to this section" href="#conflicts">#</a></h3>
+<p>A conflict is never a silent overwrite. Feed exits <code>1</code>, and the file holds git's markers:</p>
+<pre tabindex="0"><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; app
+your version
+=======
+the template's version
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; sourdough 0.1.6
+</code></pre>
+<p>Edit the file to what it should be, delete the markers, and run your checks. <code>git diff --check</code> lists any markers left behind, so put it in a pre-commit hook or CI. Until the markers (and any <code>.sourdough-new</code> copies) are gone, the next feed refuses with exit <code>2</code> and lists them: finish one feeding before the next.</p>
+<h3 id="rules-feed-keeps">Rules feed keeps<a class="docs-heading-link" aria-label="Link to this section" href="#rules-feed-keeps">#</a></h3>
+<ul>
+<li><strong>A clean git tree first.</strong> Copier recommends a clean <code>git status</code> but does not enforce it; feed enforces it (exit <code>2</code>), untracked files included, so <code>git status</code> and <code>git diff</code> show exactly what it did. To undo a whole feed: <code>git restore . &amp;&amp; git clean -fd</code>.</li>
+<li><strong>Git, and only git.</strong> Feed needs git on PATH (or <code>SOURDOUGH_GIT</code> pointing at it), on Windows, macOS and Linux alike. The Laravel shapes also bake on a fresh <code>laravel/laravel</code> skeleton through Composer, the same as <code>sourdough new</code>, so feeding one needs Composer and the network; Laravel's own skeleton updates arrive as template updates, merged the same way.</li>
+<li><strong>Forward only.</strong> A manifest written by a newer Sourdough than the one running is refused (exit <code>2</code>). Update Sourdough first: a starter only rises forward.</li>
+<li><strong>The answers stay.</strong> Feed bakes with the answers in the manifest (the shape, <code>--sail</code> or <code>--docker</code>, Playbook and ADVISOR). It does not change them.</li>
+</ul>
+<h3 id="exit-codes">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes">#</a></h3>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th><code>0</code></th>
+<th><code>1</code></th>
+<th><code>2</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sourdough feed</code></td>
+<td>fed cleanly, or nothing to feed</td>
+<td>fed, with conflicts to resolve</td>
+<td>tool error: no manifest, no git, a dirty tree, conflicts left from the last feed, a newer manifest, a failed bake</td>
+</tr>
+<tr>
+<td><code>sourdough feed --dry-run</code></td>
+<td>fresh: nothing to feed</td>
+<td>feeding would change files</td>
+<td>tool error</td>
+</tr>
+</tbody>
+</table></div>
+<p>Add <code>--json</code> to either for a machine-readable plan: the template, <code>from</code> and <code>to</code> versions, one entry per file (<code>path</code>, <code>action</code>, <code>detail</code>), a summary count per action, the base copies, any notes, and the exit code.</p>
+<h3 id="feed-in-ci">Feed in CI<a class="docs-heading-link" aria-label="Link to this section" href="#feed-in-ci">#</a></h3>
+<p>Put the dry run in the app's pipeline so an app that falls behind its template fails the pipeline instead of surfacing as drift later; that is what makes a starter &quot;fed&quot;:</p>
+<pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
+</code></pre>
+<p>Copier's <code>copier check-update</code> is the same idea: <code>--quiet</code> makes it exit 2 when an update exists, and <code>--output-format json</code> gives machines the answer.</p>
+<h3 id="apps-sourdough-did-not-make-and-weld">Apps Sourdough did not make, and WELD<a class="docs-heading-link" aria-label="Link to this section" href="#apps-sourdough-did-not-make-and-weld">#</a></h3>
+<p>Feed needs the manifest <code>sourdough new</code> writes. An app without one (an app Sourdough did not make, or WELD itself, which was built by hand and checks its drift against a fresh Inertia bake with its own regen check) gets exit <code>2</code>. Writing a manifest into an existing app is <code>sourdough adopt</code>'s job (ADR-0014), which is not built yet.</p>
 <h2 id="versioned-template-releases">Versioned template releases<a class="docs-heading-link" aria-label="Link to this section" href="#versioned-template-releases">#</a></h2>
 <p>Tag template releases with semantic versions, and put a short &quot;what changed, what to do&quot; entry in the changelog for each. Copier picks the newest tag by default. An update tool is only as good as the history it can read.</p>
 <h2 id="compatibility-ci">Compatibility CI<a class="docs-heading-link" aria-label="Link to this section" href="#compatibility-ci">#</a></h2>
@@ -65,7 +199,7 @@
 <pre tabindex="0"><code class="language-bash">php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
-<p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. From the installed package the same refresh is <code>composer squire-copy:sync</code>, verified by <code>composer squire-copy:check</code> (part of <code>composer ci</code>). Until <code>feed</code> exists, apps generated earlier pick up template changes by hand.</p>
+<p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. From the installed package the same refresh is <code>composer squire-copy:sync</code>, verified by <code>composer squire-copy:check</code> (part of <code>composer ci</code>). Apps generated earlier pick up the refreshed files with their next <code>sourdough feed</code>.</p>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
 <ul>
 <li><a href="./manifest.html">The manifest</a></li>
@@ -76,7 +210,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/laravel.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Building on Laravel</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/every-os.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Every developer, every operating system</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#record-where-the-app-came-from">Record where the app came from</a></li><li class="docs-toc__item"><a href="#check-for-drift">Check for drift</a></li><li class="docs-toc__item"><a href="#the-planned-feed-a-merge-not-an-overwrite">The planned feed: a merge, not an overwrite</a></li><li class="docs-toc__item"><a href="#versioned-template-releases">Versioned template releases</a></li><li class="docs-toc__item"><a href="#compatibility-ci">Compatibility CI</a></li><li class="docs-toc__item"><a href="#keep-templates-thin">Keep templates thin</a></li><li class="docs-toc__item"><a href="#owners-windows-and-sunsets">Owners, windows and sunsets</a></li><li class="docs-toc__item"><a href="#refreshing-the-squire-templates">Refreshing the Squire templates</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#record-where-the-app-came-from">Record where the app came from</a></li><li class="docs-toc__item"><a href="#check-for-drift">Check for drift</a></li><li class="docs-toc__item"><a href="#feed-the-app-a-merge-not-an-overwrite">Feed the app: a merge, not an overwrite</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#what-feed-does">What feed does</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#where-the-base-comes-from">Where the base comes from</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#conflicts">Conflicts</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#rules-feed-keeps">Rules feed keeps</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#feed-in-ci">Feed in CI</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#apps-sourdough-did-not-make-and-weld">Apps Sourdough did not make, and WELD</a></li><li class="docs-toc__item"><a href="#versioned-template-releases">Versioned template releases</a></li><li class="docs-toc__item"><a href="#compatibility-ci">Compatibility CI</a></li><li class="docs-toc__item"><a href="#keep-templates-thin">Keep templates thin</a></li><li class="docs-toc__item"><a href="#owners-windows-and-sunsets">Owners, windows and sunsets</a></li><li class="docs-toc__item"><a href="#refreshing-the-squire-templates">Refreshing the Squire templates</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>

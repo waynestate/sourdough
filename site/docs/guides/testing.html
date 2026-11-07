@@ -103,7 +103,9 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough
 <li><code>blade-vue</code>: the blade steps plus <code>npm install</code> and <code>npm run build</code></li>
 <li><code>inertia</code>: the blade steps plus <code>npm install</code>, <code>npm run build</code> and <code>npm run typecheck</code></li>
 </ul>
+<p>Right after the bake, every shape also proves the bake is reproducible: the gate commits the fresh app to a scratch git repository and expects <code>sourdough feed --dry-run</code> to exit 0 (nothing to feed), then drops the repository again. A loaf that comes out different every time would make every feed of it a conflict.</p>
 <p>Each step prints <code>ok</code>; the first <code>FAIL</code> stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.</p>
+<p><code>tests/FeedCommandTest.php</code> covers <code>sourdough feed</code> itself on every shape (and with <code>--sail</code> and <code>--docker</code>), offline, in the PHPUnit suite: an app aged to an older template, one with local edits that merge cleanly, one with a conflict, and the refusals. It needs git on PATH and skips without it.</p>
 <p>Run it per OS. The image (<code>scripts/smoke.Dockerfile</code>) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:</p>
 <div class="docs-tabs" data-tabs="linux|windows"><div class="docs-tabs__panel" data-tab-label="linux"><p class="docs-tabs__label">linux</p><pre tabindex="0"><code class="language-bash">docker build -f scripts/smoke.Dockerfile -t sourdough-smoke:local .
 docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdough-smoke:local sh /repo/scripts/smoke-shape.sh &lt;shape&gt;

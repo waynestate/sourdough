@@ -5,7 +5,7 @@ description: What .sourdough/manifest.json records, how managed and seeded files
 
 # The manifest
 
-Every app Sourdough generates carries a `.sourdough/manifest.json`, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so a later `sourdough feed` can bring template updates in without clobbering what you have changed.
+Every app Sourdough generates carries a `.sourdough/manifest.json`, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so `sourdough feed` can bring template updates in without clobbering what you have changed.
 
 ## What it records
 
@@ -13,9 +13,9 @@ The manifest records the Sourdough version, the template, the answers you chose,
 
 | Key | Value |
 |---|---|
-| `answers` | each option you chose, sorted by key |
-| `files` | every generated file with its `sha256` hash and a `class` of `managed` or `seeded` |
-| `generated_at` | the generation time, UTC |
+| `answers` | each option you chose, sorted by key: the name, the shape flags, `sail` or `docker`, and the Playbook and ADVISOR choices |
+| `files` | every generated file with its `sha256` hash and a `class` of `managed` or `seeded`, including the `--sail` and `--docker` files |
+| `generated_at` | the generation time (or, after a feed, the time of the new bake), UTC |
 | `schema` | the manifest schema version, currently `1` |
 | `sourdough_version` | the Sourdough package version, or `dev` when it cannot be determined (running from a git checkout without a release tag) |
 | `template` | the template the app was generated from |
@@ -29,11 +29,15 @@ The JSON is pretty-printed with sorted keys and a trailing newline, and paths us
 | `managed` | Sourdough owns the file and will update it |
 | `seeded` | Sourdough wrote the file once; you own it now (`.env.example` and `README.md`) |
 
-The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. A later `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
+The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed: see [Keeping apps current](./keeping-current.md).
+
+## After a feed
+
+`sourdough feed` moves the manifest to the new base: the hashes of the loaf the installed Sourdough bakes today, and its version. Next to the manifest it keeps `.sourdough/base/`, one `<file>.base` per managed file you have changed, holding the template's version of that file. That is the base the next feed merges from, even when git history no longer has it. The `.base` suffix keeps a kept `.gitignore` from ignoring anything and keeps linters out. Commit the folder with the manifest, and do not edit it either.
 
 ## Check an app against its manifest
 
-Until `feed` ships, `sourdough manifest --check` is the gate. Run it in your app to list the managed files that have drifted from the manifest:
+`sourdough manifest --check` lists the managed files that have drifted from the manifest, the files a feed will merge rather than replace:
 
 ```bash
 sourdough manifest --check

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commands | Sourdough docs</title>
-<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check, with their exit codes.">
+<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check and sourdough feed, with their exit codes.">
 <meta name="docs-version" content="0.1.6">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -301,8 +301,184 @@
 </tbody>
 </table></div>
 <p>Seeded files are never reported: the app owns them.</p>
+<h2 id="sourdough-feed">sourdough feed<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed">#</a></h2>
+<p>Bring Sourdough template updates into an app without clobbering what it has changed.</p>
+<pre tabindex="0"><code>sourdough feed [dir] [--dry-run] [--json]
+</code></pre>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dir</code></td>
+<td>the app directory to feed (default: the current directory)</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>print the plan and write nothing; exit <code>1</code> when feeding would change files</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print the plan, or the result, as JSON</td>
+</tr>
+</tbody>
+</table></div>
+<p>Feed bakes the app's shape again with the answers in its manifest, compares the base (what the manifest recorded), the app and the new loaf file by file, and writes the result. How it decides, and where the base comes from, is in <a href="../guides/keeping-current.html#what-feed-does">Keeping apps current</a>.</p>
+<h3 id="plan-lines">Plan lines<a class="docs-heading-link" aria-label="Link to this section" href="#plan-lines">#</a></h3>
+<p>One line per file that changes, <code>  &lt;action&gt;  &lt;file&gt; (&lt;why&gt;)</code>; files feed leaves alone are not listed.</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add</code></td>
+<td>new in the template (or a seeded file new to the template, where the app has none)</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>the template changed it and the app had not: replaced</td>
+</tr>
+<tr>
+<td><code>merge</code></td>
+<td>both changed it in different places: three-way merged by <code>git merge-file</code></td>
+</tr>
+<tr>
+<td><code>conflict</code></td>
+<td>both changed the same lines, there was no base to merge from, or the file is binary: marked, never overwritten</td>
+</tr>
+<tr>
+<td><code>remove</code></td>
+<td>the template dropped it and the app had not changed it</td>
+</tr>
+<tr>
+<td><code>keep</code></td>
+<td>the template dropped a file the app changed (it is the app's now), or changed a file the app deleted (it stays deleted)</td>
+</tr>
+</tbody>
+</table></div>
+<p>A conflict in a text file holds git's markers, <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; app</code>, <code>=======</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; sourdough &lt;version&gt;</code>; a binary conflict leaves the template's copy next to the app's as <code>&lt;file&gt;.sourdough-new</code>.</p>
+<p>After the plan lines: how many base copies feed keeps in <code>.sourdough/base/</code>, a one-line count per action, and the next steps. A real feed ends with the undo line: <code>To undo the whole feed: git restore . &amp;&amp; git clean -fd (the tree was clean before it ran).</code></p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Fresh: the app already has everything Sourdough &lt;version&gt; bakes into a &lt;template&gt; app. Nothing to feed.</code></td>
+<td>nothing to do; nothing written, not even the manifest</td>
+</tr>
+<tr>
+<td><code>note: Not inside a git repository: ...</code></td>
+<td>dry runs only: a real feed would refuse</td>
+</tr>
+<tr>
+<td><code>note: Uncommitted changes: ...</code></td>
+<td>dry runs only: a real feed would refuse until the tree is clean</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="exit-codes-1">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-1">#</a></h3>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Run</th>
+<th><code>0</code></th>
+<th><code>1</code></th>
+<th><code>2</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sourdough feed</code></td>
+<td>fed cleanly, or nothing to feed</td>
+<td>fed, with conflicts to resolve</td>
+<td>tool error</td>
+</tr>
+<tr>
+<td><code>sourdough feed --dry-run</code></td>
+<td>fresh</td>
+<td>feeding would change files</td>
+<td>tool error</td>
+</tr>
+</tbody>
+</table></div>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Tool error</th>
+<th>Message starts with</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no manifest in the directory</td>
+<td><code>No Sourdough manifest found in &quot;&lt;dir&gt;&quot;.</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>git is not on PATH</td>
+<td><code>sourdough feed needs git on PATH</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the app is not inside a git repository (real run)</td>
+<td><code>sourdough feed only runs inside a git repository</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>uncommitted or untracked changes (real run)</td>
+<td><code>Commit or stash your changes first</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>conflict markers or <code>.sourdough-new</code> copies left from the last feed</td>
+<td><code>Finish the last feed first</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the manifest was written by a newer Sourdough</td>
+<td><code>This app was fed by Sourdough &lt;version&gt;, newer than this one</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the manifest names a template this Sourdough does not bake</td>
+<td><code>The manifest names the template</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the manifest lists a path outside the app</td>
+<td><code>The manifest lists an unsafe path</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the bake failed (for example, Composer could not fetch the Laravel skeleton)</td>
+<td><code>sourdough feed failed:</code></td>
+<td><code>2</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="json">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json">#</a></h3>
+<p><code>--json</code> prints one object: <code>dir</code>, <code>template</code>, <code>from</code> and <code>to</code> (the Sourdough versions), <code>dry_run</code>, <code>fresh</code>, <code>files</code> (one <code>{path, action, detail}</code> per plan line), <code>summary</code> (a count per action), <code>base_copies</code> (the files kept in <code>.sourdough/base/</code>), <code>notes</code>, and <code>exit</code>.</p>
+<h3 id="environment">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment">#</a></h3>
+<ul>
+<li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>
+<li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
+</ul>
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
 <ul>
+<li><a href="../guides/keeping-current.html">Keeping apps current</a></li>
 <li><a href="plan-format.html">Plan format</a></li>
 <li><a href="../guides/wiring-the-stack.html">Wiring the stack in</a></li>
 </ul>
@@ -310,7 +486,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/wiring-the-stack.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Wiring the stack in</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/plan-format.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Plan format</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#sourdough-feed">sourdough feed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#plan-lines">Plan lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-1">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment">Environment</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>
