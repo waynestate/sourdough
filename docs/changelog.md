@@ -20,6 +20,8 @@ Versioning once 1.0 is out.
 
 ### Fixed
 
+- Fixed: Baked apps pin `config.platform.php` to their PHP floor, so PROCTOR no longer flags the lock.
+- Fixed: Baked Laravel apps read the signed-in user again on every request, so Laravel 13's JSON sessions no longer sign everyone out after the first page.
 - Fixed: `sourdough feed` brings an app baked by 0.1.6 with `--sail` or `--docker` forward with its oven. 0.1.6 wrote the manifest before the oven's scaffold ran, so the answers named no oven, the oven's files were not in it, and `composer.json` was hashed before the scaffold edited it: feed baked the plain shape, found it "Fresh", and left `sourdough manifest --check` reporting `composer.json` changed for good. Feed now reads the oven from the app's files when a 0.1.6 manifest names none (a `Dockerfile`, `compose.yaml` and the `dev-up` script for Docker; `laravel/sail` and Sail's `compose.yaml` for Sail) and says so in a `note:` line. The proof harness found it.
 - Fixed: `sourdough feed` records a managed file that already holds the template's new version (a new `record` action) instead of passing over it in silence. Nothing in the file is written, but the manifest moves to the new hash, so `sourdough manifest --check` stops calling it changed. A plan of only `record` lines is a change: `--dry-run` exits `1`, and the real feed writes the manifest.
 

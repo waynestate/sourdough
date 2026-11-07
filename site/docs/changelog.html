@@ -53,6 +53,12 @@ Versioning once 1.0 is out.</p>
 <h3 id="fixed">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed">#</a></h3>
 <ul>
 <li>
+<p>Fixed: Baked apps pin <code>config.platform.php</code> to their PHP floor, so PROCTOR no longer flags the lock.</p>
+</li>
+<li>
+<p>Fixed: Baked Laravel apps read the signed-in user again on every request, so Laravel 13's JSON sessions no longer sign everyone out after the first page.</p>
+</li>
+<li>
 <p>Fixed: <code>sourdough feed</code> brings an app baked by 0.1.6 with <code>--sail</code> or <code>--docker</code> forward with its oven. 0.1.6 wrote the manifest before the oven's scaffold ran, so the answers named no oven, the oven's files were not in it, and <code>composer.json</code> was hashed before the scaffold edited it: feed baked the plain shape, found it &quot;Fresh&quot;, and left <code>sourdough manifest --check</code> reporting <code>composer.json</code> changed for good. Feed now reads the oven from the app's files when a 0.1.6 manifest names none (a <code>Dockerfile</code>, <code>compose.yaml</code> and the <code>dev-up</code> script for Docker; <code>laravel/sail</code> and Sail's <code>compose.yaml</code> for Sail) and says so in a <code>note:</code> line. The proof harness found it.</p>
 </li>
 <li>
