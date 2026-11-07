@@ -8,8 +8,8 @@ namespace Waynestate\Sourdough;
  * The record Sourdough writes into every app it generates:
  * `.sourdough/manifest.json`.
  *
- * It is what `sourdough feed` (a later release) compares the app against
- * when it brings template updates in. The manifest lists every generated
+ * It is what `sourdough feed` compares the app against when it brings
+ * template updates in. The manifest lists every generated
  * file with a sha256 hash and a class:
  *
  * - "managed": Sourdough owns the file and will update it.
@@ -94,7 +94,21 @@ final class Manifest
      */
     public function write(string $dir): void
     {
-        $json = json_encode($this->build($dir), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        self::writeData($dir, $this->build($dir));
+    }
+
+    /**
+     * Write an already-built manifest array into $dir, in the same format
+     * write() produces. `sourdough feed` uses it to move the app's record
+     * to the new base.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @throws \RuntimeException when the manifest cannot be encoded or written
+     */
+    public static function writeData(string $dir, array $data): void
+    {
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         if (false === $json) {
             throw new \RuntimeException('Could not encode the manifest as JSON.');
         }
@@ -121,22 +135,12 @@ final class Manifest
      */
     public static function check(string $dir): array
     {
-        $manifestPath = $dir . '/' . self::FILE;
-        if (!is_file($manifestPath)) {
-            throw new \RuntimeException(sprintf('No Sourdough manifest found in "%s".', $dir));
-        }
-
-        $content = file_get_contents($manifestPath);
-        if (false === $content) {
-            throw new \RuntimeException(sprintf('Could not read "%s".', $manifestPath));
-        }
-
-        $manifest = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $manifest = self::read($dir);
 
         $changed = [];
         $missing = [];
-        foreach ($manifest['files'] as $relative => $info) {
-            if ('managed' !== ($info['class'] ?? 'managed')) {
+        foreach (self::files($manifest) as $relative => $info) {
+            if ('managed' !== $info['class']) {
                 continue;
             }
 
@@ -155,6 +159,69 @@ final class Manifest
         sort($missing);
 
         return ['changed' => $changed, 'missing' => $missing];
+    }
+
+    /**
+     * Read and decode the manifest in $dir.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException when there is no manifest in $dir, or it is not a manifest
+     */
+    public static function read(string $dir): array
+    {
+        $manifestPath = $dir . '/' . self::FILE;
+        if (!is_file($manifestPath)) {
+            throw new \RuntimeException(sprintf('No Sourdough manifest found in "%s".', $dir));
+        }
+
+        $content = file_get_contents($manifestPath);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $manifestPath));
+        }
+
+        try {
+            $manifest = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new \RuntimeException(sprintf('"%s" is not valid JSON: %s', $manifestPath, $e->getMessage()), 0, $e);
+        }
+
+        if (!is_array($manifest) || !is_array($manifest['files'] ?? null)) {
+            throw new \RuntimeException(sprintf('"%s" is not a Sourdough manifest: it has no files map.', $manifestPath));
+        }
+
+        $data = [];
+        foreach ($manifest as $key => $value) {
+            $data[(string) $key] = $value;
+        }
+
+        return $data;
+    }
+
+    /**
+     * The files map of a decoded manifest, with every entry normalized to a
+     * class and a hash. An entry with no class counts as managed, as it
+     * always has; an entry with no usable hash is dropped.
+     *
+     * @param array<string, mixed> $manifest
+     *
+     * @return array<string, array{class: string, sha256: string}>
+     */
+    public static function files(array $manifest): array
+    {
+        $files = [];
+        foreach (is_array($manifest['files'] ?? null) ? $manifest['files'] : [] as $relative => $info) {
+            if (!is_array($info) || !is_string($info['sha256'] ?? null)) {
+                continue;
+            }
+            $class = $info['class'] ?? 'managed';
+            $files[(string) $relative] = [
+                'class' => 'seeded' === $class ? 'seeded' : 'managed',
+                'sha256' => $info['sha256'],
+            ];
+        }
+
+        return $files;
     }
 
     private function isSeeded(string $relative): bool

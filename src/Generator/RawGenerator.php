@@ -43,8 +43,8 @@ final class RawGenerator
 {
     /**
      * The files Sourdough seeds once and then leaves to the app. Everything
-     * else in the template is managed: `sourdough feed` (a later release)
-     * will update it.
+     * else in the template is managed: `sourdough feed` updates it, merging
+     * in whatever the app changed.
      *
      * - .env.example: the app's environment config. The developer fills in
      *   real values per environment, so Sourdough must not clobber them.

@@ -15,6 +15,7 @@ use Waynestate\Sourdough\Command\NewCommand;
 use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\SkeletonSource;
+use Waynestate\Sourdough\Manifest;
 use Waynestate\Sourdough\PlaybookAccess;
 
 final class NewCommandTest extends TestCase
@@ -393,6 +394,42 @@ final class NewCommandTest extends TestCase
         self::assertStringContainsString('npm run build', $display);
         self::assertStringContainsString('composer serve', $display);
         self::assertStringNotContainsString('php artisan', $display);
+    }
+
+    /**
+     * The manifest is written after the --docker or --sail scaffold, so it
+     * lists the scaffold's files and the composer.json it edited, and the
+     * answers say which scaffold `sourdough feed` must bake again.
+     *
+     * @return array<string, array{string, list<string>}>
+     */
+    public static function scaffolds(): array
+    {
+        return [
+            'docker' => ['--docker', ['Dockerfile', 'compose.yaml', '.dockerignore']],
+            'sail' => ['--sail', ['compose.yaml']],
+        ];
+    }
+
+    /**
+     * @param list<string> $files
+     */
+    #[DataProvider('scaffolds')]
+    public function testTheManifestRecordsTheScaffoldAndIsCleanRightAfterTheBake(string $flag, array $files): void
+    {
+        $target = $this->makeTempDir() . '/demo';
+
+        $tester = new CommandTester($this->createCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
+        $exit = $tester->execute(['dir' => $target, '--laravel' => true, $flag => true]);
+        self::assertSame(0, $exit, $tester->getDisplay());
+
+        $manifest = Manifest::read($target);
+        self::assertIsArray($manifest['answers']);
+        self::assertTrue($manifest['answers'][ltrim($flag, '-')]);
+        foreach ($files as $file) {
+            self::assertArrayHasKey($file, Manifest::files($manifest), $file . ' is in the manifest');
+        }
+        self::assertSame(['changed' => [], 'missing' => []], Manifest::check($target));
     }
 
     public function testLaravelGeneratesWithTheFixtureSource(): void

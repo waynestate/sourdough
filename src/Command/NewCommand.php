@@ -11,16 +11,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Waynestate\Sourdough\AppPlan;
+use Waynestate\Sourdough\Baker;
 use Waynestate\Sourdough\Describe;
 use Waynestate\Sourdough\DescribeException;
-use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
-use Waynestate\Sourdough\Generator\DockerScaffold;
-use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
-use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
-use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
 use Waynestate\Sourdough\Generator\RawGenerator;
-use Waynestate\Sourdough\Generator\RawVueGenerator;
-use Waynestate\Sourdough\Generator\SailScaffold;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
@@ -303,38 +297,11 @@ final class NewCommand extends Command
         }
 
         try {
-            if (Permutation::LaravelBlade === $permutation) {
-                (new LaravelBladeGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
-                    ->generate($dir, $name, $answers, $playbook, $advisor);
-            } elseif (Permutation::LaravelBladeVue === $permutation) {
-                (new LaravelBladeVueGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
-                    ->generate($dir, $name, $answers, $playbook, $advisor);
-            } elseif (Permutation::LaravelInertia === $permutation) {
-                (new LaravelInertiaGenerator($this->skeletonSource ?? new ComposerSkeletonSource()))
-                    ->generate($dir, $name, $answers, $playbook, $advisor);
-            } elseif (Permutation::RawVue === $permutation) {
-                (new RawVueGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
-            } else {
-                (new RawGenerator())->generate($dir, $name, $answers, $playbook, $advisor);
-            }
-
-            // The app's own Docker setup lands on the generated Laravel app
-            // after the shape is baked: a two-target Dockerfile pinned by
-            // digest, a compose.yaml (with a vite service for the Vue and
-            // Inertia shapes), the dev-up/dev-down/dev-shell scripts and the
-            // database settings in .env.example. A raw bake with --docker
-            // never reaches here; Plan refuses it first.
-            if ($docker) {
-                (new DockerScaffold())->apply($dir, Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation);
-            }
-
-            // Sail lands on the generated Laravel app after the shape is
-            // baked: composer.json gets laravel/sail, plus compose.yaml, the
-            // .env.example lines and the README section. A raw bake with
-            // --sail never reaches here; Plan refuses it first.
-            if ($sail) {
-                (new SailScaffold())->apply($dir);
-            }
+            // The shape, then --docker or --sail (a raw bake with either
+            // never reaches here; Plan refuses it first), then the manifest,
+            // which records sail and docker so `sourdough feed` can bake the
+            // same loaf again. Feed bakes through the same Baker.
+            (new Baker($this->skeletonSource))->bake($permutation, $dir, $name, $answers, $playbook, $advisor, $sail, $docker);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
