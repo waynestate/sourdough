@@ -12,6 +12,7 @@
             "phpstan/extension-installer": true
         },
         "platform": {
+            "php": "8.3.0",
             "ext-oci8": "3.4.1"
         }
     },
