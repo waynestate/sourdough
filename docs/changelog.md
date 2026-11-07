@@ -12,6 +12,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Changed
+
+- Changed: every shape's `.gitlab-ci.yml` caches its downloads. Docker Hub images (the app's own jobs and the Preflight components' `image` inputs, digest pins kept) are `${IMAGE_PREFIX}/<image>`; `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's GitLab Dependency Proxy when the GitLab has one. Composer and npm installs extend `.composer-cache` (keyed on `composer.lock`) and `.npm-cache` (keyed on `package-lock.json` and `package.json`). A project variable `IMAGE_PREFIX=docker.io` skips the proxy. New `tests/TemplateCiCacheTest.php` keeps every shape that way. Apps already baked take it with `sourdough feed`.
+
 ## 0.1.7 (2026-11-07)
 
 ### Added

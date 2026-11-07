@@ -227,6 +227,10 @@ The Laravel shapes (Blade, Blade + Vue islands, Inertia) come with Pest 4. The s
 
 Strongly recommended: a git.wayne.edu instance runner.
 
+Every baked `.gitlab-ci.yml` caches its downloads: Docker Hub images come through the group's GitLab Dependency Proxy
+when the GitLab has one (`IMAGE_PREFIX`, Docker Hub otherwise), and Composer and npm installs are cached per lock
+file. See [Dependency caching](docs/guides/ci.md#dependency-caching).
+
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>
 

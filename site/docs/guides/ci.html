@@ -44,6 +44,22 @@
 <aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Strongly recommended: a git.wayne.edu instance runner.</p></aside>
 <h2 id="on-gitlab">On GitLab<a class="docs-heading-link" aria-label="Link to this section" href="#on-gitlab">#</a></h2>
 <p>Preflight's <code>php-test</code> (PHP 8.3, 8.4, 8.5) and <code>composer-audit</code> components, plus a <code>composer-ci</code> job.</p>
+<h2 id="dependency-caching">Dependency caching<a class="docs-heading-link" aria-label="Link to this section" href="#dependency-caching">#</a></h2>
+<p>A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's <code>.gitlab-ci.yml</code> keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.</p>
+<p><strong>Images.</strong> Each job's image is <code>${IMAGE_PREFIX}/&lt;image&gt;</code>, digest pins kept. <code>IMAGE_PREFIX</code> defaults to <code>docker.io</code>, and a <code>workflow:</code> rule sets it to the group's <a rel="noopener" href="https://docs.gitlab.com/user/packages/dependency_proxy/">GitLab Dependency Proxy</a> (<code>$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX</code>) when the GitLab has one. The runner signs in to the proxy on its own; the proxy asks Docker Hub once and serves its copy after that. The Preflight components' <code>image</code> inputs carry the same prefix in front of the components' own default images.</p>
+<pre tabindex="0"><code class="language-yaml">workflow:
+  rules:
+    - if: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+      variables:
+        IMAGE_PREFIX: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+    - when: always
+
+variables:
+  IMAGE_PREFIX: docker.io
+</code></pre>
+<p>On a group whose proxy is turned off, set <code>IMAGE_PREFIX</code> to <code>docker.io</code> in <strong>Settings &gt; CI/CD &gt; Variables</strong>: a project variable beats the file's own.</p>
+<p><strong>Packages.</strong> <code>COMPOSER_CACHE_DIR</code> and <code>npm_config_cache</code> point at <code>.cache/composer/</code> and <code>.cache/npm/</code> inside the project, and every job that installs extends <code>.composer-cache</code> (keyed on <code>composer.lock</code>) or <code>.npm-cache</code> (keyed on <code>package-lock.json</code> and <code>package.json</code>). A lock change starts a fresh cache, and the install still resolves from the lock, so a cached run never gets a stale package.</p>
+<p><code>tests/TemplateCiCacheTest.php</code> fails Sourdough's own suite when a shape's pipeline gains an image without <code>${IMAGE_PREFIX}/</code> or an install without its cache.</p>
 <h2 id="on-github">On GitHub<a class="docs-heading-link" aria-label="Link to this section" href="#on-github">#</a></h2>
 <p><code>.github/workflows/ci.yml</code> calls Preflight's reusable workflow with <code>composer ci</code>.</p>
 <h2 id="what-green-means">What green means<a class="docs-heading-link" aria-label="Link to this section" href="#what-green-means">#</a></h2>
@@ -66,7 +82,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/testing.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Testing</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/ovens.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Same kitchen, many ovens</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#on-gitlab">On GitLab</a></li><li class="docs-toc__item"><a href="#on-github">On GitHub</a></li><li class="docs-toc__item"><a href="#what-green-means">What green means</a></li><li class="docs-toc__item"><a href="#the-smoke-jobs-on-ci">The smoke jobs on CI</a></li><li class="docs-toc__item"><a href="#on-the-bench">On the bench</a></li><li class="docs-toc__item"><a href="#the-recipe-card">The recipe card</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#on-gitlab">On GitLab</a></li><li class="docs-toc__item"><a href="#dependency-caching">Dependency caching</a></li><li class="docs-toc__item"><a href="#on-github">On GitHub</a></li><li class="docs-toc__item"><a href="#what-green-means">What green means</a></li><li class="docs-toc__item"><a href="#the-smoke-jobs-on-ci">The smoke jobs on CI</a></li><li class="docs-toc__item"><a href="#on-the-bench">On the bench</a></li><li class="docs-toc__item"><a href="#the-recipe-card">The recipe card</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.7</span></span>

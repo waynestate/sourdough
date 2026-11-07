@@ -14,6 +14,30 @@ Sourdough's pipelines run one gate, `composer ci`, on both forges: the same comm
 
 Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
 
+## Dependency caching
+
+A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's `.gitlab-ci.yml` keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.
+
+**Images.** Each job's image is `${IMAGE_PREFIX}/<image>`, digest pins kept. `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's [GitLab Dependency Proxy](https://docs.gitlab.com/user/packages/dependency_proxy/) (`$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX`) when the GitLab has one. The runner signs in to the proxy on its own; the proxy asks Docker Hub once and serves its copy after that. The Preflight components' `image` inputs carry the same prefix in front of the components' own default images.
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+      variables:
+        IMAGE_PREFIX: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+    - when: always
+
+variables:
+  IMAGE_PREFIX: docker.io
+```
+
+On a group whose proxy is turned off, set `IMAGE_PREFIX` to `docker.io` in **Settings > CI/CD > Variables**: a project variable beats the file's own.
+
+**Packages.** `COMPOSER_CACHE_DIR` and `npm_config_cache` point at `.cache/composer/` and `.cache/npm/` inside the project, and every job that installs extends `.composer-cache` (keyed on `composer.lock`) or `.npm-cache` (keyed on `package-lock.json` and `package.json`). A lock change starts a fresh cache, and the install still resolves from the lock, so a cached run never gets a stale package.
+
+`tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's pipeline gains an image without `${IMAGE_PREFIX}/` or an install without its cache.
+
 ## On GitHub
 
 `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.

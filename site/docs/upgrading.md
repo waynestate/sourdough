@@ -38,6 +38,16 @@ Sourdough 0.1.7
 
 Then read the section for the version you are moving to.
 
+## Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
+
+**Breaking:** none. **Deprecated:** none.
+
+Every shape's `.gitlab-ci.yml` now caches its downloads: Docker Hub images through `${IMAGE_PREFIX}` (the group's Dependency Proxy when the GitLab has one, Docker Hub otherwise) and Composer and npm installs per lock file. See [Dependency caching](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching).
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`. Feed merges the new `.gitlab-ci.yml` with your own jobs; a job you added that pulls a Docker Hub image or installs packages takes the same pattern by hand (`image: ${IMAGE_PREFIX}/<image>` and `extends: .composer-cache` or `.npm-cache`).
+
+**How to verify:** the next pipeline's job logs show `Pulling docker image` with your GitLab's host in front, and a second run logs `Successfully extracted cache`.
+
 ## 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-7-2026-11-07)
 
 **Breaking:** for new bakes, and for apps you feed. The Inertia shape moves to Inertia 3 (`inertiajs/inertia-laravel` `^3.0`, `@inertiajs/vue3` `^3.0`: PHP 8.2+, Laravel 11+, ES modules only, Axios no longer bundled). Every shape requires PROCTOR `^0.6`, and the Laravel shapes' `composer proctor` script drops `--policy`, because PROCTOR 0.6 refuses that option in CI.
