@@ -150,10 +150,11 @@ step() {
 # "Tests: 5 passed (9 assertions)", so the proof table can quote it.
 suite_step() {
     step "$@"
-    counts=$(sed -n -E \
+    # Pest colors its summary even without a terminal: drop the escapes.
+    counts=$(tr -d '\033' <"$log" | sed -E 's/\[[0-9;]*m//g' | sed -n -E \
         -e 's/.*OK \(([0-9]+) tests?, ([0-9]+) assertions?\).*/\1 tests, \2 assertions/p' \
         -e 's/.*Tests:.* ([0-9]+) passed \(([0-9]+) assertions?\).*/\1 tests, \2 assertions/p' \
-        "$log" | tail -n 1)
+        | tail -n 1)
     if [ -n "$counts" ]; then
         echo "note suite: $counts"
     fi
@@ -171,7 +172,8 @@ start_server() {
     server_pid=$!
     i=0
     while [ "$i" -lt 20 ]; do
-        if curl -s -o /dev/null "http://127.0.0.1:$port/up"; then
+        # -f: a 500 from a half-baked app is not an answer.
+        if curl -sf -o /dev/null "http://127.0.0.1:$port/up"; then
             echo "ok $label answers /up within 20s"
             return 0
         fi
@@ -403,13 +405,17 @@ case "$shape" in
         step "composer ci" composer ci
 
         # Live check: the same router php artisan serve starts, run directly
-        # so the gate holds one process it can stop. APP_ENV=local comes from
-        # .env, so SESAME signs in with its fake driver.
-        start_server "$shape server" php -S "127.0.0.1:$port" -t "$dir/public" "$dir/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
+        # so the gate holds one process it can stop. Like artisan, it starts
+        # in public/, because the router finds index.php from its working
+        # directory. APP_ENV=local comes from .env, so SESAME signs in with
+        # its fake driver.
+        dir=$work/app/public
+        start_server "$shape server" php -S "127.0.0.1:$port" -t "$dir" "$work/app/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
+        dir=$work/app
         case "$shape" in
             blade)
                 check_http "blade GET / answers 200 with the Blade home page" / 200 'baked fresh by Sourdough'
-                check_http "blade GET /dashboard signs in with the fake driver" /dashboard 200 'jdoe'
+                check_http "blade GET /dashboard signs in with the fake driver" /dashboard 200 'Signed in as'
                 ;;
             blade-vue)
                 check_http "blade-vue GET / answers 200 with the Blade home page" / 200 'baked fresh by Sourdough'
@@ -417,9 +423,11 @@ case "$shape" in
                 check_http "blade-vue GET /dashboard carries the Vue island" /dashboard 200 'data-vue-island="counter"'
                 ;;
             inertia)
-                check_http "inertia GET / answers 200 with the Inertia Home page" / 200 'Home'
+                # Inertia 2 hands the page to Vue in the root div's
+                # data-page attribute, HTML-escaped.
+                check_http "inertia GET / answers 200 with the Inertia Home page" / 200 '&quot;component&quot;:&quot;Home&quot;'
                 check_http "inertia GET / loads the built app" / 200 '/build/assets/'
-                check_http "inertia GET /dashboard signs in with the fake driver" /dashboard 200 'Dashboard'
+                check_http "inertia GET /dashboard signs in with the fake driver" /dashboard 200 '&quot;component&quot;:&quot;Dashboard&quot;'
                 ;;
         esac
         check_http "$shape GET /nope answers 404" /nope 404

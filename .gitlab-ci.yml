@@ -88,3 +88,28 @@ smoke-inertia:
   extends: .smoke-base
   script:
     - sh scripts/smoke-shape.sh inertia
+
+# The proof: every shape and every Laravel shape in each oven, one after
+# another, with the last release fed forward (scripts/proof.sh, see
+# docs/reference/proof.md). A full proof takes its time, like any good dough,
+# so it never runs on a push: start it by hand from any pipeline, or from a
+# pipeline schedule that sets SOURDOUGH_PROOF to 1. The Last run table and
+# every step log are kept as artifacts.
+proof:
+  extends: .smoke-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $SOURDOUGH_PROOF == "1"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: manual
+      allow_failure: true
+  timeout: 2h
+  variables:
+    PROOF_OUT: $CI_PROJECT_DIR/proof-out
+  script:
+    - sh scripts/proof.sh --here
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths:
+      - proof-out/

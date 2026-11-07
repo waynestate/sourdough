@@ -15,7 +15,7 @@ final class FeedPlan
      * @param list<FeedStep>        $steps    one per file that changes, sorted by path
      * @param array<string, string> $bases    path => the template's version of a managed file the app has changed
      * @param array<string, mixed>  $manifest the new manifest, written when the feed applies
-     * @param list<string>          $notes    things a real run would refuse or warn about (dry runs only)
+     * @param list<string>          $notes    things a real run would refuse or warn about (dry runs), and what feed inferred
      */
     public function __construct(
         public readonly string $appDir,

@@ -461,6 +461,79 @@ final class FeedCommandTest extends TestCase
         self::assertStringContainsString('Fresh', $tester->getDisplay());
     }
 
+    public function testAFileThatAlreadyHasTheTemplatesNewVersionIsRecorded(): void
+    {
+        $app = $this->bake(Permutation::Raw);
+        $file = $this->pickFile($app);
+        $current = $this->read($app, $file);
+        // The manifest says the template wrote something older; the app
+        // already holds what the template writes today.
+        $this->rewindManifest($app, $file, self::TEMPLATE_LINE . $current);
+        $this->commitAll($app, 'already current');
+        self::assertSame([$file], Manifest::check($app)['changed']);
+
+        $dry = $this->feed($app, ['--dry-run' => true]);
+        self::assertSame(1, $dry->getStatusCode(), 'the manifest would change: ' . $dry->getDisplay());
+        self::assertMatchesRegularExpression('/record\s+' . preg_quote($file, '/') . ' /', $dry->getDisplay());
+
+        $real = $this->feed($app);
+        self::assertSame(0, $real->getStatusCode(), $real->getDisplay());
+        self::assertStringContainsString('1 record', $real->getDisplay());
+        self::assertSame($current, $this->read($app, $file), 'record never writes the file');
+        self::assertSame(['changed' => [], 'missing' => []], Manifest::check($app));
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function ovens(): array
+    {
+        return ['docker' => ['docker'], 'sail' => ['sail']];
+    }
+
+    /**
+     * Sourdough 0.1.6 wrote the manifest of a --sail or --docker app before
+     * the oven's scaffold ran: no oven in its answers, none of the oven's
+     * files in it, and composer.json hashed before the scaffold edited it.
+     * Feed must find the oven from the app's files, keep it, and leave a
+     * manifest that checks clean.
+     */
+    #[DataProvider('ovens')]
+    public function testAnOvenApp016BakedFeedsForwardWithItsOven(string $oven): void
+    {
+        $app = $this->bake(Permutation::LaravelBlade, 'sail' === $oven, 'docker' === $oven);
+        $plain = $this->bake(Permutation::LaravelBlade);
+
+        $manifest = Manifest::read($app);
+        self::assertIsArray($manifest['answers']);
+        $manifest['files'] = Manifest::read($plain)['files'];
+        unset($manifest['answers']['sail'], $manifest['answers']['docker']);
+        $manifest['sourdough_version'] = '0.1.6';
+        Manifest::writeData($app, $manifest);
+        $this->commitAll($app, 'baked by 0.1.6');
+        self::assertContains('composer.json', Manifest::check($app)['changed'], 'the 0.1.6 symptom');
+        self::assertSame($oven, Feed::ovenFromFiles($app));
+        self::assertNull(Feed::ovenFromFiles($plain));
+
+        $real = $this->feed($app);
+        $display = $real->getDisplay();
+        self::assertSame(0, $real->getStatusCode(), $display);
+        self::assertStringContainsString('did not record the oven in the manifest; this app has the --' . $oven . ' files', $display);
+        self::assertMatchesRegularExpression('/record\s+composer\.json /', $display);
+        self::assertStringNotContainsString('conflict', $display);
+        self::assertSame(['changed' => [], 'missing' => []], Manifest::check($app));
+
+        $fed = Manifest::read($app);
+        self::assertIsArray($fed['answers']);
+        self::assertTrue($fed['answers'][$oven] ?? null);
+        self::assertArrayHasKey('compose.yaml', Manifest::files($fed));
+
+        $this->commitAll($app, 'fed');
+        $again = $this->feed($app, ['--dry-run' => true]);
+        self::assertSame(0, $again->getStatusCode(), $again->getDisplay());
+        self::assertStringContainsString('Fresh', $again->getDisplay());
+    }
+
     public function testMatchesForgivesLineEndingsOnly(): void
     {
         $lf = "one\ntwo\n";

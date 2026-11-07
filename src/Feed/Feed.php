@@ -163,6 +163,26 @@ final class Feed
         }
 
         $notes = [];
+
+        // Sourdough 0.1.6 baked --sail and --docker but wrote the manifest
+        // before the oven's scaffold ran, so its answers never say which oven
+        // the app has. Without one, feed would bake the plain shape and leave
+        // the oven's files behind for good. Read it from the files the
+        // scaffold leaves instead: no oven means no fire, but the app knows.
+        if ('0.1.6' === $from && !isset($answers['sail']) && !isset($answers['docker'])
+            && Permutation::Raw !== $permutation && Permutation::RawVue !== $permutation
+        ) {
+            $oven = self::ovenFromFiles($appDir);
+            if (null !== $oven) {
+                $answers[$oven] = true;
+                $notes[] = sprintf(
+                    'Sourdough 0.1.6 did not record the oven in the manifest; this app has the --%s files, so feed bakes it with --%s.',
+                    $oven,
+                    $oven,
+                );
+            }
+        }
+
         $inRepo = null === $this->git->workTreeProblem($appDir);
         if (!$inRepo) {
             $notes[] = 'Not inside a git repository: a real feed would refuse, and no base can come from history.';
@@ -216,7 +236,10 @@ final class Feed
                 } elseif (self::matches($app, $o['sha256'])) {
                     $step = new FeedStep($path, FeedAction::Update, 'you had not changed it', self::likeEol($newContents[$path], $app), $executable[$path]);
                 } elseif (self::matches($app, $n['sha256'])) {
-                    // The app already has the template's new version.
+                    // The app already has the template's new version: nothing
+                    // to write, but the manifest must learn it, or
+                    // sourdough manifest --check reports the file changed.
+                    $step = new FeedStep($path, FeedAction::Record, 'you already have the template\'s new version: the manifest records it');
                 } else {
                     $base = $this->resolveBase($appDir, $path, $o['sha256'], $inRepo);
                     $step = $this->mergeStep($path, $app, $base, $newContents[$path], $from, $to, null === $base
@@ -236,7 +259,9 @@ final class Feed
                 // New in the template.
                 if (null === $app) {
                     $step = new FeedStep($path, FeedAction::Add, 'new in the template', $newContents[$path], $executable[$path]);
-                } elseif (!self::matches($app, $n['sha256'])) {
+                } elseif (self::matches($app, $n['sha256'])) {
+                    $step = new FeedStep($path, FeedAction::Record, 'new in the template, and you already have the same file: the manifest records it');
+                } else {
                     $step = $this->mergeStep($path, $app, null, $newContents[$path], $from, $to, 'new in the template, but you already have a file here: your version and the template\'s are both marked');
                 }
             }
@@ -519,6 +544,35 @@ final class Feed
         $lf = self::toLf($content);
 
         return hash('sha256', $lf) === $sha256 || hash('sha256', str_replace("\n", "\r\n", $lf)) === $sha256;
+    }
+
+    /**
+     * The oven a Laravel app was baked with, read from the files its
+     * scaffold writes: "docker" for a Dockerfile, a compose.yaml and the
+     * dev-up script; "sail" for laravel/sail in require-dev and a
+     * compose.yaml that builds from Sail's runtimes; null for neither. Only
+     * for manifests that never recorded the oven (Sourdough 0.1.6).
+     */
+    public static function ovenFromFiles(string $appDir): ?string
+    {
+        $json = is_file($appDir . '/composer.json') ? file_get_contents($appDir . '/composer.json') : false;
+        $composer = is_string($json) ? json_decode($json, true) : null;
+        $compose = is_file($appDir . '/compose.yaml') ? file_get_contents($appDir . '/compose.yaml') : false;
+        if (!is_array($composer) || !is_string($compose)) {
+            return null;
+        }
+
+        $scripts = is_array($composer['scripts'] ?? null) ? $composer['scripts'] : [];
+        if (is_file($appDir . '/Dockerfile') && array_key_exists('dev-up', $scripts)) {
+            return 'docker';
+        }
+
+        $requireDev = is_array($composer['require-dev'] ?? null) ? $composer['require-dev'] : [];
+        if (array_key_exists('laravel/sail', $requireDev) && str_contains($compose, 'vendor/laravel/sail/runtimes/')) {
+            return 'sail';
+        }
+
+        return null;
     }
 
     /**

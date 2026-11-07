@@ -29,10 +29,17 @@ enum FeedAction: string
     case Keep = 'keep';
 
     /**
-     * Whether this action writes or deletes anything in the app.
+     * The app already has the template's new version, but the manifest does
+     * not know it yet: the file is left as it is and the manifest records it.
+     */
+    case Record = 'record';
+
+    /**
+     * Whether this action writes or deletes anything in the app (besides the
+     * manifest, which every feed with a step moves).
      */
     public function writes(): bool
     {
-        return self::Keep !== $this;
+        return self::Keep !== $this && self::Record !== $this;
     }
 }
