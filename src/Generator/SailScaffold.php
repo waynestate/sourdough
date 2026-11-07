@@ -26,6 +26,11 @@ final class SailScaffold
     public const SAIL_CONSTRAINT = '^1.41';
 
     /**
+     * The composer package the scaffold adds to require-dev.
+     */
+    public const SAIL_PACKAGE = 'laravel/sail';
+
+    /**
      * The Sail runtime folder the compose file builds from: a folder that
      * exists in laravel/sail. Bump when Sail ships the PHP version the
      * shape needs.
@@ -227,22 +232,76 @@ COMPOSE;
             throw new \RuntimeException(sprintf('"%s" is not a JSON object.', $path));
         }
 
-        $dev = $decoded['require-dev'] ?? [];
-        if (!is_array($dev)) {
-            throw new \RuntimeException(sprintf('"%s" has a require-dev section that is not an object.', $path));
-        }
-
-        $dev['laravel/sail'] = self::SAIL_CONSTRAINT;
-        ksort($dev, SORT_STRING);
-        $decoded['require-dev'] = $dev;
-
-        $encoded = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if (false === $encoded) {
-            throw new \RuntimeException(sprintf('Could not encode "%s".', $path));
-        }
-        if (false === file_put_contents($path, $encoded . "\n")) {
+        $encoded = $this->redoComposer($decoded);
+        if (false === file_put_contents($path, $encoded)) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $path));
         }
+    }
+
+    /**
+     * The pre-scaffold composer data behind $content: the laravel/sail
+     * entry removed, and the require-dev section dropped when the removal
+     * empties it, since the file Sourdough 0.1.6 hashed never had the
+     * scaffold's keys. Null when $content is not a JSON object with an
+     * object require-dev: nothing to verify.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function undoComposer(string $content): ?array
+    {
+        try {
+            $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $dev = $decoded['require-dev'] ?? null;
+        if (null !== $dev && !is_array($dev)) {
+            return null;
+        }
+        if (is_array($dev)) {
+            unset($dev[self::SAIL_PACKAGE]);
+            if ([] === $dev) {
+                unset($decoded['require-dev']);
+            } else {
+                $decoded['require-dev'] = $dev;
+            }
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * The bytes the scaffold writes for $composer: laravel/sail in
+     * require-dev, the section sorted alphabetically by package name,
+     * pretty-printed with unescaped slashes and a trailing newline. The
+     * inverse of undoComposer() on the data it returned, so feed can
+     * rebuild the exact file Sourdough 0.1.6 left behind.
+     *
+     * @param array<string, mixed> $composer
+     *
+     * @throws \RuntimeException when require-dev is not an object or the data will not encode
+     */
+    public function redoComposer(array $composer): string
+    {
+        $dev = $composer['require-dev'] ?? [];
+        if (!is_array($dev)) {
+            throw new \RuntimeException('composer.json has a require-dev section that is not an object.');
+        }
+
+        $dev[self::SAIL_PACKAGE] = self::SAIL_CONSTRAINT;
+        ksort($dev, SORT_STRING);
+        $composer['require-dev'] = $dev;
+
+        $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if (false === $encoded) {
+            throw new \RuntimeException('Could not encode composer.json.');
+        }
+
+        return $encoded . "\n";
     }
 
     /**

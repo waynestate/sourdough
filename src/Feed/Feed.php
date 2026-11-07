@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Feed;
 
 use Waynestate\Sourdough\Baker;
+use Waynestate\Sourdough\Generator\DockerScaffold;
+use Waynestate\Sourdough\Generator\SailScaffold;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Manifest;
 use Waynestate\Sourdough\Permutation;
@@ -169,6 +171,7 @@ final class Feed
         // the app has. Without one, feed would bake the plain shape and leave
         // the oven's files behind for good. Read it from the files the
         // scaffold leaves instead: no oven means no fire, but the app knows.
+        $oven = null;
         if ('0.1.6' === $from && !isset($answers['sail']) && !isset($answers['docker'])
             && Permutation::Raw !== $permutation && Permutation::RawVue !== $permutation
         ) {
@@ -241,10 +244,27 @@ final class Feed
                     // sourdough manifest --check reports the file changed.
                     $step = new FeedStep($path, FeedAction::Record, 'you already have the template\'s new version: the manifest records it');
                 } else {
+                    $noBaseDetail = 'no base version to merge from (not in .sourdough/base/ or git history): your version and the template\'s are both marked';
                     $base = $this->resolveBase($appDir, $path, $o['sha256'], $inRepo);
-                    $step = $this->mergeStep($path, $app, $base, $newContents[$path], $from, $to, null === $base
-                        ? 'no base version to merge from (not in .sourdough/base/ or git history): your version and the template\'s are both marked'
-                        : '');
+                    $unedited = false;
+                    if (null === $base && '0.1.6' === $from && null !== $oven && 'composer.json' === $path) {
+                        // Sourdough 0.1.6 hashed composer.json before the oven's
+                        // scaffold edited it, so the recorded hash names a
+                        // version no checkout ever held: rebuild the scaffold's
+                        // output from the nearest version whose pre-scaffold
+                        // data the hash verifies.
+                        $base = $this->ovenBase($appDir, $path, $o['sha256'], $app, $oven, $permutation, $inRepo);
+                        if (null === $base) {
+                            $noBaseDetail = self::noBaseDetail($oven);
+                        } else {
+                            $unedited = self::matches($base, hash('sha256', self::toLf($app)));
+                        }
+                    }
+                    if ($unedited) {
+                        $step = new FeedStep($path, FeedAction::Update, 'you had not changed it', self::likeEol($newContents[$path], $app), $executable[$path]);
+                    } else {
+                        $step = $this->mergeStep($path, $app, $base, $newContents[$path], $from, $to, $noBaseDetail);
+                    }
                 }
             } elseif (null !== $o) {
                 // The template dropped it.
@@ -501,6 +521,143 @@ final class Feed
         }
 
         return null;
+    }
+
+    /**
+     * The base composer.json for a Sourdough 0.1.6 oven app. 0.1.6 hashed
+     * the file before the oven's scaffold edited it, so the recorded hash
+     * names a version no checkout ever held. Rebuild the scaffold's output
+     * from the nearest version whose pre-scaffold data the hash verifies:
+     * the app's file first, then its git history, newest first. Null when
+     * nothing verifies: the conflict stands, with a message that says why.
+     */
+    private function ovenBase(string $appDir, string $path, string $sha256, string $app, string $oven, Permutation $permutation, bool $inRepo): ?string
+    {
+        $scaffold = 'sail' === $oven ? new SailScaffold() : new DockerScaffold();
+
+        $candidates = [$app];
+        if ($inRepo) {
+            foreach ($this->git->historyVersions($appDir, $path) as $version) {
+                $candidates[] = $version;
+            }
+        }
+
+        foreach ($candidates as $candidate) {
+            $data = $scaffold->undoComposer(self::toLf($candidate));
+            if (null === $data || !self::preScaffoldHashMatches($data, $sha256, $permutation)) {
+                continue;
+            }
+            $base = $scaffold->redoComposer($data);
+            if (null !== $base) {
+                return $base;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the pre-scaffold composer data $data is the version Sourdough
+     * 0.1.6 hashed: the recorded sha256 carried by its bytes, under the
+     * encodings and require-dev orders the bake pipeline can produce.
+     *
+     * @param array<string, mixed> $data
+     */
+    private static function preScaffoldHashMatches(array $data, string $sha256, Permutation $permutation): bool
+    {
+        $orders = [$data, self::pipelineRequireDevOrder($data, $permutation)];
+        $flags = [
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+        ];
+
+        foreach ($orders as $order) {
+            foreach ($flags as $flag) {
+                $encoded = json_encode($order, $flag);
+                if (false !== $encoded && hash('sha256', $encoded . "\n") === $sha256) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * $data with require-dev in the order the bake pipeline produces: the
+     * packages the skeleton ships, alphabetical, then the overlay's, in the
+     * overlay's file order. A composer.json the app never ran composer over
+     * carries that order.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private static function pipelineRequireDevOrder(array $data, Permutation $permutation): array
+    {
+        $dev = $data['require-dev'] ?? [];
+        if (!is_array($dev) || [] === $dev) {
+            return $data;
+        }
+
+        $overlay = self::overlayRequireDevKeys($permutation);
+        $own = [];
+        $shared = [];
+        foreach ($dev as $package => $constraint) {
+            if (in_array($package, $overlay, true)) {
+                $shared[$package] = $constraint;
+            } else {
+                $own[$package] = $constraint;
+            }
+        }
+        ksort($own, SORT_STRING);
+
+        $ordered = $own;
+        foreach ($overlay as $package) {
+            if (isset($shared[$package])) {
+                $ordered[$package] = $shared[$package];
+            }
+        }
+        $data['require-dev'] = $ordered;
+
+        return $data;
+    }
+
+    /**
+     * The require-dev keys the template's composer overlay adds, in the
+     * overlay's file order, for $permutation's template dir.
+     *
+     * @return list<string>
+     */
+    private static function overlayRequireDevKeys(Permutation $permutation): array
+    {
+        $dir = match ($permutation) {
+            Permutation::LaravelBlade, Permutation::LaravelBladeVue => 'laravel-blade',
+            Permutation::LaravelInertia => 'laravel-inertia',
+            default => null,
+        };
+        if (null === $dir) {
+            return [];
+        }
+
+        $path = __DIR__ . '/../../templates/' . $dir . '/composer.overlay.json';
+        $overlay = is_file($path) ? json_decode((string) file_get_contents($path), true) : null;
+        $dev = is_array($overlay) ? ($overlay['require-dev'] ?? null) : null;
+
+        return is_array($dev) ? array_keys($dev) : [];
+    }
+
+    /**
+     * The no-base message for a 0.1.6 oven composer.json feed could not
+     * rebuild: the recorded hash predates the scaffold, and neither the
+     * app's file nor its git history verifies it.
+     */
+    private static function noBaseDetail(string $oven): string
+    {
+        return sprintf(
+            'Sourdough 0.1.6 hashed composer.json before the --%s scaffold edited it, and feed cannot rebuild the base from the app\'s file or its git history: your version and the template\'s are both marked. To take the template\'s version as an update instead, set composer.json\'s sha256 in .sourdough/manifest.json to the sha256 of your current composer.json, commit, and feed again.',
+            $oven,
+        );
     }
 
     /**

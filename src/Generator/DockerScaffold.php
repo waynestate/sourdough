@@ -24,6 +24,27 @@ final class DockerScaffold
     private const TEMPLATES_DIR = __DIR__ . '/../../templates/docker';
 
     /**
+     * The composer scripts the scaffold adds, with their descriptions, in
+     * the order they are appended.
+     *
+     * @var array<string, array{list<string>, string}>
+     */
+    private const COMPOSER_ADDITIONS = [
+        'dev-up' => [
+            ['Composer\Config::disableProcessTimeout', 'docker compose up --build'],
+            'Build and start the local Docker setup on http://localhost:8000.',
+        ],
+        'dev-down' => [
+            'docker compose down',
+            'Stop the local Docker setup.',
+        ],
+        'dev-shell' => [
+            ['Composer\Config::disableProcessTimeout', 'docker compose exec app bash'],
+            'Open a shell in the app container.',
+        ],
+    ];
+
+    /**
      * @throws \RuntimeException when a file cannot be read or written, when
      *         composer.json is missing or invalid JSON, or when Dockerfile,
      *         compose.yaml or .dockerignore already exists in $dir
@@ -90,32 +111,82 @@ final class DockerScaffold
             throw new \RuntimeException(sprintf('"%s" is not valid JSON.', $path));
         }
 
+        $encoded = $this->redoComposer($composer);
+        if (null === $encoded) {
+            return;
+        }
+        if (false === file_put_contents($path, $encoded)) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
+    }
+
+    /**
+     * The pre-scaffold composer data behind $content: the dev-up, dev-down
+     * and dev-shell scripts and descriptions removed, and a section the
+     * removal empties dropped, since the file Sourdough 0.1.6 hashed never
+     * had them. Null when $content is not a JSON object with object script
+     * sections: nothing to verify.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function undoComposer(string $content): ?array
+    {
+        try {
+            $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        foreach (['scripts', 'scripts-descriptions'] as $section) {
+            $value = $decoded[$section] ?? null;
+            if (null === $value) {
+                continue;
+            }
+            if (!is_array($value)) {
+                return null;
+            }
+            foreach (array_keys(self::COMPOSER_ADDITIONS) as $name) {
+                unset($value[$name]);
+            }
+            if ([] === $value) {
+                unset($decoded[$section]);
+            } else {
+                $decoded[$section] = $value;
+            }
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * The bytes the scaffold writes for $composer: the dev-up, dev-down and
+     * dev-shell scripts and descriptions appended, existing entries left
+     * alone, pretty-printed with unescaped slashes and unicode and a
+     * trailing newline. Null when $composer already carries every entry:
+     * the scaffold would leave the file alone. The inverse of
+     * undoComposer() on the data it returned, so feed can rebuild the exact
+     * file Sourdough 0.1.6 left behind.
+     *
+     * @param array<string, mixed> $composer
+     *
+     * @throws \RuntimeException when a scripts section is not an object or the data will not encode
+     */
+    public function redoComposer(array $composer): ?string
+    {
         $scripts = $composer['scripts'] ?? [];
         if (!is_array($scripts)) {
-            throw new \RuntimeException(sprintf('"%s" has no usable scripts section.', $path));
+            throw new \RuntimeException('composer.json has no usable scripts section.');
         }
         $descriptions = $composer['scripts-descriptions'] ?? [];
         if (!is_array($descriptions)) {
-            throw new \RuntimeException(sprintf('"%s" has no usable scripts-descriptions section.', $path));
+            throw new \RuntimeException('composer.json has no usable scripts-descriptions section.');
         }
 
-        $additions = [
-            'dev-up' => [
-                ['Composer\Config::disableProcessTimeout', 'docker compose up --build'],
-                'Build and start the local Docker setup on http://localhost:8000.',
-            ],
-            'dev-down' => [
-                'docker compose down',
-                'Stop the local Docker setup.',
-            ],
-            'dev-shell' => [
-                ['Composer\Config::disableProcessTimeout', 'docker compose exec app bash'],
-                'Open a shell in the app container.',
-            ],
-        ];
-
         $changed = false;
-        foreach ($additions as $name => [$command, $description]) {
+        foreach (self::COMPOSER_ADDITIONS as $name => [$command, $description]) {
             if (!array_key_exists($name, $scripts)) {
                 $scripts[$name] = $command;
                 $changed = true;
@@ -126,7 +197,7 @@ final class DockerScaffold
             }
         }
         if (!$changed) {
-            return;
+            return null;
         }
 
         $composer['scripts'] = $scripts;
@@ -134,11 +205,10 @@ final class DockerScaffold
 
         $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         if (false === $encoded) {
-            throw new \RuntimeException(sprintf('Could not encode "%s".', $path));
+            throw new \RuntimeException('Could not encode composer.json.');
         }
-        if (false === file_put_contents($path, $encoded . "\n")) {
-            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
-        }
+
+        return $encoded . "\n";
     }
 
     /**

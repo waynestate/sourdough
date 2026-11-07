@@ -534,6 +534,89 @@ final class FeedCommandTest extends TestCase
         self::assertStringContainsString('Fresh', $again->getDisplay());
     }
 
+    /**
+     * Sourdough 0.1.6 hashed composer.json before the oven's scaffold
+     * edited it, and the template has since gained the platform pin: the
+     * recorded hash names a version no checkout ever held. Feed rebuilds
+     * the scaffold's output as the base, so an app that never touched the
+     * file takes the template's composer.json as an update.
+     */
+    #[DataProvider('ovens')]
+    public function testAnUneditedOvenApp016BakedTakesTheTemplateComposerAsAnUpdate(string $oven): void
+    {
+        $app = $this->bake(Permutation::LaravelBlade, 'sail' === $oven, 'docker' === $oven);
+        $plain = $this->bake(Permutation::LaravelBlade);
+        $current = $this->read($app, 'composer.json');
+        $this->ageOven($app, $plain);
+        $this->commitAll($app, 'baked by 0.1.6');
+        self::assertContains('composer.json', Manifest::check($app)['changed'], 'the 0.1.6 symptom');
+
+        $real = $this->feed($app);
+        $display = $real->getDisplay();
+        self::assertSame(0, $real->getStatusCode(), $display);
+        self::assertMatchesRegularExpression('/update\s+composer\.json /', $display);
+        self::assertStringNotContainsString('conflict', $display);
+        self::assertSame($current, $this->read($app, 'composer.json'), 'the untouched app takes the template\'s composer.json');
+        self::assertSame(['changed' => [], 'missing' => []], Manifest::check($app));
+    }
+
+    /**
+     * The same 0.1.6 symptom, but the app edited composer.json after the
+     * bake: feed merges the edit over the rebuilt base and keeps both the
+     * edit and the template's platform pin.
+     */
+    #[DataProvider('ovens')]
+    public function testAnEditedOvenApp016BakedMergesItsEditWithTheTemplatePin(string $oven): void
+    {
+        $app = $this->bake(Permutation::LaravelBlade, 'sail' === $oven, 'docker' === $oven);
+        $plain = $this->bake(Permutation::LaravelBlade);
+        $current = $this->read($app, 'composer.json');
+        $this->ageOven($app, $plain);
+        $this->commitAll($app, 'baked by 0.1.6');
+
+        // The app's own edit, far from the line the template changes.
+        $this->put($app, 'composer.json', str_replace('a Wayne State app baked from Sourdough', 'our own words', $this->read($app, 'composer.json')));
+        $this->commitAll($app, 'our edit');
+
+        $tester = $this->feed($app);
+        $display = $tester->getDisplay();
+        self::assertSame(0, $tester->getStatusCode(), $display);
+        self::assertMatchesRegularExpression('/merge\s+composer\.json /', $display);
+
+        $merged = $this->read($app, 'composer.json');
+        self::assertStringContainsString('"description": "Feed Demo, our own words."', $merged);
+        self::assertStringContainsString('"php": "8.3.0",', $merged, 'the template\'s platform pin merged in');
+        self::assertSame($current, $this->read($app, Feed::BASE_DIR . '/composer.json.base'), 'the template\'s version is kept for the next feed');
+        self::assertSame(['changed' => ['composer.json'], 'missing' => []], Manifest::check($app), 'only the app\'s own edit stands out from the template');
+    }
+
+    /**
+     * The 0.1.6 symptom with no recoverable base: the app edited
+     * composer.json before its first commit, so neither its file nor its
+     * git history verifies the recorded pre-scaffold hash. Feed marks the
+     * conflict and says exactly why, instead of guessing.
+     */
+    #[DataProvider('ovens')]
+    public function testAnUnrecoverableOvenApp016BakedIsMarkedWithAReason(string $oven): void
+    {
+        $app = $this->bake(Permutation::LaravelBlade, 'sail' === $oven, 'docker' === $oven);
+        $plain = $this->bake(Permutation::LaravelBlade);
+        $this->ageOven($app, $plain);
+
+        // Edited before the first commit: the pre-edit state never reached history.
+        $this->put($app, 'composer.json', str_replace('a Wayne State app baked from Sourdough', 'our own words', $this->read($app, 'composer.json')));
+        $this->commitAll($app, 'baked by 0.1.6 and edited');
+
+        $tester = $this->feed($app);
+        $display = $tester->getDisplay();
+        self::assertSame(1, $tester->getStatusCode(), $display);
+        self::assertStringContainsString('hashed composer.json before the --' . $oven . ' scaffold edited it', $display);
+
+        $marked = $this->read($app, 'composer.json');
+        self::assertStringContainsString('<<<<<<< app', $marked);
+        self::assertStringContainsString('>>>>>>> sourdough ' . self::NEW_VERSION, $marked);
+    }
+
     public function testMatchesForgivesLineEndingsOnly(): void
     {
         $lf = "one\ntwo\n";
@@ -636,6 +719,32 @@ final class FeedCommandTest extends TestCase
     {
         $this->put($app, $path, $old);
         $this->rewindManifest($app, $path, $old);
+    }
+
+    /**
+     * Make the app look like Sourdough 0.1.6 baked it with an oven, before
+     * the template gained the platform pin: composer.json holds the
+     * scaffold's output without the pin, the manifest holds the plain
+     * bake's files with composer.json hashed before the scaffold ran, no
+     * oven in its answers, and the version 0.1.6.
+     */
+    private function ageOven(string $app, string $plain): void
+    {
+        $pin = '            "php": "8.3.0",' . "\n";
+        self::assertStringContainsString($pin, $this->read($app, 'composer.json'), 'the template carries the platform pin');
+        self::assertStringContainsString($pin, $this->read($plain, 'composer.json'), 'the template carries the platform pin');
+
+        $this->put($app, 'composer.json', str_replace($pin, '', $this->read($app, 'composer.json')));
+
+        $manifest = Manifest::read($app);
+        self::assertIsArray($manifest['answers']);
+        $plainFiles = Manifest::read($plain)['files'];
+        self::assertIsArray($plainFiles['composer.json'] ?? null);
+        $manifest['files'] = $plainFiles;
+        $manifest['files']['composer.json']['sha256'] = hash('sha256', str_replace($pin, '', $this->read($plain, 'composer.json')));
+        unset($manifest['answers']['sail'], $manifest['answers']['docker']);
+        $manifest['sourdough_version'] = '0.1.6';
+        Manifest::writeData($app, $manifest);
     }
 
     private function rewindManifest(string $app, string $path, string $old): void
