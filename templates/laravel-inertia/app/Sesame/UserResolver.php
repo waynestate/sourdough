@@ -21,7 +21,7 @@ use Waynestate\Sesame\UserResolver as UserResolverContract;
  * credential. The signed-in user is read again from the database on every
  * request.
  */
-class UserResolver implements UserResolverContract, RefreshesUser
+class UserResolver implements RefreshesUser, UserResolverContract
 {
     public function findOrImportUser(Identity $identity): mixed
     {
