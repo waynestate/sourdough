@@ -12,6 +12,7 @@ Versioning once 1.0 is out.
 ### Fixed
 
 - Fixed: the manifest of an app baked with `--sail` or `--docker` lists the scaffold's files (`Dockerfile`, `compose.yaml`, `.dockerignore`, the `docker/` ini files) and the composer.json the scaffold edited, and records `sail` or `docker` in its answers again, so `sourdough manifest --check` is clean right after the bake. It was written before the scaffold ran, so the check reported `composer.json` as changed on a fresh app. `new` and `feed` now bake through one `Baker`.
+- Fixed: the front page's feeding schedule shows its rows again for visitors who allow motion. Each row is clipped until it wipes in, and Chromium counts a clipped row as 0 % visible, so the reveal's 20 % threshold never fired and the rows stayed blank. The reveal now trips on the row's first edge, 15 % above the bottom of the screen.
 
 ## 0.1.6 (2026-11-06)
 

@@ -232,13 +232,17 @@
   });
 
   /* ------------------------------------------------- chalk reveals */
+  /* A row's own clip-path hides it from the observer's ratio (Chromium
+     counts it as 0 % visible until it is unclipped), so a ratio threshold
+     never fires. Trip on the first edge instead, once the row is 15 % of
+     the screen above the bottom, so the chalk still wipes in view. */
   var reveals = document.querySelectorAll("[data-reveal]");
   if (motion && "IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (list) {
       list.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
       });
-    }, { threshold: 0.2 });
+    }, { threshold: 0, rootMargin: "0px 0px -15% 0px" });
     reveals.forEach(function (el) { io.observe(el); });
   } else {
     reveals.forEach(function (el) { el.classList.add("is-in"); });

@@ -51,6 +51,7 @@ Versioning once 1.0 is out.</p>
 <h3 id="fixed">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed">#</a></h3>
 <ul>
 <li>Fixed: the manifest of an app baked with <code>--sail</code> or <code>--docker</code> lists the scaffold's files (<code>Dockerfile</code>, <code>compose.yaml</code>, <code>.dockerignore</code>, the <code>docker/</code> ini files) and the composer.json the scaffold edited, and records <code>sail</code> or <code>docker</code> in its answers again, so <code>sourdough manifest --check</code> is clean right after the bake. It was written before the scaffold ran, so the check reported <code>composer.json</code> as changed on a fresh app. <code>new</code> and <code>feed</code> now bake through one <code>Baker</code>.</li>
+<li>Fixed: the front page's feeding schedule shows its rows again for visitors who allow motion. Each row is clipped until it wipes in, and Chromium counts a clipped row as 0 % visible, so the reveal's 20 % threshold never fired and the rows stayed blank. The reveal now trips on the row's first edge, 15 % above the bottom of the screen.</li>
 </ul>
 <h2 id="0-1-6-2026-11-06">0.1.6 (2026-11-06)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-6-2026-11-06">#</a></h2>
 <h3 id="added-1">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-1">#</a></h3>
