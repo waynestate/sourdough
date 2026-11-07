@@ -1,3 +1,6 @@
 /vendor/
 /.phpunit.cache/
 .phpunit.result.cache
+
+# scripts/proof.sh and proof.ps1 write their table and logs here.
+/proof-out/
