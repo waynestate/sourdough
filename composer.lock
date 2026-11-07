@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6317bd41328be101d2410410dea15267",
+    "content-hash": "6bf6f784cfd747e61c45e5ce07c64d74",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -4255,16 +4255,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.4.0",
+            "version": "0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "aa0113e9e534de51831d2e2689362cd741c7ef4b"
+                "reference": "db89c7cbbe5ab1b25e515489d8f69c83de8affa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/aa0113e9e534de51831d2e2689362cd741c7ef4b",
-                "reference": "aa0113e9e534de51831d2e2689362cd741c7ef4b",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/db89c7cbbe5ab1b25e515489d8f69c83de8affa4",
+                "reference": "db89c7cbbe5ab1b25e515489d8f69c83de8affa4",
                 "shasum": ""
             },
             "require": {
@@ -4273,14 +4273,24 @@
             },
             "require-dev": {
                 "laravel/pint": "^1.32",
+                "league/commonmark": "^2.10",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^11.5",
+                "waynestate/advisor": "^0.1.2",
                 "waynestate/pinstripe": "^0.1"
+            },
+            "suggest": {
+                "waynestate/advisor": "ADVISOR module: lets your coding agent run squire_doctor and squire_drift read-only."
             },
             "bin": [
                 "bin/squire"
             ],
             "type": "library",
+            "extra": {
+                "proctor": {
+                    "wayneui.copies": "fail"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Waynestate\\Squire\\": "src/"
@@ -4298,10 +4308,10 @@
             "description": "The Citadel kit: standard build.sh, release script and health check, and local parity on the Citadel images.",
             "homepage": "https://squire.apps.wayne.edu/",
             "support": {
-                "issues": "https://github.com/waynestate/squire/issues",
+                "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-01T07:39:19+00:00"
+            "time": "2026-11-07T23:01:02+00:00"
         }
     ],
     "aliases": [],
