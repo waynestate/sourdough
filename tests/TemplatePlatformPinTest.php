@@ -54,7 +54,7 @@ final class TemplatePlatformPinTest extends TestCase
      * The five shapes and their generators, all pointed at the real
      * templates (the Laravel ones on the fixture skeleton).
      *
-     * @return list<array{string, object}>
+     * @return list<array{string, RawGenerator|RawVueGenerator|LaravelBladeGenerator|LaravelBladeVueGenerator|LaravelInertiaGenerator}>
      */
     private function shapes(): array
     {
@@ -74,8 +74,9 @@ final class TemplatePlatformPinTest extends TestCase
      */
     private function phpFloor(string $constraint): string
     {
-        preg_match('/\d+\.\d+(?:\.\d+)?/', $constraint, $matches);
-        self::assertNotEmpty($matches, 'No version in the php constraint "' . $constraint . '".');
+        if (1 !== preg_match('/\d+\.\d+(?:\.\d+)?/', $constraint, $matches)) {
+            self::fail('No version in the php constraint "' . $constraint . '".');
+        }
         $parts = explode('.', $matches[0]);
         if (2 === \count($parts)) {
             $parts[] = '0';
