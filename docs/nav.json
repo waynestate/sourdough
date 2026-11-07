@@ -1,12 +1,7 @@
 {
     "title": "Sourdough",
-    "source": "https://nougat.snu.gs/enterprise-apps/sourdough",
-    "mirrors": [
-        {
-            "title": "GitHub",
-            "url": "https://github.com/waynestate/sourdough"
-        }
-    ],
+    "source": "https://github.com/waynestate/sourdough",
+    "mirrors": [],
     "items": [
         {
             "title": "Getting Started",

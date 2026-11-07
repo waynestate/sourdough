@@ -74,7 +74,7 @@ Version 0.1.6 (2026-11-06), MIT license. Agents: this site ships [llms.txt](http
 <a href="https://github.com/waynestate/pinstripe"><img src="readme/cast/pinstripe.png" width="44" alt="Pinstripe"></a>
 <a href="https://github.com/waynestate/booster"><img src="readme/cast/booster.png" width="44" alt="Booster"></a>
 <a href="https://github.com/waynestate/rollcall"><img src="readme/cast/rollcall.png" width="44" alt="Rollcall"></a>
-<a href="https://nougat.snu.gs/enterprise-apps/drawbridge"><img src="readme/cast/drawbridge.png" width="44" alt="Drawbridge"></a>
+<a href="https://git.wayne.edu/enterprise-apps/drawbridge"><img src="readme/cast/drawbridge.png" width="44" alt="Drawbridge"></a>
 <a href="https://github.com/waynestate/advisor"><img src="readme/cast/advisor.png" width="44" alt="ADVISOR"></a>
 <a href="https://github.com/waynestate/weld"><img src="readme/cast/weld.png" width="44" alt="WELD"></a>
 

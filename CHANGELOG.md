@@ -12,6 +12,10 @@ Versioning once 1.0 is out.
 - Added: the smoke gate checks more of every loaf. Right after the bake, `sourdough manifest --check` must be clean. Every shape runs its own suite as its own step (the count goes in the proof table) and `composer proctor`. The Laravel shapes now boot too, on Laravel's own router: `/` must answer with the shape's home page (the Blade page, the built Vue islands, or the Inertia `Home` page), `/dashboard` after SESAME's fake sign-in, `/nope` 404 and `/up` 200; the raw shape's `/` must carry its home page in WayneUI's shell. A second argument, `--sail` or `--docker`, proves a Laravel shape's oven (the scaffold's files, install, suite, PROCTOR), and `SMOKE_FEED_FROM=<version>` bakes that release from Packagist and feeds it forward. `scripts/smoke-shape.ps1` takes `-Oven` and `-FeedFrom` to match.
 - Added: the Laravel shapes ship skeleton feature tests (`tests/Feature/SkeletonTest.php`, Pest, next to the starter's example tests): `/up` answers 200, the home page answers 200 for a guest (the Blade page, the built Vue island, or the Inertia `Home` component), a guest at `/dashboard` goes to the sign-in flow, the dashboard renders for a signed-in user after SESAME's fake sign-in (with the islands view's `data-vue-island="counter"` island and the Inertia `Dashboard` component checked too), a missing page answers 404, and `UserResolver::refreshUser()` turns a stored user array back into the `User` by username, or `null` when the username no longer exists. Each baked Laravel suite grows from two tests to nine, and the proof table quotes the new counts.
 
+### Changed
+
+- Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
+
 ### Fixed
 
 - Fixed: the Laravel templates' `UserResolver` lists its interfaces in Pint's order (`RefreshesUser` before `UserResolverContract`), so a freshly baked app passes its own `pint --test` on the first run instead of failing `composer ci`.

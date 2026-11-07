@@ -3,8 +3,8 @@
     "description": "A starter that makes a Wayne State app with the stack already wired in.",
     "homepage": "https://sourdough.apps.wayne.edu/",
     "support": {
-        "source": "https://nougat.snu.gs/enterprise-apps/sourdough",
-        "issues": "https://nougat.snu.gs/enterprise-apps/sourdough/-/issues"
+        "source": "https://github.com/waynestate/sourdough",
+        "issues": "https://git.wayne.edu/enterprise-apps/sourdough/-/issues"
     },
     "type": "library",
     "license": "MIT",

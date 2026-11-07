@@ -28,7 +28,7 @@ needs regular feeding, or it goes flat.
 
 ## Where it lives
 
-Development happens on nougat, the canonical repository ([enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough)). This GitHub repository and git.wayne.edu are read-only mirrors: `main` and tags are copied automatically. Changes, issues and merge requests go to nougat. Nobody pushes to the mirrors.
+Development happens on git.wayne.edu, the canonical repository ([enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough)). GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror: `main` and tags are copied automatically, nobody pushes to it, and Packagist picks releases up from there. Changes, issues and merge requests go to git.wayne.edu.
 
 ## Build and test
 
@@ -135,7 +135,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 1. Move the lines under `## Unreleased` in `CHANGELOG.md` to a new `## X.Y.Z (YYYY-MM-DD)` heading.
 2. `composer ci` and the Squire copy check green locally, then both pipelines green for that commit.
 3. Run a secrets scan of the history and check that nothing internal (server names, people, IDs) is in the tree.
-4. Tag `X.Y.Z` (no `v`) on nougat. The mirror carries the tag to GitHub, and Packagist picks it up from there.
+4. Tag `X.Y.Z` (no `v`) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.
 5. A release needs a maintainer's approval. Never move or delete a published tag.
 
 ## The front page
