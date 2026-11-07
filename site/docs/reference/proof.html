@@ -133,13 +133,13 @@
 <tr>
 <td><code>composer ci</code></td>
 <td>2026-11-07</td>
-<td><code>{{CI_COMMIT}}</code></td>
-<td>{{CI_RESULT}}</td>
-<td>{{CI_SECONDS}} s</td>
+<td><code>c2c54b3</code></td>
+<td>pass: 364 tests, 3437 assertions, 2 PHP warnings from older tests; Pint, PHPStan, Squire copy, agent-ready, docs site, audit clean</td>
+<td>20 s</td>
 </tr>
 </tbody>
 </table></div>
-<p>All eleven runs came from one <code>.\scripts\proof.ps1</code> on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with <code>record</code> lines only, which is the fix this run was written for: 0.1.6 left the oven out of the manifest (see <a href="#what-it-found">What it found</a>). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.</p>
+<p>The <code>composer ci</code> row ran in <code>composer:2.10.3</code> on PHP 8.5. All eleven proof runs came from one <code>.\scripts\proof.ps1</code> on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with <code>record</code> lines only: that is the 0.1.6 oven fix at work, since 0.1.6 left the oven out of the manifest (see <a href="#what-it-found">What it found</a>). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.</p>
 <h2 id="what-it-found">What it found<a class="docs-heading-link" aria-label="Link to this section" href="#what-it-found">#</a></h2>
 <p>The first run of the harness, on the same day, failed nine of eleven runs. Six of the failures were Sourdough's:</p>
 <ul>

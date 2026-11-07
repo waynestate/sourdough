@@ -25,9 +25,9 @@ This page says what each check of Sourdough proves and how to run it. Sourdough'
 | `sh scripts/smoke-shape.sh blade-vue --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 10 s |
 | `sh scripts/smoke-shape.sh inertia --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
 | `sh scripts/smoke-shape.sh inertia --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 11 s |
-| `composer ci` | 2026-11-07 | `{{CI_COMMIT}}` | {{CI_RESULT}} | {{CI_SECONDS}} s |
+| `composer ci` | 2026-11-07 | `c2c54b3` | pass: 364 tests, 3437 assertions, 2 PHP warnings from older tests; Pint, PHPStan, Squire copy, agent-ready, docs site, audit clean | 20 s |
 
-All eleven runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with `record` lines only, which is the fix this run was written for: 0.1.6 left the oven out of the manifest (see [What it found](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.
+The `composer ci` row ran in `composer:2.10.3` on PHP 8.5. All eleven proof runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with `record` lines only: that is the 0.1.6 oven fix at work, since 0.1.6 left the oven out of the manifest (see [What it found](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.
 
 ## What it found[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)
 
