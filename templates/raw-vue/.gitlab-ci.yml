@@ -1,20 +1,59 @@
-# PREFLIGHT components, pinned to released Preflight tags.
+# PREFLIGHT components, pinned to released Preflight tags. Their image inputs
+# below only add ${IMAGE_PREFIX}; the images are the components' defaults.
 include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       proctor_command: vendor/bin/proctor check --format=codequality
+      image: "${IMAGE_PREFIX}/php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       test_command: vendor/bin/phpunit
+      image: "${IMAGE_PREFIX}/php:${PHP_VERSION}-cli-trixie"
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
       working_dir: .
+      image: "${IMAGE_PREFIX}/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
+
+# Dependency caching. Docker Hub images come through the group's GitLab
+# Dependency Proxy when this GitLab has one, so pipelines are served from
+# GitLab's copy instead of counting against Docker Hub's pull limit; without
+# the proxy they come straight from Docker Hub. To force Docker Hub (a group
+# with the proxy turned off), set IMAGE_PREFIX to docker.io in Settings >
+# CI/CD > Variables. Composer and npm downloads are cached per lock file.
+workflow:
+  rules:
+    - if: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+      variables:
+        IMAGE_PREFIX: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+    - when: always
+
+variables:
+  IMAGE_PREFIX: docker.io
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+  npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+
+.composer-cache:
+  cache:
+    key:
+      files: [composer.lock]
+      prefix: composer
+    paths: [.cache/composer/]
+
+# package.json is in the key too, so the cache still turns over before
+# package-lock.json is committed.
+.npm-cache:
+  cache:
+    key:
+      files: [package-lock.json, package.json]
+      prefix: npm
+    paths: [.cache/npm/]
 
 # composer ci is the contract: one job runs the whole "ci" script from
 # composer.json, so PROCTOR sees an explicit composer ci in the pipeline.
 composer-ci:
-  image: composer:2.10.3
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
@@ -23,7 +62,8 @@ composer-ci:
 # sprite still resolve. Commit package-lock.json and switch to npm ci for
 # repeatable installs. Multi-arch image, pinned by its list digest.
 frontend:
-  image: node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
+  extends: .npm-cache
+  image: ${IMAGE_PREFIX}/node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
   script:
     - npm install --no-audit --no-fund
     - npm run build

@@ -2,6 +2,8 @@
 # Pinned to Preflight 0.1.4. Never use ~latest.
 # {{app_name}} requires PHP ^8.3, so the test matrix starts at 8.3.
 # composer ci is the contract: every check runs from the "ci" script in composer.json.
+# The components' image inputs below only add ${IMAGE_PREFIX}; the images are
+# the components' defaults.
 include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
     inputs:
@@ -9,10 +11,48 @@ include:
       # The example tests are Pest files, and PHPUnit refuses to load them
       # ("Please run ./vendor/bin/pest instead"). Pest runs PHPUnit classes too.
       test_command: vendor/bin/pest
+      image: "${IMAGE_PREFIX}/php:${PHP_VERSION}-cli-trixie"
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+    inputs:
+      image: "${IMAGE_PREFIX}/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
+
+# Dependency caching. Docker Hub images come through the group's GitLab
+# Dependency Proxy when this GitLab has one, so pipelines are served from
+# GitLab's copy instead of counting against Docker Hub's pull limit; without
+# the proxy they come straight from Docker Hub. To force Docker Hub (a group
+# with the proxy turned off), set IMAGE_PREFIX to docker.io in Settings >
+# CI/CD > Variables. Composer and npm downloads are cached per lock file.
+workflow:
+  rules:
+    - if: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+      variables:
+        IMAGE_PREFIX: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
+    - when: always
+
+variables:
+  IMAGE_PREFIX: docker.io
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+  npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+
+.composer-cache:
+  cache:
+    key:
+      files: [composer.lock]
+      prefix: composer
+    paths: [.cache/composer/]
+
+# package.json is in the key too, so the cache still turns over before
+# package-lock.json is committed.
+.npm-cache:
+  cache:
+    key:
+      files: [package-lock.json, package.json]
+      prefix: npm
+    paths: [.cache/npm/]
 
 composer-ci:
-  image: composer:2.10.3
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
@@ -20,7 +60,8 @@ composer-ci:
 # PROCTOR measures {{app_name}} against the CREED version policy. Warnings are
 # allowed; failures block the pipeline.
 proctor-root:
-  image: composer:2.10.3
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer proctor
@@ -31,7 +72,8 @@ proctor-root:
 # sprite still resolve. Commit package-lock.json and switch to npm ci for
 # repeatable installs. Multi-arch image, pinned by its list digest.
 frontend:
-  image: node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
+  extends: .npm-cache
+  image: ${IMAGE_PREFIX}/node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
   script:
     - npm install --no-audit --no-fund
     - npm run lint
@@ -43,7 +85,8 @@ frontend:
 # the committed resources/js/ziggy.* must match the routes. Regenerate and
 # fail on any diff.
 ziggy:
-  image: composer:2.10.3
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ziggy
