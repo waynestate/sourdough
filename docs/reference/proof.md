@@ -27,7 +27,7 @@ sh scripts/proof.sh raw inertia+docker
 
 It needs git and Docker, and the network for Composer, npm, Packagist and the WayneUI release. It needs no credentials: every bake passes `--no-playbook` and `--no-advisor`, and the gate drops any Oracle, CAS or Composer credential the host leaks in.
 
-The harness proofs the committed tree plus any edits to tracked files (`git stash create`), never untracked files, and the table marks the commit `+ local edits` when there were any. The source goes into the container as one tar file rather than a mounted folder, because Docker Desktop can list a mounted folder only partially.
+The harness proofs the committed tree plus any edits to tracked files (`git stash create`), never untracked files, and the table marks the commit `+ local edits` when there were any. The source goes into the container as one tar file from `git archive` rather than a mounted folder, because Docker Desktop can list a mounted folder only partially. `git archive` honors the `export-ignore` lines in `.gitattributes`, so the proof bakes with the package exactly as Composer ships it: no tests, no site, no `composer.lock`, and Sourdough's own dependencies resolve fresh, as they do for anyone who installs it from Packagist. The CI job runs on the checkout instead, lock and all.
 
 Results land in `proof-out/` (or `-OutDir`, or `PROOF_OUT`):
 

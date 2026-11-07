@@ -24,16 +24,15 @@ final class ProofHarnessTest extends TestCase
     {
         $sh = self::read('scripts/proof.sh');
 
-        self::assertSame(1, preg_match("/^all_runs='([^']+)'/m", $sh, $m));
-        self::assertSame(self::RUNS, explode(' ', $m[1]));
+        self::assertSame(self::RUNS, explode(' ', self::capture("/^all_runs='([^']+)'/m", $sh)));
     }
 
     public function testThePowerShellHarnessListsTheSameRuns(): void
     {
         $ps1 = self::read('scripts/proof.ps1');
 
-        self::assertSame(1, preg_match('/\$allRuns = @\((.*?)\)/s', $ps1, $m));
-        self::assertSame(count(self::RUNS), preg_match_all("/'([^']+)'/", $m[1], $runs));
+        $list = self::capture('/\$allRuns = @\((.*?)\)/s', $ps1);
+        self::assertSame(count(self::RUNS), preg_match_all("/'([^']+)'/", $list, $runs));
         self::assertSame(self::RUNS, $runs[1]);
     }
 
@@ -63,14 +62,26 @@ final class ProofHarnessTest extends TestCase
     {
         $ci = self::read('.gitlab-ci.yml');
 
-        self::assertSame(1, preg_match('/^proof:\n((?:[ ].*\n|\n)+)/m', $ci, $m));
-        $job = $m[1];
+        $job = self::capture('/^proof:\n((?:[ ].*\n|\n)+)/m', $ci);
         self::assertStringContainsString('sh scripts/proof.sh --here', $job);
         self::assertStringContainsString('$CI_PIPELINE_SOURCE == "schedule" && $SOURDOUGH_PROOF == "1"', $job);
         self::assertStringContainsString('- when: manual', $job);
         // Every rule either needs the schedule, says never, or waits for a hand.
         self::assertSame(1, substr_count($job, '- if: $CI_PIPELINE_SOURCE == "schedule" &&'));
         self::assertStringContainsString("when: never", $job);
+    }
+
+    /**
+     * The first group of $pattern in $subject; fails the test when it does
+     * not match.
+     */
+    private static function capture(string $pattern, string $subject): string
+    {
+        if (1 !== preg_match($pattern, $subject, $m) || !isset($m[1])) {
+            self::fail(sprintf('%s does not match', $pattern));
+        }
+
+        return $m[1];
     }
 
     private static function read(string $path): string
