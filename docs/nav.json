@@ -84,6 +84,10 @@
                 {
                     "path": "reference/templates",
                     "title": "Templates"
+                },
+                {
+                    "path": "reference/proof",
+                    "title": "Proof"
                 }
             ]
         },

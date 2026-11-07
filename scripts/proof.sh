@@ -115,8 +115,8 @@ fi
 
 # One download cache for every run: the ovens bake the same Laravel
 # skeleton the shapes do.
-export COMPOSER_CACHE_DIR=${COMPOSER_CACHE_DIR:-$work/cache/composer}
-export npm_config_cache=${npm_config_cache:-$work/cache/npm}
+export COMPOSER_CACHE_DIR="${COMPOSER_CACHE_DIR:-$work/cache/composer}"
+export npm_config_cache="${npm_config_cache:-$work/cache/npm}"
 
 table=$out/last-run.md
 summary=$out/summary.txt

@@ -66,12 +66,16 @@ Feed is the update model of Copier and cruft (ADR-0014), built on plain git inst
 | did not change it | anything | leaves it alone (no line in the plan) |
 | changed it | never touched it | `update`: takes the template's new version |
 | changed it | changed it too | `merge`: `git merge-file` applies the template's change on top of yours |
+| changed it | already has the new version | `record`: nothing written; the manifest records the new version |
 | changed the same lines | changed them too | `conflict`: git's markers in the file, `<<<<<<< app` ... `>>>>>>> sourdough <version>` |
 | added it | has no such file | `add` |
+| added it | has the very same file | `record`: nothing written; the manifest takes the file in |
 | added it | has its own file there | `conflict`: both versions marked |
 | dropped it | never touched it | `remove` (and its emptied folder) |
 | dropped it | changed it | `keep`: it is yours now, and leaves the manifest |
 | changed it | deleted it | `keep`: it stays deleted |
+
+A `record` line changes no file, only the manifest, so `sourdough manifest --check` stops calling the file changed. It is how an app baked by Sourdough 0.1.6 with `--sail` or `--docker` catches up: 0.1.6 wrote the manifest before the oven's scaffold ran, so feed reads the oven from the app's files (it says so in a `note:` line) and records them.
 
 Seeded files (`README.md`, `.env.example`) are never touched; a seeded file new to the template is written only where you have none. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
 

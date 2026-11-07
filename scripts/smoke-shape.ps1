@@ -12,6 +12,15 @@
 .PARAMETER Shape
     Which shape to bake: raw, raw-vue, blade, blade-vue or inertia.
 
+.PARAMETER Oven
+    Optional, Laravel shapes only: sail or docker. Proves the shape in that
+    oven (the scaffold's files, install, suite, PROCTOR) instead of the full
+    bake.
+
+.PARAMETER FeedFrom
+    Optional. A released Sourdough version (for example 0.1.6) to bake the
+    shape with too and feed forward with this checkout (SMOKE_FEED_FROM).
+
 .PARAMETER WorkDir
     Optional. Bind this local directory to /work so the scratch copy, the
     generated app and the per-step logs survive the run for inspection.
@@ -28,6 +37,11 @@ param(
     [Parameter(Mandatory = $true, Position = 0)]
     [ValidateSet('raw', 'raw-vue', 'blade', 'blade-vue', 'inertia')]
     [string]$Shape,
+
+    [ValidateSet('', 'sail', 'docker')]
+    [string]$Oven = '',
+
+    [string]$FeedFrom = '',
 
     [string]$WorkDir
 )
@@ -65,12 +79,17 @@ if ($WorkDir) {
     $workMount = "$(Resolve-Path -LiteralPath $WorkDir):/work"
 }
 
-Invoke-Docker @(
+$runArgs = @(
     'run', '--rm',
     '-v', "${repoRoot}:/repo:ro",
     '-v', $workMount,
     '-e', 'SMOKE_WORK=/work',
+    '-e', "SMOKE_FEED_FROM=$FeedFrom",
     $image,
     'sh', '/repo/scripts/smoke-shape.sh', $Shape
 )
+if ($Oven) {
+    $runArgs += "--$Oven"
+}
+Invoke-Docker $runArgs
 exit $LASTEXITCODE

@@ -190,6 +190,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 - a managed file you never touched takes the template's new version;
 - a file you both changed is three-way merged by git (`git merge-file`), from the version Sourdough wrote last time; where you both changed the same lines, git's conflict markers go in the file (`<<<<<<< app` and `>>>>>>> sourdough <version>`), never a silent overwrite;
 - new template files are added, and files the template dropped are removed only if you never changed them;
+- a file that already matches the template's new version is only recorded in the manifest (`record`); that is also how an app baked by 0.1.6 with `--sail` or `--docker` gets its oven into the manifest;
 - seeded files (`README.md`, `.env.example`) are never touched.
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
@@ -215,6 +216,8 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 ```
 
 The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+
+The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](docs/reference/proof.md) page.
 
 The site accessibility gate runs axe-core (WCAG 2.2 AA) over every committed page under `site/` in Docker, in light and dark at 360 px and 1280 px: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows.
 
