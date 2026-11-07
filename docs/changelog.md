@@ -21,6 +21,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- Changed: the front page's deploy layer (`deploy/`) runs Squire's kit 0.5.0 (was 0.4.0): `.squire/base-fallback.Dockerfile` and `scripts/parity.ps1` take the new templates, so `squire init --check` passes. `site/assets/stack-env.js` takes the stack's one copy, with bindingless catch blocks.
 - Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
 
 ### Fixed
