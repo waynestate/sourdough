@@ -152,6 +152,16 @@ case "$shape" in
         ;;
 esac
 
+# 2b. A fresh loaf has nothing to feed: sourdough feed bakes the same shape
+# again (same skeleton, same answers) and must find every file as it is.
+# A bake that is not reproducible would turn every feed of it into a
+# conflict. The scratch repository goes again before the app's own checks,
+# so they run exactly as they did before.
+dir=$work/app
+step "git commit the fresh bake" sh -c 'git init -q && git add -A && git -c user.name=smoke -c user.email=smoke@example.invalid -c commit.gpgsign=false commit -q -m baked'
+step "sourdough feed --dry-run finds nothing to feed" php "$src/bin/sourdough" feed --dry-run
+step "drop the scratch repository" rm -rf .git
+
 # 3. Run the generated app's own checks.
 dir=$work/app
 case "$shape" in
