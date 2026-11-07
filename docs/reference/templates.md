@@ -96,6 +96,7 @@ sourdough new my-app --inertia
 ### laravel-inertia/
 
 - The same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.
+- Inertia 3 on both sides: `inertiajs/inertia-laravel` `^3.0` and `@inertiajs/vue3` `^3.0`. The root view marks its `<title>` with `data-inertia`, Inertia hands the first page to Vue in a `<script type="application/json">` element (data, not code, so HELMET's CSP has nothing to admit), and no Axios: the pages talk through Inertia's own client. Add `axios` to `package.json` only when your own code imports it. `resources/js/app.ts` hands HELMET's per-request nonce (read from the pre-paint script) to Inertia's `nonce` option, so the progress bar's injected styles pass the CSP.
 - Ships `AppServiceProvider` (string length 191 for Citadel's MySQL 5.6) and a `tests/TestCase.php` that writes a stub Vite manifest, so view tests boot without a build.
 - The `.gitlab-ci.yml` carries the `ziggy` job: it regenerates `resources/js/ziggy.*` and fails on any diff, so the route list that ships inside the Vite bundle always matches the routes.
 - The overlay allows `phpstan/extension-installer`; the appended SESAME and HELMET env keys ship commented out (except `SESAME_DRIVER=fake`) so package defaults hold instead of being overridden by empty values. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe`, so the fake driver has a non-empty username.
@@ -105,10 +106,10 @@ sourdough new my-app --inertia
 
 | Part | What lands in the app |
 |---|---|
-| Stack packages | HELMET `^0.3`, SESAME `^0.4`, PROCTOR `^0.4` |
+| Stack packages | HELMET `^0.3`, SESAME `^0.4`, PROCTOR `^0.6` (its `composer proctor` script is plain `proctor check`: PROCTOR 0.6 refuses `--policy` in CI and finds CREED's released policy in `vendor/waynestate/creed` by itself) |
 | Playbook | `waynestate/playbook` in `require`, the VCS repository, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access |
 | ADVISOR | `waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored (a client config starts a program for whoever opens the project), a README "ADVISOR" section; install with `php vendor/bin/advisor install --client=claude --write` |
-| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment), because PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA |
+| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment), because PROCTOR's `preflight-pinned` check (since 0.4) wants a 40-hex SHA |
 | Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
 | Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
 

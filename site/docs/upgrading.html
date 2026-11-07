@@ -53,6 +53,30 @@
 <pre tabindex="0"><code>Sourdough 0.1.6
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
+<h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
+<p><strong>Breaking:</strong> for new bakes, and for apps you feed. The Inertia shape moves to Inertia 3 (<code>inertiajs/inertia-laravel</code> <code>^3.0</code>, <code>@inertiajs/vue3</code> <code>^3.0</code>: PHP 8.2+, Laravel 11+, ES modules only, Axios no longer bundled). Every shape requires PROCTOR <code>^0.6</code>, and the Laravel shapes' <code>composer proctor</code> script drops <code>--policy</code>, because PROCTOR 0.6 refuses that option in CI.</p>
+<p><strong>Deprecated:</strong> none.</p>
+<p><strong>Steps:</strong> upgrade the CLI, then in each app, on a clean git tree:</p>
+<pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
+sourdough feed
+</code></pre>
+<p>Feed merges the new pins into <code>composer.json</code> (and, in an Inertia app, <code>package.json</code>, <code>resources/views/app.blade.php</code> and <code>resources/js/app.ts</code>, which now hands HELMET's nonce to Inertia so the progress bar's styles pass the CSP) with your own edits. The lock files are yours, so move them next:</p>
+<div class="docs-tabs" data-tabs="every shape|inertia"><div class="docs-tabs__panel" data-tab-label="every shape"><p class="docs-tabs__label">every shape</p><pre tabindex="0"><code class="language-bash">composer update waynestate/proctor --with-all-dependencies
+</code></pre></div>
+<div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre tabindex="0"><code class="language-bash">composer update inertiajs/inertia-laravel waynestate/proctor --with-all-dependencies
+npm install
+php artisan view:clear
+</code></pre></div></div>
+<p>What to check by hand in an Inertia app, because feed only knows the template's code, not yours:</p>
+<ul>
+<li>Your own code imports <code>axios</code> (or <code>qs</code>, or <code>lodash-es</code>)? Inertia 3 no longer brings them along: <code>npm install axios</code> (or the one you use), or move the call to Inertia's <code>useHttp</code>.</li>
+<li><code>Inertia::lazy()</code> becomes <code>Inertia::optional()</code>; <code>router.cancel()</code> becomes <code>router.cancelAll()</code>; the <code>invalid</code> and <code>exception</code> router events are now <code>httpException</code> and <code>networkError</code>.</li>
+<li>You published <code>config/inertia.php</code>? Its <code>testing.page_paths</code> and <code>testing.page_extensions</code> moved to <code>pages.paths</code> and <code>pages.extensions</code>. Republish with <code>php artisan vendor:publish --provider=&quot;Inertia\ServiceProvider&quot; --force</code> and reapply your changes.</li>
+<li>Another head tag in your root view carries a bare <code>inertia</code> attribute? Rename it to <code>data-inertia</code>, as the template's <code>&lt;title&gt;</code> now is.</li>
+</ul>
+<p>The full list is Inertia's own <a rel="noopener" href="https://inertiajs.com/docs/v3/getting-started/upgrade-guide">upgrade guide</a>.</p>
+<p>A pipeline that passes <code>--policy</code> or <code>--today</code> to PROCTOR fails with exit <code>2</code> on 0.6. Drop the option (PROCTOR finds CREED's policy in <code>vendor/waynestate/creed</code> by itself, or name it with the <code>PROCTOR_POLICY</code> variable), or set <code>PROCTOR_ALLOW_OVERRIDES: &quot;1&quot;</code> in a protected or group-level CI variable, never in the app's own <code>.gitlab-ci.yml</code>. PROCTOR 0.6 also fails <code>composer-audit</code> when there is no <code>composer.lock</code> or Composer is not on <code>PATH</code>, and when an audit ignore entry in <code>composer.json</code> has no matching override in <code>policy-overrides.json</code>.</p>
+<p><strong>How to verify:</strong> <code>composer proctor</code> passes. In an Inertia app, <code>npm ls @inertiajs/vue3</code> and <code>composer show inertiajs/inertia-laravel</code> both print a 3.x version, <code>npm run typecheck</code> and <code>npm run build</code> pass, and the page source of <code>/</code> carries <code>&lt;script data-page=&quot;app&quot; type=&quot;application/json&quot;&gt;</code> instead of a <code>data-page</code> attribute on the root div.</p>
 <h2 id="0-1-6-2026-11-06">0.1.6 (2026-11-06)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-6-2026-11-06">#</a></h2>
 <p><strong>Breaking:</strong> for new bakes only; apps you already baked are not rewritten. <code>sourdough new</code> now requires Playbook (<code>waynestate/playbook</code>) in every app and checks that you can read it before writing anything, so a developer without Playbook access gets exit <code>1</code> until they have it (<code>--no-playbook</code> is for CI and automated tests only; <code>--playbook</code> is now a no-op kept for old scripts). The Inertia shape draws with WayneUI instead of the Tailwind starter kit, so a new Inertia app has no <code>tailwind.config.js</code>, <code>cn()</code> or kit components. The Laravel shapes generate apps on Pest 4.</p>
 <p><strong>Deprecated:</strong> none.</p>
@@ -101,7 +125,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#unreleased">Unreleased</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>

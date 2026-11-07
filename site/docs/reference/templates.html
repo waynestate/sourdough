@@ -166,6 +166,7 @@
 <h3 id="laravel-inertia">laravel-inertia/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-inertia">#</a></h3>
 <ul>
 <li>The same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.</li>
+<li>Inertia 3 on both sides: <code>inertiajs/inertia-laravel</code> <code>^3.0</code> and <code>@inertiajs/vue3</code> <code>^3.0</code>. The root view marks its <code>&lt;title&gt;</code> with <code>data-inertia</code>, Inertia hands the first page to Vue in a <code>&lt;script type=&quot;application/json&quot;&gt;</code> element (data, not code, so HELMET's CSP has nothing to admit), and no Axios: the pages talk through Inertia's own client. Add <code>axios</code> to <code>package.json</code> only when your own code imports it. <code>resources/js/app.ts</code> hands HELMET's per-request nonce (read from the pre-paint script) to Inertia's <code>nonce</code> option, so the progress bar's injected styles pass the CSP.</li>
 <li>Ships <code>AppServiceProvider</code> (string length 191 for Citadel's MySQL 5.6) and a <code>tests/TestCase.php</code> that writes a stub Vite manifest, so view tests boot without a build.</li>
 <li>The <code>.gitlab-ci.yml</code> carries the <code>ziggy</code> job: it regenerates <code>resources/js/ziggy.*</code> and fails on any diff, so the route list that ships inside the Vite bundle always matches the routes.</li>
 <li>The overlay allows <code>phpstan/extension-installer</code>; the appended SESAME and HELMET env keys ship commented out (except <code>SESAME_DRIVER=fake</code>) so package defaults hold instead of being overridden by empty values. <code>config/sesame.php</code> defaults <code>SESAME_FAKE_USERNAME</code> to <code>jane.doe</code>, so the fake driver has a non-empty username.</li>
@@ -182,7 +183,7 @@
 <tbody>
 <tr>
 <td>Stack packages</td>
-<td>HELMET <code>^0.3</code>, SESAME <code>^0.4</code>, PROCTOR <code>^0.4</code></td>
+<td>HELMET <code>^0.3</code>, SESAME <code>^0.4</code>, PROCTOR <code>^0.6</code> (its <code>composer proctor</code> script is plain <code>proctor check</code>: PROCTOR 0.6 refuses <code>--policy</code> in CI and finds CREED's released policy in <code>vendor/waynestate/creed</code> by itself)</td>
 </tr>
 <tr>
 <td>Playbook</td>
@@ -194,7 +195,7 @@
 </tr>
 <tr>
 <td>Preflight</td>
-<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment), because PROCTOR 0.4's <code>preflight-pinned</code> check wants a 40-hex SHA</td>
+<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment), because PROCTOR's <code>preflight-pinned</code> check (since 0.4) wants a 40-hex SHA</td>
 </tr>
 <tr>
 <td>Oracle</td>

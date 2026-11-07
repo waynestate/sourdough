@@ -31,6 +31,44 @@ Sourdough 0.1.6
 
 Then read the section for the version you are moving to.
 
+## Unreleased
+
+**Breaking:** for new bakes, and for apps you feed. The Inertia shape moves to Inertia 3 (`inertiajs/inertia-laravel` `^3.0`, `@inertiajs/vue3` `^3.0`: PHP 8.2+, Laravel 11+, ES modules only, Axios no longer bundled). Every shape requires PROCTOR `^0.6`, and the Laravel shapes' `composer proctor` script drops `--policy`, because PROCTOR 0.6 refuses that option in CI.
+
+**Deprecated:** none.
+
+**Steps:** upgrade the CLI, then in each app, on a clean git tree:
+
+```bash
+sourdough feed --dry-run
+sourdough feed
+```
+
+Feed merges the new pins into `composer.json` (and, in an Inertia app, `package.json`, `resources/views/app.blade.php` and `resources/js/app.ts`, which now hands HELMET's nonce to Inertia so the progress bar's styles pass the CSP) with your own edits. The lock files are yours, so move them next:
+
+```bash tab="every shape"
+composer update waynestate/proctor --with-all-dependencies
+```
+
+```bash tab="inertia"
+composer update inertiajs/inertia-laravel waynestate/proctor --with-all-dependencies
+npm install
+php artisan view:clear
+```
+
+What to check by hand in an Inertia app, because feed only knows the template's code, not yours:
+
+- Your own code imports `axios` (or `qs`, or `lodash-es`)? Inertia 3 no longer brings them along: `npm install axios` (or the one you use), or move the call to Inertia's `useHttp`.
+- `Inertia::lazy()` becomes `Inertia::optional()`; `router.cancel()` becomes `router.cancelAll()`; the `invalid` and `exception` router events are now `httpException` and `networkError`.
+- You published `config/inertia.php`? Its `testing.page_paths` and `testing.page_extensions` moved to `pages.paths` and `pages.extensions`. Republish with `php artisan vendor:publish --provider="Inertia\ServiceProvider" --force` and reapply your changes.
+- Another head tag in your root view carries a bare `inertia` attribute? Rename it to `data-inertia`, as the template's `<title>` now is.
+
+The full list is Inertia's own [upgrade guide](https://inertiajs.com/docs/v3/getting-started/upgrade-guide).
+
+A pipeline that passes `--policy` or `--today` to PROCTOR fails with exit `2` on 0.6. Drop the option (PROCTOR finds CREED's policy in `vendor/waynestate/creed` by itself, or name it with the `PROCTOR_POLICY` variable), or set `PROCTOR_ALLOW_OVERRIDES: "1"` in a protected or group-level CI variable, never in the app's own `.gitlab-ci.yml`. PROCTOR 0.6 also fails `composer-audit` when there is no `composer.lock` or Composer is not on `PATH`, and when an audit ignore entry in `composer.json` has no matching override in `policy-overrides.json`.
+
+**How to verify:** `composer proctor` passes. In an Inertia app, `npm ls @inertiajs/vue3` and `composer show inertiajs/inertia-laravel` both print a 3.x version, `npm run typecheck` and `npm run build` pass, and the page source of `/` carries `<script data-page="app" type="application/json">` instead of a `data-page` attribute on the root div.
+
 ## 0.1.6 (2026-11-06)
 
 **Breaking:** for new bakes only; apps you already baked are not rewritten. `sourdough new` now requires Playbook (`waynestate/playbook`) in every app and checks that you can read it before writing anything, so a developer without Playbook access gets exit `1` until they have it (`--no-playbook` is for CI and automated tests only; `--playbook` is now a no-op kept for old scripts). The Inertia shape draws with WayneUI instead of the Tailwind starter kit, so a new Inertia app has no `tailwind.config.js`, `cn()` or kit components. The Laravel shapes generate apps on Pest 4.

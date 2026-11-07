@@ -22,9 +22,13 @@ Versioning once 1.0 is out.
 ### Changed
 
 - Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
+- Changed: the Inertia shape bakes on Inertia 3: `inertiajs/inertia-laravel` `^3.0` and `@inertiajs/vue3` `^3.0` (PHP 8.2+, Laravel 11+, ESM only, no bundled Axios). The root view marks its title `data-inertia` instead of the bare `inertia` attribute, and Inertia now hands the first page to Vue in a `<script type="application/json">` element instead of the root div's `data-page` attribute (HELMET's CSP is untouched: a JSON data block never runs). The template never used Axios, `Inertia::lazy()`, `router.cancel()` or the `future` options, so the rest of it bakes as before (one fix rides along: the progress bar's nonce, below). Apps already baked: the Upgrading page's Unreleased section has the steps (`sourdough feed`, then `composer update` and `npm install`).
+- Changed: new apps in every shape require PROCTOR `^0.6` (was `^0.4`). The Laravel shapes' `composer proctor` script is now plain `proctor check`: PROCTOR 0.6 refuses `--policy` in CI unless the job sets `PROCTOR_ALLOW_OVERRIDES=1`, and without the option it still reads CREED's released policy from `vendor/waynestate/creed` on its own. PROCTOR 0.6 also fails `composer-audit` when the app has no `composer.lock` or Composer is not on `PATH`; every baked pipeline installs first, so a baked app passes as before.
+- Changed: the smoke gate reads the Inertia `Home` and `Dashboard` pages from Inertia 3's JSON page element, and `tests/StackPinsTest.php` keeps the PROCTOR and Inertia lines, the plain `proctor check` script and the `data-inertia` title from slipping back.
 
 ### Fixed
 
+- Fixed: the Inertia shape's progress bar wears its styles again. Inertia injects them in an inline `<style>`, and HELMET's CSP admits one only with the request's nonce, so the browser refused it on every page ("Refused to apply inline style") and the bar ran unstyled. `resources/js/app.ts` now reads the nonce from the pre-paint script's `nonce` property and hands it to Inertia 3's new `nonce` option, which stamps it on everything Inertia injects; no CSP is loosened.
 - Fixed: the Laravel templates' `UserResolver` lists its interfaces in Pint's order (`RefreshesUser` before `UserResolverContract`), so a freshly baked app passes its own `pint --test` on the first run instead of failing `composer ci`.
 - Fixed: Baked apps pin `config.platform.php` to their PHP floor, so PROCTOR no longer flags the lock.
 - Fixed: Baked Laravel apps read the signed-in user again on every request, so Laravel 13's JSON sessions no longer sign everyone out after the first page.
