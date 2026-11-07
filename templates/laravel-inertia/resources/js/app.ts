@@ -26,6 +26,13 @@ document.documentElement.setAttribute('data-wsu-sprite', spriteUrl);
 // ships it in the markup.
 document.querySelector('.helmet-ribbon')?.setAttribute('role', 'status');
 
+// HELMET's CSP admits an inline <style> only when it carries this request's
+// nonce, so the progress bar's styles were turned away at the door and the
+// bar went out unstyled. Inertia 3 stamps a nonce on the styles it injects;
+// the pre-paint script in app.blade.php already holds it (the browser blanks
+// the attribute after load, the nonce property keeps the value).
+const cspNonce = document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce || undefined;
+
 // The generated file's url is the build machine's; the browser's origin is the truth.
 const ziggy = { ...Ziggy, url: window.location.origin, port: null };
 
@@ -56,6 +63,7 @@ createInertiaApp({
         // WayneUI's brand green.
         color: '#0c5449',
     },
+    nonce: cspNonce,
 });
 
 // A link in the open drawer starts a visit that unmounts the drawer mid-open.

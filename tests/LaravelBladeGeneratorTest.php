@@ -66,7 +66,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/creed']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/pinstripe']);
-        self::assertSame('^0.4', $composer['require-dev']['waynestate/proctor']);
+        self::assertSame('^0.6', $composer['require-dev']['waynestate/proctor']);
         // ...and Pest is the test runner for new tests...
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);
@@ -77,7 +77,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertSame('pest', $composer['scripts']['test']);
         self::assertContains('phpstan analyse --memory-limit=1G', $composer['scripts']['ci']);
         self::assertSame(
-            'proctor check --policy=vendor/waynestate/creed/policy/policy.json',
+            'proctor check',
             $composer['scripts']['proctor'],
         );
         self::assertArrayHasKey('setup', $composer['scripts']);

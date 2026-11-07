@@ -26,7 +26,8 @@
             })();
         </script>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        {{-- Inertia 3 owns head tags marked data-inertia (2 used a bare inertia attribute). --}}
+        <title data-inertia>{{ config('app.name', 'Laravel') }}</title>
 
         @php(\Illuminate\Support\Facades\Vite::useCspNonce($cspNonce))
         @vite(['resources/js/app.ts'])

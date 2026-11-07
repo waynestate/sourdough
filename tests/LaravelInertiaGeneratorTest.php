@@ -69,7 +69,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The Inertia packages land in require alongside the stack's...
-        self::assertSame('^2.0', $composer['require']['inertiajs/inertia-laravel']);
+        self::assertSame('^3.0', $composer['require']['inertiajs/inertia-laravel']);
         self::assertSame('^2.4', $composer['require']['tightenco/ziggy']);
         self::assertSame('^0.4', $composer['require']['waynestate/sesame']);
         self::assertSame('^0.3', $composer['require']['waynestate/helmet']);
@@ -86,7 +86,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertSame('pest', $composer['scripts']['test']);
         self::assertContains('phpstan analyse --memory-limit=1G', $composer['scripts']['ci']);
         self::assertSame(
-            'proctor check --policy=vendor/waynestate/creed/policy/policy.json',
+            'proctor check',
             $composer['scripts']['proctor'],
         );
         self::assertSame('php artisan ziggy:generate --types', $composer['scripts']['ziggy']);

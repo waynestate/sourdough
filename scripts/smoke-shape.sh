@@ -423,11 +423,13 @@ case "$shape" in
                 check_http "blade-vue GET /dashboard carries the Vue island" /dashboard 200 'data-vue-island="counter"'
                 ;;
             inertia)
-                # Inertia 2 hands the page to Vue in the root div's
-                # data-page attribute, HTML-escaped.
-                check_http "inertia GET / answers 200 with the Inertia Home page" / 200 '&quot;component&quot;:&quot;Home&quot;'
+                # Inertia 3 hands the page to Vue as plain JSON in a
+                # <script data-page="app" type="application/json"> element
+                # (Inertia 2 used the root div's HTML-escaped data-page attribute).
+                check_http "inertia GET / answers 200 with the Inertia Home page" / 200 '"component":"Home"'
+                check_http "inertia GET / carries the page as a JSON element" / 200 '<script data-page="app" type="application/json">'
                 check_http "inertia GET / loads the built app" / 200 '/build/assets/'
-                check_http "inertia GET /dashboard signs in with the fake driver" /dashboard 200 '&quot;component&quot;:&quot;Dashboard&quot;'
+                check_http "inertia GET /dashboard signs in with the fake driver" /dashboard 200 '"component":"Dashboard"'
                 ;;
         esac
         check_http "$shape GET /nope answers 404" /nope 404
