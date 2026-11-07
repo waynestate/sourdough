@@ -26,10 +26,20 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.1.5
+Sourdough 0.1.6
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.1.6 (2026-11-06)
+
+**Breaking:** for new bakes only; apps you already baked are not rewritten. `sourdough new` now requires Playbook (`waynestate/playbook`) in every app and checks that you can read it before writing anything, so a developer without Playbook access gets exit `1` until they have it (`--no-playbook` is for CI and automated tests only; `--playbook` is now a no-op kept for old scripts). The Inertia shape draws with WayneUI instead of the Tailwind starter kit, so a new Inertia app has no `tailwind.config.js`, `cn()` or kit components. The Laravel shapes generate apps on Pest 4.
+
+**Deprecated:** none.
+
+**Steps:** upgrade the CLI with `composer global require waynestate/sourdough`. The fifth loaf is out of the oven: `sourdough new --raw --vue` bakes a raw PHP + Vue SPA over JSON (Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`), so all five shapes generate. Raw apps start with `composer serve` now; an app baked earlier can copy the raw template's `serve` script. Laravel apps baked earlier can pick up the fixes by hand: the `.gitlab-ci.yml` php-test matrix runs `vendor/bin/pest`, `--docker` apps run the vite service with `LARAVEL_SAIL=1` and install `node_modules` when Vite is missing, and `--sail` apps take the new compose entrypoint. See [Keeping apps current](guides/keeping-current.md).
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.1.6`. Bake `sourdough new --raw --vue`, run its Next steps, and `/`, `/api/me` and `/up` answer.
 
 ## 0.1.5 (2026-11-03)
 

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Upgrading | Sourdough docs</title>
 <meta name="description" content="How to upgrade Sourdough itself and bring the apps it baked up to date with the manifest and sourdough feed.">
-<meta name="docs-version" content="0.1.5">
+<meta name="docs-version" content="0.1.6">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.1.5</span>
+    <span class="ticket" title="Sourdough version">No. 0.1.6</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -50,9 +50,14 @@
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre tabindex="0"><code>Sourdough 0.1.5
+<pre tabindex="0"><code>Sourdough 0.1.6
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
+<h2 id="0-1-6-2026-11-06">0.1.6 (2026-11-06)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-6-2026-11-06">#</a></h2>
+<p><strong>Breaking:</strong> for new bakes only; apps you already baked are not rewritten. <code>sourdough new</code> now requires Playbook (<code>waynestate/playbook</code>) in every app and checks that you can read it before writing anything, so a developer without Playbook access gets exit <code>1</code> until they have it (<code>--no-playbook</code> is for CI and automated tests only; <code>--playbook</code> is now a no-op kept for old scripts). The Inertia shape draws with WayneUI instead of the Tailwind starter kit, so a new Inertia app has no <code>tailwind.config.js</code>, <code>cn()</code> or kit components. The Laravel shapes generate apps on Pest 4.</p>
+<p><strong>Deprecated:</strong> none.</p>
+<p><strong>Steps:</strong> upgrade the CLI with <code>composer global require waynestate/sourdough</code>. The fifth loaf is out of the oven: <code>sourdough new --raw --vue</code> bakes a raw PHP + Vue SPA over JSON (Next steps: <code>composer install</code>, <code>npm install</code>, <code>npm run build</code>, <code>composer serve</code>), so all five shapes generate. Raw apps start with <code>composer serve</code> now; an app baked earlier can copy the raw template's <code>serve</code> script. Laravel apps baked earlier can pick up the fixes by hand: the <code>.gitlab-ci.yml</code> php-test matrix runs <code>vendor/bin/pest</code>, <code>--docker</code> apps run the vite service with <code>LARAVEL_SAIL=1</code> and install <code>node_modules</code> when Vite is missing, and <code>--sail</code> apps take the new compose entrypoint. See <a href="guides/keeping-current.html">Keeping apps current</a>.</p>
+<p><strong>How to verify:</strong> <code>sourdough --version</code> prints <code>Sourdough 0.1.6</code>. Bake <code>sourdough new --raw --vue</code>, run its Next steps, and <code>/</code>, <code>/api/me</code> and <code>/up</code> answer.</p>
 <h2 id="0-1-5-2026-11-03">0.1.5 (2026-11-03)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-5-2026-11-03">#</a></h2>
 <p><strong>Breaking:</strong> none. Three more loaves join the bench: <code>sourdough new --laravel</code> (Laravel + Blade), <code>sourdough new --inertia</code> (Laravel + Inertia/Vue) and <code>sourdough new --laravel --vue</code> (Laravel + Blade + Vue islands) now bake, so four of the five shapes generate. New bakes also carry ADVISOR by default (<code>waynestate/advisor</code> in <code>require-dev</code>, <code>.mcp.json</code> git-ignored, a README &quot;ADVISOR&quot; section); pass <code>--no-advisor</code> to skip it. The raw template pins WayneUI 2.0.8 instead of fetching the floating <code>main</code> branch copy, and the Squire copy comes from Squire 0.4.0 (dev dependency <code>^0.4</code>).</p>
 <p><strong>Deprecated:</strong> none.</p>
@@ -96,10 +101,10 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.1.5</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>
   <span><a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">Source</a> Mirrors: <a rel="noopener" href="https://github.com/waynestate/sourdough">GitHub</a> <a href="upgrading.md">Markdown</a></span>
 </footer>
 </body>

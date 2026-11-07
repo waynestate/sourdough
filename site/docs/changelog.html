@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changelog | Sourdough docs</title>
 <meta name="description" content="All notable changes to this project.">
-<meta name="docs-version" content="0.1.5">
+<meta name="docs-version" content="0.1.6">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.1.5</span>
+    <span class="ticket" title="Sourdough version">No. 0.1.6</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -44,127 +44,63 @@
 <p>All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
+<h2 id="0-1-6-2026-11-06">0.1.6 (2026-11-06)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-6-2026-11-06">#</a></h2>
+<h3 id="added">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added">#</a></h3>
 <ul>
-<li>
-<p>Added: the site accessibility gate: <code>scripts/a11y.sh</code> (Git Bash, Linux, macOS) and <code>scripts/a11y.ps1</code> (Windows) run axe-core (WCAG 2.2 AA) in Docker over every committed HTML page under <code>site/</code>, in light and dark at 360 px and 1280 px.</p>
-</li>
-<li>
-<p>Added: <code>sourdough new --raw --vue</code> bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then <code>templates/raw-vue/</code> over it: a front controller that answers JSON under <code>/api/</code> (<code>/api/me</code> returns the signed-in user, or <code>401</code> instead of sending a <code>fetch()</code> to CAS) and sends the Vue page for <code>/</code> (and for any other path, with a <code>404</code>); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from <code>@waynestate/wayne-ui-vue</code> and <code>@waynestate/wayne-ui-css</code> 2.0.8, pinned exactly as in the Inertia shape; and <code>src/Vite.php</code>, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while <code>npm run dev</code> runs (and adds it to the CSP, never in production). Its Next steps: <code>composer install</code>, <code>npm install</code>, <code>npm run build</code>, <code>composer serve</code>. The <code>--raw --vue</code> plan no longer ends in &quot;not available in this release&quot;, and a <code>smoke-raw-vue</code> CI job bakes the shape and checks <code>/</code>, <code>/api/me</code> and <code>/up</code> on a live server. All five loaves bake now.</p>
-</li>
-<li>
-<p>Fixed: <code>--sail</code> apps answer 200 on <code>/</code> and <code>/up</code> when the checkout is one Sail's <code>sail</code> user cannot write (a Windows drive under Docker Desktop, or files a root container wrote). Every page was a 500 naming <code>tempnam()</code>, because Blade could not write <code>storage/framework/views</code>. The compose file's entrypoint now gives the <code>sail</code> user its <code>WWWUSER</code> uid first (so a <code>sail artisan</code> run the moment <code>sail up -d</code> returns no longer runs as the image's uid 1337 and leaves a log file the server cannot append to), opens the app's files to that user only when it cannot write them (<code>vendor/</code>, <code>node_modules/</code> and <code>.git</code> untouched), then starts Sail as usual.</p>
-</li>
-<li>
-<p>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) serve <code>/</code> on the first <code>composer dev-up</code>. Nothing installed <code>node_modules</code>, so the vite service exited with <code>vite: not found</code> and <code>/</code> was a 500 (<code>Vite manifest not found</code>). The service now runs <code>npm install</code> when Vite is missing, then <code>npm run dev</code>.</p>
-</li>
-<li>
-<p>Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the <code>ziggy-js</code> npm package. The home page and the dashboard are new, in WayneUI's components and tokens. <code>eslint.config.js</code> refuses <code>components/ui</code> imports and the kit's helper packages, <code>.prettierrc</code> is the stack's, and a <code>frontend</code> CI job runs lint, Prettier, vue-tsc and the build.</p>
-</li>
-<li>
-<p>Removed: from the Inertia shape, <code>tailwind.config.js</code>, <code>cn()</code> (<code>resources/js/lib/utils.ts</code>), <code>tailwindcss</code>, <code>autoprefixer</code>, <code>tailwind-merge</code>, <code>clsx</code>, <code>lucide-vue-next</code>, <code>@vueuse/core</code>, <code>prettier-plugin-tailwindcss</code>, the Bunny Fonts link and the ten kit components they served.</p>
-</li>
-<li>
-<p>Fixed: the Laravel shapes' (Blade, Blade + Vue, Inertia) <code>.gitlab-ci.yml</code> runs the php-test matrix with <code>vendor/bin/pest</code>. The Preflight component defaults to <code>vendor/bin/phpunit</code>, which refuses the Pest example tests (&quot;Please run ./vendor/bin/pest instead&quot;), so every job in the matrix crashed with exit 255. Pest runs the PHPUnit class tests too.</p>
-</li>
-<li>
-<p>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) load their pages. The service ran <code>npm run dev -- --host 0.0.0.0</code>, so laravel-vite-plugin wrote <code>http://0.0.0.0:5173</code> to <code>public/hot</code> and the browser got a blank page; it now runs <code>npm run dev</code> with <code>LARAVEL_SAIL=1</code>, which listens on every address and writes <code>http://localhost:5173</code>.</p>
-</li>
-<li>
-<p>Added: the Laravel shapes refuse to boot production on the tests' dummy APP_KEY (<code>app/Support/DummyAppKey.php</code>, called from <code>AppServiceProvider::boot()</code>), and <code>tests/Support/SkipEnvFile.php</code> hands the tests that one dummy key (base64 of 32 zero bytes) when nothing else sets one. WELD ships the same files.</p>
-</li>
-<li>
-<p>Fixed: the GitLab smoke jobs (raw, Blade, Blade + Vue, Inertia) failed before they started: the Composer installer's options were handed to <code>php</code> itself (<code>no argument for option -</code>). They now go after <code>--</code>, with Composer pinned to 2.10.3, and the image gets <code>unzip</code> so Composer can unpack the locked packages.</p>
-</li>
-<li>
-<p>Fixed: a freshly baked Laravel app passes its own <code>pint --test</code> again: the Pest example tests are written out over several lines and <code>tests/Support/SkipEnvFile.php</code> uses imports and Laravel's operator order, so <code>composer ci</code> no longer fails on the template's own style.</p>
-</li>
-<li>
-<p>Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).</p>
-</li>
-<li>
-<p>Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (<code>tests/Pest.php</code>, a Pest example test, <code>composer test</code> and <code>composer ci</code> run Pest, PHPUnit tests unchanged, tests read <code>.env</code>, or <code>.env.example</code> when there is no <code>.env</code>); the raw shape is unchanged.</p>
-</li>
-<li>
-<p>Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: <code>docs/_header.html</code>, <code>docs/theme/sourdough.css</code> and a <code>theme</code> key in <code>docs/docs.json</code>; the kit's <code>docs.css</code> is unchanged.</p>
-</li>
-<li>
-<p>Added: the docs site in <code>site/docs/</code> is built by the shared Squire docs-site builder (<code>bin/docs-site.php</code>) from the pages in <code>docs/</code>, and <code>composer ci</code> checks it with <code>@docs:check</code>.</p>
-</li>
-<li>
-<p>Fixed: raw apps start with <code>composer serve</code>. The old <code>php -S localhost:8000 -t public</code> line booted the app as production, because the raw front controller defaults <code>APP_ENV</code> to production when it is unset. The raw template's new <code>serve</code> script disables Composer's process timeout, sets <code>APP_ENV=local</code> cross-platform with <code>@putenv</code>, then starts <code>php -S localhost:8000 -t public</code>, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at <code>composer serve</code> now.</p>
-</li>
-<li>
-<p>Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into <code>public/wayne-ui.php</code>, starts the app with <code>APP_ENV=local</code> on <code>127.0.0.1:8099</code> and expects <code>/</code> 200, <code>/nope</code> 404 and <code>/up</code> 200. Every shape now bakes with <code>--no-playbook</code>, because Playbook is required by default and its private package cannot be installed credential-free.</p>
-</li>
-<li>
-<p>Added: <code>--docker</code> generates the app's own Docker setup for the Laravel shapes (<code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code>): a two-target <code>Dockerfile</code> (dev and prod) whose base images are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64, a <code>compose.yaml</code> with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a <code>.dockerignore</code>, the PHP ini files the image copies in, the <code>composer dev-up</code>, <code>dev-down</code> and <code>dev-shell</code> scripts, the database settings in <code>.env.example</code>, and a &quot;Run it locally with Docker&quot; README section. It works natively on Windows, macOS and Linux (no WSL2 needed). Playbook credentials reach a production build only as a BuildKit secret, never a build arg, and the <code>FROM</code> lines are the single place to swap in SQUIRE's Citadel-parity image when it exists.</p>
-</li>
-<li>
-<p>Added: <code>--sail</code> generates a Sail setup (compose.yaml, laravel/sail) for the Laravel shapes.</p>
-</li>
-<li>
-<p>Added: the raw template's <code>.gitlab-ci.yml</code> runs an explicit <code>composer-ci</code> job (<code>composer install</code>, then <code>composer ci</code>), mirroring the Laravel overlay, so PROCTOR sees a <code>composer ci</code> in the pipeline instead of warning that no job runs it.</p>
-</li>
-<li>
-<p>Fixed: the raw front controller answers <code>404</code> for any path but <code>/</code> (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. <code>/up</code> stays HELMET's and answers first.</p>
-</li>
-<li>
-<p>Added: generated apps in Require mode get a <code>composer playbook</code> script (<code>@composer show waynestate/playbook --no-interaction</code>) with its <code>scripts-descriptions</code> entry, so you can check any time whether Playbook (WSU shared values) is installed. Existing scripts keep their order and <code>playbook</code> is appended last; an existing <code>playbook</code> script is left alone.</p>
-</li>
-<li>
-<p>Changed: <code>sourdough new</code> now requires <code>waynestate/playbook</code> in every app it bakes: the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends the token to git.wayne.edu, the <code>.env.example</code> block, and a README section with the access how-to. The command checks read access before writing anything (a Composer credential, then a direct git probe) and refuses with exit <code>1</code> until the developer can read the package; an unreachable git.wayne.edu generates with a warning, and non-interactive and CI runs skip the check. <code>--playbook</code> stays as a no-op for old scripts, and <code>--no-playbook</code> is for CI and automated tests only.</p>
-</li>
-<li>
-<p>Added: the raw template ships Pinstripe's coding standard: <code>pint.json</code> (the per preset, with the fetched <code>public/wayne-ui.php</code> kept out and <code>vendor</code> excluded) and <code>phpstan.neon</code> (Pinstripe's raw preset, level 8 over <code>src/</code> and <code>public/</code>), <code>waynestate/pinstripe</code> in require-dev with the extension-installer plugin allowed, and <code>lint</code>, <code>fix</code> and <code>analyse</code> scripts, so <code>composer ci</code> runs test, lint, analyse, proctor and audit in that order.</p>
-</li>
-<li>
-<p>Changed: the raw template's code passes both of Pinstripe's tools: per-preset style fixes in <code>Oracle</code>, <code>OracleException</code>, <code>public/index.php</code> and <code>OracleTest</code>, precise closure and binds types in <code>Oracle</code>, a false guard for <code>oci_error()</code> results, and the connect-failure branch reporting the last driver error instead of passing the failed connection as its source. A freshly baked raw app passes its own checks.</p>
-</li>
-<li>
-<p>Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).</p>
-</li>
-<li>
-<p>Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.</p>
-</li>
-<li>
-<p>Changed: new apps now get HELMET <code>^0.3</code>, SESAME <code>^0.4</code> and PROCTOR <code>^0.4</code>, and their <code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment) because PROCTOR 0.4's <code>preflight-pinned</code> check wants a 40-hex SHA.</p>
-</li>
-<li>
-<p>Fixed: the GitHub CI workflow was rejected as invalid (every run failed with &quot;workflow file issue&quot;) because the smoke job used GitLab's <code>allow_failure</code>; it now uses <code>continue-on-error</code>.</p>
-</li>
-<li>
-<p>Fixed: the sourdough command now works after composer global require (bin/sourdough also looks for the autoloader three folders up, where a dependency install keeps it).</p>
-</li>
-<li>
-<p>Fixed: the Laravel Next steps now run <code>php artisan migrate</code> after <code>php artisan key:generate</code> (all three Laravel shapes), so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.</p>
-</li>
-<li>
-<p>Fixed: the Blade and Blade + Vue islands views read the signed-in user as an array (<code>$user['name']</code>), because SESAME's <code>Sesame::user()</code> returns an array, not an object; the dashboard and the layout no longer crash after sign-in.</p>
-</li>
-<li>
-<p>Fixed: the laravel-blade template ships <code>app/Providers/AppServiceProvider.php</code> with <code>Schema::defaultStringLength(191)</code> like the laravel-inertia one, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR <code>mysql56-string-default</code>).</p>
-</li>
-<li>
-<p>Fixed: the Oracle check command in the laravel-blade and laravel-inertia templates compares in Pint's non-Yoda order (<code>$script === null</code>), so a freshly baked app passes its own <code>composer ci</code> on the first run.</p>
-</li>
-<li>
-<p>Fixed: the laravel-blade-vue template ships <code>tests/Feature/ExampleTest.php</code> with <code>$this-&gt;withoutVite()</code>, so <code>composer ci</code> in a freshly baked islands app no longer fails on the missing Vite manifest before <code>npm run build</code> has run.</p>
-</li>
-<li>
-<p>Changed: the smoke gate runs <code>php artisan migrate</code> like the Next steps, and the Laravel template READMEs show <code>migrate</code> for local and <code>migrate --force</code> for deploys.</p>
-</li>
-<li>
-<p>Added: the front page's main nav links the docs site.</p>
-</li>
-<li>
-<p>Fixed: the Playbook wiring no longer drops a template's own composer config keys.</p>
-</li>
-<li>
-<p>Fixed: the raw template ships <code>stubs/wayne-ui.php</code>, a static-analysis stub for the run-time WayneUI functions (<code>wsu_shell_start</code>, <code>wsu_shell_end</code>) that <code>phpstan.neon</code> scans through <code>scanFiles</code>, so <code>composer ci</code> in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched <code>public/wayne-ui.php</code>.</p>
-</li>
+<li>Added: the site accessibility gate: <code>scripts/a11y.sh</code> (Git Bash, Linux, macOS) and <code>scripts/a11y.ps1</code> (Windows) run axe-core (WCAG 2.2 AA) in Docker over every committed HTML page under <code>site/</code>, in light and dark at 360 px and 1280 px.</li>
+<li>Added: <code>sourdough new --raw --vue</code> bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then <code>templates/raw-vue/</code> over it: a front controller that answers JSON under <code>/api/</code> (<code>/api/me</code> returns the signed-in user, or <code>401</code> instead of sending a <code>fetch()</code> to CAS) and sends the Vue page for <code>/</code> (and for any other path, with a <code>404</code>); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from <code>@waynestate/wayne-ui-vue</code> and <code>@waynestate/wayne-ui-css</code> 2.0.8, pinned exactly as in the Inertia shape; and <code>src/Vite.php</code>, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while <code>npm run dev</code> runs (and adds it to the CSP, never in production). Its Next steps: <code>composer install</code>, <code>npm install</code>, <code>npm run build</code>, <code>composer serve</code>. The <code>--raw --vue</code> plan no longer ends in &quot;not available in this release&quot;, and a <code>smoke-raw-vue</code> CI job bakes the shape and checks <code>/</code>, <code>/api/me</code> and <code>/up</code> on a live server. All five loaves bake now.</li>
+<li>Added: the Laravel shapes refuse to boot production on the tests' dummy APP_KEY (<code>app/Support/DummyAppKey.php</code>, called from <code>AppServiceProvider::boot()</code>), and <code>tests/Support/SkipEnvFile.php</code> hands the tests that one dummy key (base64 of 32 zero bytes) when nothing else sets one. WELD ships the same files.</li>
+<li>Added: the docs site in <code>site/docs/</code> is built by the shared Squire docs-site builder (<code>bin/docs-site.php</code>) from the pages in <code>docs/</code>, and <code>composer ci</code> checks it with <code>@docs:check</code>.</li>
+<li>Added: the smoke gate proves a live baked raw app serves: it fetches the pinned WayneUI release once into <code>public/wayne-ui.php</code>, starts the app with <code>APP_ENV=local</code> on <code>127.0.0.1:8099</code> and expects <code>/</code> 200, <code>/nope</code> 404 and <code>/up</code> 200. Every shape now bakes with <code>--no-playbook</code>, because Playbook is required by default and its private package cannot be installed credential-free.</li>
+<li>Added: <code>--docker</code> generates the app's own Docker setup for the Laravel shapes (<code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code>): a two-target <code>Dockerfile</code> (dev and prod) whose base images are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64, a <code>compose.yaml</code> with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a <code>.dockerignore</code>, the PHP ini files the image copies in, the <code>composer dev-up</code>, <code>dev-down</code> and <code>dev-shell</code> scripts, the database settings in <code>.env.example</code>, and a &quot;Run it locally with Docker&quot; README section. It works natively on Windows, macOS and Linux (no WSL2 needed). Playbook credentials reach a production build only as a BuildKit secret, never a build arg, and the <code>FROM</code> lines are the single place to swap in SQUIRE's Citadel-parity image when it exists.</li>
+<li>Added: <code>--sail</code> generates a Sail setup (compose.yaml, laravel/sail) for the Laravel shapes.</li>
+<li>Added: the raw template's <code>.gitlab-ci.yml</code> runs an explicit <code>composer-ci</code> job (<code>composer install</code>, then <code>composer ci</code>), mirroring the Laravel overlay, so PROCTOR sees a <code>composer ci</code> in the pipeline instead of warning that no job runs it.</li>
+<li>Added: generated apps in Require mode get a <code>composer playbook</code> script (<code>@composer show waynestate/playbook --no-interaction</code>) with its <code>scripts-descriptions</code> entry, so you can check any time whether Playbook (WSU shared values) is installed. Existing scripts keep their order and <code>playbook</code> is appended last; an existing <code>playbook</code> script is left alone.</li>
+<li>Added: the raw template ships Pinstripe's coding standard: <code>pint.json</code> (the per preset, with the fetched <code>public/wayne-ui.php</code> kept out and <code>vendor</code> excluded) and <code>phpstan.neon</code> (Pinstripe's raw preset, level 8 over <code>src/</code> and <code>public/</code>), <code>waynestate/pinstripe</code> in require-dev with the extension-installer plugin allowed, and <code>lint</code>, <code>fix</code> and <code>analyse</code> scripts, so <code>composer ci</code> runs test, lint, analyse, proctor and audit in that order.</li>
+<li>Added: the front page's main nav links the docs site.</li>
+</ul>
+<h3 id="changed">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed">#</a></h3>
+<ul>
+<li>Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the <code>ziggy-js</code> npm package. The home page and the dashboard are new, in WayneUI's components and tokens. <code>eslint.config.js</code> refuses <code>components/ui</code> imports and the kit's helper packages, <code>.prettierrc</code> is the stack's, and a <code>frontend</code> CI job runs lint, Prettier, vue-tsc and the build.</li>
+<li>Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (<code>tests/Pest.php</code>, a Pest example test, <code>composer test</code> and <code>composer ci</code> run Pest, PHPUnit tests unchanged, tests read <code>.env</code>, or <code>.env.example</code> when there is no <code>.env</code>); the raw shape is unchanged.</li>
+<li>Changed: the docs site wears Sourdough's own look: the front page header and menu (Docs marked current), the gold version ticket, Caprasimo titles, the baker's Kalam hand for labels, the recipe terminal with its gold Copy pill for commands, recipe-card tables, baker's-note callouts and the deep green footer, with a derived chalkboard dark mode. Source: <code>docs/_header.html</code>, <code>docs/theme/sourdough.css</code> and a <code>theme</code> key in <code>docs/docs.json</code>; the kit's <code>docs.css</code> is unchanged.</li>
+<li>Changed: <code>sourdough new</code> now requires <code>waynestate/playbook</code> in every app it bakes: the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends the token to git.wayne.edu, the <code>.env.example</code> block, and a README section with the access how-to. The command checks read access before writing anything (a Composer credential, then a direct git probe) and refuses with exit <code>1</code> until the developer can read the package; an unreachable git.wayne.edu generates with a warning, and non-interactive and CI runs skip the check. <code>--playbook</code> stays as a no-op for old scripts, and <code>--no-playbook</code> is for CI and automated tests only.</li>
+<li>Changed: the raw template's code passes both of Pinstripe's tools: per-preset style fixes in <code>Oracle</code>, <code>OracleException</code>, <code>public/index.php</code> and <code>OracleTest</code>, precise closure and binds types in <code>Oracle</code>, a false guard for <code>oci_error()</code> results, and the connect-failure branch reporting the last driver error instead of passing the failed connection as its source. A freshly baked raw app passes its own checks.</li>
+<li>Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).</li>
+<li>Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.</li>
+<li>Changed: new apps now get HELMET <code>^0.3</code>, SESAME <code>^0.4</code> and PROCTOR <code>^0.4</code>, and their <code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment) because PROCTOR 0.4's <code>preflight-pinned</code> check wants a 40-hex SHA.</li>
+<li>Changed: the smoke gate runs <code>php artisan migrate</code> like the Next steps, and the Laravel template READMEs show <code>migrate</code> for local and <code>migrate --force</code> for deploys.</li>
+</ul>
+<h3 id="removed">Removed<a class="docs-heading-link" aria-label="Link to this section" href="#removed">#</a></h3>
+<ul>
+<li>Removed: from the Inertia shape, <code>tailwind.config.js</code>, <code>cn()</code> (<code>resources/js/lib/utils.ts</code>), <code>tailwindcss</code>, <code>autoprefixer</code>, <code>tailwind-merge</code>, <code>clsx</code>, <code>lucide-vue-next</code>, <code>@vueuse/core</code>, <code>prettier-plugin-tailwindcss</code>, the Bunny Fonts link and the ten kit components they served.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed">#</a></h3>
+<ul>
+<li>Fixed: <code>--sail</code> apps answer 200 on <code>/</code> and <code>/up</code> when the checkout is one Sail's <code>sail</code> user cannot write (a Windows drive under Docker Desktop, or files a root container wrote). Every page was a 500 naming <code>tempnam()</code>, because Blade could not write <code>storage/framework/views</code>. The compose file's entrypoint now gives the <code>sail</code> user its <code>WWWUSER</code> uid first (so a <code>sail artisan</code> run the moment <code>sail up -d</code> returns no longer runs as the image's uid 1337 and leaves a log file the server cannot append to), opens the app's files to that user only when it cannot write them (<code>vendor/</code>, <code>node_modules/</code> and <code>.git</code> untouched), then starts Sail as usual.</li>
+<li>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) serve <code>/</code> on the first <code>composer dev-up</code>. Nothing installed <code>node_modules</code>, so the vite service exited with <code>vite: not found</code> and <code>/</code> was a 500 (<code>Vite manifest not found</code>). The service now runs <code>npm install</code> when Vite is missing, then <code>npm run dev</code>.</li>
+<li>Fixed: the Laravel shapes' (Blade, Blade + Vue, Inertia) <code>.gitlab-ci.yml</code> runs the php-test matrix with <code>vendor/bin/pest</code>. The Preflight component defaults to <code>vendor/bin/phpunit</code>, which refuses the Pest example tests (&quot;Please run ./vendor/bin/pest instead&quot;), so every job in the matrix crashed with exit 255. Pest runs the PHPUnit class tests too.</li>
+<li>Fixed: <code>--docker</code> apps with a vite service (Blade + Vue, Inertia) load their pages. The service ran <code>npm run dev -- --host 0.0.0.0</code>, so laravel-vite-plugin wrote <code>http://0.0.0.0:5173</code> to <code>public/hot</code> and the browser got a blank page; it now runs <code>npm run dev</code> with <code>LARAVEL_SAIL=1</code>, which listens on every address and writes <code>http://localhost:5173</code>.</li>
+<li>Fixed: the GitLab smoke jobs (raw, Blade, Blade + Vue, Inertia) failed before they started: the Composer installer's options were handed to <code>php</code> itself (<code>no argument for option -</code>). They now go after <code>--</code>, with Composer pinned to 2.10.3, and the image gets <code>unzip</code> so Composer can unpack the locked packages.</li>
+<li>Fixed: a freshly baked Laravel app passes its own <code>pint --test</code> again: the Pest example tests are written out over several lines and <code>tests/Support/SkipEnvFile.php</code> uses imports and Laravel's operator order, so <code>composer ci</code> no longer fails on the template's own style.</li>
+<li>Fixed: raw apps start with <code>composer serve</code>. The old <code>php -S localhost:8000 -t public</code> line booted the app as production, because the raw front controller defaults <code>APP_ENV</code> to production when it is unset. The raw template's new <code>serve</code> script disables Composer's process timeout, sets <code>APP_ENV=local</code> cross-platform with <code>@putenv</code>, then starts <code>php -S localhost:8000 -t public</code>, so SESAME signs in with its fake driver; the raw Next steps, the raw README and the site recipe all point at <code>composer serve</code> now.</li>
+<li>Fixed: the raw front controller answers <code>404</code> for any path but <code>/</code> (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL. <code>/up</code> stays HELMET's and answers first.</li>
+<li>Fixed: the GitHub CI workflow was rejected as invalid (every run failed with &quot;workflow file issue&quot;) because the smoke job used GitLab's <code>allow_failure</code>; it now uses <code>continue-on-error</code>.</li>
+<li>Fixed: the sourdough command now works after composer global require (bin/sourdough also looks for the autoloader three folders up, where a dependency install keeps it).</li>
+<li>Fixed: the Laravel Next steps now run <code>php artisan migrate</code> after <code>php artisan key:generate</code> (all three Laravel shapes), so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.</li>
+<li>Fixed: the Blade and Blade + Vue islands views read the signed-in user as an array (<code>$user['name']</code>), because SESAME's <code>Sesame::user()</code> returns an array, not an object; the dashboard and the layout no longer crash after sign-in.</li>
+<li>Fixed: the laravel-blade template ships <code>app/Providers/AppServiceProvider.php</code> with <code>Schema::defaultStringLength(191)</code> like the laravel-inertia one, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR <code>mysql56-string-default</code>).</li>
+<li>Fixed: the Oracle check command in the laravel-blade and laravel-inertia templates compares in Pint's non-Yoda order (<code>$script === null</code>), so a freshly baked app passes its own <code>composer ci</code> on the first run.</li>
+<li>Fixed: the laravel-blade-vue template ships <code>tests/Feature/ExampleTest.php</code> with <code>$this-&gt;withoutVite()</code>, so <code>composer ci</code> in a freshly baked islands app no longer fails on the missing Vite manifest before <code>npm run build</code> has run.</li>
+<li>Fixed: the Playbook wiring no longer drops a template's own composer config keys.</li>
+<li>Fixed: the raw template ships <code>stubs/wayne-ui.php</code>, a static-analysis stub for the run-time WayneUI functions (<code>wsu_shell_start</code>, <code>wsu_shell_end</code>) that <code>phpstan.neon</code> scans through <code>scanFiles</code>, so <code>composer ci</code> in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched <code>public/wayne-ui.php</code>.</li>
+</ul>
+<h3 id="security">Security<a class="docs-heading-link" aria-label="Link to this section" href="#security">#</a></h3>
+<ul>
+<li>Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).</li>
 </ul>
 <h2 id="0-1-5-2026-11-03">0.1.5 (2026-11-03)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-5-2026-11-03">#</a></h2>
-<h3 id="added">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added">#</a></h3>
+<h3 id="added-1">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-1">#</a></h3>
 <ul>
 <li>Added: <code>sourdough new --laravel</code> bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest. Its Next steps suit the shape: <code>composer install</code>, <code>cp .env.example .env</code>, <code>php artisan key:generate</code>, <code>php artisan serve</code>. One more loaf on the bench.</li>
 <li>Added: <code>sourdough new --inertia</code> bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest. Its Next steps suit the shape: <code>composer install</code>, <code>cp .env.example .env</code>, <code>php artisan key:generate</code>, <code>npm install</code>, <code>npm run build</code>, <code>php artisan serve</code>. Three of the five loaves bake now.</li>
@@ -173,7 +109,7 @@ Versioning once 1.0 is out.</p>
 <li>Added: generated apps ship ADVISOR by default. <code>waynestate/advisor</code> lands in <code>require-dev</code> (raw template and the laravel-blade overlay), <code>.mcp.json</code> is git-ignored, the README gains an &quot;ADVISOR&quot; section, and the Next steps print <code>php vendor/bin/advisor install --client=claude --write</code>. <code>--no-advisor</code> skips all of it and records the choice in the manifest.</li>
 <li>Added: the smoke gate (<code>scripts/smoke-shape.sh</code>, <code>scripts/smoke-shape.ps1</code>, <code>scripts/smoke.Dockerfile</code>) bakes a shape with this checkout's own CLI and runs the generated app's own checks; CI runs one job per shape, all <code>allow_failure: true</code> until seen green once.</li>
 </ul>
-<h3 id="changed">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed">#</a></h3>
+<h3 id="changed-1">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-1">#</a></h3>
 <ul>
 <li>Changed: <code>--name</code> on the Laravel bakes reaches every place WELD applies it by hand: <code>composer.json</code>'s <code>name</code> becomes <code>app/&lt;slug&gt;</code> (an application is not a published package) with the description reading &quot;<name>, a Wayne State app baked from Sourdough.&quot;, <code>.env.example</code>'s <code>APP_NAME</code> carries the app name (quoted when it holds a space), and the <code>config/app.php</code> default follows it.</li>
 <li>Changed: the raw template pins WayneUI 2.0.8 (<code>https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php</code>) instead of fetching the floating <code>main</code> branch copy.</li>
@@ -188,7 +124,7 @@ Versioning once 1.0 is out.</p>
 <li>Changed: docs and package metadata name nougat as the canonical repository, with git.wayne.edu and GitHub as read-only mirrors, until git.wayne.edu has CI runners.</li>
 <li>Changed: the front page tells the truth about the shapes. The Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue loaves come out of the oven with their real commands; the hero, the rack note and the two agent prompts name the four that bake in 0.1; and WELD reads as the Inertia/Vue shape already built from Sourdough, not the other starter. Only raw PHP with Vue stays proofing.</li>
 </ul>
-<h3 id="fixed">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed">#</a></h3>
+<h3 id="fixed-1">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed-1">#</a></h3>
 <ul>
 <li>Fixed: the laravel-inertia bake drops the skeleton leftovers before the manifest is written: <code>vite.config.js</code> (next to the overlay's <code>vite.config.ts</code> it breaks <code>npm run build</code>), the dead <code>resources/js/app.js</code> stub, and <code>resources/views/welcome.blade.php</code> (no route renders it); the manifest no longer lists a file that is gone.</li>
 <li>Fixed: <code>php artisan oracle:check</code> finds the kit where it lives, in both the laravel-blade and the laravel-inertia templates: <code>oracle-check.php</code> at the app root (Squire's Laravel layout) first, then <code>deploy/oracle-check.php</code> (WELD's home).</li>
@@ -201,11 +137,11 @@ Versioning once 1.0 is out.</p>
 <li>Fixed: the laravel-inertia template boots a fresh app out of the box: <code>config/sesame.php</code> defaults <code>SESAME_FAKE_USERNAME</code> to <code>jane.doe</code> so the fake driver has a non-empty username, and Pint skips the two verbatim Squire files (<code>health.php</code>, <code>oracle-check.php</code>) through <code>notPath</code>.</li>
 </ul>
 <h2 id="0-1-4-2026-10-29">0.1.4 (2026-10-29)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-4-2026-10-29">#</a></h2>
-<h3 id="added-1">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-1">#</a></h3>
+<h3 id="added-2">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-2">#</a></h3>
 <ul>
 <li>Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.</li>
 </ul>
-<h3 id="changed-1">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-1">#</a></h3>
+<h3 id="changed-2">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-2">#</a></h3>
 <ul>
 <li>The Squire template copy in <code>templates/squire/</code> now comes from the <code>waynestate/squire</code> Composer package (new dev
 dependency, <code>^0.2</code>) instead of a Squire checkout. <code>composer squire-copy:sync</code> rewrites the copy from
@@ -216,33 +152,33 @@ copy has drifted. The refresh brings Squire 0.2.0's deploy files: <code>scripts/
 <li>Changed: generated apps require SESAME ^0.2 (Entra sign-in).</li>
 <li>Changed: the Squire copy comes from Squire 0.3.0.</li>
 </ul>
-<h3 id="fixed-1">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed-1">#</a></h3>
+<h3 id="fixed-2">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed-2">#</a></h3>
 <ul>
 <li>Fixed: <code>--laravel --inertia</code> is accepted.</li>
 <li>Fixed: stale capability claims in the site and README.</li>
 </ul>
 <h2 id="0-1-3-2026-10-29">0.1.3 (2026-10-29)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-3-2026-10-29">#</a></h2>
-<h3 id="added-2">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-2">#</a></h3>
+<h3 id="added-3">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-3">#</a></h3>
 <ul>
 <li><code>sourdough new</code> wires PLAYBOOK into generated apps. By default the app's <code>composer.json</code> gets a <code>suggest</code> for <code>waynestate/playbook</code>, <code>.env.example</code> lists the seven WSU shared setting names, the README gains a &quot;WSU values (PLAYBOOK)&quot; section, and the command prints a hint line pointing at it. <code>--playbook</code> adds the VCS repository and requires <code>waynestate/playbook</code> <code>^0.1</code>; <code>--no-playbook</code> skips all of it; the two flags together are refused with exit 1.</li>
 </ul>
 <h2 id="0-1-2-2026-10-29">0.1.2 (2026-10-29)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-2-2026-10-29">#</a></h2>
-<h3 id="added-3">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-3">#</a></h3>
+<h3 id="added-4">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-4">#</a></h3>
 <ul>
 <li><code>sourdough new</code> validates the app name before writing anything: it must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters (<code>RawGenerator::assertValidName</code>). Hostile names (quotes, backslashes, newlines, NUL bytes, placeholders, path traversal, overlong or empty names) are refused with exit 1 and write nothing.</li>
 </ul>
-<h3 id="changed-2">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-2">#</a></h3>
+<h3 id="changed-3">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-3">#</a></h3>
 <ul>
 <li>The raw template now requires HELMET <code>^0.2</code> and PROCTOR <code>^0.2</code>, so <code>sourdough new</code> installs the current stack releases instead of the 0.1 line. SESAME stays at <code>^0.1</code> until it cuts 0.2.</li>
 </ul>
 <h2 id="0-1-1-2026-10-29">0.1.1 (2026-10-29)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-1-2026-10-29">#</a></h2>
-<h3 id="changed-3">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-3">#</a></h3>
+<h3 id="changed-4">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-4">#</a></h3>
 <ul>
 <li>PHPStan and Pint now take their settings from Pinstripe (<code>waynestate/pinstripe</code> ^0.1) instead of a hand
 copy: <code>phpstan.neon</code> includes the raw preset, and <code>pint.json</code> extends the per preset. Same cut, off the rack.</li>
 </ul>
 <h2 id="0-1-0-2026-10-29">0.1.0 (2026-10-29)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-0-2026-10-29">#</a></h2>
-<h3 id="added-4">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-4">#</a></h3>
+<h3 id="added-5">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-5">#</a></h3>
 <ul>
 <li>The raw app now installs SQUIRE's deploy files from a checked copy at <code>templates/squire/</code>: <code>build.sh</code>,
 <code>deployments/001-first-release.sh</code>, <code>scripts/release.sh</code>, <code>scripts/parity.sh</code>, <code>scripts/parity.ps1</code>, <code>health.php</code>,
@@ -251,12 +187,12 @@ them; Sourdough copies them as-is and records them in the manifest.</li>
 <li><code>composer squire-copy:check</code>: verify that <code>templates/squire/</code> still matches a fresh export from the SQUIRE checkout
 (<code>SQUIRE_PATH</code>, default <code>/squire</code>). Skips with exit 0 when no checkout is mounted.</li>
 </ul>
-<h3 id="changed-4">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-4">#</a></h3>
+<h3 id="changed-5">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed-5">#</a></h3>
 <ul>
 <li>Refreshed the SQUIRE template copy in <code>templates/squire/</code> from e66f07b to 2a893c0: the Vue layer's <code>.npmrc</code> and
 <code>docker-compose.squire.yml</code> joined the batch. Fresh flour, same recipe.</li>
 </ul>
-<h3 id="removed">Removed<a class="docs-heading-link" aria-label="Link to this section" href="#removed">#</a></h3>
+<h3 id="removed-1">Removed<a class="docs-heading-link" aria-label="Link to this section" href="#removed-1">#</a></h3>
 <ul>
 <li>The raw template's own <code>deployments/release.sh</code> and <code>deployments/release.ps1</code>; the release steps now come from SQUIRE.</li>
 </ul>
@@ -264,10 +200,10 @@ them; Sourdough copies them as-is and records them in the manifest.</li>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/upgrading.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Upgrading</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#unreleased">Unreleased</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#fixed">Fixed</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-1">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-1">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#fixed-1">Fixed</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-2">Added</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-3">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-2">Changed</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-3">Changed</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-4">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-4">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#removed">Removed</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#unreleased">Unreleased</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#removed">Removed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#fixed">Fixed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#security">Security</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-1">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-1">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#fixed-1">Fixed</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-2">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-2">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#fixed-2">Fixed</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-3">Added</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-4">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-3">Changed</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-4">Changed</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#added-5">Added</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#changed-5">Changed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#removed-1">Removed</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.1.5</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>
   <span><a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">Source</a> Mirrors: <a rel="noopener" href="https://github.com/waynestate/sourdough">GitHub</a> <a href="changelog.md">Markdown</a></span>
 </footer>
 </body>
