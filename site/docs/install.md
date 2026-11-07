@@ -47,10 +47,10 @@ sourdough --version
 Expected:
 
 ```
-Sourdough 0.1.6
+Sourdough 0.1.7
 ```
 
-The CLI is a Symfony Console application named Sourdough, version 0.1.6 (`bin/sourdough`), so `--version` prints the name and the version.
+The CLI is a Symfony Console application named Sourdough, version 0.1.7 (`bin/sourdough`), so `--version` prints the name and the version.
 
 ## Next steps[#](https://sourdough.apps.wayne.edu/docs/install.html#next-steps)
 

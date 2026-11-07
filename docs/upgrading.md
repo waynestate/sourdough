@@ -26,12 +26,12 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.1.6
+Sourdough 0.1.7
 ```
 
 Then read the section for the version you are moving to.
 
-## Unreleased
+## 0.1.7 (2026-11-07)
 
 **Breaking:** for new bakes, and for apps you feed. The Inertia shape moves to Inertia 3 (`inertiajs/inertia-laravel` `^3.0`, `@inertiajs/vue3` `^3.0`: PHP 8.2+, Laravel 11+, ES modules only, Axios no longer bundled). Every shape requires PROCTOR `^0.6`, and the Laravel shapes' `composer proctor` script drops `--policy`, because PROCTOR 0.6 refuses that option in CI.
 

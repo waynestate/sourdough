@@ -614,6 +614,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+### 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-7-2026-11-07)
+
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
 - Added: `sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what the app changed (ADR-0014, decision 4). It bakes the app's shape again with the answers in its manifest and goes file by file: files the template did not change are left alone, untouched managed files take the new version, files both sides changed are three-way merged by `git merge-file`, same-line changes get git's conflict markers (`<<<<<<< app` ... `>>>>>>> sourdough <version>`) and never a silent overwrite, new template files are added, dropped ones are removed only when untouched, binary files are never merged (the template's copy lands as `<file>.sourdough-new`), and seeded files are never touched. The base for a merge is found by its manifest hash, in `.sourdough/base/` (the template's version of each changed managed file, kept by the previous feed) or anywhere in the app's git history; with no base, both versions are marked. Feed then moves the manifest to the new base. It runs only on a clean git tree, refuses while the last feed's markers are unresolved, and refuses a manifest from a newer Sourdough. `--dry-run` prints the plan and writes nothing (exit `0` fresh, `1` feeding would change files, so it works as a CI gate), `--json` prints the plan for machines; a real feed exits `0` fed cleanly, `1` fed with conflicts, `2` tool error. It needs git and nothing else. Every shape is covered by `tests/FeedCommandTest.php`, and the smoke gate now checks that a fresh bake of each shape has nothing to feed.
@@ -1725,7 +1727,7 @@ The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/d
 
 ### Status[#](https://sourdough.apps.wayne.edu/docs/#status)
 
-Version 0.1.6 (2026-11-06), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.1.7 (2026-11-07), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 **On the bench: the five loaves and the feeding schedule**
 
@@ -1786,10 +1788,10 @@ sourdough --version
 Expected:
 
 ```
-Sourdough 0.1.6
+Sourdough 0.1.7
 ```
 
-The CLI is a Symfony Console application named Sourdough, version 0.1.6 (`bin/sourdough`), so `--version` prints the name and the version.
+The CLI is a Symfony Console application named Sourdough, version 0.1.7 (`bin/sourdough`), so `--version` prints the name and the version.
 
 ### Next steps[#](https://sourdough.apps.wayne.edu/docs/install.html#next-steps)
 
@@ -2894,12 +2896,12 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.1.6
+Sourdough 0.1.7
 ```
 
 Then read the section for the version you are moving to.
 
-### Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
+### 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-7-2026-11-07)
 
 **Breaking:** for new bakes, and for apps you feed. The Inertia shape moves to Inertia 3 (`inertiajs/inertia-laravel` `^3.0`, `@inertiajs/vue3` `^3.0`: PHP 8.2+, Laravel 11+, ES modules only, Axios no longer bundled). Every shape requires PROCTOR `^0.6`, and the Laravel shapes' `composer proctor` script drops `--policy`, because PROCTOR 0.6 refuses that option in CI.
 
