@@ -182,6 +182,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 - a managed file you never touched takes the template's new version;
 - a file you both changed is three-way merged by git (`git merge-file`), from the version Sourdough wrote last time; where you both changed the same lines, git's conflict markers go in the file (`<<<<<<< app` and `>>>>>>> sourdough `), never a silent overwrite;
 - new template files are added, and files the template dropped are removed only if you never changed them;
+- a file that already matches the template's new version is only recorded in the manifest (`record`); that is also how an app baked by 0.1.6 with `--sail` or `--docker` gets its oven into the manifest;
 - seeded files (`README.md`, `.env.example`) are never touched.
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
@@ -207,6 +208,8 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 ```
 
 The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 ` runs it in one line.
+
+The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/reference/proof.md) page.
 
 The site accessibility gate runs axe-core (WCAG 2.2 AA) over every committed page under `site/` in Docker, in light and dark at 360 px and 1280 px: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows.
 
@@ -263,7 +266,7 @@ On the cooling rack
 
 ### Five loaves, one starter
 
-These are the five app shapes the stack supports, and all five bake today. Score a loaf to see what's inside.
+These are the five app shapes the stack supports, and all five bake today. The proof harness bakes, boots and feeds forward every one of them: read [the latest proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html). Score a loaf to see what's inside.
 
 Country boule
 
@@ -616,9 +619,13 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
 - Added: `sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what the app changed (ADR-0014, decision 4). It bakes the app's shape again with the answers in its manifest and goes file by file: files the template did not change are left alone, untouched managed files take the new version, files both sides changed are three-way merged by `git merge-file`, same-line changes get git's conflict markers (`<<<<<<< app` ... `>>>>>>> sourdough <version>`) and never a silent overwrite, new template files are added, dropped ones are removed only when untouched, binary files are never merged (the template's copy lands as `<file>.sourdough-new`), and seeded files are never touched. The base for a merge is found by its manifest hash, in `.sourdough/base/` (the template's version of each changed managed file, kept by the previous feed) or anywhere in the app's git history; with no base, both versions are marked. Feed then moves the manifest to the new base. It runs only on a clean git tree, refuses while the last feed's markers are unresolved, and refuses a manifest from a newer Sourdough. `--dry-run` prints the plan and writes nothing (exit `0` fresh, `1` feeding would change files, so it works as a CI gate), `--json` prints the plan for machines; a real feed exits `0` fed cleanly, `1` fed with conflicts, `2` tool error. It needs git and nothing else. Every shape is covered by `tests/FeedCommandTest.php`, and the smoke gate now checks that a fresh bake of each shape has nothing to feed.
+- Added: the proof harness, `scripts/proof.sh` (Linux, macOS) and `scripts/proof.ps1` (Windows), and the Proof page (`docs/reference/proof.md`) with its dated Last run table. In Docker, one after another, it runs the smoke gate on all five shapes and on every Laravel shape with `--sail` and with `--docker` (eleven runs), and feeds a bake of the last release (read from this changelog) forward in each. It writes `proof-out/last-run.md`, a summary and every step log, and exits `1` when any run fails. A GitLab `proof` job runs it by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push, and keeps the results as an artifact. `tests/ProofHarnessTest.php` keeps the two scripts, the gate, the CI job and the table listing the same runs.
+- Added: the smoke gate checks more of every loaf. Right after the bake, `sourdough manifest --check` must be clean. Every shape runs its own suite as its own step (the count goes in the proof table) and `composer proctor`. The Laravel shapes now boot too, on Laravel's own router: `/` must answer with the shape's home page (the Blade page, the built Vue islands, or the Inertia `Home` page), `/dashboard` after SESAME's fake sign-in, `/nope` 404 and `/up` 200; the raw shape's `/` must carry its home page in WayneUI's shell. A second argument, `--sail` or `--docker`, proves a Laravel shape's oven (the scaffold's files, install, suite, PROCTOR), and `SMOKE_FEED_FROM=<version>` bakes that release from Packagist and feeds it forward. `scripts/smoke-shape.ps1` takes `-Oven` and `-FeedFrom` to match.
 
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
+- Fixed: `sourdough feed` brings an app baked by 0.1.6 with `--sail` or `--docker` forward with its oven. 0.1.6 wrote the manifest before the oven's scaffold ran, so the answers named no oven, the oven's files were not in it, and `composer.json` was hashed before the scaffold edited it: feed baked the plain shape, found it "Fresh", and left `sourdough manifest --check` reporting `composer.json` changed for good. Feed now reads the oven from the app's files when a 0.1.6 manifest names none (a `Dockerfile`, `compose.yaml` and the `dev-up` script for Docker; `laravel/sail` and Sail's `compose.yaml` for Sail) and says so in a `note:` line. The proof harness found it.
+- Fixed: `sourdough feed` records a managed file that already holds the template's new version (a new `record` action) instead of passing over it in silence. Nothing in the file is written, but the manifest moves to the new hash, so `sourdough manifest --check` stops calling it changed. A plan of only `record` lines is a change: `--dry-run` exits `1`, and the real feed writes the manifest.
 - Fixed: the manifest of an app baked with `--sail` or `--docker` lists the scaffold's files (`Dockerfile`, `compose.yaml`, `.dockerignore`, the `docker/` ini files) and the composer.json the scaffold edited, and records `sail` or `docker` in its answers again, so `sourdough manifest --check` is clean right after the bake. It was written before the scaffold ran, so the check reported `composer.json` as changed on a fresh app. `new` and `feed` now bake through one `Baker`.
 - Fixed: the front page's feeding schedule shows its rows again for visitors who allow motion. Each row is clipped until it wipes in, and Chromium counts a clipped row as 0 % visible, so the reveal's 20 % threshold never fired and the rows stayed blank. The reveal now trips on the row's first edge, 15 % above the bottom of the screen.
 - Fixed: the docs pages reflow at 320 px (WCAG 1.4.10). The version ticket in the shared header carried `flex-shrink: 0`, so the header row could not give up ground and every docs page measured 328 px wide in a 320 px viewport. The ticket now shrinks and wraps to its version number instead of holding its width. The front page's five crumb buttons are named by their visible words too: each `aria-label` starts with "Score it", the words the hint shows, so the accessible name contains the visible text (axe `label-content-name-mismatch`).
@@ -799,6 +806,8 @@ Green means `composer ci` passed on all three PHP versions on both.
 ### The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
 On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
+
+The `proof` job runs the whole [proof harness](https://sourdough.apps.wayne.edu/docs/reference/proof.html) on GitLab: every shape and every oven, with the last release fed forward, and keeps the Last run table and every step log as an artifact. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets `SOURDOUGH_PROOF` to `1`.
 
 ### On the bench[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
 
@@ -1040,12 +1049,16 @@ Feed is the update model of Copier and cruft (ADR-0014), built on plain git inst
 | did not change it | anything | leaves it alone (no line in the plan) |
 | changed it | never touched it | `update`: takes the template's new version |
 | changed it | changed it too | `merge`: `git merge-file` applies the template's change on top of yours |
+| changed it | already has the new version | `record`: nothing written; the manifest records the new version |
 | changed the same lines | changed them too | `conflict`: git's markers in the file, `<<<<<<< app` ... `>>>>>>> sourdough <version>` |
 | added it | has no such file | `add` |
+| added it | has the very same file | `record`: nothing written; the manifest takes the file in |
 | added it | has its own file there | `conflict`: both versions marked |
 | dropped it | never touched it | `remove` (and its emptied folder) |
 | dropped it | changed it | `keep`: it is yours now, and leaves the manifest |
 | changed it | deleted it | `keep`: it stays deleted |
+
+A `record` line changes no file, only the manifest, so `sourdough manifest --check` stops calling the file changed. It is how an app baked by Sourdough 0.1.6 with `--sail` or `--docker` catches up: 0.1.6 wrote the manifest before the oven's scaffold ran, so feed reads the oven from the app's files (it says so in a `note:` line) and records them.
 
 Seeded files (`README.md`, `.env.example`) are never touched; a seeded file new to the template is written only where you have none. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
 
@@ -1524,19 +1537,23 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/
 
 ### The smoke gate[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#the-smoke-gate)
 
-The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
+The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-playbook --no-input` (the CLI under test is the one being shipped). Every bake passes `--no-playbook`, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.
 
-- `raw`: `composer install` and `composer ci`
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
-- `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
-- `blade-vue`: the blade steps plus `npm install` and `npm run build`
-- `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
+Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
-Right after the bake, every shape also proves the bake is reproducible: the gate commits the fresh app to a scratch git repository and expects `sourdough feed --dry-run` to exit 0 (nothing to feed), then drops the repository again. A loaf that comes out different every time would make every feed of it a conflict.
+- `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
+- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
+
+With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
+
+With `SMOKE_FEED_FROM` set to a release (for example `0.1.6`), the gate also bakes the shape with that release from Packagist, commits it, and feeds it forward with this checkout: no conflict, a clean manifest afterwards, nothing left to feed. `scripts/proof.sh` (`scripts/proof.ps1` on Windows) runs every shape and every oven this way, one after another, and writes the Last run table on the [Proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html) page.
 
 Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
 
-`tests/FeedCommandTest.php` covers `sourdough feed` itself on every shape (and with `--sail` and `--docker`), offline, in the PHPUnit suite: an app aged to an older template, one with local edits that merge cleanly, one with a conflict, and the refusals. It needs git on PATH and skips without it.
+`tests/FeedCommandTest.php` covers `sourdough feed` itself on every shape (and with `--sail` and `--docker`), offline, in the PHPUnit suite: an app aged to an older template, one with local edits that merge cleanly, one with a conflict, a file that already has the template's new version, an oven app baked by 0.1.6, and the refusals. It needs git on PATH and skips without it.
 
 Run it per OS. The image (`scripts/smoke.Dockerfile`) pins php 8.5, composer 2 and node 22, so the bake is identical everywhere:
 
@@ -1553,16 +1570,23 @@ windows
 .\scripts\smoke-shape.ps1 <shape>
 ```
 
-The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run, `-Oven sail` or `-Oven docker` for an oven run, and `-FeedFrom <version>` to feed a release forward. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
 
-Two environment variables control the scratch space:
+Environment variables:
 
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
+- `SMOKE_FEED_FROM`: a released Sourdough to bake and feed forward (off when unset).
+- `SMOKE_PREV_CACHE`: where that release is installed, so several runs share one copy.
+- `SMOKE_PORT`: the live server's port (default `8099`).
+
+### Proof the lot[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#proof-the-lot)
+
+`sh scripts/proof.sh` (Linux, macOS) and `.\scripts\proof.ps1` (Windows) run the gate on all eleven runs (five shapes, six ovens), feed the last release forward in each, and write the Last run table. What each run proves and the latest results are on the [Proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html) page.
 
 Note
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
 
 ### Related[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#related)
 
@@ -1810,15 +1834,19 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 
 ### Smoke gate[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
 
-The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-input` (the CLI under test is the one being shipped), then runs the generated app's own checks:
+The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-playbook --no-input` (the CLI under test is the one being shipped). Every bake passes `--no-playbook`, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.
 
-- `raw`: `composer install` and `composer ci`
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then a live server that must answer `/` with the built app, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and `/up` with `200`
-- `blade`: the raw steps plus `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate` and `php artisan test`
-- `blade-vue`: the blade steps plus `npm install` and `npm run build`
-- `inertia`: the blade steps plus `npm install`, `npm run build` and `npm run typecheck`
+Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
-Right after the bake, every shape also proves the bake is reproducible: the gate commits the fresh app to a scratch git repository and expects `sourdough feed --dry-run` to exit 0 (nothing to feed), then drops the repository again. A shape whose bake is not stable would make every feed of it a conflict.
+- `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
+- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
+- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
+
+With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
+
+With `SMOKE_FEED_FROM` set to a release (for example `0.1.6`), the gate also bakes the shape with that release from Packagist, commits it, and feeds it forward with this checkout: no conflict, a clean manifest afterwards, nothing left to feed. `scripts/proof.sh` (`scripts/proof.ps1` on Windows) runs every shape and every oven this way, one after another, and writes the Last run table on the [Proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html) page.
 
 Each step prints `ok`; the first `FAIL` stops the run and shows the command's tail. A shape is claimed in the docs only when its smoke is green.
 
@@ -1839,12 +1867,26 @@ Windows PowerShell:
 
 The PowerShell wrapper builds the same image once and reuses it. Pass `-WorkDir <dir>` to bind a local folder to `/work` so the scratch copy, the generated app and the per-step logs survive the run.
 
-Two environment variables control the scratch space:
+Environment variables:
 
 - `SMOKE_WORK`: the scratch dir for the copy, the app and the logs. Defaults to a fresh temp dir that is removed on exit.
 - `SMOKE_KEEP`: set to `1` to keep the scratch dir behind for inspection.
+- `SMOKE_FEED_FROM`: a released Sourdough to bake and feed forward (off when unset).
+- `SMOKE_PREV_CACHE`: where that release is installed, so several runs share one copy.
+- `SMOKE_PORT`: the live server's port (default `8099`).
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
+
+### The local runtime output (Sail and Docker)[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-local-runtime-output-sail-and-docker)
+
+The `--sail` and `--docker` output is checked by tests and by the proof's oven runs: `tests/SailScaffoldTest.php` and `tests/DockerScaffoldTest.php` assert on the files each scaffold writes, including real-binary runs through `bin/sourdough`, and `scripts/proof.sh` bakes every Laravel shape in each oven, installs it and runs its suite and PROCTOR. No Docker daemon is part of either, so a bake with `--docker` is not proven to boot here. The plan is to add Docker smoke runs to the smoke gate once it can drive a compose stack (build the app image, start MySQL, run `php artisan migrate` and expect `/up` 200); until then the docs claim what the tests prove.
+
+The base images in `templates/docker/Dockerfile` are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64. To bump a pin:
+
+1. Run `docker buildx imagetools inspect <tag>` for the tag you want (for example `php:8.5-cli-trixie`) and copy the manifest-list digest, the `sha256:` value on the top `Digest:` line, not the per-architecture digests listed below it.
+2. Replace the digest on the matching `FROM` line, add a CHANGELOG line, and commit.
+
+A digest pin never moves on its own, so schedule these bumps (for example when a new patch release lands on the line) to pick up security fixes inside the image.
 
 ### Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-the-squire-templates)
 
@@ -2038,6 +2080,9 @@ One line per file that changes, ` <action> <file> (<why>)`; files feed leaves al
 | `conflict` | both changed the same lines, there was no base to merge from, or the file is binary: marked, never overwritten |
 | `remove` | the template dropped it and the app had not changed it |
 | `keep` | the template dropped a file the app changed (it is the app's now), or changed a file the app deleted (it stays deleted) |
+| `record` | the app already has the template's new version of the file: nothing is written, the manifest records it |
+
+An app baked by Sourdough 0.1.6 with `--sail` or `--docker` has no oven in its manifest's answers (0.1.6 wrote the manifest before the oven's scaffold ran). Feed reads the oven from the app's files instead (a `Dockerfile`, `compose.yaml` and the `dev-up` script for Docker; `laravel/sail` and Sail's `compose.yaml` for Sail), says so in a `note:` line, and records the oven's files, so `sourdough manifest --check` is clean afterwards.
 
 A conflict in a text file holds git's markers, `<<<<<<< app`, `=======` and `>>>>>>> sourdough <version>`; a binary conflict leaves the template's copy next to the app's as `<file>.sourdough-new`.
 
@@ -2226,6 +2271,148 @@ The app plan is the what: permutation, parts, name, models, pages. The steps pla
 
 - [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
 - [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)
+
+---
+
+Source: https://sourdough.apps.wayne.edu/docs/reference/proof.html
+
+## Proof[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#proof)
+
+This page says what each check of Sourdough proves and how to run it. Sourdough's promise is that every shape it bakes works on the day it comes out of the oven, so the proof is not a unit test of the generator: it bakes every shape for real, with this checkout, and makes the loaf prove itself.
+
+### Last run[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#last-run)
+
+| Run | Date | Commit | Result | Duration |
+| --- | --- | --- | --- | --- |
+| `sh scripts/smoke-shape.sh raw` | 2026-11-07 | `191ee57` | pass: 25 of 25 steps; suite: 11 tests, 21 assertions; fed from 0.1.6: fresh | 18 s |
+| `sh scripts/smoke-shape.sh raw-vue` | 2026-11-07 | `191ee57` | pass: 28 of 28 steps; suite: 16 tests, 34 assertions; fed from 0.1.6: fresh | 16 s |
+| `sh scripts/smoke-shape.sh blade` | 2026-11-07 | `191ee57` | pass: 27 of 27 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 19 s |
+| `sh scripts/smoke-shape.sh blade-vue` | 2026-11-07 | `191ee57` | pass: 30 of 30 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 16 s |
+| `sh scripts/smoke-shape.sh inertia` | 2026-11-07 | `191ee57` | pass: 31 of 31 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 37 s |
+| `sh scripts/smoke-shape.sh blade --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
+| `sh scripts/smoke-shape.sh blade --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 9 s |
+| `sh scripts/smoke-shape.sh blade-vue --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 9 s |
+| `sh scripts/smoke-shape.sh blade-vue --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 10 s |
+| `sh scripts/smoke-shape.sh inertia --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
+| `sh scripts/smoke-shape.sh inertia --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 11 s |
+| `composer ci` | 2026-11-07 | `{{CI_COMMIT}}` | {{CI_RESULT}} | {{CI_SECONDS}} s |
+
+All eleven runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with `record` lines only, which is the fix this run was written for: 0.1.6 left the oven out of the manifest (see [What it found](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.
+
+### What it found[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)
+
+The first run of the harness, on the same day, failed nine of eleven runs. Six of the failures were Sourdough's:
+
+- **An app baked by 0.1.6 with `--sail` or `--docker` could never feed cleanly.** 0.1.6 wrote the manifest before the oven's scaffold ran, so it named no oven and hashed `composer.json` before the scaffold edited it. `sourdough feed` then baked the plain shape, called the app fresh and wrote nothing, and `sourdough manifest --check` reported `composer.json` changed for good. Fixed in the same branch: feed reads the oven from the app's files when a 0.1.6 manifest names none, and a new `record` action moves the manifest to a file the app already has right ([Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#what-feed-does)).
+- The other three failures were the harness's own: Laravel's router wants `public/` as its working directory. Fixed before the run above, along with the suite count, which Pest prints in color even without a terminal.
+
+Still open, from the same runs:
+
+- **The Laravel shapes ship two tests**: the home page answers 200, and the skeleton's unit example. Nothing in a baked app's own suite checks that `/dashboard` needs a sign-in or that `/up` answers; the proof checks both from outside.
+- **PROCTOR says `INFO composer-config`** on every shape: the baked `composer.json` sets `require.php` but not `config.platform.php`, so the lock resolves against whatever PHP ran `composer install`.
+- **The raw shapes run PROCTOR on its bundled policy**, the Laravel shapes on CREED's released one: the raw template does not require `waynestate/creed` and its `proctor` script passes no `--policy`.
+- **PROCTOR warns `php-floor`** on every shape: PHP 8.3 is in security-only support until 2027-12-31. Expected, and the stack's floor until then.
+
+### Run it[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#run-it)
+
+The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.10.3, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
+
+sh
+
+```bash
+sh scripts/proof.sh            # every run
+sh scripts/proof.sh raw inertia+docker
+```
+
+PowerShell
+
+```powershell
+.\scripts\proof.ps1            # every run
+.\scripts\proof.ps1 raw inertia+docker -OutDir C:\temp\proof
+```
+
+It needs git and Docker, and the network for Composer, npm, Packagist and the WayneUI release. It needs no credentials: every bake passes `--no-playbook` and `--no-advisor`, and the gate drops any Oracle, CAS or Composer credential the host leaks in.
+
+The harness proofs the committed tree plus any edits to tracked files (`git stash create`), never untracked files, and the table marks the commit `+ local edits` when there were any. The source goes into the container as one tar file from `git archive` rather than a mounted folder, because Docker Desktop can list a mounted folder only partially. `git archive` honors the `export-ignore` lines in `.gitattributes`, so the proof bakes with the package exactly as Composer ships it: no tests, no site, no `composer.lock`, and Sourdough's own dependencies resolve fresh, as they do for anyone who installs it from Packagist. The CI job runs on the checkout instead, lock and all.
+
+Results land in `proof-out/` (or `-OutDir`, or `PROOF_OUT`):
+
+| File | What it holds |
+| --- | --- |
+| `last-run.md` | the table above, ready to paste |
+| `summary.txt` | the image's versions, one line per run, the total |
+| `logs/<run>.txt` | the run's `ok` and `FAIL` lines |
+| `logs/<run>/<n>.log` | the full output of each step |
+
+The exit code is `0` when every run passed, `1` when any failed, `2` when the harness could not start. To refresh this page, run the harness on a clean checkout of `main` and paste `last-run.md` over the table.
+
+| Setting | Meaning |
+| --- | --- |
+| runs (arguments) | `raw`, `raw-vue`, `blade`, `blade-vue`, `inertia`, or a Laravel shape in an oven: `blade+sail`, `blade+docker`, `blade-vue+sail`, `blade-vue+docker`, `inertia+sail`, `inertia+docker`. None means all eleven. |
+| `PROOF_FEED_FROM` (`-FeedFrom`) | the released Sourdough to feed forward from. Default: the newest release in `CHANGELOG.md`; `none` skips the feed. |
+| `PROOF_OUT` (`-OutDir`) | where the results go. Default: `proof-out/`. |
+| `--here` | `proof.sh` only: run in this machine instead of Docker. The CI job uses it inside the smoke image. |
+
+### What each run proves[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-each-run-proves)
+
+Every run goes through `scripts/smoke-shape.sh`, the same gate the per-shape smoke jobs run on every pipeline. Each step prints `ok` or `FAIL`; the first `FAIL` stops the run and shows the step's tail.
+
+1. **It bakes.** `sourdough new` with this checkout's own CLI, so the starter under test is the one being shipped.
+2. **The manifest is clean.** `sourdough manifest --check` exits 0 right after the bake: every managed file matches `.sourdough/manifest.json`.
+3. **The bake is reproducible.** The fresh app is committed to a scratch git repository and `sourdough feed --dry-run` must find nothing to feed. A loaf that came out different every time would make every feed of it a conflict.
+4. **Yesterday's loaf feeds forward.** The same shape is baked with the last release, installed from Packagist, and committed as an app would be. This checkout's `sourdough feed` must bring it up to date without a conflict, `sourdough manifest --check` must be clean afterwards, and a second `sourdough feed --dry-run` must find nothing left to do.
+5. **It installs.** `composer install` (and `npm install` for the Vue shapes) from the baked `composer.json` and `package.json`.
+6. **Its own suite passes.** `composer test` for the raw shapes (PHPUnit), `php artisan test` for the Laravel shapes (Pest 4). The table quotes the suite's own count.
+7. **PROCTOR passes.** `composer proctor`: the stack's checks against CREED's policy, from inside the app.
+8. **Its own gate passes.** `composer ci`, plus `npm run build` for the Vue shapes and `npm run typecheck` for Inertia.
+9. **It serves.** A live server, then its front page:
+
+| Shape | Server | `/` must answer 200 with | Also |
+| --- | --- | --- | --- |
+| Raw PHP | `php -S` with `APP_ENV=local`, after fetching the pinned WayneUI release into `public/wayne-ui.php` | `app is running.` in WayneUI's shell | `/nope` 404, `/up` 200 |
+| Raw PHP + Vue | the same | the built app (`src="/build/assets/`) mounted on `id="app"` | `/api/me` 401 without a session and the fake user with one, `/nope` 404 with the app, `/up` 200 |
+| Laravel + Blade | `php -S` with Laravel's own router, as `php artisan serve` runs it | `baked fresh by Sourdough` | `/dashboard` signs in with SESAME's fake driver, `/nope` 404, `/up` 200 |
+| Laravel + Blade + Vue islands | the same | `baked fresh by Sourdough` and the built assets | `/dashboard` carries the `data-vue-island="counter"` island, `/nope` 404, `/up` 200 |
+| Laravel + Inertia/Vue | the same | the `Home` page component and the built assets | `/dashboard` renders the `Dashboard` page after the fake sign-in, `/nope` 404, `/up` 200 |
+
+#### The ovens[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#the-ovens)
+
+A Laravel shape with `--sail` or `--docker` is proven up to the oven door. The run bakes it, checks the manifest, the reproducible bake and the feed from the last release as above, checks that the scaffold wrote its files (`compose.yaml` and `laravel/sail` for Sail; the `Dockerfile`, `compose.yaml`, `.dockerignore` and the `dev-up` script for Docker), then installs the app and runs its own suite and PROCTOR. The oven's `.env.example` points at MySQL, which the gate does not run; the suite keeps to SQLite in memory, as `phpunit.xml` says.
+
+### composer ci[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#composer-ci)
+
+Sourdough's own gate, the same command on GitLab and GitHub:
+
+```sh
+composer ci   # validate, PHPUnit, Pint, PHPStan, the Squire copy, agent-ready files, the docs site, audit
+```
+
+The PHPUnit suite covers every generator, the manifest, `sourdough feed` on every shape with local edits, merges, conflicts and refusals (`tests/FeedCommandTest.php`, offline), and the Sail and Docker scaffolds file by file. `tests/ProofHarnessTest.php` keeps the two harness scripts, the gate, the CI job and the table on this page listing the same runs.
+
+### On CI[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#on-ci)
+
+Each shape's smoke job (`smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue`, `smoke-inertia`) runs the gate on every pipeline, without the feed from the last release and without the ovens.
+
+The `proof` job runs the whole harness. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets `SOURDOUGH_PROOF` to `1`. It keeps `proof-out/` (the table, the summary and every step log) as an artifact for 30 days. Like the smoke jobs it is allowed to fail for now. The runner it lands on is arm64 where the table above ran on amd64, so a green `proof` job is the arm64 half of the same proof.
+
+Tip
+
+Strongly recommended: a git.wayne.edu instance runner, so the proof and every app's pipeline run where the code lives.
+
+### What it does not prove yet[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-does-not-prove-yet)
+
+- **No oven is lit.** The `--sail` and `--docker` runs never start a compose stack: the gate has no Docker daemon. The scaffold tests (`tests/SailScaffoldTest.php`, `tests/DockerScaffoldTest.php`) pin their files.
+- **No Playbook, no ADVISOR.** Every bake passes `--no-playbook` (its package is private and the proof runs credential-free) and `--no-advisor`. A Wayne State app needs Playbook; its wiring is covered by the unit suite.
+- **No MySQL or Oracle.** The Laravel shapes migrate SQLite; nothing connects to a database server.
+- **No browser.** The front page is fetched with curl. Nothing clicks the Vue island, runs axe on a baked app, or checks it on a phone.
+- **A feed with local edits** is proven by `tests/FeedCommandTest.php`, not by the harness: the harness feeds an app nobody has touched.
+
+### Related[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#related)
+
+- [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
+- [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
+- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
+- [Same kitchen, many ovens](https://sourdough.apps.wayne.edu/docs/guides/ovens.html)
 
 ---
 

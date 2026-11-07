@@ -47,7 +47,7 @@ On the cooling rack
 
 ## Five loaves, one starter
 
-These are the five app shapes the stack supports, and all five bake today. Score a loaf to see what's inside.
+These are the five app shapes the stack supports, and all five bake today. The proof harness bakes, boots and feeds forward every one of them: read [the latest proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html). Score a loaf to see what's inside.
 
 Country boule
 

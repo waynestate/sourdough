@@ -9,7 +9,36 @@ This page says what each check of Sourdough proves and how to run it. Sourdough'
 
 ## Last run
 
-{{TABLE}}
+| Run | Date | Commit | Result | Duration |
+| --- | --- | --- | --- | --- |
+| `sh scripts/smoke-shape.sh raw` | 2026-11-07 | `191ee57` | pass: 25 of 25 steps; suite: 11 tests, 21 assertions; fed from 0.1.6: fresh | 18 s |
+| `sh scripts/smoke-shape.sh raw-vue` | 2026-11-07 | `191ee57` | pass: 28 of 28 steps; suite: 16 tests, 34 assertions; fed from 0.1.6: fresh | 16 s |
+| `sh scripts/smoke-shape.sh blade` | 2026-11-07 | `191ee57` | pass: 27 of 27 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 19 s |
+| `sh scripts/smoke-shape.sh blade-vue` | 2026-11-07 | `191ee57` | pass: 30 of 30 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 16 s |
+| `sh scripts/smoke-shape.sh inertia` | 2026-11-07 | `191ee57` | pass: 31 of 31 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 37 s |
+| `sh scripts/smoke-shape.sh blade --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
+| `sh scripts/smoke-shape.sh blade --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 9 s |
+| `sh scripts/smoke-shape.sh blade-vue --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 9 s |
+| `sh scripts/smoke-shape.sh blade-vue --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 10 s |
+| `sh scripts/smoke-shape.sh inertia --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
+| `sh scripts/smoke-shape.sh inertia --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 11 s |
+| `composer ci` | 2026-11-07 | `{{CI_COMMIT}}` | {{CI_RESULT}} | {{CI_SECONDS}} s |
+
+All eleven runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with `record` lines only, which is the fix this run was written for: 0.1.6 left the oven out of the manifest (see [What it found](#what-it-found)). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.
+
+## What it found
+
+The first run of the harness, on the same day, failed nine of eleven runs. Six of the failures were Sourdough's:
+
+- **An app baked by 0.1.6 with `--sail` or `--docker` could never feed cleanly.** 0.1.6 wrote the manifest before the oven's scaffold ran, so it named no oven and hashed `composer.json` before the scaffold edited it. `sourdough feed` then baked the plain shape, called the app fresh and wrote nothing, and `sourdough manifest --check` reported `composer.json` changed for good. Fixed in the same branch: feed reads the oven from the app's files when a 0.1.6 manifest names none, and a new `record` action moves the manifest to a file the app already has right ([Keeping apps current](../guides/keeping-current.md#what-feed-does)).
+- The other three failures were the harness's own: Laravel's router wants `public/` as its working directory. Fixed before the run above, along with the suite count, which Pest prints in color even without a terminal.
+
+Still open, from the same runs:
+
+- **The Laravel shapes ship two tests**: the home page answers 200, and the skeleton's unit example. Nothing in a baked app's own suite checks that `/dashboard` needs a sign-in or that `/up` answers; the proof checks both from outside.
+- **PROCTOR says `INFO composer-config`** on every shape: the baked `composer.json` sets `require.php` but not `config.platform.php`, so the lock resolves against whatever PHP ran `composer install`.
+- **The raw shapes run PROCTOR on its bundled policy**, the Laravel shapes on CREED's released one: the raw template does not require `waynestate/creed` and its `proctor` script passes no `--policy`.
+- **PROCTOR warns `php-floor`** on every shape: PHP 8.3 is in security-only support until 2027-12-31. Expected, and the stack's floor until then.
 
 ## Run it
 

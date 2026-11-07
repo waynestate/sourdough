@@ -158,6 +158,9 @@ One line per file that changes, ` <action> <file> (<why>)`; files feed leaves al
 | `conflict` | both changed the same lines, there was no base to merge from, or the file is binary: marked, never overwritten |
 | `remove` | the template dropped it and the app had not changed it |
 | `keep` | the template dropped a file the app changed (it is the app's now), or changed a file the app deleted (it stays deleted) |
+| `record` | the app already has the template's new version of the file: nothing is written, the manifest records it |
+
+An app baked by Sourdough 0.1.6 with `--sail` or `--docker` has no oven in its manifest's answers (0.1.6 wrote the manifest before the oven's scaffold ran). Feed reads the oven from the app's files instead (a `Dockerfile`, `compose.yaml` and the `dev-up` script for Docker; `laravel/sail` and Sail's `compose.yaml` for Sail), says so in a `note:` line, and records the oven's files, so `sourdough manifest --check` is clean afterwards.
 
 A conflict in a text file holds git's markers, `<<<<<<< app`, `=======` and `>>>>>>> sourdough <version>`; a binary conflict leaves the template's copy next to the app's as `<file>.sourdough-new`.
 
