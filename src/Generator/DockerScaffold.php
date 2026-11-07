@@ -27,7 +27,7 @@ final class DockerScaffold
      * The composer scripts the scaffold adds, with their descriptions, in
      * the order they are appended.
      *
-     * @var array<string, array{list<string>, string}>
+     * @var array<string, array{list<string>|string, string}>
      */
     private const COMPOSER_ADDITIONS = [
         'dev-up' => [
