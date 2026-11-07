@@ -289,7 +289,7 @@ if [ -n "${SMOKE_FEED_FROM:-}" ]; then
     # The feed's own summary line: "Fed: 1 update, 2 add."
     feed_counts=$(sed -n 's/^Fed: \(.*\)\.$/\1/p' "$log" | tail -n 1)
     if grep -q '^Fresh:' "$log"; then
-        echo "note feed: nothing to feed from $SMOKE_FEED_FROM"
+        echo "note feed: fresh"
     elif [ -n "$feed_counts" ]; then
         echo "note feed: $feed_counts"
     fi

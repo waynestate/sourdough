@@ -175,7 +175,7 @@ for run in $runs; do
         result="FAIL at \"$first_fail\" ($oks steps ok before it)"
     fi
     if [ -n "$suite" ]; then
-        result="$result; its suite: $suite"
+        result="$result; suite: $suite"
     fi
     if [ -n "$feed_from" ] && [ "$status" -eq 0 ]; then
         result="$result; fed from $feed_from: ${feed:-ok}"
