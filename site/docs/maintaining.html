@@ -61,7 +61,7 @@ app's git history (see <code>docs/guides/keeping-current.md</code>). <code>new</
 change to a generator reaches both.</li>
 </ul>
 <h2 id="where-it-lives">Where it lives<a class="docs-heading-link" aria-label="Link to this section" href="#where-it-lives">#</a></h2>
-<p>Development happens on nougat, the canonical repository (<a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">enterprise-apps/sourdough</a>). This GitHub repository and git.wayne.edu are read-only mirrors: <code>main</code> and tags are copied automatically. Changes, issues and merge requests go to nougat. Nobody pushes to the mirrors.</p>
+<p>Development happens on git.wayne.edu, the canonical repository (<a rel="noopener" href="https://git.wayne.edu/enterprise-apps/sourdough">enterprise-apps/sourdough</a>). GitHub (<a rel="noopener" href="https://github.com/waynestate/sourdough">waynestate/sourdough</a>) is a read-only push mirror: <code>main</code> and tags are copied automatically, nobody pushes to it, and Packagist picks releases up from there. Changes, issues and merge requests go to git.wayne.edu.</p>
 <h2 id="build-and-test">Build and test<a class="docs-heading-link" aria-label="Link to this section" href="#build-and-test">#</a></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -166,7 +166,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 <li>Move the lines under <code>## Unreleased</code> in <code>CHANGELOG.md</code> to a new <code>## X.Y.Z (YYYY-MM-DD)</code> heading.</li>
 <li><code>composer ci</code> and the Squire copy check green locally, then both pipelines green for that commit.</li>
 <li>Run a secrets scan of the history and check that nothing internal (server names, people, IDs) is in the tree.</li>
-<li>Tag <code>X.Y.Z</code> (no <code>v</code>) on nougat. The mirror carries the tag to GitHub, and Packagist picks it up from there.</li>
+<li>Tag <code>X.Y.Z</code> (no <code>v</code>) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.</li>
 <li>A release needs a maintainer's approval. Never move or delete a published tag.</li>
 </ol>
 <h2 id="the-front-page">The front page<a class="docs-heading-link" aria-label="Link to this section" href="#the-front-page">#</a></h2>
@@ -188,7 +188,7 @@ access): ask Enterprise Applications.</p>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.6</span></span>
-  <span><a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/sourdough">Source</a> Mirrors: <a rel="noopener" href="https://github.com/waynestate/sourdough">GitHub</a> <a href="maintaining.md">Markdown</a></span>
+  <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="maintaining.md">Markdown</a></span>
 </footer>
 </body>
 </html>

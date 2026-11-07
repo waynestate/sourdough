@@ -8,7 +8,7 @@ The README and the Markdown twin of every page, joined. The index is https://sou
 
 ## README
 
-Source: https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/README.md
+Source: https://github.com/waynestate/sourdough/blob/HEAD/README.md
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
 
@@ -16,17 +16,15 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Every loaf gets proofed before it ships.
 
-Documentation: the [docs site](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs:build` rebuilds it and `composer docs:check` fails when it is stale. The docs pages wear the front page's header, menu, palette and fonts: edit [`docs/_header.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/_header.html) and [`docs/theme/sourdough.css`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/theme/sourdough.css) (named by the `theme` key in `docs/docs.json`), never the kit's `docs.css`.
+Documentation: the [docs site](https://github.com/waynestate/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://github.com/waynestate/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs:build` rebuilds it and `composer docs:check` fails when it is stale. The docs pages wear the front page's header, menu, palette and fonts: edit [`docs/_header.html`](https://github.com/waynestate/sourdough/blob/HEAD/docs/_header.html) and [`docs/theme/sourdough.css`](https://github.com/waynestate/sourdough/blob/HEAD/docs/theme/sourdough.css) (named by the `theme` key in `docs/docs.json`), never the kit's `docs.css`.
 
-Front page: [`site/index.html`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
+Front page: [`site/index.html`](https://github.com/waynestate/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
 
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
 ### Where the code lives
 
-The canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it.
-Open issues and merge requests on nougat, not on the mirrors.
-This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
+The canonical repository is [enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough) on git.wayne.edu. Open issues and merge requests there; tags are made there, by the maintainer, with an approver. GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror of it: nobody pushes to it, and Packagist reads from it. git.wayne.edu is the starter culture now; GitHub is the slice Packagist eats.
 
 Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
 
@@ -189,13 +187,13 @@ Then the manifest moves to the new base, and the template's version of each mana
 
 Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files, so `sourdough feed --dry-run` in CI fails the pipeline when an app falls behind its template. `--json` prints the plan for machines.
 
-Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/guides/keeping-current.md). A fed starter is a happy starter.
+Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/keeping-current.md). A fed starter is a happy starter.
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 
 ### Testing
 
-Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/MAINTAINING.md).
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/sourdough/blob/HEAD/MAINTAINING.md).
 
 From the repo root:
 
@@ -207,9 +205,9 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
-The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 ` runs it in one line.
+The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](https://github.com/waynestate/sourdough/blob/HEAD/MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 ` runs it in one line.
 
-The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](https://nougat.snu.gs/enterprise-apps/sourdough/blob/HEAD/docs/reference/proof.md) page.
+The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](https://github.com/waynestate/sourdough/blob/HEAD/docs/reference/proof.md) page.
 
 The site accessibility gate runs axe-core (WCAG 2.2 AA) over every committed page under `site/` in Docker, in light and dark at 360 px and 1280 px: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows.
 
@@ -623,6 +621,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: the smoke gate checks more of every loaf. Right after the bake, `sourdough manifest --check` must be clean. Every shape runs its own suite as its own step (the count goes in the proof table) and `composer proctor`. The Laravel shapes now boot too, on Laravel's own router: `/` must answer with the shape's home page (the Blade page, the built Vue islands, or the Inertia `Home` page), `/dashboard` after SESAME's fake sign-in, `/nope` 404 and `/up` 200; the raw shape's `/` must carry its home page in WayneUI's shell. A second argument, `--sail` or `--docker`, proves a Laravel shape's oven (the scaffold's files, install, suite, PROCTOR), and `SMOKE_FEED_FROM=<version>` bakes that release from Packagist and feeds it forward. `scripts/smoke-shape.ps1` takes `-Oven` and `-FeedFrom` to match.
 - Added: the Laravel shapes ship skeleton feature tests (`tests/Feature/SkeletonTest.php`, Pest, next to the starter's example tests): `/up` answers 200, the home page answers 200 for a guest (the Blade page, the built Vue island, or the Inertia `Home` component), a guest at `/dashboard` goes to the sign-in flow, the dashboard renders for a signed-in user after SESAME's fake sign-in (with the islands view's `data-vue-island="counter"` island and the Inertia `Dashboard` component checked too), a missing page answers 404, and `UserResolver::refreshUser()` turns a stored user array back into the `User` by username, or `null` when the username no longer exists. Each baked Laravel suite grows from two tests to nine, and the proof table quotes the new counts.
 
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
+
+- Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
+
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
 - Fixed: the Laravel templates' `UserResolver` lists its interfaces in Pint's order (`RefreshesUser` before `UserResolverContract`), so a freshly baked app passes its own `pint --test` on the first run instead of failing `composer ci`.
@@ -651,7 +653,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: the raw template ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), `waynestate/pinstripe` in require-dev with the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
 - Added: the front page's main nav links the docs site.
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-1)
 
 - Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the `ziggy-js` npm package. The home page and the dashboard are new, in WayneUI's components and tokens. `eslint.config.js` refuses `components/ui` imports and the kit's helper packages, `.prettierrc` is the stack's, and a `frontend` CI job runs lint, Prettier, vue-tsc and the build.
 - Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests read `.env`, or `.env.example` when there is no `.env`); the raw shape is unchanged.
@@ -702,7 +704,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: generated apps ship ADVISOR by default. `waynestate/advisor` lands in `require-dev` (raw template and the laravel-blade overlay), `.mcp.json` is git-ignored, the README gains an "ADVISOR" section, and the Next steps print `php vendor/bin/advisor install --client=claude --write`. `--no-advisor` skips all of it and records the choice in the manifest.
 - Added: the smoke gate (`scripts/smoke-shape.sh`, `scripts/smoke-shape.ps1`, `scripts/smoke.Dockerfile`) bakes a shape with this checkout's own CLI and runs the generated app's own checks; CI runs one job per shape, all `allow_failure: true` until seen green once.
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-1)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-2)
 
 - Changed: `--name` on the Laravel bakes reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package) with the description reading ", a Wayne State app baked from Sourdough.", `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
 - Changed: the raw template pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
@@ -735,7 +737,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-2)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-3)
 
 - The Squire template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev dependency, `^0.2`) instead of a Squire checkout. `composer squire-copy:sync` rewrites the copy from `vendor/waynestate/squire`, and `composer squire-copy:check` (now part of `composer ci`) exits 1 when the committed copy has drifted. The refresh brings Squire 0.2.0's deploy files: `scripts/release.sh` gains the `SQUIRE_PROCTOR=enforce` handling, and the `static` target joins the catalog. Fresh flour, straight from the mill.
 - Changed: project names written as words except acronyms.
@@ -759,13 +761,13 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - `sourdough new` validates the app name before writing anything: it must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters (`RawGenerator::assertValidName`). Hostile names (quotes, backslashes, newlines, NUL bytes, placeholders, path traversal, overlong or empty names) are refused with exit 1 and write nothing.
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-3)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-4)
 
 - The raw template now requires HELMET `^0.2` and PROCTOR `^0.2`, so `sourdough new` installs the current stack releases instead of the 0.1 line. SESAME stays at `^0.1` until it cuts 0.2.
 
 ### 0.1.1 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-1-2026-10-29)
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-4)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-5)
 
 - PHPStan and Pint now take their settings from Pinstripe (`waynestate/pinstripe` ^0.1) instead of a hand copy: `phpstan.neon` includes the raw preset, and `pint.json` extends the per preset. Same cut, off the rack.
 
@@ -776,7 +778,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - The raw app now installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
 - `composer squire-copy:check`: verify that `templates/squire/` still matches a fresh export from the SQUIRE checkout (`SQUIRE_PATH`, default `/squire`). Skips with exit 0 when no checkout is mounted.
 
-#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-5)
+#### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-6)
 
 - Refreshed the SQUIRE template copy in `templates/squire/` from e66f07b to 2a893c0: the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch. Fresh flour, same recipe.
 
@@ -1349,7 +1351,7 @@ Sourdough is one of the parts. Feed it, and it grows; just do not leave it on th
 - [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe)
 - [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster)
 - [![Rollcall](https://sourdough.apps.wayne.edu/docs/readme/cast/rollcall.png)](https://github.com/waynestate/rollcall)
-- [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://nougat.snu.gs/enterprise-apps/drawbridge)
+- [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://git.wayne.edu/enterprise-apps/drawbridge)
 - [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor)
 - [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
 
@@ -1661,7 +1663,7 @@ Sensitive values belong in an external secrets manager. Put no secrets in compon
 
 ### Where the code lives[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#where-the-code-lives)
 
-The canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. This moves to git.wayne.edu once it has CI runners. Nougat is the starter culture; the mirrors are just slices.
+The canonical repository is [enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough) on git.wayne.edu. Open issues and merge requests there; tags are made there, by the maintainer, with an approver. GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror of it: nobody pushes to it, and Packagist reads from it. git.wayne.edu is the starter culture now; GitHub is the slice Packagist eats.
 
 ### Related[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#related)
 
@@ -1730,7 +1732,7 @@ Version 0.1.6 (2026-11-06), MIT license. Agents: this site ships [llms.txt](http
 
 ### Same kitchen, many ovens[#](https://sourdough.apps.wayne.edu/docs/#same-kitchen-many-ovens)
 
-[![WayneUI](https://sourdough.apps.wayne.edu/docs/readme/cast/wayneui.png)](https://github.com/waynestate/wayne-ui) [![CREED](https://sourdough.apps.wayne.edu/docs/readme/cast/creed.png)](https://github.com/waynestate/creed) [![PROCTOR](https://sourdough.apps.wayne.edu/docs/readme/cast/proctor.png)](https://github.com/waynestate/proctor) [![SESAME](https://sourdough.apps.wayne.edu/docs/readme/cast/sesame.png)](https://github.com/waynestate/sesame) [![HELMET](https://sourdough.apps.wayne.edu/docs/readme/cast/helmet.png)](https://github.com/waynestate/helmet) [![Sourdough](https://sourdough.apps.wayne.edu/docs/readme/cast/sourdough.png)](https://github.com/waynestate/sourdough) [![Squire](https://sourdough.apps.wayne.edu/docs/readme/cast/squire.png)](https://github.com/waynestate/squire) [![Preflight](https://sourdough.apps.wayne.edu/docs/readme/cast/preflight.png)](https://github.com/waynestate/preflight) [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe) [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster) [![Rollcall](https://sourdough.apps.wayne.edu/docs/readme/cast/rollcall.png)](https://github.com/waynestate/rollcall) [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://nougat.snu.gs/enterprise-apps/drawbridge) [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor) [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
+[![WayneUI](https://sourdough.apps.wayne.edu/docs/readme/cast/wayneui.png)](https://github.com/waynestate/wayne-ui) [![CREED](https://sourdough.apps.wayne.edu/docs/readme/cast/creed.png)](https://github.com/waynestate/creed) [![PROCTOR](https://sourdough.apps.wayne.edu/docs/readme/cast/proctor.png)](https://github.com/waynestate/proctor) [![SESAME](https://sourdough.apps.wayne.edu/docs/readme/cast/sesame.png)](https://github.com/waynestate/sesame) [![HELMET](https://sourdough.apps.wayne.edu/docs/readme/cast/helmet.png)](https://github.com/waynestate/helmet) [![Sourdough](https://sourdough.apps.wayne.edu/docs/readme/cast/sourdough.png)](https://github.com/waynestate/sourdough) [![Squire](https://sourdough.apps.wayne.edu/docs/readme/cast/squire.png)](https://github.com/waynestate/squire) [![Preflight](https://sourdough.apps.wayne.edu/docs/readme/cast/preflight.png)](https://github.com/waynestate/preflight) [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe) [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster) [![Rollcall](https://sourdough.apps.wayne.edu/docs/readme/cast/rollcall.png)](https://github.com/waynestate/rollcall) [![Drawbridge](https://sourdough.apps.wayne.edu/docs/readme/cast/drawbridge.png)](https://git.wayne.edu/enterprise-apps/drawbridge) [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor) [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
 
 Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend.
 
@@ -1748,7 +1750,7 @@ Sourdough is one PHP command, so it works on Windows, macOS, and Linux.
 - Composer, for the install lines below.
 - No PHP extensions are declared in `composer.json`.
 
-Where the code lives: the canonical repository is on nougat: [enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough). git.wayne.edu and GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) are read-only mirrors of it. Open issues and merge requests on nougat, not on the mirrors. Nougat is the starter culture; the mirrors are just slices.
+Where the code lives: the canonical repository is [enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough) on git.wayne.edu. Open issues and merge requests there; tags are made there, by the maintainer, with an approver. GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror of it: nobody pushes to it, and Packagist reads from it. git.wayne.edu is the starter culture now; GitHub is the slice Packagist eats.
 
 ### Install[#](https://sourdough.apps.wayne.edu/docs/install.html#install-1)
 
@@ -1808,7 +1810,7 @@ How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne St
 
 ### Where it lives[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#where-it-lives)
 
-Development happens on nougat, the canonical repository ([enterprise-apps/sourdough](https://nougat.snu.gs/enterprise-apps/sourdough)). This GitHub repository and git.wayne.edu are read-only mirrors: `main` and tags are copied automatically. Changes, issues and merge requests go to nougat. Nobody pushes to the mirrors.
+Development happens on git.wayne.edu, the canonical repository ([enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough)). GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror: `main` and tags are copied automatically, nobody pushes to it, and Packagist picks releases up from there. Changes, issues and merge requests go to git.wayne.edu.
 
 ### Build and test[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#build-and-test)
 
@@ -1913,7 +1915,7 @@ If every app should have something, it goes in Sourdough's templates. If only th
 1. Move the lines under `## Unreleased` in `CHANGELOG.md` to a new `## X.Y.Z (YYYY-MM-DD)` heading.
 2. `composer ci` and the Squire copy check green locally, then both pipelines green for that commit.
 3. Run a secrets scan of the history and check that nothing internal (server names, people, IDs) is in the tree.
-4. Tag `X.Y.Z` (no `v`) on nougat. The mirror carries the tag to GitHub, and Packagist picks it up from there.
+4. Tag `X.Y.Z` (no `v`) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.
 5. A release needs a maintainer's approval. Never move or delete a published tag.
 
 ### The front page[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-front-page)
