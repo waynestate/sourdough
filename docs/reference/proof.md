@@ -11,20 +11,20 @@ This page says what each check of Sourdough proves and how to run it. Sourdough'
 
 | Run | Date | Commit | Result | Duration |
 | --- | --- | --- | --- | --- |
-| `sh scripts/smoke-shape.sh raw` | 2026-11-07 | `191ee57` | pass: 25 of 25 steps; suite: 11 tests, 21 assertions; fed from 0.1.6: fresh | 18 s |
-| `sh scripts/smoke-shape.sh raw-vue` | 2026-11-07 | `191ee57` | pass: 28 of 28 steps; suite: 16 tests, 34 assertions; fed from 0.1.6: fresh | 16 s |
-| `sh scripts/smoke-shape.sh blade` | 2026-11-07 | `191ee57` | pass: 27 of 27 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 19 s |
-| `sh scripts/smoke-shape.sh blade-vue` | 2026-11-07 | `191ee57` | pass: 30 of 30 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 16 s |
-| `sh scripts/smoke-shape.sh inertia` | 2026-11-07 | `191ee57` | pass: 31 of 31 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: fresh | 37 s |
-| `sh scripts/smoke-shape.sh blade --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
-| `sh scripts/smoke-shape.sh blade --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 9 s |
-| `sh scripts/smoke-shape.sh blade-vue --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 9 s |
-| `sh scripts/smoke-shape.sh blade-vue --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 10 s |
-| `sh scripts/smoke-shape.sh inertia --sail` | 2026-11-07 | `191ee57` | pass: 22 of 22 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 2 record | 10 s |
-| `sh scripts/smoke-shape.sh inertia --docker` | 2026-11-07 | `191ee57` | pass: 24 of 24 steps; suite: 2 tests, 2 assertions; fed from 0.1.6: 6 record | 11 s |
-| `composer ci` | 2026-11-07 | `c2c54b3` | pass: 364 tests, 3437 assertions, 2 PHP warnings from older tests; Pint, PHPStan, Squire copy, agent-ready, docs site, audit clean | 20 s |
+| `sh scripts/smoke-shape.sh raw` | 2026-11-07 | `8a02374` | pass: 25 of 25 steps; suite: 11 tests, 21 assertions; fed from 0.1.6: 1 update | 15 s |
+| `sh scripts/smoke-shape.sh raw-vue` | 2026-11-07 | `8a02374` | pass: 28 of 28 steps; suite: 16 tests, 34 assertions; fed from 0.1.6: 1 update | 15 s |
+| `sh scripts/smoke-shape.sh blade` | 2026-11-07 | `8a02374` | pass: 27 of 27 steps; suite: 9 tests, 17 assertions; fed from 0.1.6: 1 add, 2 update | 19 s |
+| `sh scripts/smoke-shape.sh blade-vue` | 2026-11-07 | `8a02374` | pass: 30 of 30 steps; suite: 9 tests, 18 assertions; fed from 0.1.6: 1 add, 2 update | 15 s |
+| `sh scripts/smoke-shape.sh inertia` | 2026-11-07 | `8a02374` | pass: 31 of 31 steps; suite: 9 tests, 32 assertions; fed from 0.1.6: 1 add, 2 update | 30 s |
+| `sh scripts/smoke-shape.sh blade --sail` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 5 s |
+| `sh scripts/smoke-shape.sh blade --docker` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 4 s |
+| `sh scripts/smoke-shape.sh blade-vue --sail` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 4 s |
+| `sh scripts/smoke-shape.sh blade-vue --docker` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 4 s |
+| `sh scripts/smoke-shape.sh inertia --sail` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 4 s |
+| `sh scripts/smoke-shape.sh inertia --docker` | 2026-11-07 | `8a02374` | FAIL at "sourdough feed brings the 0.1.6 bake forward without a conflict" (10 steps ok before it) | 4 s |
+| `composer ci` | 2026-11-07 | `8a02374 + local edits` | pass: 366 tests, 3473 assertions, 2 PHP warnings from older tests; Pint, PHPStan, Squire copy, agent-ready, docs site, audit clean | 271 s |
 
-The `composer ci` row ran in `composer:2.10.3` on PHP 8.5. All eleven proof runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 167 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. The plain shapes fed forward from 0.1.6 found nothing to do, because no template has changed since that release. Every oven run fed a 0.1.6 bake forward with `record` lines only: that is the 0.1.6 oven fix at work, since 0.1.6 left the oven out of the manifest (see [What it found](#what-it-found)). The Laravel shapes ship two tests each, the starter's own examples; the count is theirs, not the proof's.
+The `composer ci` row ran in `composer:2.10.3` on PHP 8.5. All eleven proof runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 121 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. Templates have changed since 0.1.6 (the platform pin, the resolver refresh, the skeleton tests), so every feed found work: the raw shapes took one update (`composer.json`), the Laravel shapes one add (`tests/Feature/SkeletonTest.php`) and two updates (`app/Sesame/UserResolver.php`, `composer.json`). The six oven runs stopped at that same feed with a `composer.json` conflict: the 0.1.6 manifest hashed the file before the scaffold edited it, so feed cannot tell the scaffold's edit from an app edit, and there is no base to merge from (see [What it found](#what-it-found)). The Laravel shapes ship nine tests each now: the two starter examples plus seven skeleton tests covering `/up`, the home page, the sign-in redirect, the signed-in dashboard, a 404 and the user refresh; the count is theirs, not the proof's.
 
 ## What it found
 
@@ -35,10 +35,10 @@ The first run of the harness, on the same day, failed nine of eleven runs. Six o
 
 Still open, from the same runs:
 
-- **The Laravel shapes ship two tests**: the home page answers 200, and the skeleton's unit example. Nothing in a baked app's own suite checks that `/dashboard` needs a sign-in or that `/up` answers; the proof checks both from outside.
-- **PROCTOR says `INFO composer-config`** on every shape: the baked `composer.json` sets `require.php` but not `config.platform.php`, so the lock resolves against whatever PHP ran `composer install`.
 - **The raw shapes run PROCTOR on its bundled policy**, the Laravel shapes on CREED's released one: the raw template does not require `waynestate/creed` and its `proctor` script passes no `--policy`.
 - **PROCTOR warns `php-floor`** on every shape: PHP 8.3 is in security-only support until 2027-12-31. Expected, and the stack's floor until then.
+
+This run found one more failure, in all six oven runs: **a 0.1.6 oven bake conflicts on `composer.json` at its first feed after a template change.** 0.1.6 wrote the manifest before the oven's scaffold ran, so the manifest's hash for `composer.json` is the pre-scaffold one while the app's file carries the scaffold's edits; feed reads that as an app change and wants a base for the three-way merge. While the template's `composer.json` stayed the same as 0.1.6's, the post-scaffold files matched and nothing happened. Once the template's file changes (this cycle, the platform pin), the base is nowhere: not in `.sourdough/base/` (first feed) and not in the app's git history (the pre-scaffold version was never committed), so feed marks both versions and stops. The plain shapes are unaffected: their manifests hashed the final file, so the same template change feeds through as an update.
 
 ## Run it
 
