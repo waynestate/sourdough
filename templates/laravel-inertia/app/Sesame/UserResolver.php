@@ -5,6 +5,7 @@ namespace App\Sesame;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Waynestate\Sesame\Identity;
+use Waynestate\Sesame\RefreshesUser;
 use Waynestate\Sesame\UserResolver as UserResolverContract;
 
 /**
@@ -17,9 +18,10 @@ use Waynestate\Sesame\UserResolver as UserResolverContract;
  * email falls back to the Wayne State address for the username when the
  * provider releases no mail attribute. Imported users get a random password
  * they can never use: sign-in goes through SESAME, never through a local
- * credential.
+ * credential. The signed-in user is read again from the database on every
+ * request.
  */
-class UserResolver implements UserResolverContract
+class UserResolver implements UserResolverContract, RefreshesUser
 {
     public function findOrImportUser(Identity $identity): mixed
     {
@@ -42,5 +44,28 @@ class UserResolver implements UserResolverContract
         }
 
         return $user;
+    }
+
+    /**
+     * Look the signed-in user up again on every request.
+     *
+     * Laravel 13 stores sessions as JSON, so the user SESAME saved at
+     * sign-in comes back as a plain array, not a User. Reading the row again
+     * by username gives the guard and the pages a real User, and a deleted
+     * account stops being signed in from the next request on.
+     */
+    public function refreshUser(mixed $user): mixed
+    {
+        $username = match (true) {
+            $user instanceof User => $user->username,
+            is_array($user) => $user['username'] ?? null,
+            default => null,
+        };
+
+        if (! is_string($username) || $username === '') {
+            return null;
+        }
+
+        return User::where('username', $username)->first();
     }
 }
