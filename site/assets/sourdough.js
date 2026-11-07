@@ -191,7 +191,7 @@
       btn.setAttribute("aria-expanded", open ? "true" : "false");
       loaf.classList.toggle("is-closed", !open);
       loaf.classList.toggle("is-scored", open);
-      if (hint) hint.textContent = open ? "Scored" : "Score it";
+      if (hint) hint.textContent = "Score it";
     };
     /* With motion the crumb waits for the blade; without it, it is open. */
     setOpen(!motion);

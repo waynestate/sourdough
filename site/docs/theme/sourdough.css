@@ -218,9 +218,12 @@ body {
   background-size: 100% 3px, 100% 2px;
 }
 
-/* The torn gold ticket with the version on it. */
+/* The torn gold ticket with the version on it. It may shrink and wrap: at
+   320 px a fixed ticket pushes the page past the viewport (WCAG 1.4.10). */
 .ticket {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
   font-family: var(--sd-hand);
   font-size: 0.95rem;
   font-weight: 700;
