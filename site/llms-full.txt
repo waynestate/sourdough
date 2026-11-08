@@ -629,6 +629,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
+- Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, `manifest` and `feed` ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is `Enforced` by the generator tests in every shape; it said only the raw shape generated.
 - Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).
 - Fixed: `scripts/parity.ps1` builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.
 - Fixed: the raw shapes (`--raw`, `--raw --vue`) sign in with CAS in production. `public/index.php` called `DriverFactory::make($config)` with no HTTP client, so with `APP_ENV=production` the cas driver refused to boot; it now passes a Guzzle client (10 second timeout, no redirects, TLS verification on), a `nyholm/psr7` request factory and the app's `NativeSession`, which SESAME 0.5's cas driver needs for its pending-login marker (a ticket is accepted only for a sign-in this browser started). The raw template requires `guzzlehttp/guzzle` `^7.9 || ^8.0` and `nyholm/psr7` `^1.8`.
