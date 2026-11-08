@@ -128,7 +128,7 @@ Stack: `Enforced` for the merge and the clean tree: `sourdough feed` bakes the n
 ### 3.4 Version templates with tags and write migration notes
 Tag template releases with semantic versions and put a short "what changed, what to do" entry in the changelog for each. Copier picks the newest tag by default. Why: an update tool is only as good as the history it can read.
 Sources: [S4].
-Stack: `Documented`. The release steps in `MAINTAINING.md` ("Releasing") tag every release `X.Y.Z` and move the changelog lines under a dated heading, and `docs/upgrading.md` has a "what changed, what to do" section per release; tags `0.1.0` to `0.1.7` all follow it. Nothing fails when a release skips its notes. Feed leans on the tags: the manifest records the release that baked the app, and `src/Feed/Feed.php` refuses a manifest from a newer one.
+Stack: `Documented`. The release steps in `MAINTAINING.md` ("Releasing") tag every release `X.Y.Z` and move the changelog lines under a dated heading, and `docs/upgrading.md` has a "what changed, what to do" section per release; tags `0.1.0` to `0.1.7` and `0.2.0` all follow it. Nothing fails when a release skips its notes. Feed leans on the tags: the manifest records the release that baked the app, and `src/Feed/Feed.php` refuses a manifest from a newer one.
 
 ### 3.5 Run compatibility CI that generates, installs and tests each permutation
 On every change to Sourdough, and on every release of WayneUI, SESAME, HELMET and PROCTOR, generate each permutation, install it and run its own tests and the PROCTOR check. Why: the starter is the place where all the stack libraries meet, so it is where a break shows first.
