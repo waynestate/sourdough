@@ -64,7 +64,7 @@ Options:
 - `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in Squire's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
-- `--no-input` never prompt (Sourdough 0.1 has no prompts)
+- `--no-input` never prompt (Sourdough has no prompts)
 - `--json` with `--dry-run`, print the plan as JSON
 - `--describe "<sentence>"` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing

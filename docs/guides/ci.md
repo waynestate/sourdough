@@ -12,7 +12,7 @@ Sourdough's pipelines run one gate, `composer ci`, on both forges: the same comm
 
 ## On GitLab
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.0 release commit, with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.1 release commit, with the tag in a trailing comment.
 
 ## Is the app still fed?
 
@@ -52,7 +52,7 @@ On a group whose proxy is turned off, set `IMAGE_PREFIX` to `docker.io` in **Set
 
 ## On GitHub
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.0.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.1.
 
 ## What green means
 

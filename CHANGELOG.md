@@ -21,6 +21,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- Docs: the CI guide, MAINTAINING and BEST_PRACTICES name Preflight 0.3.1 (the release the templates pin), and the --no-input help no longer names Sourdough 0.1.
 - Changed: new bakes start on the Squire 0.7.0 deploy kit: the release script restarts queue workers and the scheduler after optimize (report only; SQUIRE_ARTISAN_RESTART=0 turns it off), and the image drops shell functions from the web's PHP (SQUIRE_PHP_DISABLE_FUNCTIONS), turns on production opcache (SQUIRE_OPCACHE_VALIDATE) and reads secrets from /run/secrets. Sourdough's own deploy layer moves too.
 - Changed: every app shape's CI caches Composer and npm downloads under a fixed key, so a lock change downloads only what changed.
 - Changed: HELMET moves to `^1.0`, its first stable release, wherever this repo requires it.
