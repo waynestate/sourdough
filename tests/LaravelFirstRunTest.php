@@ -98,6 +98,42 @@ final class LaravelFirstRunTest extends TestCase
         self::assertLessThan($serve, $migrate);
     }
 
+    /**
+     * The skeleton source runs create-project with --no-scripts, so
+     * Laravel's post-create-project-cmd never touches
+     * database/database.sqlite. The bake must leave the empty file the way
+     * Laravel's own installer does, or the printed php artisan migrate
+     * stops to ask whether to create the database.
+     *
+     * @param array<string, bool> $flags
+     */
+    #[DataProvider('laravelShapes')]
+    public function testBakeCreatesTheSqliteDatabaseLikeLaravelDoes(array $flags): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $tester = new CommandTester(new NewCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
+        $exit = $tester->execute(array_merge(['dir' => $target, '--no-playbook' => true], $flags));
+
+        self::assertSame(0, $exit);
+        self::assertFileExists($target . '/database/database.sqlite');
+        self::assertSame(0, filesize($target . '/database/database.sqlite'));
+    }
+
+    public function testBakeLeavesNoSqliteFileWhenTheAppDoesNotUseSqlite(): void
+    {
+        $target = $this->makeTempDir();
+        mkdir($target . '/database');
+        file_put_contents($target . '/.env.example', "APP_NAME=Laravel\nDB_CONNECTION=mysql\n");
+
+        $generator = new LaravelBladeGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));
+        $method = new \ReflectionMethod($generator, 'createSqliteDatabase');
+        $method->invoke($generator, $target);
+
+        self::assertFileDoesNotExist($target . '/database/database.sqlite');
+    }
+
     public function testBladeAppSetsTheDefaultStringLength(): void
     {
         $target = $this->generate('laravel-blade');

@@ -133,6 +133,8 @@ abstract class LaravelOverlayGenerator
             $this->appendEnvAdditions($targetDir, $overlayDir);
         }
 
+        $this->createSqliteDatabase($targetDir);
+
         $this->applyAppName($targetDir, $name, $slug);
 
         $this->support->installSquireFiles($targetDir, 'laravel');
@@ -290,6 +292,56 @@ abstract class LaravelOverlayGenerator
 
         if (false === file_put_contents($envPath, $existing . "\n" . $additions)) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $envPath));
+        }
+    }
+
+    /**
+     * Create an empty database/database.sqlite when the baked app will use
+     * sqlite. ComposerSkeletonSource runs create-project with --no-scripts,
+     * so Laravel's post-create-project-cmd never runs; this recreates the
+     * one file its touch() script makes, because without it the printed
+     * php artisan migrate stops to ask whether to create the database.
+     * Laravel's own installer leaves the file in place, and its .gitignore
+     * already keeps *.sqlite out of git.
+     *
+     * @throws \RuntimeException when the file cannot be created
+     */
+    private function createSqliteDatabase(string $targetDir): void
+    {
+        $envPath = $targetDir . '/.env.example';
+        if (!is_file($envPath)) {
+            return;
+        }
+
+        $content = file_get_contents($envPath);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $envPath));
+        }
+
+        // A commented line such as # DB_CONNECTION=sqlite does not count.
+        $usesSqlite = false;
+        foreach (explode("\n", $content) as $line) {
+            if ('DB_CONNECTION=sqlite' === trim($line)) {
+                $usesSqlite = true;
+                break;
+            }
+        }
+        if (!$usesSqlite) {
+            return;
+        }
+
+        $databaseDir = $targetDir . '/database';
+        if (!is_dir($databaseDir)) {
+            return;
+        }
+
+        $dbPath = $databaseDir . '/database.sqlite';
+        if (file_exists($dbPath)) {
+            return;
+        }
+
+        if (false === touch($dbPath)) {
+            throw new \RuntimeException(sprintf('Could not create "%s".', $dbPath));
         }
     }
 
