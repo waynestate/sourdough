@@ -44,6 +44,10 @@ Then read the section for the version you are moving to.
 
 **Steps:** in each app, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/proctor --with-all-dependencies`, then `vendor/bin/proctor check`. See [PROCTOR's upgrading notes](https://proctor.apps.wayne.edu/docs/upgrading.html).
 
+**Laravel shapes: `config/helmet.php` shrinks to the app's own override.** Feed brings a short `config/helmet.php` that sets only `policy_path`; every other HELMET setting comes from the package's own config. If you never changed the file, feed replaces it and nothing else changes, except that the app now gets HELMET's current defaults: `HELMET_PRESET` can come from Playbook, a set-but-empty `HELMET_PROXIES` trusts no proxy (as HELMET documents), and the newer settings (`HELMET_SESSION_SECURE`, `HELMET_WARN_DEBUG`, the metrics storage) work. If you changed it, feed marks a conflict: keep only the keys you changed, each with the package's whole value for that key, and drop the rest. The full list is in `vendor/waynestate/helmet/config/helmet.php`.
+
+**New bakes take their PHP floor from CREED.** Nothing changes for an app today: the floor is still `^8.3`, tested on 8.3, 8.4 and 8.5. When CREED's policy moves the floor, the next Sourdough release bakes the new one and feed brings it in. `sourdough new` prints the floor, where it came from and the shape's support line; see [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html). **Deprecated:** none.
+
 ## 0.2.0 (2026-11-08)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-2-0-2026-11-08)
 
 **Breaking:** for apps you feed, in two cases only. The fed pipeline pins Preflight 0.3.0, which needs GitLab 18.7 or later (git.wayne.edu is newer), and the fed `composer.json` moves PROCTOR to `^0.7`, whose `node-eol` check fails an app that pins Node 20 or older. **Deprecated:** none.

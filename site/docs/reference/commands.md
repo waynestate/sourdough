@@ -92,6 +92,23 @@ php vendor/bin/advisor install --client=claude --write
 
 The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
 
+### PHP floor and support lines[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#php-floor-and-support-lines)
+
+Every plan, dry run or real, prints two lines under `Target:`:
+
+```
+PHP:         PHP ^8.3, tested on 8.3, 8.4 and 8.5 (from waynestate/creed, refreshed 2026-10-29)
+Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security fixes until 2028-03-17
+```
+
+The floor comes from CREED's policy at bake time; when the policy cannot be read, the first line ends `(pinned fallback: <reason>)` and the bake uses the pinned values. A shape that is deprecated also prints `Deprecated: The <shape> shape is deprecated since Sourdough <x> and is removed in <y>; move to <shape>. See <page>` to stderr; it never changes the exit code. With `--dry-run --json` the plan gains a `php` object and a `support` object with the same facts. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
+
+### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
+
+- `SOURDOUGH_POLICY`: a CREED-format `policy.json` to take the PHP floor from (default: the copy installed with `waynestate/creed`). A file that cannot be read means the pinned fallback, named in the `PHP:` line.
+- `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH).
+- `SOURDOUGH_LLM_BASE_URL`, `SOURDOUGH_LLM_API_KEY`, `SOURDOUGH_LLM_MODEL`: the model `--describe` asks.
+
 ### Next steps printed after generation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#next-steps-printed-after-generation)
 
 | Shape | Steps |
@@ -193,12 +210,13 @@ After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a o
 
 ### JSON[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json)
 
-`--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`.
+`--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`. A deprecated shape's notice is one of the `notes` on every run; feeding an app whose shape was removed stops with exit `2` and names the replacement. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
 
-### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
+### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-1)
 
 - `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
+- `SOURDOUGH_POLICY`: the CREED policy the new loaf takes its PHP floor from, as for `sourdough new`. Feed with the same policy the app was baked with, or the floor shows up as a template change.
 
 ## Related[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#related)
 

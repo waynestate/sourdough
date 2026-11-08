@@ -56,6 +56,10 @@
                     "title": "Keeping apps current"
                 },
                 {
+                    "path": "guides/support",
+                    "title": "Support and sunset"
+                },
+                {
                     "path": "guides/every-os",
                     "title": "Every developer, every operating system"
                 },
