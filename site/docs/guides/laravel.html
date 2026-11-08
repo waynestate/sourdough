@@ -48,6 +48,7 @@
 <li><code>--laravel --vue</code> bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a <code>resources/js/app.js</code> registry that mounts a Vue 3 app on every <code>[data-vue-island]</code> element, and a Counter island live on the dashboard view).</li>
 <li><code>--inertia</code> bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia 3 pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's <code>components/ui</code> imports; Ziggy routes; the stack packages; a <code>frontend</code> CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.</li>
 </ul>
+<p>All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the stack's guidelines and starter rules in <code>.ai/</code> (see <a href="#laravel-boost-dev-only">Laravel Boost, dev only</a>).</p>
 <p>All five permutations generate in 0.1; the raw ones (<code>--raw</code>, <code>--raw --vue</code>) start from the raw base instead of a Laravel skeleton.</p>
 <h2 id="build-on-the-official-installer">Build on the official installer<a class="docs-heading-link" aria-label="Link to this section" href="#build-on-the-official-installer">#</a></h2>
 <p>For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. <code>composer create-project laravel/laravel</code> picks the newest major, which is right. The installer also accepts a community starter kit published on Packagist:</p>
@@ -68,8 +69,63 @@
 <h2 id="sign-in-stays-sesame">Sign-in stays SESAME<a class="docs-heading-link" aria-label="Link to this section" href="#sign-in-stays-sesame">#</a></h2>
 <p>Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>A live <code>/register</code> route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.</p></aside>
-<h2 id="keep-boost-current">Keep Boost current<a class="docs-heading-link" aria-label="Link to this section" href="#keep-boost-current">#</a></h2>
-<p>For the Inertia reference path, install Laravel Boost with <code>--dev</code>, and refresh its generated guideline and skill files with <code>boost:update</code>; the Boost docs suggest running it from Composer's <code>post-update-cmd</code>. Stale agent guidance teaches an agent last year's API. Boost runs on Laravel 10 to 13 with PHP 8.1 or higher. Its docs say the generated <code>.mcp.json</code>, guideline files (<code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>junie/</code>) and <code>boost.json</code> may go in <code>.gitignore</code>, because <code>boost:install</code> and <code>boost:update</code> regenerate them; the <code>.ai/rules</code> directory (project rules recorded by agents) should be committed.</p>
+<h2 id="laravel-boost-dev-only">Laravel Boost, dev only<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-boost-dev-only">#</a></h2>
+<p>Every Laravel bake (Blade, Blade with Vue, Inertia) ships <a rel="noopener" href="https://laravel.com/docs/boost">Laravel Boost</a> in <code>require-dev</code>: an MCP server, guidelines and skills that teach a coding agent the app's Laravel. Boost is used as published, through its own commands and file layout. Sourdough adds the stack's guidance and the guard rails around it. <a rel="noopener" href="https://github.com/waynestate/advisor">ADVISOR</a> complements Boost, never replaces it: Boost knows Laravel, ADVISOR knows the Wayne State stack.</p>
+<p>After <code>composer install</code>, each developer wires Boost into their own agent once per checkout:</p>
+<pre tabindex="0"><code class="language-bash">php artisan boost:install
+</code></pre>
+<p>What the bake gives you:</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Where</th>
+<th>In git?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boost itself</td>
+<td><code>laravel/boost ^2.10</code> in <code>require-dev</code></td>
+<td>yes (<code>composer.json</code>)</td>
+</tr>
+<tr>
+<td>The stack's conventions (SESAME, WayneUI, HELMET, MySQL 5.6, Oracle, Squire)</td>
+<td><code>.ai/guidelines/wayne-state.md</code>, folded into every agent's file by Boost</td>
+<td>yes, managed: <code>sourdough feed</code> refreshes it</td>
+</tr>
+<tr>
+<td>Starter project rules</td>
+<td><code>.ai/rules/migrations.md</code>, <code>.ai/rules/routes.md</code> and Boost's <code>.ai/rules/index.md</code></td>
+<td>yes, seeded: the team's from the first commit</td>
+</tr>
+<tr>
+<td>What <code>boost:install</code> writes</td>
+<td><code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.mcp.json</code>, <code>.claude/skills/</code>, <code>.junie/</code>, <code>boost.json</code></td>
+<td>no: a <code>.gitignore</code> block keeps them out</td>
+</tr>
+<tr>
+<td>A refresh after <code>composer update</code></td>
+<td><code>composer boost-update</code>, appended to Laravel's <code>post-update-cmd</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>A check that Boost stays a dev tool</td>
+<td><code>tests/Feature/BoostDevOnlyTest.php</code></td>
+<td>yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>Why each choice:</p>
+<ul>
+<li><strong><code>boost.json</code> is ignored.</strong> It records the agents each developer picked, so it is personal. Boost's docs allow ignoring it.</li>
+<li><strong>The refresh is guarded.</strong> Boost's docs suggest <code>@php artisan boost:update --ansi</code> in <code>post-update-cmd</code>, but <code>boost:update</code> exits 1 until <code>boost:install</code> has written <code>boost.json</code>, and under <code>composer update --no-dev</code> the command does not exist. <code>composer boost-update</code> runs it only when <code>vendor/laravel/boost</code> is installed and <code>boost.json</code> names at least one agent (Boost's own precondition; a <code>boost:install</code> that found no agent leaves an empty list), and passes its exit code through, so a real failure still fails <code>composer update</code>.</li>
+<li><strong>The agent files are ignored whole.</strong> Git cannot ignore the generated block inside <code>CLAUDE.md</code>, and Boost rewrites that block on every <code>boost:update</code>. Team guidance goes in <code>.ai/guidelines/</code>, which Boost folds into every agent's file, so nothing is lost.</li>
+<li><strong>The skeleton's <code>CLAUDE.md</code> and <code>AGENTS.md</code> are dropped.</strong> Laravel 13 ships them holding only a bootstrap block that tells an agent to <code>composer require laravel/boost --dev</code> (already done) and to install PHP with a remote PowerShell one-liner the stack does not copy. <code>boost:install</code> writes them again for the agents you pick. A skeleton file with anything else in it is kept.</li>
+<li><strong><code>.agents/</code> stays tracked.</strong> Booster keeps its playbooks in <code>.agents/skills/</code>, and Boost writes its Codex, OpenCode, Amp and Antigravity skills there too, so commit what you want to keep from that folder.</li>
+<li><strong>Record rules through your agent.</strong> Ask it to &quot;remember&quot; something and Boost's <code>record-rule</code> tool files it in <code>.ai/rules/</code> and rewrites the index; a rule file added by hand is not found until <code>php artisan boost:index-rules</code> runs.</li>
+</ul>
+<p>Boost never reaches production. Squire's <code>scripts/release.sh</code> and the <code>--docker</code> prod target both install with <code>composer install --no-dev</code>, which leaves <code>require-dev</code> behind, and <code>BoostDevOnlyTest</code> fails when <code>laravel/boost</code> moves into <code>require</code> or the lock file puts it outside <code>packages-dev</code>. Boost 2.10 needs PHP 8.2 or newer and Laravel 11.45, 12.41 or 13.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>Boost's MCP server can run database queries and code through Tinker, so the development <code>.env</code> must point at a local database and never at the shared server.</p></aside>
 <h2 id="support-windows">Support windows<a class="docs-heading-link" aria-label="Link to this section" href="#support-windows">#</a></h2>
 <p>Laravel gives each major 18 months of bug fixes and two years of security fixes. From its release notes: 11 reached the end of security fixes on 2026-03-12; 12 (PHP 8.2 to 8.5) gets security fixes until 2027-02-24; 13 (PHP 8.3 to 8.5) until 2028-03-17. Name the major in the generator's tests, so a new release cannot change output unseen, and print the end-of-security date in the generated README. Laravel 13 needs PHP 8.3, which is also the stack's floor: 8.2 security support ends 2026-12-31.</p>
@@ -108,7 +164,7 @@ npm run build
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/ovens.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Same kitchen, many ovens</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/keeping-current.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Keeping apps current</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-a-laravel-bake-adds">What a Laravel bake adds</a></li><li class="docs-toc__item"><a href="#build-on-the-official-installer">Build on the official installer</a></li><li class="docs-toc__item"><a href="#local-runtime-sail-or-docker">Local runtime: Sail or Docker</a></li><li class="docs-toc__item"><a href="#sign-in-stays-sesame">Sign-in stays SESAME</a></li><li class="docs-toc__item"><a href="#keep-boost-current">Keep Boost current</a></li><li class="docs-toc__item"><a href="#support-windows">Support windows</a></li><li class="docs-toc__item"><a href="#trust-the-ha-proxy-not-every-sender">Trust the HA-Proxy, not every sender</a></li><li class="docs-toc__item"><a href="#a-stopped-scheduler-shows-up">A stopped scheduler shows up</a></li><li class="docs-toc__item"><a href="#work-on-the-shared-mysql-5-6">Work on the shared MySQL 5.6</a></li><li class="docs-toc__item"><a href="#next-steps">Next steps</a></li><li class="docs-toc__item"><a href="#the-oracle-check">The Oracle check</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-a-laravel-bake-adds">What a Laravel bake adds</a></li><li class="docs-toc__item"><a href="#build-on-the-official-installer">Build on the official installer</a></li><li class="docs-toc__item"><a href="#local-runtime-sail-or-docker">Local runtime: Sail or Docker</a></li><li class="docs-toc__item"><a href="#sign-in-stays-sesame">Sign-in stays SESAME</a></li><li class="docs-toc__item"><a href="#laravel-boost-dev-only">Laravel Boost, dev only</a></li><li class="docs-toc__item"><a href="#support-windows">Support windows</a></li><li class="docs-toc__item"><a href="#trust-the-ha-proxy-not-every-sender">Trust the HA-Proxy, not every sender</a></li><li class="docs-toc__item"><a href="#a-stopped-scheduler-shows-up">A stopped scheduler shows up</a></li><li class="docs-toc__item"><a href="#work-on-the-shared-mysql-5-6">Work on the shared MySQL 5.6</a></li><li class="docs-toc__item"><a href="#next-steps">Next steps</a></li><li class="docs-toc__item"><a href="#the-oracle-check">The Oracle check</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.2.0</span></span>
