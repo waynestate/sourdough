@@ -195,7 +195,7 @@
 </tr>
 <tr>
 <td>Preflight</td>
-<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.3.0 release SHA (<code>23038dfe767f6ef60e3b2efca1128f53d9acdff7</code>, with the tag in a trailing comment), which PROCTOR's <code>preflight-pinned</code> check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no <code>image</code> inputs, so each component runs its own default image, pinned by digest inside that release, and they pass <code>image_prefix: &quot;${IMAGE_PREFIX}&quot;</code>, so the components and the app's own jobs pull through the same Dependency Proxy rule</td>
+<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.3.1 release SHA (<code>b90323b5823287a7840095d0d5f0682aaeedf327</code>, with the tag in a trailing comment), which PROCTOR's <code>preflight-pinned</code> check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no <code>image</code> inputs, so each component runs its own default image, pinned by digest inside that release, and they pass <code>image_prefix: &quot;${IMAGE_PREFIX}&quot;</code>, so the components and the app's own jobs pull through the same Dependency Proxy rule</td>
 </tr>
 <tr>
 <td>Oracle</td>
