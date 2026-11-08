@@ -23,7 +23,7 @@
         "waynestate/advisor": "^0.1",
         "waynestate/creed": "^0.1",
         "waynestate/pinstripe": "^0.1",
-        "waynestate/proctor": "^0.7"
+        "waynestate/proctor": "^0.8"
     },
     "scripts": {
         "ci": [

@@ -38,6 +38,12 @@ Sourdough 0.2.0
 
 Then read the section for the version you are moving to.
 
+## Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
+
+**Breaking:** for apps you feed, in one case only. The fed `composer.json` moves PROCTOR to `^0.8`, whose `crlf-deploy-script` check fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF). Such a script was already broken on the Linux host; convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.8 also adds `mysql-eol`, which only warns. **Deprecated:** none.
+
+**Steps:** in each app, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/proctor --with-all-dependencies`, then `vendor/bin/proctor check`. See [PROCTOR's upgrading notes](https://proctor.apps.wayne.edu/docs/upgrading.html).
+
 ## 0.2.0 (2026-11-08)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-2-0-2026-11-08)
 
 **Breaking:** for apps you feed, in two cases only. The fed pipeline pins Preflight 0.3.0, which needs GitLab 18.7 or later (git.wayne.edu is newer), and the fed `composer.json` moves PROCTOR to `^0.7`, whose `node-eol` check fails an app that pins Node 20 or older. **Deprecated:** none.

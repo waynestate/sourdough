@@ -16,6 +16,10 @@ Versioning once 1.0 is out.
 
 - Added: every shape's `.gitlab-ci.yml` runs a `sourdough-feed` job (BEST_PRACTICES 3.2, now `Checked`): on the shape's `composer` image, through `${IMAGE_PREFIX}` and the Composer cache, it installs the newest Sourdough release and runs `sourdough manifest --check` and `sourdough feed --dry-run`. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which `allow_failure: exit_codes: [1]` shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next `sourdough feed`. New `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are `Enforced` and name the tests that hold them.
 
+### Changed
+
+- Changed: every shape requires PROCTOR ^0.8 (was ^0.7): the raw `composer.json` and both Laravel overlays. Breaking for apps you feed whose deploy scripts have Windows line endings, which PROCTOR 0.8's `crlf-deploy-script` fails; the upgrading page has the steps. The deploy layer requires PROCTOR ^0.8 (locked 0.8.0).
+
 ### Fixed
 
 - Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.

@@ -16,6 +16,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - Added: every shape's `.gitlab-ci.yml` runs a `sourdough-feed` job (BEST_PRACTICES 3.2, now `Checked`): on the shape's `composer` image, through `${IMAGE_PREFIX}` and the Composer cache, it installs the newest Sourdough release and runs `sourdough manifest --check` and `sourdough feed --dry-run`. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which `allow_failure: exit_codes: [1]` shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next `sourdough feed`. New `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are `Enforced` and name the tests that hold them.
 
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
+
+- Changed: every shape requires PROCTOR ^0.8 (was ^0.7): the raw `composer.json` and both Laravel overlays. Breaking for apps you feed whose deploy scripts have Windows line endings, which PROCTOR 0.8's `crlf-deploy-script` fails; the upgrading page has the steps. The deploy layer requires PROCTOR ^0.8 (locked 0.8.0).
+
 ### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
 - Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
@@ -28,7 +32,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
 - Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-1)
 
 - Changed: every shape's `.gitlab-ci.yml` pins the Preflight CI components to the 0.3.0 release SHA (`23038dfe767f6ef60e3b2efca1128f53d9acdff7` with `# 0.3.0`, was 0.1.4; Preflight 0.2.0 and later need GitLab 18.7 or later). From Preflight 0.3.0 each Docker Hub component adds the registry prefix itself (`image_prefix`, D-054), so the includes pass `image_prefix: "${IMAGE_PREFIX}"` and drop their `image` inputs, which only carried the prefix in front of the components' own defaults: the components and the app's own jobs follow one proxy rule. Apps already baked take it with `sourdough feed`; a Preflight include an owner added with a prefixed `image` keeps the plain name (docs/upgrading.md).
 - Changed: Sourdough's own GitLab pipeline pins the Preflight components to the `0.3.0` release tag (was 0.1.4), and their `image` inputs are plain names (the components add the proxy prefix); the jobs Sourdough defines itself keep `${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/`. The GitHub workflow stays on Preflight 0.1.4: GitHub's copy of Preflight has no tag after 0.1.4 yet (D-069).
@@ -59,7 +63,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: the smoke gate checks more of every loaf. Right after the bake, `sourdough manifest --check` must be clean. Every shape runs its own suite as its own step (the count goes in the proof table) and `composer proctor`. The Laravel shapes now boot too, on Laravel's own router: `/` must answer with the shape's home page (the Blade page, the built Vue islands, or the Inertia `Home` page), `/dashboard` after SESAME's fake sign-in, `/nope` 404 and `/up` 200; the raw shape's `/` must carry its home page in WayneUI's shell. A second argument, `--sail` or `--docker`, proves a Laravel shape's oven (the scaffold's files, install, suite, PROCTOR), and `SMOKE_FEED_FROM=<version>` bakes that release from Packagist and feeds it forward. `scripts/smoke-shape.ps1` takes `-Oven` and `-FeedFrom` to match.
 - Added: the Laravel shapes ship skeleton feature tests (`tests/Feature/SkeletonTest.php`, Pest, next to the starter's example tests): `/up` answers 200, the home page answers 200 for a guest (the Blade page, the built Vue island, or the Inertia `Home` component), a guest at `/dashboard` goes to the sign-in flow, the dashboard renders for a signed-in user after SESAME's fake sign-in (with the islands view's `data-vue-island="counter"` island and the Inertia `Dashboard` component checked too), a missing page answers 404, and `UserResolver::refreshUser()` turns a stored user array back into the `User` by username, or `null` when the username no longer exists. Each baked Laravel suite grows from two tests to nine, and the proof table quotes the new counts.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-1)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-2)
 
 - Changed: the front page's deploy layer (`deploy/`) runs Squire's kit 0.5.0 (was 0.4.0): `.squire/base-fallback.Dockerfile` and `scripts/parity.ps1` take the new templates, so `squire init --check` passes. `site/assets/stack-env.js` takes the stack's one copy, with bindingless catch blocks.
 - Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
@@ -96,7 +100,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: the raw template ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), `waynestate/pinstripe` in require-dev with the extension-installer plugin allowed, and `lint`, `fix` and `analyse` scripts, so `composer ci` runs test, lint, analyse, proctor and audit in that order.
 - Added: the front page's main nav links the docs site.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-2)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-3)
 
 - Changed: the Inertia shape draws with WayneUI instead of the Tailwind starter kit, the same wiring WELD ships. `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 are pinned exactly; every page wears WayneUI's app bar (shield, theme toggle), the sidebar that becomes a focus-trapping drawer on phones, breadcrumbs, cards and footer; a pre-paint script under HELMET's nonce stops the dark-mode flash; Ziggy's client comes from the `ziggy-js` npm package. The home page and the dashboard are new, in WayneUI's components and tokens. `eslint.config.js` refuses `components/ui` imports and the kit's helper packages, `.prettierrc` is the stack's, and a `frontend` CI job runs lint, Prettier, vue-tsc and the build.
 - Changed: the Laravel shapes (Blade, Blade + Vue, Inertia) generate apps on Pest 4 (`tests/Pest.php`, a Pest example test, `composer test` and `composer ci` run Pest, PHPUnit tests unchanged, tests read `.env`, or `.env.example` when there is no `.env`); the raw shape is unchanged.
@@ -147,7 +151,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Added: generated apps ship ADVISOR by default. `waynestate/advisor` lands in `require-dev` (raw template and the laravel-blade overlay), `.mcp.json` is git-ignored, the README gains an "ADVISOR" section, and the Next steps print `php vendor/bin/advisor install --client=claude --write`. `--no-advisor` skips all of it and records the choice in the manifest.
 - Added: the smoke gate (`scripts/smoke-shape.sh`, `scripts/smoke-shape.ps1`, `scripts/smoke.Dockerfile`) bakes a shape with this checkout's own CLI and runs the generated app's own checks; CI runs one job per shape, all `allow_failure: true` until seen green once.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-3)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-4)
 
 - Changed: `--name` on the Laravel bakes reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package) with the description reading ", a Wayne State app baked from Sourdough.", `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
 - Changed: the raw template pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
@@ -180,7 +184,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-4)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-5)
 
 - The Squire template copy in `templates/squire/` now comes from the `waynestate/squire` Composer package (new dev dependency, `^0.2`) instead of a Squire checkout. `composer squire-copy:sync` rewrites the copy from `vendor/waynestate/squire`, and `composer squire-copy:check` (now part of `composer ci`) exits 1 when the committed copy has drifted. The refresh brings Squire 0.2.0's deploy files: `scripts/release.sh` gains the `SQUIRE_PROCTOR=enforce` handling, and the `static` target joins the catalog. Fresh flour, straight from the mill.
 - Changed: project names written as words except acronyms.
@@ -204,13 +208,13 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - `sourdough new` validates the app name before writing anything: it must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters (`RawGenerator::assertValidName`). Hostile names (quotes, backslashes, newlines, NUL bytes, placeholders, path traversal, overlong or empty names) are refused with exit 1 and write nothing.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-5)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-6)
 
 - The raw template now requires HELMET `^0.2` and PROCTOR `^0.2`, so `sourdough new` installs the current stack releases instead of the 0.1 line. SESAME stays at `^0.1` until it cuts 0.2.
 
 ## 0.1.1 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-1-2026-10-29)
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-6)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-7)
 
 - PHPStan and Pint now take their settings from Pinstripe (`waynestate/pinstripe` ^0.1) instead of a hand copy: `phpstan.neon` includes the raw preset, and `pint.json` extends the per preset. Same cut, off the rack.
 
@@ -221,7 +225,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - The raw app now installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
 - `composer squire-copy:check`: verify that `templates/squire/` still matches a fresh export from the SQUIRE checkout (`SQUIRE_PATH`, default `/squire`). Skips with exit 0 when no checkout is mounted.
 
-### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-7)
+### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-8)
 
 - Refreshed the SQUIRE template copy in `templates/squire/` from e66f07b to 2a893c0: the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch. Fresh flour, same recipe.
 

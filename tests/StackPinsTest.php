@@ -41,7 +41,8 @@ final class StackPinsTest extends TestCase
 
         // 0.7 brings `proctor gate`, the deploy gate Squire 0.6.0's
         // release.sh asks for; an older PROCTOR falls back to `check`.
-        self::assertSame('^0.7', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+        // 0.8 adds crlf-deploy-script, which fails a CRLF deploy script.
+        self::assertSame('^0.8', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
     }
 
     #[DataProvider('proctorComposerFiles')]
