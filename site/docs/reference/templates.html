@@ -148,7 +148,7 @@
 <li><code>package.json</code> pins <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. <code>resources/css/app.css</code> imports WayneUI's layered <code>dist/wayne-ui.css</code>, and <code>resources/js/App.vue</code> draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).</li>
 <li><code>vite.config.js</code> builds into <code>public/build</code> with the manifest at its top, keeps <code>public/</code> (PHP's document root) out of the copy, and writes and removes <code>public/hot</code> around the dev server. <code>.gitignore</code> adds <code>/node_modules/</code>, <code>/public/build/</code> and <code>/public/hot</code>: Squire's release script runs <code>npm ci</code> and <code>npm run build</code> once <code>package-lock.json</code> is committed.</li>
 <li>Drops <code>stubs/wayne-ui.php</code> and <code>phpstan.neon</code>'s <code>scanFiles</code>: Vue draws the chrome, so there is no fetched <code>public/wayne-ui.php</code>.</li>
-<li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm install</code>, <code>npm run build</code>) to the raw pipeline.</li>
+<li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm install</code>, <code>npm run build</code>, and <code>sbom-npm.cdx.json</code> from CycloneDX's npm tool) to the raw pipeline, and its <code>a11y-pages</code> job waits for that build and also saves <code>/api/me</code>, so the accessibility gate sees the Vue app signed in.</li>
 </ul>
 <h3 id="laravel-blade">laravel-blade/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade">#</a></h3>
 <ul>
@@ -162,6 +162,7 @@
 <ul>
 <li>The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a <code>resources/js/app.js</code> registry that mounts a Vue 3 app on every <code>[data-vue-island]</code> element, and a Counter island live on the dashboard view.</li>
 <li>Ships <code>tests/Feature/ExampleTest.php</code> with <code>$this-&gt;withoutVite()</code>, so <code>composer ci</code> in a freshly baked islands app does not fail on the missing Vite manifest before <code>npm run build</code> has run.</li>
+<li>Its own <code>.gitlab-ci.yml</code>: the Laravel + Blade pipeline plus a <code>frontend</code> job (<code>npm install</code>, <code>npm run build</code>, the npm SBOM), whose <code>public/build/</code> the <code>a11y-pages</code> job serves, because Blade's <code>@vite</code> reads the build's manifest.</li>
 <li>Next steps: the Laravel + Blade steps plus <code>npm install</code> and <code>npm run build</code>.</li>
 </ul>
 <h3 id="laravel-inertia">laravel-inertia/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-inertia">#</a></h3>
@@ -196,7 +197,11 @@
 </tr>
 <tr>
 <td>Preflight</td>
-<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.3.1 release SHA (<code>b90323b5823287a7840095d0d5f0682aaeedf327</code>, with the tag in a trailing comment), which PROCTOR's <code>preflight-pinned</code> check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no <code>image</code> inputs, so each component runs its own default image, pinned by digest inside that release, and they pass <code>image_prefix: &quot;${IMAGE_PREFIX}&quot;</code>, so the components and the app's own jobs pull through the same Dependency Proxy rule</td>
+<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.3.1 release SHA (<code>b90323b5823287a7840095d0d5f0682aaeedf327</code>, with the tag in a trailing comment), which PROCTOR's <code>preflight-pinned</code> check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no <code>image</code> inputs, so each component runs its own default image, pinned by digest inside that release, and the ones that pull from Docker Hub pass <code>image_prefix: &quot;${IMAGE_PREFIX}&quot;</code>, so the components and the app's own jobs pull through the same Dependency Proxy rule (<code>a11y</code> pulls Playwright's image from Microsoft's registry and takes none)</td>
+</tr>
+<tr>
+<td>CI gates</td>
+<td>every shape's <code>.gitlab-ci.yml</code> includes Preflight's <code>sbom</code> (Composer SBOM), <code>secret-detection</code> (Gitleaks) and <code>a11y</code> (axe-core at WCAG 2.2 AA over <code>a11y-site/</code>, which the <code>a11y-pages</code> job fills by booting the app with SESAME's fake driver and saving each page in <code>A11Y_PATHS</code>), and carries a hidden <code>.deploy</code> template that runs only on protected refs and never for a merge request. <code>tests/TemplateCiGatesTest.php</code> holds all five shapes to it; see <a href="../guides/ci.html#the-accessibility-gate">CI</a></td>
 </tr>
 <tr>
 <td>Oracle</td>

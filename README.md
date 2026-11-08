@@ -262,6 +262,11 @@ Every baked `.gitlab-ci.yml` caches its downloads: Docker Hub images come throug
 when the GitLab has one (`IMAGE_PREFIX`, Docker Hub otherwise), and Composer and npm installs are cached per lock
 file. See [Dependency caching](docs/guides/ci.md#dependency-caching).
 
+Every baked pipeline also carries three gates from Preflight: an accessibility check of the app's own pages
+(signed in, at WCAG 2.2 AA, blocking), a CycloneDX bill of materials for Composer and, in the front-end shapes, npm,
+and Gitleaks over the repository. A `.deploy` template keeps any deploy job on protected refs, and each generated
+README lists the GitLab settings a file cannot hold. See [CI](docs/guides/ci.md#the-accessibility-gate).
+
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>
 

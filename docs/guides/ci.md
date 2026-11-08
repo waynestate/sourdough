@@ -12,7 +12,50 @@ Sourdough's pipelines run one gate, `composer ci`, on both forges: the same comm
 
 ## On GitLab
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.1 release commit, with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.3.1 release commit, with the tag in a trailing comment.
+
+## The accessibility gate
+
+Every shape's pipeline checks the app's own pages in a real browser (BEST_PRACTICES 6.4). Two jobs share the work, so the checking stays Preflight's:
+
+1. `a11y-pages` boots the app the way its first run on a desk does, with SESAME's fake driver: PHP's built-in server for the raw shapes, `php artisan serve` (after `.env`, a key and an SQLite database) for the Laravel shapes. The shapes with a front end wait for the `frontend` job (`needs: [frontend]`) and serve its build. The job copies `public/`'s static files (never its PHP) into `a11y-site/` and saves each path in `A11Y_PATHS` there as `<path>/index.html`, through one cookie jar, so a page behind sign-in is saved signed in. The server's own origin is cut out of the saved pages, so their links work on any port. `A11Y_DATA` (raw + Vue only: `/api/me`) saves the JSON the page fetches as it loads, so the Vue app draws its signed-in view.
+2. Preflight's `a11y` component (`site_dir: a11y-site`, `needs: [a11y-pages]`) opens each page in Chromium with axe-core, light and dark, at 320 and 1280 px, plus the WCAG 1.4.10 reflow check, at WCAG 2.2 AA (WayneUI's floor; the ADA Title II rule names 2.1 AA, which 2.2 AA includes). It blocks: a violation fails the pipeline.
+
+| Shape | `A11Y_PATHS` | What it covers |
+|---|---|---|
+| Raw PHP | `/` | the one page, signed in by the fake driver |
+| Raw PHP + Vue SPA | `/` (and `/api/me` in `A11Y_DATA`) | the Vue app with the signed-in user |
+| Laravel + Blade, Blade + Vue islands, Inertia | `/ /dashboard` | the home page signed out, then the dashboard after `/login` signs in |
+
+In production the sign-in page is the CAS server's own, so the part of the sign-in flow an app draws is the signed-in page it lands on. An app owner adds each new page to `A11Y_PATHS` and to the a11y include's `pages` (the two lists name the same pages; `tests/TemplateCiGatesTest.php` holds the templates to that). Every shape renders pages, so every shape gets the gate; an app that later becomes a pure JSON API with no pages can drop the `a11y` include and the `a11y-pages` and `a11y` jobs together.
+
+> [!NOTE]
+> Automated checks find only part of the problems. axe-core checks a loaded page; it does not follow a client-side navigation, so focus after a route change and announced route changes in the Vue shapes still need a person with a keyboard and a screen reader. The generated README says so.
+
+## The bill of materials
+
+Preflight's `sbom` component writes `sbom.cdx.json`, a CycloneDX SBOM of the Composer packages `composer.lock` installs (dev packages left out), and keeps it for 30 days (BEST_PRACTICES 4.15). The shapes with a front end add the npm half in their `frontend` job: `@cyclonedx/cyclonedx-npm`, the CycloneDX project's own tool, pinned to an exact version and run with `--ignore-scripts`, writes `sbom-npm.cdx.json` from what the install put in `node_modules`, dev packages included, because the build tools make the bundle. npm's built-in `npm sbom` refuses a `package.json` without a `version`, which an app's never has. When the next advisory lands, the affected apps are one search per file away. Container image contents are not covered: the shapes build no image in CI.
+
+## Secrets and deploy credentials
+
+Preflight's `secret-detection` component runs Gitleaks over the checkout and fails on anything shaped like a credential, redacted in the log and in `gitleaks.json`. A freshly baked app of every shape scans clean.
+
+Citadel deploys an app with a Quick Update, so a baked pipeline holds no deploy credential and runs no deploy job (BEST_PRACTICES 6.5). Each shape ships the part a pipeline file can express, a hidden `.deploy` template for the day an app adds a deploy job:
+
+```yaml
+.deploy:
+  stage: deploy
+  resource_group: deploy
+  interruptible: false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_REF_PROTECTED == "true"
+```
+
+A job that extends it never runs for a merge request and runs only on a protected branch or tag, the only refs where GitLab hands a job its protected variables. One deploy runs at a time, and a newer pipeline never cancels one halfway. `tests/TemplateCiGatesTest.php` fails Sourdough's suite when a shape's job deploys (`stage: deploy` or `environment:`) without extending `.deploy`, when a component input references any variable but the GitLab host and `IMAGE_PREFIX`, or when the file sets a variable named like a credential.
+
+The rest are project settings, so each generated README lists them under "Pipeline": protect `main` and the release tags; keep each deploy credential in a protected, masked (or masked and hidden) variable; never put a credential in the file or a component's inputs; keep the job token allowlist on and add other projects by name; read a fork's merge request before running its pipeline in the project; prefer the deploy target's own secret store for anything long-lived. All of it works on GitLab Community Edition. Protected environments, which would add an approval step, are a paid tier feature, so the file does not rely on them.
 
 ## Is the app still fed?
 
@@ -47,6 +90,8 @@ On a group whose proxy is turned off, set `IMAGE_PREFIX` to `docker.io` in **Set
 > To run a component on another image, give its `image` input the plain name, such as `php:8.4-cli-trixie@sha256:<digest>`, never `${IMAGE_PREFIX}/php:...`. The component already adds `image_prefix` in front, so a prefixed image is pulled from a path that does not exist and the job fails before it starts.
 
 **Packages.** `COMPOSER_CACHE_DIR` and `npm_config_cache` point at `.cache/composer/` and `.cache/npm/` inside the project, and every job that installs extends `.composer-cache` (keyed on `composer.lock`) or `.npm-cache` (keyed on `package-lock.json` and `package.json`). A lock change starts a fresh cache, and the install still resolves from the lock, so a cached run never gets a stale package.
+
+The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, which the Dependency Proxy does not front, so it takes no `image_prefix`; the runner's own image cache is what keeps that pull rare.
 
 `tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's own job gains an image without `${IMAGE_PREFIX}/` or an install without its cache, and `tests/PreflightPinTest.php` fails it when a shape pins another Preflight version than the rest, gives a component a prefixed `image`, or leaves out `image_prefix`.
 

@@ -36,21 +36,16 @@ Generated commands should run and exit on their own, with no prompts and no netw
 
 The US Justice Department's Title II web rule sets WCAG 2.1 Level AA for state and local government web content. An interim final rule published on 2026-04-20 moved the first compliance date to 2027-04-26 for entities of 50,000 people or more and to 2028-04-26 for smaller ones. The standard and the ongoing duty to keep content accessible did not change. Whether and when the rule applies to a given WSU app is not decided here; ask WSU's accessibility office.
 
-For Sourdough: each permutation's generated home page and sign-in flow get an automated accessibility check in CI, including the Vue paths (focus after navigation, announced route changes); WayneUI's accessible templates are the default markup; and the "new app" page passes the same gate.
+What Sourdough ships: every shape's pipeline renders the app's own pages and checks them with Preflight's `a11y` component at WCAG 2.2 AA (which includes 2.1 AA), blocking. The Laravel shapes check the home page signed out and the dashboard signed in through `/login`; the raw shapes check their one page, signed in by SESAME's fake driver, and raw + Vue saves `/api/me` so its Vue app draws the signed-in view. In production the sign-in page itself is the CAS server's. WayneUI's accessible templates are the default markup, and Sourdough's own pipeline runs the same component over every page under `site/`, so the "new app" page passes the gate when it lands there. How the pages are saved is in [CI](./ci.md#the-accessibility-gate).
 
 > [!NOTE]
-> Automated checks find only part of the problems, so the generated README should say so.
+> Automated checks find only part of the problems, and every generated README says so. axe-core checks a loaded page, so the Vue paths' focus after navigation and announced route changes still need a person with a keyboard and a screen reader.
 
 ## Protect deploy credentials in the generated pipeline
 
-GitLab's docs say masking a variable does not reliably stop a malicious user from reading it; protected variables exist only in pipelines on protected branches and tags; a pipeline for a merge request from a fork should run in the parent project only after review, because malicious code can compromise masked and protected variables; and sensitive values belong in an external secrets manager. A project's job-token allowlist includes only the project itself by default, and GitLab calls disabling it a security risk. From GitLab 19.0 job tokens use the JWT format by default, and the legacy format is available only until 20.0. Which GitLab version WSU runs was not checked.
+GitLab's docs say masking a variable does not reliably stop a malicious user from reading it; protected variables exist only in pipelines on protected branches and tags; a pipeline for a merge request from a fork should run in the parent project only after review, because malicious code can compromise masked and protected variables; and sensitive values belong in an external secrets manager. A project's job-token allowlist includes only the project itself by default, and GitLab calls disabling it a security risk. From GitLab 19.0 job tokens use the JWT format by default, and the legacy format is available only until 20.0.
 
-The generated `.gitlab-ci.yml` should therefore:
-
-- run deploy jobs only on a protected branch or tag with protected variables
-- put no secrets in component `inputs`
-- leave the job-token allowlist on
-- add other projects to it by name when the pipeline must fetch from them
+What Sourdough ships: Citadel deploys by Quick Update, so a generated pipeline holds no credential and runs no deploy job. Each shape carries a `.deploy` template (no merge request pipelines, protected refs only, one deploy at a time) for the day an app adds one, Preflight's `secret-detection` component (Gitleaks) fails a pipeline that commits a credential, and Sourdough's suite fails when a shape's job deploys without `.deploy`, a component input carries a variable other than the host and `IMAGE_PREFIX`, or the file sets a variable named like a credential. The settings a file cannot hold are a checklist in every generated README: protected `main` and tags, protected and masked variables, the job-token allowlist on with projects added by name, fork merge requests read before they run, and the deploy target's own secret store for anything long-lived. Details in [CI](./ci.md#secrets-and-deploy-credentials).
 
 > [!DANGER]
 > Sensitive values belong in an external secrets manager. Put no secrets in component `inputs`, and run deploy jobs only on a protected branch or tag with protected variables.
