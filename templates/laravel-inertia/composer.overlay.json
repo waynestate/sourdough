@@ -27,7 +27,7 @@
         "waynestate/proctor": "^0.8"
     },
     "scripts": {
-        "boost-update": "@php -r \"exit(is_file('boost.json') && is_dir('vendor/laravel/boost') ? pclose(popen(escapeshellarg(PHP_BINARY) . ' artisan boost:update --ansi', 'w')) : 0);\"",
+        "boost-update": "@php -r \"exit(is_dir('vendor/laravel/boost') && is_file('boost.json') && ! empty(json_decode(file_get_contents('boost.json'), true)['agents']) ? pclose(popen(escapeshellarg(PHP_BINARY) . ' artisan boost:update --ansi', 'w')) : 0);\"",
         "ci": [
             "@composer validate --strict",
             "pest",
@@ -43,6 +43,6 @@
         "ziggy": "php artisan ziggy:generate --types"
     },
     "scripts-descriptions": {
-        "boost-update": "Refresh Laravel Boost's guidelines and skills (php artisan boost:update). Skipped when Boost is not set up here: no boost.json yet, or a composer --no-dev install."
+        "boost-update": "Refresh Laravel Boost's guidelines and skills (php artisan boost:update). Skipped when Boost is not set up here: no boost.json naming an agent yet, or a composer --no-dev install."
     }
 }

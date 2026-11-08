@@ -219,7 +219,7 @@ final class BoostWiringTest extends TestCase
         self::assertSame($expected, file_get_contents($dir . '/index.md'));
     }
 
-    public function testTheGuardSkipsAFreshCloneAndANoDevInstall(): void
+    public function testTheGuardSkipsAFreshCloneANoDevInstallAndNoAgent(): void
     {
         $dir = $this->makeTempDir();
         // An artisan that fails loudly if the guard ever calls it.
@@ -229,7 +229,14 @@ final class BoostWiringTest extends TestCase
         self::assertSame(0, $exit);
         self::assertSame('', $stderr);
 
-        file_put_contents($dir . '/boost.json', "{}\n");
+        file_put_contents($dir . '/boost.json', "{\"agents\": [\"claude_code\"]}\n");
+        [$exit, , $stderr] = $this->runGuard($dir);
+        self::assertSame(0, $exit);
+        self::assertSame('', $stderr);
+
+        // boost:install found no agent, so boost:update would exit 1 asking for setup.
+        mkdir($dir . '/vendor/laravel/boost', 0o777, true);
+        file_put_contents($dir . '/boost.json', "{\"agents\": []}\n");
         [$exit, , $stderr] = $this->runGuard($dir);
         self::assertSame(0, $exit);
         self::assertSame('', $stderr);
@@ -239,7 +246,7 @@ final class BoostWiringTest extends TestCase
     {
         $dir = $this->makeTempDir();
         mkdir($dir . '/vendor/laravel/boost', 0o777, true);
-        file_put_contents($dir . '/boost.json', "{}\n");
+        file_put_contents($dir . '/boost.json', "{\"agents\": [\"claude_code\"]}\n");
         file_put_contents($dir . '/artisan', "<?php\necho implode(' ', array_slice(\$argv, 1));\nexit(3);\n");
 
         [$exit, $stdout] = $this->runGuard($dir);

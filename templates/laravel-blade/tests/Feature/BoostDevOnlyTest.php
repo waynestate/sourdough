@@ -74,10 +74,17 @@ it('skips the refresh where Boost is not set up', function () {
             ->and($fresh->getErrorOutput())->toBe('');
 
         // composer install --no-dev: boost.json is there, Boost is not.
-        File::put($dir.'/boost.json', "{}\n");
+        File::put($dir.'/boost.json', "{\"agents\": [\"claude_code\"]}\n");
         $noDev = sourdoughBoostGuard($dir);
         expect($noDev->getExitCode())->toBe(0)
             ->and($noDev->getErrorOutput())->toBe('');
+
+        // boost:install found no agent: boost:update would only say "set me up".
+        File::ensureDirectoryExists($dir.'/vendor/laravel/boost');
+        File::put($dir.'/boost.json', "{\"agents\": []}\n");
+        $noAgent = sourdoughBoostGuard($dir);
+        expect($noAgent->getExitCode())->toBe(0)
+            ->and($noAgent->getErrorOutput())->toBe('');
     } finally {
         File::deleteDirectory($dir);
     }
@@ -86,7 +93,7 @@ it('skips the refresh where Boost is not set up', function () {
 it('runs boost:update and keeps its exit code where Boost is set up', function () {
     $dir = sys_get_temp_dir().'/boost-guard-'.bin2hex(random_bytes(4));
     File::ensureDirectoryExists($dir.'/vendor/laravel/boost');
-    File::put($dir.'/boost.json', "{}\n");
+    File::put($dir.'/boost.json', "{\"agents\": [\"claude_code\"]}\n");
     File::put($dir.'/artisan', "<?php\necho implode(' ', array_slice(\$argv, 1));\nexit(3);\n");
 
     try {
