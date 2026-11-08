@@ -12,7 +12,7 @@
         "php": "^8.3",
         "guzzlehttp/guzzle": "^7.9 || ^8.0",
         "nyholm/psr7": "^1.8",
-        "waynestate/helmet": "^0.4",
+        "waynestate/helmet": "^1.0",
         "waynestate/sesame": "^0.5"
     },
     "require-dev": {
