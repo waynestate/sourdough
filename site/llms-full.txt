@@ -632,6 +632,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
+- Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
 - Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, `manifest` and `feed` ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is `Enforced` by the generator tests in every shape; it said only the raw shape generated.
 - Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).
 - Fixed: `scripts/parity.ps1` builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.
