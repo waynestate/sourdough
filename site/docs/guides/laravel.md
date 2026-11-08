@@ -18,6 +18,8 @@ A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sour
 - `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
 - `--inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia 3 pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's `components/ui` imports; Ziggy routes; the stack packages; a `frontend` CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.
 
+All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the stack's guidelines and starter rules in `.ai/` (see [Laravel Boost, dev only](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)).
+
 All five permutations generate in 0.1; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
 ## Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
@@ -55,9 +57,37 @@ Warning
 
 A live `/register` route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.
 
-## Keep Boost current[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#keep-boost-current)
+## Laravel Boost, dev only[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)
 
-For the Inertia reference path, install Laravel Boost with `--dev`, and refresh its generated guideline and skill files with `boost:update`; the Boost docs suggest running it from Composer's `post-update-cmd`. Stale agent guidance teaches an agent last year's API. Boost runs on Laravel 10 to 13 with PHP 8.1 or higher. Its docs say the generated `.mcp.json`, guideline files (`CLAUDE.md`, `AGENTS.md`, `junie/`) and `boost.json` may go in `.gitignore`, because `boost:install` and `boost:update` regenerate them; the `.ai/rules` directory (project rules recorded by agents) should be committed.
+Every Laravel bake (Blade, Blade with Vue, Inertia) ships [Laravel Boost](https://laravel.com/docs/boost) in `require-dev`: an MCP server, guidelines and skills that teach a coding agent the app's Laravel. Boost is used as published, through its own commands and file layout. Sourdough adds the stack's guidance and the guard rails around it. [ADVISOR](https://github.com/waynestate/advisor) complements Boost, never replaces it: Boost knows Laravel, ADVISOR knows the Wayne State stack.
+
+After `composer install`, each developer wires Boost into their own agent once per checkout:
+
+```bash
+php artisan boost:install
+```
+
+What the bake gives you:
+
+| Piece | Where | In git? |
+| --- | --- | --- |
+| Boost itself | `laravel/boost ^2.10` in `require-dev` | yes (`composer.json`) |
+| The stack's conventions (SESAME, WayneUI, HELMET, MySQL 5.6, Oracle, Squire) | `.ai/guidelines/wayne-state.md`, folded into every agent's file by Boost | yes, managed: `sourdough feed` refreshes it |
+| Starter project rules | `.ai/rules/migrations.md`, `.ai/rules/routes.md` and Boost's `.ai/rules/index.md` | yes, seeded: the team's from the first commit |
+| What `boost:install` writes | `CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `.claude/skills/`, `.junie/`, `boost.json` | no: a `.gitignore` block keeps them out |
+| A refresh after `composer update` | `composer boost-update`, appended to Laravel's `post-update-cmd` | yes |
+| A check that Boost stays a dev tool | `tests/Feature/BoostDevOnlyTest.php` | yes |
+
+Why each choice:
+
+- **`boost.json` is ignored.** It records the agents each developer picked, so it is personal. Boost's docs allow ignoring it.
+- **The refresh is guarded.** Boost's docs suggest `@php artisan boost:update --ansi` in `post-update-cmd`, but `boost:update` exits 1 until `boost:install` has written `boost.json`, and under `composer update --no-dev` the command does not exist. `composer boost-update` runs it only when `boost.json` and `vendor/laravel/boost` are both there, and passes its exit code through, so a real failure still fails `composer update`.
+- **The agent files are ignored whole.** Git cannot ignore the generated block inside `CLAUDE.md`, and Boost rewrites that block on every `boost:update`. Team guidance goes in `.ai/guidelines/`, which Boost folds into every agent's file, so nothing is lost.
+- **The skeleton's `CLAUDE.md` and `AGENTS.md` are dropped.** Laravel 13 ships them holding only a bootstrap block that tells an agent to `composer require laravel/boost --dev` (already done) and to install PHP with a remote PowerShell one-liner the stack does not copy. `boost:install` writes them again for the agents you pick. A skeleton file with anything else in it is kept.
+- **`.agents/` stays tracked.** Booster keeps its playbooks in `.agents/skills/`, and Boost writes its Codex, OpenCode, Amp and Antigravity skills there too, so commit what you want to keep from that folder.
+- **Record rules through your agent.** Ask it to "remember" something and Boost's `record-rule` tool files it in `.ai/rules/` and rewrites the index; a rule file added by hand is not found until `php artisan boost:index-rules` runs.
+
+Boost never reaches production. Squire's `scripts/release.sh` and the `--docker` prod target both install with `composer install --no-dev`, which leaves `require-dev` behind, and `BoostDevOnlyTest` fails when `laravel/boost` moves into `require` or the lock file puts it outside `packages-dev`. Boost 2.10 needs PHP 8.2 or newer and Laravel 11.45, 12.41 or 13.
 
 Warning
 

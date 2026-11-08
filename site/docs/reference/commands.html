@@ -117,7 +117,7 @@
 </tr>
 <tr>
 <td><code>--no-advisor</code></td>
-<td>skip the ADVISOR wiring (no <code>require-dev</code> entry, no <code>.mcp.json</code> git-ignore, no README section)</td>
+<td>skip the ADVISOR wiring (no <code>require-dev</code> entry, no <code>.mcp.json</code> git-ignore line of its own, no README section; the Laravel shapes still ignore <code>/.mcp.json</code> for Laravel Boost)</td>
 </tr>
 </tbody>
 </table></div>
@@ -216,6 +216,7 @@
 <pre tabindex="0"><code>php vendor/bin/advisor install --client=claude --write
 </code></pre>
 <p><code>--no-advisor</code> skips all of it.</p>
+<p>The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: <code>laravel/boost</code> in <code>require-dev</code>, a guarded <code>composer boost-update</code> after <code>composer update</code>, a <code>.gitignore</code> block for what <code>php artisan boost:install</code> writes (<code>/.mcp.json</code>, <code>/boost.json</code>, <code>/CLAUDE.md</code>, <code>/AGENTS.md</code>, <code>/.claude/skills/</code>, <code>/.junie/</code>), the stack's guidelines and two starter rules in <code>.ai/</code>, and <code>tests/Feature/BoostDevOnlyTest.php</code>. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See <a href="../guides/laravel.html#laravel-boost-dev-only">Laravel Boost, dev only</a>.</p>
 <h3 id="app-name-validation">App name validation<a class="docs-heading-link" aria-label="Link to this section" href="#app-name-validation">#</a></h3>
 <p>The app name (from <code>--name</code>, from the plan, or from the basename of <code>&lt;dir&gt;</code>) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.</p>
 <h3 id="php-floor-and-support-lines">PHP floor and support lines<a class="docs-heading-link" aria-label="Link to this section" href="#php-floor-and-support-lines">#</a></h3>

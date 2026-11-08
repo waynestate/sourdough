@@ -36,7 +36,7 @@ sourdough new [dir] [options]
 | `--plan <file>` | a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves |
 | `--playbook` | kept for compatibility: Playbook is now the default |
 | `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
-| `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |
+| `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore line of its own, no README section; the Laravel shapes still ignore `/.mcp.json` for Laravel Boost) |
 
 > [!NOTE]
 > `--sail` and `--docker` are both real for the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) and mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.` (exit `1`). With `--sail` the app runs on Laravel Sail: `laravel/sail` in require-dev, a `compose.yaml`, the database settings in `.env.example` and a README section; the database is MySQL 8.4 LTS. On Windows, Sail needs WSL2, and `--docker` is the route that works natively. With `--docker` Sourdough writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64. Playbook credentials reach a production build only as a BuildKit secret, never a build arg. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP."
@@ -83,6 +83,8 @@ php vendor/bin/advisor install --client=claude --write
 ```
 
 `--no-advisor` skips all of it.
+
+The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: `laravel/boost` in `require-dev`, a guarded `composer boost-update` after `composer update`, a `.gitignore` block for what `php artisan boost:install` writes (`/.mcp.json`, `/boost.json`, `/CLAUDE.md`, `/AGENTS.md`, `/.claude/skills/`, `/.junie/`), the stack's guidelines and two starter rules in `.ai/`, and `tests/Feature/BoostDevOnlyTest.php`. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See [Laravel Boost, dev only](../guides/laravel.md#laravel-boost-dev-only).
 
 ### App name validation
 
