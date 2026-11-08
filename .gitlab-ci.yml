@@ -1,5 +1,5 @@
 # Sourdough's pipeline, built from the Preflight components on this GitLab.
-# Every include is pinned to one Preflight release, 0.3.1. Never use ~latest.
+# Every include is pinned to one Preflight release, 0.4.0. Never use ~latest.
 # composer ci is the contract: the same checks run on GitLab and GitHub.
 # Sourdough requires PHP ^8.3, so the test matrix starts at 8.3. A starter
 # that can't pass its own tests is just flour and wishful thinking.
@@ -8,16 +8,16 @@
 # the group's proxy, so the image inputs below are plain image names. Put the prefix in the
 # image as well and the dough is proofed twice: the pull fails.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.4.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       image: "php:${PHP_VERSION}-cli-trixie"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.4.0
     inputs:
       image: "composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
   # allow_failure: current findings: unbounded dev-main constraints; CI files missing in deploy/.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.4.0
     inputs:
       working_dir: deploy
       proctor_command: vendor/bin/proctor check --format=codequality
@@ -26,7 +26,7 @@ include:
   # Accessibility: Preflight's a11y component serves site/ and checks every page with axe-core 4.14.0, light and
   # dark, at 320 and 1280 px, plus WCAG 1.4.10 reflow, at WCAG 2.2 AA. Its Playwright image comes from
   # mcr.microsoft.com, which the Dependency Proxy does not front, so it takes no image_prefix.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.4.0
     inputs:
       site_dir: site
       pages: ["**/*.html"]
