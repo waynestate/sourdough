@@ -28,6 +28,7 @@ final class LaravelBladeGeneratorTest extends TestCase
 
         foreach ([
             '.gitlab-ci.yml',
+            'app/Health/SchedulerHeartbeat.php',
             'app/Models/User.php',
             'app/Sesame/UserResolver.php',
             'bootstrap/app.php',
@@ -44,6 +45,7 @@ final class LaravelBladeGeneratorTest extends TestCase
             'routes/console.php',
             'routes/web.php',
             'tests/Feature/QueueWorkerScheduleTest.php',
+            'tests/Feature/SchedulerHeartbeatTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }

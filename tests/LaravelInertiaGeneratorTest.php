@@ -28,6 +28,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
 
         foreach ([
             '.gitlab-ci.yml',
+            'app/Health/SchedulerHeartbeat.php',
             'app/Http/Middleware/HandleInertiaRequests.php',
             'app/Models/User.php',
             'app/Sesame/UserResolver.php',
@@ -48,6 +49,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
             'routes/console.php',
             'routes/web.php',
             'tests/Feature/QueueWorkerScheduleTest.php',
+            'tests/Feature/SchedulerHeartbeatTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }
