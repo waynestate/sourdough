@@ -27,7 +27,7 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5",
         "waynestate/pinstripe": "^0.1",
-        "waynestate/squire": "^0.6"
+        "waynestate/squire": "^0.7"
     },
     "config": {
         "allow-plugins": {

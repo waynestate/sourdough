@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e8caa072d4f0f78b864617d7b4c2852",
+    "content-hash": "c4c0fbb43f400976c917556a5633861f",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -4331,16 +4331,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.6.0",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "db89c7cbbe5ab1b25e515489d8f69c83de8affa4"
+                "reference": "a1813f0cb6feb2c05d883f9a5fb506c9512a61c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/db89c7cbbe5ab1b25e515489d8f69c83de8affa4",
-                "reference": "db89c7cbbe5ab1b25e515489d8f69c83de8affa4",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/a1813f0cb6feb2c05d883f9a5fb506c9512a61c1",
+                "reference": "a1813f0cb6feb2c05d883f9a5fb506c9512a61c1",
                 "shasum": ""
             },
             "require": {
@@ -4387,7 +4387,7 @@
                 "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-07T23:01:02+00:00"
+            "time": "2026-11-08T14:30:45+00:00"
         }
     ],
     "aliases": [],

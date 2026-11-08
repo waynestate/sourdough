@@ -73,6 +73,12 @@
             "appMayOwn": false
         },
         {
+            "path": ".squire/apache-hardening.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
             "executable": true,
@@ -92,6 +98,12 @@
         },
         {
             "path": ".squire/php.ini",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/php-web.ini",
             "group": "parity",
             "executable": false,
             "appMayOwn": false
@@ -177,6 +189,12 @@
             "appMayOwn": false
         },
         {
+            "path": ".squire/apache-hardening.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
             "executable": true,
@@ -196,6 +214,12 @@
         },
         {
             "path": ".squire/php.ini",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/php-web.ini",
             "group": "parity",
             "executable": false,
             "appMayOwn": false
@@ -299,6 +323,12 @@
             "appMayOwn": false
         },
         {
+            "path": ".squire/apache-hardening.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": ".squire/fallback/citadel-apache-entrypoint",
             "group": "parity",
             "executable": true,
@@ -318,6 +348,12 @@
         },
         {
             "path": ".squire/php.ini",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/php-web.ini",
             "group": "parity",
             "executable": false,
             "appMayOwn": false
