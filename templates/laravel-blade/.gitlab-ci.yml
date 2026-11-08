@@ -8,14 +8,14 @@
 # further down. To override an image, give the plain name (php:8.4-cli-trixie@sha256:...):
 # put the prefix in it too and the loaf gets proofed twice, and the pull fails.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@b90323b5823287a7840095d0d5f0682aaeedf327 # 0.3.1
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       # The example tests are Pest files, and PHPUnit refuses to load them
       # ("Please run ./vendor/bin/pest instead"). Pest runs PHPUnit classes too.
       test_command: vendor/bin/pest
       image_prefix: "${IMAGE_PREFIX}"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@b90323b5823287a7840095d0d5f0682aaeedf327 # 0.3.1
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
 
