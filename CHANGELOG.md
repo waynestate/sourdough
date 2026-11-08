@@ -5,11 +5,17 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
-## 0.2.0 (2026-11-08)
-
 ### Added
 
 - Added: every shape's `.gitlab-ci.yml` runs a `sourdough-feed` job (BEST_PRACTICES 3.2, now `Checked`): on the shape's `composer` image, through `${IMAGE_PREFIX}` and the Composer cache, it installs the newest Sourdough release and runs `sourdough manifest --check` and `sourdough feed --dry-run`. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which `allow_failure: exit_codes: [1]` shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next `sourdough feed`. New `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are `Enforced` and name the tests that hold them.
+
+### Fixed
+
+- Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
+
+## 0.2.0 (2026-11-08)
+
+### Added
 
 - Added: `tests/PreflightPinTest.php`: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component `image` input with a registry prefix; every Docker Hub component in a shape takes the shape's `IMAGE_PREFIX`. BEST_PRACTICES 4.3 is `Enforced` by it. `tests/TemplateCiCacheTest.php` now checks the `${IMAGE_PREFIX}/` rule on the app's own jobs only.
 - Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
@@ -29,8 +35,6 @@ Versioning once 1.0 is out.
 - Changed: every shape's `.gitlab-ci.yml` caches its downloads. Docker Hub images in the app's own jobs are `${IMAGE_PREFIX}/<image>`, digest pins kept, and the Preflight components get the same prefix as their `image_prefix` input; `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's GitLab Dependency Proxy when the GitLab has one. Composer and npm installs extend `.composer-cache` (keyed on `composer.lock`) and `.npm-cache` (keyed on `package-lock.json` and `package.json`). A project variable `IMAGE_PREFIX=docker.io` skips the proxy. New `tests/TemplateCiCacheTest.php` keeps every shape that way. Apps already baked take it with `sourdough feed`.
 
 ### Fixed
-
-- Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
 
 - Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
 - Fixed: BEST_PRACTICES.md's "Keeping generated apps current" tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are `Enforced` by the manifest and `sourdough feed`, 3.2 (a check that fails CI) is `Partly enforced` (`feed --dry-run` and `manifest --check` exist; no template runs them in CI yet), 3.4 (tags and migration notes) is `Documented` in the release steps, and 3.5 (compatibility CI) is `Checked` by the smoke gate, which still only warns. They all said `Not yet` or `Documented`. 4.3 keeps `Partly enforced` and now names its templates and test.
