@@ -206,14 +206,14 @@ Maintainers: how to build, test and release this project, and where its data com
 From the repo root:
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2 composer install --no-interaction
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2 composer install --no-interaction
 docker run --rm -v "${PWD}:/app" -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli vendor/bin/phpunit
-docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
-The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
+The `stack-composer-cache` volume keeps Composer's downloads between runs; Docker creates it the first time. The smoke gate bakes a shape for real and runs the generated app's own checks; see the "Smoke gate" section of [MAINTAINING.md](MAINTAINING.md) for the full recipe. On Windows, `.\scripts\smoke-shape.ps1 <shape>` runs it in one line.
 
 The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](docs/reference/proof.md) page.
 

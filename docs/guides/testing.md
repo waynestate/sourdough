@@ -29,17 +29,19 @@ This page is the proofing bench: how to run Sourdough's own checks day to day, a
 The same lines work in PowerShell and sh:
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
+
+The `stack-composer-cache` volume keeps Composer's downloads between runs; Docker creates it the first time.
 
 ## From the repo root
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2 composer install --no-interaction
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2 composer install --no-interaction
 docker run --rm -v "${PWD}:/app" -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli vendor/bin/phpunit
-docker run --rm -v "${PWD}:/app" -w /app composer:2 composer validate --strict
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2 composer validate --strict
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
