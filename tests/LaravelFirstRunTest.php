@@ -119,6 +119,10 @@ final class LaravelFirstRunTest extends TestCase
         self::assertSame(0, $exit);
         self::assertFileExists($target . '/database/database.sqlite');
         self::assertSame(0, filesize($target . '/database/database.sqlite'));
+
+        $manifestPath = $target . '/.sourdough/manifest.json';
+        $manifest = json_decode((string) file_get_contents($manifestPath), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('database/database.sqlite', $manifest['files']);
     }
 
     public function testBakeLeavesNoSqliteFileWhenTheAppDoesNotUseSqlite(): void

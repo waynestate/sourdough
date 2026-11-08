@@ -31,6 +31,18 @@ final class Manifest
     public const FILE = '.sourdough/manifest.json';
 
     /**
+     * Runtime-state paths that are never template files: Sourdough creates
+     * them for the app's first run, and they hold the app's data once it
+     * has migrated, so the manifest leaves them out and feed must never
+     * treat them as template files.
+     *
+     * @var list<string>
+     */
+    private const RUNTIME_STATE_FILES = [
+        'database/database.sqlite',
+    ];
+
+    /**
      * @param array<string, string|bool> $answers     each option the user chose
      * @param list<string>               $seededFiles relative paths (forward slashes) of the seeded files
      */
@@ -262,7 +274,7 @@ final class Manifest
 
             if (is_dir($path)) {
                 $this->walkDir($path, $relative, $files);
-            } else {
+            } elseif (!in_array($relative, self::RUNTIME_STATE_FILES, true)) {
                 $files[] = $relative;
             }
         }

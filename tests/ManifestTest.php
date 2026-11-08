@@ -102,6 +102,19 @@ final class ManifestTest extends TestCase
         self::assertSame($first, $second);
     }
 
+    public function testBuildLeavesOutTheSqliteDatabase(): void
+    {
+        $dir = $this->makeTempDir();
+        mkdir($dir . '/database/seeders', 0777, true);
+        touch($dir . '/database/database.sqlite');
+        file_put_contents($dir . '/database/seeders/DatabaseSeeder.php', "<?php\n\n// The app's seeder.\n");
+
+        $manifest = (new Manifest('raw', ['name' => 'My Cool App'], []))->build($dir);
+
+        self::assertArrayHasKey('database/seeders/DatabaseSeeder.php', $manifest['files']);
+        self::assertArrayNotHasKey('database/database.sqlite', $manifest['files']);
+    }
+
     public function testCheckIsCleanRightAfterGeneration(): void
     {
         $target = $this->generateApp();
