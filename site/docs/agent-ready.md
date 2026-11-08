@@ -24,7 +24,7 @@ An agent that fetches `llms.txt` gets a map; it then fetches only the pages it n
 
 The front page carries three prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask before it guesses.
 
-![The Recipes for your agent section: two recipe cards, Get started with Sourdough and Check what has drifted in a Sourdough app, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](https://sourdough.apps.wayne.edu/docs/agent-ready/agents-1440.png)
+![The Recipes for your agent section: three recipe cards, Get started with Sourdough, Check what has drifted in a Sourdough app and Bake a Laravel app with Sourdough, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](https://sourdough.apps.wayne.edu/docs/agent-ready/agents-1440.png)
 
 ### Recipe No. 1: Get started with Sourdough[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-1-get-started-with-sourdough)
 
