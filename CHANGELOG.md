@@ -11,6 +11,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Added: the Laravel shapes schedule a heartbeat each minute and register HELMET's readiness route at /ready with a scheduler check; while the cache stamp is missing or older than WORKER_HEARTBEAT_MAX_AGE seconds (default 180) /ready answers 503, so a stopped scheduler shows up instead of quietly dropping jobs. /up stays the liveness answer and never looks at the cache (WELD W23).
 - Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).
 - Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid_* lines.
 - Fixed: the manifest leaves out database/database.sqlite, so sourdough feed never treats an app's database as a template file and WELD's regen gate does not see it as drift.

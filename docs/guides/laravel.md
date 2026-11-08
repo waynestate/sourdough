@@ -66,6 +66,10 @@ Laravel gives each major 18 months of bug fixes and two years of security fixes.
 
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
 
+## A stopped scheduler shows up
+
+Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`) and registers HELMET's readiness route at `/ready` with a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
+
 ## Work on the shared MySQL 5.6
 
 Laravel's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported; the shared server is MySQL 5.6, which left extended support on 2021-02-28. The practical limit is the index key prefix: 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071. The Laravel templates set the 191 default with `Schema::defaultStringLength(191)` in `app/Providers/AppServiceProvider.php` and avoid JSON columns, so string columns stay inside the limit (PROCTOR `mysql56-string-default`). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
