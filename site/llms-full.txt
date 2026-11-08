@@ -687,6 +687,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Added: the Laravel shapes schedule a heartbeat each minute and register HELMET's readiness route at /ready with a scheduler check; while the cache stamp is missing or older than WORKER_HEARTBEAT_MAX_AGE seconds (default 180) /ready answers 503, so a stopped scheduler shows up instead of quietly dropping jobs. /up stays the liveness answer and never looks at the cache (WELD W23).
 - Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).
 - Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid\_\* lines.
 - Fixed: the manifest leaves out database/database.sqlite, so sourdough feed never treats an app's database as a template file and WELD's regen gate does not see it as drift.
@@ -1436,6 +1437,10 @@ Laravel gives each major 18 months of bug fixes and two years of security fixes.
 ### Trust the HA-Proxy, not every sender[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#trust-the-ha-proxy-not-every-sender)
 
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
+
+### A stopped scheduler shows up[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#a-stopped-scheduler-shows-up)
+
+Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`) and registers HELMET's readiness route at `/ready` with a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
 
 ### Work on the shared MySQL 5.6[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
 
