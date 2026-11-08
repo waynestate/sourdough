@@ -8,6 +8,7 @@ Versioning once 1.0 is out.
 ### Added
 
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.3.1 (b90323b; fixed cache keys, and caches saved even when a job fails; D-072).
+- Added: the Laravel shapes (Blade, Blade with Vue, Inertia) test that a POST without a CSRF token gets 419, and that a matching token or a same-origin request passes (CsrfTest, WELD W27).
 - Changed: every app shape's CI saves its Composer and npm caches even when a job fails, so a retry after a dropped download fetches only what is missing (D-072).
 - Fixed: the Laravel shapes' ProductionDebugTest passes the app's own Pint check and every case asserts something.
 - Added: Laravel apps (Blade, Blade with Vue, Inertia) refuse to boot in production with APP_DEBUG on (ProductionDebug, beside the dummy-key guard).
