@@ -106,7 +106,7 @@ final class TemplateFeedJobTest extends TestCase
             $blocks[$shape] = $m[1] ?? '';
         }
 
-        self::assertCount(4, $blocks);
+        self::assertCount(5, $blocks);
         self::assertCount(1, array_unique($blocks), 'the ' . self::JOB . ' job differs between shapes');
         self::assertStringContainsString('allow_failure turns that into a', (string) reset($blocks), 'the comment explains warn versus fail');
     }

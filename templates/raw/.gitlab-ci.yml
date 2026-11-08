@@ -18,6 +18,31 @@ include:
     inputs:
       working_dir: .
       image_prefix: "${IMAGE_PREFIX}"
+  # The bill of materials (BEST_PRACTICES 4.15): a CycloneDX SBOM of the
+  # Composer packages composer.lock installs, dev packages left out, kept as
+  # sbom.cdx.json for 30 days. When the next advisory lands, finding the
+  # apps it hits is one search per app instead of one guess per app.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/sbom@b90323b5823287a7840095d0d5f0682aaeedf327 # 0.3.1
+    inputs:
+      image_prefix: "${IMAGE_PREFIX}"
+  # Gitleaks reads the checkout and fails on anything shaped like a
+  # credential, with the finding redacted in the log and in gitleaks.json.
+  # A secret belongs in Settings > CI/CD > Variables, never in a file.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@b90323b5823287a7840095d0d5f0682aaeedf327 # 0.3.1
+    inputs:
+      image_prefix: "${IMAGE_PREFIX}"
+  # The accessibility gate (BEST_PRACTICES 6.4): axe-core in a real browser
+  # over the pages the a11y-pages job saves, light and dark, at 320 and
+  # 1280 px, plus WCAG 1.4.10 reflow. The tags are WCAG 2.2 AA, WayneUI's
+  # floor; the ADA Title II rule names 2.1 AA, which 2.2 AA includes. The
+  # pages list is the a11y-pages job's A11Y_PATHS: change the two together.
+  # The Playwright image comes from mcr.microsoft.com, which the Dependency
+  # Proxy does not front, so this component takes no image_prefix.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@b90323b5823287a7840095d0d5f0682aaeedf327 # 0.3.1
+    inputs:
+      site_dir: a11y-site
+      pages: ["/"]
+      wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 # Dependency caching. Docker Hub images come through the group's GitLab
 # Dependency Proxy when this GitLab has one, so pipelines are served from
@@ -84,3 +109,88 @@ sourdough-feed:
     - fed=0; php "$SOURDOUGH_HOME/bin/sourdough" feed --dry-run || fed=$?
     - if [ "$drift" -gt 1 ] || [ "$fed" -gt 1 ]; then exit 2; fi
     - if [ "$fed" -eq 1 ]; then echo "This app has template changes to feed. Run sourdough feed, review and commit." >&2; exit 1; fi
+
+# The pages the a11y gate checks. axe-core needs a page in a browser and
+# this app's pages come from PHP, so this job serves the app on PHP's
+# built-in server, as on your desk, with APP_ENV=local so SESAME signs in
+# with its fake driver. It saves each path in A11Y_PATHS, with public/'s
+# static files, into a11y-site/, and the a11y job checks that folder. Add
+# each page you build to A11Y_PATHS and to the a11y include's pages. The
+# gate finds only part of the problems: try each page with a keyboard and
+# a screen reader too. public/wayne-ui.php is fetched as the README says
+# when it is not committed.
+a11y-pages:
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3@sha256:2cf275428757e5435a667bfc0d038b14520ca02be2b1b70d44a05c8c19e2de48
+  variables:
+    APP_ENV: local
+    A11Y_PATHS: "/"
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - test -f public/wayne-ui.php || curl -fsSL -o public/wayne-ui.php https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php
+    - php -S 127.0.0.1:8080 -t public > a11y-server.log 2>&1 &
+    # Wait for /up, copy public/'s static files (never its PHP), then save
+    # each page in A11Y_PATHS as <path>/index.html and each JSON answer in
+    # A11Y_DATA at its own path. One cookie jar for the whole list keeps the
+    # fake sign-in from one path to the next, and the server's own origin
+    # is cut out of the saved pages so their links work on any port.
+    - |
+      set -eu
+      origin=http://127.0.0.1:8080
+      tries=0
+      until curl -sf -o /dev/null "$origin/up"; do
+        tries=$((tries + 1))
+        if [ "$tries" -ge 30 ]; then echo "The app did not answer $origin/up within 30s." >&2; cat a11y-server.log >&2; exit 1; fi
+        sleep 1
+      done
+      rm -rf a11y-site
+      mkdir a11y-site
+      cp -R public/. a11y-site/
+      find a11y-site -name '*.php' -delete
+      for path in $A11Y_PATHS; do
+        page="a11y-site${path%/}/index.html"
+        mkdir -p "$(dirname "$page")"
+        curl -fsSL -b .a11y-cookies -c .a11y-cookies -o "$page" "$origin$path"
+        sed -i -e "s#$origin/#/#g" -e "s#$origin#/#g" "$page"
+        echo "a11y-pages: saved $path"
+      done
+      for path in ${A11Y_DATA:-}; do
+        mkdir -p "$(dirname "a11y-site$path")"
+        curl -fsSL -b .a11y-cookies -c .a11y-cookies -H 'Accept: application/json' -o "a11y-site$path" "$origin$path"
+        echo "a11y-pages: saved $path"
+      done
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - a11y-site/
+      - a11y-server.log
+
+a11y:
+  needs: [a11y-pages]
+
+# Deploy credentials (BEST_PRACTICES 6.5). Citadel deploys this app with a
+# Quick Update, so the pipeline holds no deploy credential and runs no
+# deploy job. When you add one (a webhook, a Squire target, a rollout on
+# another platform), extend .deploy:
+#
+#   deploy-production:
+#     extends: .deploy
+#     script:
+#       - ./deploy.sh
+#
+# .deploy never runs in a merge request pipeline (that code is not merged
+# yet) and runs only on a protected branch or tag, the only refs where
+# GitLab hands a job its protected variables. Keep the credential in a
+# protected, masked variable in Settings > CI/CD > Variables, never in this
+# file or in a component's inputs. The README's "Pipeline" section lists
+# the project settings this file cannot hold. A loaf this well guarded
+# needs no bouncer at the bakery door.
+.deploy:
+  stage: deploy
+  resource_group: deploy
+  interruptible: false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_REF_PROTECTED == "true"

@@ -498,6 +498,22 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/.nvmrc');
     }
 
+    /**
+     * The baked pipeline carries the three CI gates: a bill of materials,
+     * an accessibility gate over this shape's own rendered pages, and the
+     * guards around deploy credentials (BEST_PRACTICES 4.15, 6.4 and 6.5).
+     */
+    public function testBakedPipelineCarriesTheCiGates(): void
+    {
+        $target = $this->generate();
+        $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
+
+        TemplateCiGatesTest::assertBakedPipelineGates($ci, 'laravel-blade');
+        foreach (['preflight/sbom@', 'preflight/secret-detection@', 'preflight/a11y@', "\na11y-pages:\n", "\n.deploy:\n"] as $gate) {
+            self::assertStringContainsString($gate, $ci);
+        }
+    }
+
     private function generate(bool $advisor = true, PlaybookMode $playbook = PlaybookMode::Suggest): string
     {
         $target = $this->makeTempDir();

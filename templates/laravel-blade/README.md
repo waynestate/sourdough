@@ -31,6 +31,55 @@ On the server, run `php artisan migrate --force` as part of the release.
 Plain `php artisan migrate` is for your laptop; the deploy step keeps the
 flag because a live database refuses plain migrations.
 
+## Pipeline
+
+Besides the checks above, `.gitlab-ci.yml` runs three gates, all from
+Preflight components pinned to one release:
+
+- **Accessibility.** The `a11y-pages` job boots the app with `php artisan
+  serve`, signs in with SESAME's fake driver and saves the pages in
+  `A11Y_PATHS`: `/` signed out, `/dashboard` signed in through `/login`.
+  Preflight's `a11y` job opens each one in Chromium and runs axe-core, light
+  and dark, at 320 and 1280 px, at WCAG 2.2 AA (the ADA Title II rule names
+  2.1 AA, which 2.2 AA includes). A violation fails the pipeline. Add each
+  page you build to `A11Y_PATHS` and to the a11y include's `pages`.
+  Automated checks find only part of the problems, so try each page with a
+  keyboard and a screen reader too.
+- **Bill of materials.** Preflight's `sbom` job keeps `sbom.cdx.json`, a
+  CycloneDX list of the Composer packages `composer.lock` installs, for 30
+  days. An app with a `frontend` job (the Vue islands shape has one) also
+  keeps `sbom-npm.cdx.json`, the npm packages, beside the build. When the
+  next advisory lands, search these files to see whether this app has the
+  package.
+- **Secrets.** Preflight's `secret-detection` job runs Gitleaks over the
+  repository and fails on anything shaped like a credential (redacted in the
+  log).
+
+This app deploys with a Citadel Quick Update, so its pipeline holds no
+deploy credential. When you add a deploy job, extend `.deploy`: it never
+runs for a merge request and runs only on a protected branch or tag. The
+file cannot hold the rest, so set these in GitLab before the first
+credential goes in:
+
+1. Protect `main` and your release tags (Settings > Repository > Protected
+   branches, Protected tags), so only maintainers push or tag them.
+2. Store each deploy credential as a CI/CD variable with **Protect
+   variable** on and visibility **Masked** or **Masked and hidden**
+   (Settings > CI/CD > Variables). GitLab gives protected variables only to
+   pipelines on protected branches and tags. Masking keeps the value out of
+   job logs; it does not stop code in the pipeline from reading it.
+3. Never put a credential in `.gitlab-ci.yml`, in a component's `inputs` or
+   in a file in the repository.
+4. Keep the job token allowlist on (Settings > CI/CD > Job token
+   permissions). When another project's pipeline must fetch from this one,
+   add that project by name.
+5. Read a merge request from a fork before you run its pipeline in this
+   project: code in a fork can try to read this project's variables.
+6. Prefer the deploy target's own secret store (on Citadel, the app's
+   environment settings) to a CI variable for anything long-lived.
+
+A starter this well guarded still needs someone to lock the bakery at night.
+
 ## Sign-in
 
 The app signs in with SESAME through the Laravel adapter. In development

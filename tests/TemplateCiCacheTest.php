@@ -31,7 +31,7 @@ final class TemplateCiCacheTest extends TestCase
         $shapes = array_keys(iterator_to_array(self::pipelines()));
         sort($shapes);
 
-        self::assertSame(['laravel-blade', 'laravel-inertia', 'raw', 'raw-vue'], $shapes);
+        self::assertSame(['laravel-blade', 'laravel-blade-vue', 'laravel-inertia', 'raw', 'raw-vue'], $shapes);
     }
 
     #[DataProvider('pipelines')]
