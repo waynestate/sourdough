@@ -20,7 +20,7 @@ Each practice ends with one tag that says how the stack holds it today.
 - `Documented`: written down in an ADR or design doc only. Where the design says a test will cover it, the text says so, but the test does not exist yet.
 - `Not yet`: a gap. Nothing holds it.
 
-Sourdough itself has no code on its main branch at the time of writing, and a delegate is building step 1 on a branch. So most tags describe the design, not a working tool. Sibling projects (SESAME, HELMET, PROCTOR, Preflight) do have code, and where a practice leans on them the tag says so.
+Sourdough is a working tool (0.1.7): `sourdough new` bakes all five shapes (raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, Laravel with Inertia and Vue), `sourdough manifest --check` and `sourdough feed` ship, and the smoke gate bakes every shape for real. Many tags below were first written while Sourdough was still a design, so some may undersell what the code now does; each is re-checked against the code when its practice is next touched. Sibling projects (SESAME, HELMET, PROCTOR, Preflight) hold part of several practices, and where one leans on them the tag says so.
 
 ---
 
@@ -287,7 +287,7 @@ Stack: `Not yet`.
 ### 6.1 Wire the stack in by default, not as an option
 Every generated app has SESAME, HELMET, PROCTOR as a dev dependency, a `.gitlab-ci.yml` that includes the Preflight components, a `/up` route that does not touch the database, and a README that points at the CREED handbook. Why: Laravel's own kits include sign-in, rate limiting and two-factor login out of the box for the same reason. Defaults decide what most apps end up doing.
 Sources: [S1].
-Stack: `Documented`. The libraries are tagged (SESAME, HELMET with a health check, PROCTOR, Preflight templates), and `sourdough new --raw` wires them into every generated app. Only the raw shape generates in 0.1; the Laravel shapes are not built yet.
+Stack: `Enforced`. `sourdough new` wires SESAME, HELMET, PROCTOR (as a dev dependency), Pinstripe, a `.gitlab-ci.yml` with the Preflight components, a `/up` route and a README with a Handbook section into all five shapes. The generator tests (`tests/RawGeneratorTest.php`, `tests/LaravelBladeGeneratorTest.php`, `tests/LaravelInertiaGeneratorTest.php` and the Vue variants) fail `composer ci` when a bake loses them, and the smoke gate bakes each shape and runs its PROCTOR check and `/up`.
 
 ### 6.2 Have the release script run the check, but do not call it the gate
 The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check. Why: promising a gate that does not hold is worse than having none.
