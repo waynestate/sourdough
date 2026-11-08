@@ -133,6 +133,31 @@ script. They come from Squire's checked copy, so Squire owns them. Refresh
 them with Sourdough, not by hand. Elsewhere, set the env vars above; a
 Dockerfile comes later.
 
+## Laravel Boost
+
+Laravel Boost ships in `require-dev`: an MCP server, guidelines and
+skills that teach your coding agent this app's Laravel. Wire it into your
+agent once per checkout, after `composer install`:
+
+```bash
+php artisan boost:install
+```
+
+It asks which agents you use and writes their files (`CLAUDE.md`,
+`AGENTS.md`, `.mcp.json`, skills) plus `boost.json`. Those are
+regenerated, so `.gitignore` keeps them out of git. What the team shares
+lives in `.ai/` and is committed: `.ai/guidelines/` holds the stack's
+conventions, which Boost folds into every agent's file, and `.ai/rules/`
+holds project rules. Ask your agent to "remember" a rule and Boost files
+it there.
+
+`composer update` refreshes the guidelines and skills through
+`composer boost-update`, which skips itself until you have run
+`boost:install` and under `--no-dev`. Boost never reaches production:
+every release installs with `composer install --no-dev`, and
+`tests/Feature/BoostDevOnlyTest.php` fails if Boost leaves `require-dev`.
+Boost's MCP server can query the database, so keep your `.env` on a local
+database. A starter needs a boost on your laptop, never on the server.
 ## Handbook
 
 See the CREED handbook for the WSU app stack standards.

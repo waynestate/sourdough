@@ -1,0 +1,11 @@
+# Laravel Boost (dev only) bakes these fresh on every boost:install and
+# boost:update, so committing them would only ship yesterday's bread.
+# boost.json holds each developer's own agent picks. Team guidance and
+# project rules live in .ai/, which is committed. .agents/ stays tracked:
+# Booster keeps its playbooks there.
+/.mcp.json
+/boost.json
+/AGENTS.md
+/CLAUDE.md
+/.claude/skills/
+/.junie/
