@@ -481,7 +481,7 @@ Hand it to your agent
 
 ### Recipes for your agent
 
-Two prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask you before it guesses. The Laravel shapes bake now too; their prompts join the rack when they do.
+Three prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
 
 #### Get started with Sourdough
 
@@ -545,6 +545,38 @@ Constraints:
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
 ```
 
+#### Bake a Laravel app with Sourdough
+
+Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+
+Read first:
+- https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
+- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs for sourdough answer from the stack's own docs, and policy_lookup gives today's PHP support from CREED. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
+
+Task:
+1. Check that PHP 8.3 or newer and Composer are on the PATH, and say which versions you found.
+2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
+3. Ask me which shape I want: Blade (`--laravel`), Blade with Vue islands (`--laravel --vue`) or Inertia/Vue (`--inertia`), and whether I want `--sail` or `--docker` for the local runtime. Then bake the app with `sourdough new my-app` and those flags, using the folder name I give you in place of my-app, and change into it.
+4. Run `composer install`, then `cp .env.example .env`, `php artisan key:generate` and `php artisan migrate`. For the islands and Inertia shapes, run `npm install` and `npm run build` before serving. With `--sail` or `--docker` the bake prints the oven's own Next steps; follow those when they differ.
+5. Wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then serve the app with `php artisan serve`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+6. Run `sourdough manifest --check` in the app and report what it says.
+
+Constraints:
+- The app requires waynestate/playbook, WSU's private shared-values package on git.wayne.edu; the settings in .env.example come from it. If the bake refuses because this machine cannot read the package, tell me; do not pass --no-playbook, which is for CI and automated tests only.
+- .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
+- The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
+- Never commit .env, and never paste a secret into a prompt or a file.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- Ask me before you guess: a folder name, a shape or an oven I have not named, or anything that touches a deploy.
+
+Output: what you ran and what it said, the app's files one level deep, then your questions.
+```
+
 The agent reads the same pages you do: [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://sourdough.apps.wayne.edu/llms-full.txt) holds them all in one file, and this page has a [Markdown twin](https://sourdough.apps.wayne.edu/index.md). Nothing here phones home. The buttons only copy text or open the tool you picked.
 
 The rest of the bakery
@@ -596,7 +628,7 @@ An agent that fetches `llms.txt` gets a map; it then fetches only the pages it n
 
 ### Recipes for your agent[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipes-for-your-agent)
 
-The front page carries two prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask before it guesses.
+The front page carries three prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask before it guesses.
 
 ![The Recipes for your agent section: two recipe cards, Get started with Sourdough and Check what has drifted in a Sourdough app, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](https://sourdough.apps.wayne.edu/docs/agent-ready/agents-1440.png)
 
@@ -607,6 +639,10 @@ Installs Sourdough, bakes a raw PHP app, fetches WayneUI's standalone file, serv
 #### Recipe No. 2: Check what has drifted in a Sourdough app[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-2-check-what-has-drifted-in-a-sourdough-app)
 
 Runs `sourdough manifest --check` in an app Sourdough baked, lists the managed files that changed since Sourdough wrote them, and proposes what to put back. It changes nothing, and seeded files never count as drift.
+
+#### Recipe No. 3: Bake a Laravel app with Sourdough[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-3-bake-a-laravel-app-with-sourdough)
+
+Installs Sourdough, bakes one of the three Laravel shapes (Blade, Blade with Vue islands or Inertia/Vue) with the oven the developer chooses, serves it locally and runs the manifest check. The prompt points the agent at `llms.txt` first, then walks it through `composer global require waynestate/sourdough`, `sourdough new my-app` with the shape and oven flags, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `npm install` and `npm run build` for the Vue shapes, ADVISOR wiring, `php artisan serve` and `sourdough manifest --check`.
 
 ![Recipe No. 1 with the OpenCode button chosen: the prompt rendered as a PowerShell command beside a bash or zsh tab, with a Copy command button](https://sourdough.apps.wayne.edu/docs/agent-ready/prompt-run-opencode-1440.png)
 
@@ -624,10 +660,12 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
 - Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
 
 #### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Changed: the `--docker` setup publishes its ports on 127.0.0.1 only, so the dev server and Vite are not reachable from the network (SOURDOUGH-25).
 - Changed: the GitLab pipeline pins the Preflight components to 0.2.0 (was 0.1.4).
 - The front page's deploy layer (`deploy/`) runs Squire's kit 0.6.0 (was 0.5.0): `scripts/release.sh` asks PROCTOR's deploy gate for a go or no-go on each release (a report, not a stop, unless `SQUIRE_PROCTOR=enforce`), and `.env.squire.example` lists the new setting. The layer's pins move to HELMET `^0.4` (locked 0.4.0) and PROCTOR `^0.7` (locked 0.7.0).
 - Docs: the Docker commands in the README and docs mount the shared `stack-composer-cache` volume, so Composer downloads are cached between runs.

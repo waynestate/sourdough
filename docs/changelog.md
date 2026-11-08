@@ -14,10 +14,12 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
 - Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
 
 ### Changed
 
+- Changed: the `--docker` setup publishes its ports on 127.0.0.1 only, so the dev server and Vite are not reachable from the network (SOURDOUGH-25).
 - Changed: the GitLab pipeline pins the Preflight components to 0.2.0 (was 0.1.4).
 - The front page's deploy layer (`deploy/`) runs Squire's kit 0.6.0 (was 0.5.0): `scripts/release.sh` asks PROCTOR's deploy gate for a go or no-go on each release (a report, not a stop, unless `SQUIRE_PROCTOR=enforce`), and `.env.squire.example` lists the new setting. The layer's pins move to HELMET `^0.4` (locked 0.4.0) and PROCTOR `^0.7` (locked 0.7.0).
 - Docs: the Docker commands in the README and docs mount the shared `stack-composer-cache` volume, so Composer downloads are cached between runs.
