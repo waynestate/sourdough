@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- The front page's deploy layer (`deploy/`) runs Squire's kit 0.6.0 (was 0.5.0): `scripts/release.sh` asks PROCTOR's deploy gate for a go or no-go on each release (a report, not a stop, unless `SQUIRE_PROCTOR=enforce`), and `.env.squire.example` lists the new setting. The layer's pins move to HELMET `^0.4` (locked 0.4.0) and PROCTOR `^0.7` (locked 0.7.0).
 - Docs: the Docker commands in the README and docs mount the shared `stack-composer-cache` volume, so Composer downloads are cached between runs.
 - Changed: apps start on the Squire 0.6.0 deploy kit (was 0.4.0). The copy in `templates/squire/` comes from Squire 0.6.0, and the dev dependency is `^0.6`.
 - Changed: a baked app's `scripts/release.sh` asks PROCTOR's deploy gate (`proctor gate`) for a go or no-go instead of running `proctor check`, right after `composer audit` and before the frontend build and the migrations, so `SQUIRE_PROCTOR=enforce` stops a no-go before it touches the database. The verdict goes to `storage/squire/proctor-gate.json` (new setting `SQUIRE_PROCTOR_RECORD_DIR`, listed in `.env.squire.example`; the folder ignores itself) and becomes the baseline the next release is ratcheted against, so a failure that is already live is held and only a new one blocks. With a PROCTOR that has no `gate` the step warns and runs `proctor check` as before.
