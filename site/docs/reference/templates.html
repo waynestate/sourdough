@@ -214,7 +214,7 @@
 <p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. <code>--no-advisor</code> skips the ADVISOR wiring.</p></aside>
 <h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></h2>
-<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.6.0's kit: its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, and writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
+<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.7.0's kit: its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (<code>php artisan reload</code>, or <code>queue:restart</code> and <code>schedule:interrupt</code> on an older Laravel; report only, <code>SQUIRE_ARTISAN_RESTART=0</code> turns it off). The image hardens too: the web's PHP loses its shell functions (<code>SQUIRE_PHP_DISABLE_FUNCTIONS</code> sets the list), opcache runs with production settings (<code>SQUIRE_OPCACHE_VALIDATE</code>), Apache answers <code>ServerTokens Prod</code>, and secrets can be read from <code>/run/secrets</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -225,7 +225,7 @@
 <tbody>
 <tr>
 <td><code>composer squire-copy:sync</code></td>
-<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.6</code>)</td>
+<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.7</code>)</td>
 </tr>
 <tr>
 <td><code>composer squire-copy:check</code></td>

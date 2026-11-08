@@ -27,6 +27,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Changed: new bakes start on the Squire 0.7.0 deploy kit: the release script restarts queue workers and the scheduler after optimize (report only; SQUIRE_ARTISAN_RESTART=0 turns it off), and the image drops shell functions from the web's PHP (SQUIRE_PHP_DISABLE_FUNCTIONS), turns on production opcache (SQUIRE_OPCACHE_VALIDATE) and reads secrets from /run/secrets. Sourdough's own deploy layer moves too.
 - Changed: every app shape's CI caches Composer and npm downloads under a fixed key, so a lock change downloads only what changed.
 - Changed: HELMET moves to `^1.0`, its first stable release, wherever this repo requires it.
 - Changed: every shape requires PROCTOR ^0.8 (was ^0.7): the raw `composer.json` and both Laravel overlays. Breaking for apps you feed whose deploy scripts have Windows line endings, which PROCTOR 0.8's `crlf-deploy-script` fails; the upgrading page has the steps. The deploy layer requires PROCTOR ^0.8 (locked 0.8.0).
