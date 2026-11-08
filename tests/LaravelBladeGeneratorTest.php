@@ -34,13 +34,16 @@ final class LaravelBladeGeneratorTest extends TestCase
             'bootstrap/providers.php',
             'config/helmet.php',
             'config/sesame.php',
+            'config/worker.php',
             'database/migrations/2026_10_28_000001_add_username_to_users_table.php',
             'phpstan.neon',
             'pint.json',
             'resources/views/dashboard.blade.php',
             'resources/views/home.blade.php',
             'resources/views/layouts/app.blade.php',
+            'routes/console.php',
             'routes/web.php',
+            'tests/Feature/QueueWorkerScheduleTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }

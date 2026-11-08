@@ -35,6 +35,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
             'bootstrap/providers.php',
             'config/helmet.php',
             'config/sesame.php',
+            'config/worker.php',
             'database/migrations/2026_10_28_000001_add_username_to_users_table.php',
             'package.json',
             'phpstan.neon',
@@ -44,7 +45,9 @@ final class LaravelInertiaGeneratorTest extends TestCase
             'resources/js/pages/Home.vue',
             'resources/js/ziggy.js',
             'resources/views/app.blade.php',
+            'routes/console.php',
             'routes/web.php',
+            'tests/Feature/QueueWorkerScheduleTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }

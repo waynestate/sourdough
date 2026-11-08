@@ -52,3 +52,8 @@ SESAME_DRIVER=fake
 #
 # Vite (resources/js)
 # VITE_APP_NAME="${APP_NAME}"
+#
+# Queue worker (config/worker.php): "scheduler" on Citadel, where the
+# scheduler starts a short queue:work each minute; "none" when a
+# supervisor or a separate container runs the worker.
+QUEUE_WORKER_MODE=scheduler
