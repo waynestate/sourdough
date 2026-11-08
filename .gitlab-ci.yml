@@ -1,5 +1,5 @@
 # Sourdough's pipeline, built from the Preflight components on this GitLab.
-# Every include is pinned to one Preflight release, 0.3.0. Never use ~latest.
+# Every include is pinned to one Preflight release, 0.3.1. Never use ~latest.
 # composer ci is the contract: the same checks run on GitLab and GitHub.
 # Sourdough requires PHP ^8.3, so the test matrix starts at 8.3. A starter
 # that can't pass its own tests is just flour and wishful thinking.
