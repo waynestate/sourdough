@@ -91,6 +91,57 @@ final class GeneratorSupportTest extends TestCase
         }
     }
 
+    public function testInstallsTheVueNpmrcWhenTheTargetHasNone(): void
+    {
+        $target = $this->makeTempDir();
+
+        (new GeneratorSupport())->installNpmrc($target);
+
+        // The file arrives as-is from Squire's vue layer, cooldown included.
+        self::assertFileExists($target . '/.npmrc');
+        self::assertSame(
+            (string) file_get_contents(__DIR__ . '/../templates/squire/vue/.npmrc'),
+            (string) file_get_contents($target . '/.npmrc'),
+        );
+        self::assertStringContainsString('min-release-age=1', (string) file_get_contents($target . '/.npmrc'));
+    }
+
+    public function testMergesTheCooldownIntoAnExistingNpmrc(): void
+    {
+        $target = $this->makeTempDir();
+        // No trailing newline on purpose: the merge must keep the file
+        // readable and add the line on its own.
+        file_put_contents($target . '/.npmrc', 'fund=false');
+
+        (new GeneratorSupport())->installNpmrc($target);
+
+        // The app's own line survives, and the cooldown lands once, after it.
+        self::assertSame("fund=false\nmin-release-age=1\n", (string) file_get_contents($target . '/.npmrc'));
+    }
+
+    public function testLeavesAnExistingNpmrcThatAlreadySetsTheCooldown(): void
+    {
+        $target = $this->makeTempDir();
+        $existing = "# the app's own cooldown\nmin-release-age=0\n";
+        file_put_contents($target . '/.npmrc', $existing);
+
+        (new GeneratorSupport())->installNpmrc($target);
+
+        // The app's value wins; nothing is appended or rewritten.
+        self::assertSame($existing, (string) file_get_contents($target . '/.npmrc'));
+    }
+
+    public function testMissingVueNpmrcInTheSquireCopyThrows(): void
+    {
+        $squire = $this->makeTempDir();
+        $target = $this->makeTempDir();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('does not exist');
+
+        (new GeneratorSupport($squire))->installNpmrc($target);
+    }
+
     private function makeTempDir(): string
     {
         $dir = sys_get_temp_dir() . '/sourdough-test-' . bin2hex(random_bytes(8));

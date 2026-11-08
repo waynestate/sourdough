@@ -181,6 +181,23 @@ final class LaravelBladeVueGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/env-additions.txt');
     }
 
+    public function testShipsTheNpmCooldownAndTheNodeFloor(): void
+    {
+        $target = $this->generate();
+
+        // The one-day npm release cooldown comes from Squire's vue layer...
+        self::assertFileExists($target . '/.npmrc');
+        self::assertStringContainsString('min-release-age=1', (string) file_get_contents($target . '/.npmrc'));
+
+        // ...and the Node floor is pinned in both places, at the LTS the CI
+        // images already run.
+        self::assertFileExists($target . '/.nvmrc');
+        self::assertSame('22', trim((string) file_get_contents($target . '/.nvmrc')));
+
+        $package = json_decode((string) file_get_contents($target . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('>=22', $package['engines']['node']);
+    }
+
     private function generator(): LaravelBladeVueGenerator
     {
         return new LaravelBladeVueGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));

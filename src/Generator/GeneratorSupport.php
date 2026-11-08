@@ -10,8 +10,9 @@ use Waynestate\Sourdough\PlaybookMode;
 /**
  * The steps every Sourdough generator shares: refusing a non-empty target,
  * copying a template tree with placeholders replaced, installing Squire's
- * deploy files for a flavour, and wiring Playbook and ADVISOR into the
- * generated app.
+ * deploy files for a flavour, installing Squire's Vue .npmrc for the shapes
+ * that ship a front end, and wiring Playbook and ADVISOR into the generated
+ * app.
  *
  * The generators keep their own template, name and manifest knowledge and
  * delegate these steps here, so every permutation gets the same behaviour.
@@ -173,6 +174,72 @@ final class GeneratorSupport
             // the executable bit on Windows, where the bit is not tracked; the
             // mode is still recorded in the manifest, so this is best-effort.
             chmod($target, intval($mode, 8));
+        }
+    }
+
+    /**
+     * Install Squire's Vue .npmrc into the target dir, so an app with a
+     * front end gets the one-day npm release cooldown (min-release-age=1)
+     * from the same file Squire's release script reads.
+     *
+     * A target without a .npmrc takes the file as-is. One that already sets
+     * a min-release-age line keeps it: the app's own value wins and the file
+     * is left untouched. One that has no such line gets the cooldown line
+     * appended, merged in rather than overwritten.
+     *
+     * @throws \RuntimeException when the Squire copy is missing or a file cannot be read or written
+     */
+    public function installNpmrc(string $targetDir): void
+    {
+        $source = $this->squireDir . '/vue/.npmrc';
+        if (!is_file($source)) {
+            throw new \RuntimeException(sprintf('The SQUIRE template file "%s" does not exist.', $source));
+        }
+        $content = file_get_contents($source);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $source));
+        }
+
+        // The line to merge in comes from the file itself, so the two can
+        // never drift apart.
+        $cooldownLine = null;
+        foreach (preg_split('/\R/', $content) ?: [] as $line) {
+            if (str_starts_with($line, 'min-release-age=')) {
+                $cooldownLine = $line;
+                break;
+            }
+        }
+        if (null === $cooldownLine) {
+            throw new \RuntimeException(sprintf('The SQUIRE vue .npmrc sets no min-release-age line ("%s").', $source));
+        }
+
+        $target = $targetDir . '/.npmrc';
+        if (!is_file($target)) {
+            if (false === file_put_contents($target, $content)) {
+                throw new \RuntimeException(sprintf('Could not write "%s".', $target));
+            }
+            chmod($target, 0644);
+
+            return;
+        }
+
+        $existing = file_get_contents($target);
+        if (false === $existing) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $target));
+        }
+
+        foreach (preg_split('/\R/', $existing) ?: [] as $line) {
+            if (str_starts_with($line, 'min-release-age=')) {
+                // The app already sets its own cooldown; leave the file alone.
+                return;
+            }
+        }
+
+        if ('' !== $existing && !str_ends_with($existing, "\n")) {
+            $existing .= "\n";
+        }
+        if (false === file_put_contents($target, $existing . $cooldownLine . "\n")) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $target));
         }
     }
 

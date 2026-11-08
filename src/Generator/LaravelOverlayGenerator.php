@@ -11,7 +11,8 @@ use Waynestate\Sourdough\PlaybookMode;
  * Generate a Laravel app from a permutation overlay: a fresh Laravel
  * skeleton from a SkeletonSource, the overlay copied over it, the stack's
  * composer packages merged into the app's composer.json, Squire's laravel
- * deploy files installed, Playbook and ADVISOR wired in, and the manifest
+ * deploy files installed, Squire's Vue .npmrc installed when an overlay
+ * ships a front end, Playbook and ADVISOR wired in, and the manifest
  * written. Subclasses pick the overlay dir and the manifest's template
  * name (laravel-blade, laravel-inertia, ...).
  *
@@ -20,6 +21,11 @@ use Waynestate\Sourdough\PlaybookMode;
  * vite.config.js, resources/js, the island views) over the laravel-blade
  * overlay. Each overlay's control files are applied when it ships them, in
  * copy order, so a layered overlay can stay silent where the first speaks.
+ *
+ * When an overlay ships a package.json (blade-vue and inertia do, plain
+ * blade does not), the generator also installs Squire's Vue .npmrc, which
+ * sets the one-day npm release cooldown (min-release-age=1); an app that
+ * already has a .npmrc gets the line merged in, not overwritten.
  *
  * The skeleton source defaults to ComposerSkeletonSource, which runs
  * `composer create-project laravel/laravel`; tests use FixtureSkeletonSource
@@ -75,6 +81,23 @@ abstract class LaravelOverlayGenerator
         }
 
         return $dirs;
+    }
+
+    /**
+     * True when any overlay ships a package.json: the blade-vue and inertia
+     * overlays do, plain laravel-blade does not. Checked on the overlay
+     * dirs, never on the target: a fresh Laravel skeleton always carries a
+     * package.json of its own, so the target can never answer the question.
+     */
+    private function shipsFrontEnd(): bool
+    {
+        foreach ($this->overlayDirs() as $overlayDir) {
+            if (is_file($overlayDir . '/package.json')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -138,6 +161,9 @@ abstract class LaravelOverlayGenerator
         $this->applyAppName($targetDir, $name, $slug);
 
         $this->support->installSquireFiles($targetDir, 'laravel');
+        if ($this->shipsFrontEnd()) {
+            $this->support->installNpmrc($targetDir);
+        }
         $this->support->applyPlaybook($targetDir, $playbook);
         $this->support->applyAdvisor($targetDir, $advisor);
 

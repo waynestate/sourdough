@@ -485,6 +485,17 @@ final class LaravelBladeGeneratorTest extends TestCase
         );
     }
 
+    public function testShipsNoNpmFilesWithoutAFrontEnd(): void
+    {
+        $target = $this->generate();
+
+        // Plain blade ships no front-end overlay, so it gets neither the npm
+        // release cooldown nor the Node floor, even though a real skeleton
+        // carries its own package.json.
+        self::assertFileDoesNotExist($target . '/.npmrc');
+        self::assertFileDoesNotExist($target . '/.nvmrc');
+    }
+
     private function generate(bool $advisor = true, PlaybookMode $playbook = PlaybookMode::Suggest): string
     {
         $target = $this->makeTempDir();

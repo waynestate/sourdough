@@ -22,6 +22,11 @@ use Waynestate\Sourdough\PlaybookMode;
  * files are copied as-is (Squire owns them, so Sourdough does not rewrite
  * them), and their executable bits come from Squire's manifest.
  *
+ * When the shape ships a package.json (the raw-vue overlay does, plain raw
+ * does not), the generator also installs Squire's Vue .npmrc, which sets
+ * the one-day npm release cooldown (min-release-age=1); an app that already
+ * has a .npmrc gets the line merged in, not overwritten.
+ *
  * Then the generator wires Playbook into the app per the chosen mode: by
  * default it requires the package (VCS repository, require entry and the
  * gitlab-domains config entry), lists its values in .env.example and
@@ -158,6 +163,9 @@ final class RawGenerator
             $this->removeLeftover($targetDir, $leftover);
         }
         $this->support->installSquireFiles($targetDir);
+        if ($this->shipsPackageJson()) {
+            $this->support->installNpmrc($targetDir);
+        }
         $this->support->applyPlaybook($targetDir, $playbook);
         $this->support->applyAdvisor($targetDir, $advisor);
 
@@ -197,6 +205,23 @@ final class RawGenerator
         if ($dir !== $targetDir && is_dir($dir) && [] === array_diff(scandir($dir) ?: [], ['.', '..'])) {
             rmdir($dir);
         }
+    }
+
+    /**
+     * True when this shape ships a package.json: the plain raw template has
+     * no front end, but the raw-vue overlay adds one. Checked on the
+     * template dirs, never on the target, so the answer does not depend on
+     * what the app already holds.
+     */
+    private function shipsPackageJson(): bool
+    {
+        foreach (array_filter([$this->templateDir, $this->overlayDir]) as $dir) {
+            if (is_file($dir . '/package.json')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

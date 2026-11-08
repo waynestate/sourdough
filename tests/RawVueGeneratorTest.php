@@ -98,6 +98,23 @@ final class RawVueGeneratorTest extends TestCase
         self::assertStringContainsString('publicDir: false', $vite);
     }
 
+    public function testShipsTheNpmCooldownAndTheNodeFloor(): void
+    {
+        $target = $this->generate();
+
+        // The one-day npm release cooldown comes from Squire's vue layer...
+        self::assertFileExists($target . '/.npmrc');
+        self::assertStringContainsString('min-release-age=1', (string) file_get_contents($target . '/.npmrc'));
+
+        // ...and the Node floor is pinned in both places, at the LTS the CI
+        // images already run.
+        self::assertFileExists($target . '/.nvmrc');
+        self::assertSame('22', trim((string) file_get_contents($target . '/.nvmrc')));
+
+        $package = json_decode((string) file_get_contents($target . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('>=22', $package['engines']['node']);
+    }
+
     public function testDropsTheStandaloneWayneUiStubAndIgnoresTheBuild(): void
     {
         $target = $this->generate();

@@ -149,6 +149,17 @@ final class RawGeneratorTest extends TestCase
         self::assertSame('My App v2.1_beta', $composer['description']);
     }
 
+    public function testShipsNoNpmFilesWithoutAFrontEnd(): void
+    {
+        $target = $this->generateFromRealTemplate();
+
+        // Plain raw has no package.json, so it gets neither the npm release
+        // cooldown nor the Node floor; only the front-end shapes do.
+        self::assertFileDoesNotExist($target . '/package.json');
+        self::assertFileDoesNotExist($target . '/.npmrc');
+        self::assertFileDoesNotExist($target . '/.nvmrc');
+    }
+
     public function testGeneratedIndexUsesNewSesameConstructor(): void
     {
         $target = $this->generateFromRealTemplate();
