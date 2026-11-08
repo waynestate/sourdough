@@ -14,6 +14,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Changed: the local a11y scripts run Preflight's own checker (vendored from 0.3.1 and pinned by a test), so they check what CI checks: axe-core 4.14.0, 320 and 1280 px, and the reflow check.
 - Added: the two Laravel shapes ship tests/Feature/SchedulerNamingTest.php, which fails on any scheduled closure without ->name() (WELD W21).
 - CI runs Preflight's a11y component (0.3.1) on site/, every page in light and dark at 320 and 1280 px with the WCAG 1.4.10 reflow check, blocking.
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.3.1 (b90323b; fixed cache keys, and caches saved even when a job fails; D-072).

@@ -236,7 +236,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 
 The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](https://github.com/waynestate/sourdough/blob/HEAD/docs/reference/proof.md) page.
 
-The site accessibility gate runs axe-core (WCAG 2.2 AA) over every committed page under `site/` in Docker, in light and dark at 360 px and 1280 px: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows.
+The site accessibility gate runs Preflight's own a11y checker (vendored in `tools/a11y/check.mjs` from the 0.3.1 tag CI pins, held there by `tests/A11yCheckerPinTest.php`) over every page under `site/` in Docker, in light and dark at 320 px and 1280 px with the WCAG 1.4.10 reflow check: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows. It uses the same image and inputs as the a11y job in CI, so a page that passes here passes the pipeline.
 
 #### Tests in the apps it bakes
 
@@ -683,6 +683,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Changed: the local a11y scripts run Preflight's own checker (vendored from 0.3.1 and pinned by a test), so they check what CI checks: axe-core 4.14.0, 320 and 1280 px, and the reflow check.
 - Added: the two Laravel shapes ship tests/Feature/SchedulerNamingTest.php, which fails on any scheduled closure without ->name() (WELD W21).
 - CI runs Preflight's a11y component (0.3.1) on site/, every page in light and dark at 320 and 1280 px with the WCAG 1.4.10 reflow check, blocking.
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.3.1 (b90323b; fixed cache keys, and caches saved even when a job fails; D-072).
