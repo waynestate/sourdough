@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid_* lines.
 - Fixed: Laravel bakes (blade, blade-vue, inertia) create an empty database/database.sqlite when .env.example uses sqlite, as Laravel's own installer does, so the printed php artisan migrate runs without a prompt.
 - Added: the Laravel shapes can run the queue from the scheduler, for Citadel where nothing supervises a worker: with QUEUE_WORKER_MODE=scheduler (the new .env.example default) routes/console.php starts queue:work --stop-when-empty --max-time=50 --tries=3 every minute with withoutOverlapping(10); QUEUE_WORKER_MODE=none leaves the queue to a supervisor. QueueWorkerScheduleTest covers both (WELD W19).
 - Changed: the local a11y scripts run Preflight's own checker (vendored from 0.3.1 and pinned by a test), so they check what CI checks: axe-core 4.14.0, 320 and 1280 px, and the reflow check.

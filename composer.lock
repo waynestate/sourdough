@@ -4331,16 +4331,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.7.0",
+            "version": "0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "a1813f0cb6feb2c05d883f9a5fb506c9512a61c1"
+                "reference": "27c879f1142a0816c93b271c5e885cb71ef3f05e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/a1813f0cb6feb2c05d883f9a5fb506c9512a61c1",
-                "reference": "a1813f0cb6feb2c05d883f9a5fb506c9512a61c1",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/27c879f1142a0816c93b271c5e885cb71ef3f05e",
+                "reference": "27c879f1142a0816c93b271c5e885cb71ef3f05e",
                 "shasum": ""
             },
             "require": {
@@ -4387,7 +4387,7 @@
                 "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-08T14:30:45+00:00"
+            "time": "2026-11-08T16:47:45+00:00"
         }
     ],
     "aliases": [],
