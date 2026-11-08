@@ -692,6 +692,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
+- Fixed: the docs kit's copy button no longer covers the first line of code when it says Copied or Failed: over the code it keeps its resting width and shows a check or a cross when the word does not fit (docs kit synced from Squire).
 - Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
 
 ### 0.2.0 (2026-11-08)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-2-0-2026-11-08)
