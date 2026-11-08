@@ -62,7 +62,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The stack's runtime packages land in require...
-        self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.6', $composer['require']['waynestate/sesame']);
         self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);

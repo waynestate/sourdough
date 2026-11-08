@@ -1,7 +1,7 @@
 {
     "require": {
         "waynestate/helmet": "^1.0",
-        "waynestate/sesame": "^0.5",
+        "waynestate/sesame": "^0.6",
         "yajra/laravel-oci8": "^13.14"
     },
     "config": {

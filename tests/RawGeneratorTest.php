@@ -165,8 +165,8 @@ final class RawGeneratorTest extends TestCase
 
         // The driver comes from the factory, not a direct FakeDriver. The
         // cas driver needs a PSR-18 client and a PSR-17 factory to check the
-        // ticket, and (SESAME 0.5) the app's session for its pending-login
-        // marker, so the factory gets all three.
+        // ticket, and (SESAME 0.5 and later) the app's session for its
+        // pending-login marker, so the factory gets all three.
         self::assertStringContainsString('DriverFactory::make($config, http: $http, requests: new Psr17Factory(), session: $session)', $index);
         self::assertStringContainsString("'timeout' => 10", $index);
         self::assertStringContainsString("'allow_redirects' => false", $index);
@@ -506,7 +506,7 @@ final class RawGeneratorTest extends TestCase
         // The rest of the require section is untouched.
         self::assertSame('^8.3', $composer['require']['php']);
         self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
-        self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.6', $composer['require']['waynestate/sesame']);
         // The cas driver's PSR-18 client and PSR-17 factory.
         self::assertSame('^7.9 || ^8.0', $composer['require']['guzzlehttp/guzzle']);
         self::assertSame('^1.8', $composer['require']['nyholm/psr7']);
