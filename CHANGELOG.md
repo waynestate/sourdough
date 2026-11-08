@@ -5,6 +5,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: every image in the baked CI files is pinned by digest: composer:2.10.3 now carries its multi-arch list digest, like the Node image already did.
+
 ### Added
 
 - Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).
