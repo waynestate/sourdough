@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Log;
  * worker.heartbeat_max_age seconds, the scheduler is presumed stopped and
  * /ready answers 503, so the balancer skips this instance instead of
  * feeding it jobs nobody will run (WELD W23). A sourdough starter that
- * stops bubbling is dead; same idea.
+ * stops bubbling is dead; same idea. Set worker.heartbeat_max_age to 0
+ * (WORKER_HEARTBEAT_MAX_AGE=0) for an app that runs no scheduler: the
+ * check then always passes.
  */
 final class SchedulerHeartbeat
 {
@@ -26,6 +28,13 @@ final class SchedulerHeartbeat
 
     public function __invoke(): bool
     {
+        $maxAge = (int) config('worker.heartbeat_max_age', 180);
+
+        // 0 (or less) turns the check off, for an app that runs no scheduler.
+        if ($maxAge <= 0) {
+            return true;
+        }
+
         $timestamp = Cache::get(self::KEY);
 
         if ($timestamp === null) {
@@ -34,7 +43,6 @@ final class SchedulerHeartbeat
             return false;
         }
 
-        $maxAge = (int) config('worker.heartbeat_max_age', 180);
         $age = now()->getTimestamp() - (int) $timestamp;
 
         if ($age > $maxAge) {

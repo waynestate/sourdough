@@ -54,6 +54,5 @@ SESAME_DRIVER=fake
 # scheduler starts a short queue:work each minute; "none" when a
 # supervisor or a separate container runs the worker.
 QUEUE_WORKER_MODE=scheduler
-# How old the scheduler's heartbeat may be before /ready answers 503, in
-# seconds (config/worker.php). The scheduler writes it each minute.
+# Seconds before /ready says the scheduler stopped; 0 turns the check off (an app with no scheduler).
 WORKER_HEARTBEAT_MAX_AGE=180

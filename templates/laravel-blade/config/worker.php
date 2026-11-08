@@ -24,6 +24,7 @@ return [
     | readiness route) answers 503. routes/console.php writes it every
     | minute; a stamp older than this means the scheduler is not running,
     | so the instance should not get traffic (WELD W23).
+    | 0 turns the check off, for an app that runs no scheduler.
     |
     */
 

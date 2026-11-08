@@ -66,6 +66,14 @@ it('answers 503 on /ready again once the clock moves past the max age', function
     $this->get('/ready')->assertStatus(503);
 });
 
+it('answers 200 on /ready with no heartbeat when the check is turned off', function () {
+    config(['worker.heartbeat_max_age' => 0]);
+
+    Cache::flush();
+
+    $this->get('/ready')->assertStatus(200);
+});
+
 it('schedules the heartbeat every minute under its own name', function () {
     $events = array_filter(
         $this->app->make(Schedule::class)->events(),
