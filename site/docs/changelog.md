@@ -14,6 +14,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Added: the two Laravel shapes ship tests/Feature/SchedulerNamingTest.php, which fails on any scheduled closure without ->name() (WELD W21).
 - CI runs Preflight's a11y component (0.3.1) on site/, every page in light and dark at 320 and 1280 px with the WCAG 1.4.10 reflow check, blocking.
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.3.1 (b90323b; fixed cache keys, and caches saved even when a job fails; D-072).
 - Added: the Laravel shapes (Blade, Blade with Vue, Inertia) test that a POST without a CSRF token gets 419, and that a matching token or a same-origin request passes (CsrfTest, WELD W27).
