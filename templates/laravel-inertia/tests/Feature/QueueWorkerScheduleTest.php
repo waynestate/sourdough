@@ -51,10 +51,42 @@ it('schedules a short queue worker every minute in scheduler mode', function () 
     $event = $events[0];
 
     expect($event)->toBeInstanceOf(Event::class)
-        ->and($event->command)->toContain('queue:work --stop-when-empty --max-time=50 --tries=3')
+        ->and($event->command)->toContain('queue:work --stop-when-empty --max-time=50 --timeout=45 --tries=3')
         ->and($event->expression)->toBe('* * * * *')
         ->and($event->withoutOverlapping)->toBeTrue()
         ->and($event->expiresAt)->toBe(10);
+});
+
+it('keeps the worker timeout below the queue connection retry_after', function () {
+    $events = sourdoughQueueWorkerEvents(sourdoughConsoleSchedule('scheduler'));
+
+    expect($events)->toHaveCount(1);
+
+    $event = $events[0];
+
+    expect(preg_match('/--timeout=(\d+)/', $event->command, $matches))->toBe(1);
+    $timeout = (int) $matches[1];
+
+    $retryAfter = config('queue.connections.' . config('queue.default') . '.retry_after');
+
+    if ($retryAfter !== null) {
+        expect($timeout)->toBeLessThan((int) $retryAfter);
+
+        return;
+    }
+
+    // The default connection declares no retry_after (for example sync): hold
+    // the timeout against every connection that does instead.
+    $withRetryAfter = array_filter(
+        config('queue.connections'),
+        fn (array $connection): bool => array_key_exists('retry_after', $connection),
+    );
+
+    expect($withRetryAfter)->not->toBeEmpty();
+
+    foreach ($withRetryAfter as $retryAfter) {
+        expect($timeout)->toBeLessThan((int) $retryAfter);
+    }
 });
 
 it('schedules no queue worker in none mode', function () {
