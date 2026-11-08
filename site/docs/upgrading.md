@@ -44,7 +44,9 @@ Then read the section for the version you are moving to.
 
 Every shape's `.gitlab-ci.yml` now caches its downloads: Docker Hub images through `${IMAGE_PREFIX}` (the group's Dependency Proxy when the GitLab has one, Docker Hub otherwise) and Composer and npm installs per lock file. See [Dependency caching](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching).
 
-**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`. Feed merges the new `.gitlab-ci.yml` with your own jobs; a job you added that pulls a Docker Hub image or installs packages takes the same pattern by hand (`image: ${IMAGE_PREFIX}/<image>` and `extends: .composer-cache` or `.npm-cache`).
+New bakes start on the Squire 0.6.0 deploy kit (was 0.4.0): `scripts/release.sh` asks PROCTOR's deploy gate (`proctor gate`) for a go or no-go before the frontend build and the migrations and keeps the verdict in `storage/squire/` as the next release's baseline. Every shape requires HELMET `^0.4`, SESAME `^0.5` and PROCTOR `^0.7`, and pins the Preflight components to the 0.2.0 release SHA. The raw shapes' `public/index.php` now hands the cas driver a Guzzle client, a request factory and the session, so they sign in with CAS in production (before, the cas driver refused to boot there).
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/helmet waynestate/sesame waynestate/proctor --with-all-dependencies` (the raw shapes add `guzzlehttp/guzzle nyholm/psr7` to that line). The feed also brings the Squire 0.6.0 kit files (they are in the manifest). Feed merges the new `.gitlab-ci.yml` with your own jobs; a job you added that pulls a Docker Hub image or installs packages takes the same pattern by hand (`image: ${IMAGE_PREFIX}/<image>` and `extends: .composer-cache` or `.npm-cache`).
 
 **How to verify:** the next pipeline's job logs show `Pulling docker image` with your GitLab's host in front, and a second run logs `Successfully extracted cache`.
 

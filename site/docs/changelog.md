@@ -14,7 +14,18 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Changed: apps start on the Squire 0.6.0 deploy kit (was 0.4.0). The copy in `templates/squire/` comes from Squire 0.6.0, and the dev dependency is `^0.6`.
+- Changed: a baked app's `scripts/release.sh` asks PROCTOR's deploy gate (`proctor gate`) for a go or no-go instead of running `proctor check`, right after `composer audit` and before the frontend build and the migrations, so `SQUIRE_PROCTOR=enforce` stops a no-go before it touches the database. The verdict goes to `storage/squire/proctor-gate.json` (new setting `SQUIRE_PROCTOR_RECORD_DIR`, listed in `.env.squire.example`; the folder ignores itself) and becomes the baseline the next release is ratcheted against, so a failure that is already live is held and only a new one blocks. With a PROCTOR that has no `gate` the step warns and runs `proctor check` as before.
+- Changed: new apps in every shape require HELMET `^0.4` (was `^0.3`), SESAME `^0.5` (was `^0.4`) and PROCTOR `^0.7` (was `^0.6`); CREED stays `^0.1` (0.1.7 today). PROCTOR 0.7 brings `proctor gate`, which the kit's release script now asks; HELMET 0.4's request metrics stay off until `HELMET_METRICS_STORAGE` is set. `tests/StackPinsTest.php` checks all three in every template composer file.
+- Changed: every shape's `.gitlab-ci.yml` pins the Preflight CI components to the 0.2.0 release SHA (`7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1`, was 0.1.4). The `proctor`, `php-test` and `composer-audit` inputs the templates pass are unchanged in 0.2.0, and so are the default images they prefix; Preflight 0.2.0 needs GitLab 18.7 or later.
+- Changed: the Laravel shapes' `config/sesame.php` names SESAME 0.5's `cas.require_pending_login` (env `SESAME_CAS_REQUIRE_PENDING_LOGIN`, default on), with a note to leave it on; the Laravel adapter already hands the cas driver the session.
 - Changed: every shape's `.gitlab-ci.yml` caches its downloads. Docker Hub images (the app's own jobs and the Preflight components' `image` inputs, digest pins kept) are `${IMAGE_PREFIX}/<image>`; `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's GitLab Dependency Proxy when the GitLab has one. Composer and npm installs extend `.composer-cache` (keyed on `composer.lock`) and `.npm-cache` (keyed on `package-lock.json` and `package.json`). A project variable `IMAGE_PREFIX=docker.io` skips the proxy. New `tests/TemplateCiCacheTest.php` keeps every shape that way. Apps already baked take it with `sourdough feed`.
+
+### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
+
+- Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).
+- Fixed: `scripts/parity.ps1` builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.
+- Fixed: the raw shapes (`--raw`, `--raw --vue`) sign in with CAS in production. `public/index.php` called `DriverFactory::make($config)` with no HTTP client, so with `APP_ENV=production` the cas driver refused to boot; it now passes a Guzzle client (10 second timeout, no redirects, TLS verification on), a `nyholm/psr7` request factory and the app's `NativeSession`, which SESAME 0.5's cas driver needs for its pending-login marker (a ticket is accepted only for a sign-in this browser started). The raw template requires `guzzlehttp/guzzle` `^7.9 || ^8.0` and `nyholm/psr7` `^1.8`.
 
 ## 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-7-2026-11-07)
 
@@ -33,7 +44,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Changed: new apps in every shape require PROCTOR `^0.6` (was `^0.4`). The Laravel shapes' `composer proctor` script is now plain `proctor check`: PROCTOR 0.6 refuses `--policy` in CI unless the job sets `PROCTOR_ALLOW_OVERRIDES=1`, and without the option it still reads CREED's released policy from `vendor/waynestate/creed` on its own. PROCTOR 0.6 also fails `composer-audit` when the app has no `composer.lock` or Composer is not on `PATH`; every baked pipeline installs first, so a baked app passes as before.
 - Changed: the smoke gate reads the Inertia `Home` and `Dashboard` pages from Inertia 3's JSON page element, and `tests/StackPinsTest.php` keeps the PROCTOR and Inertia lines, the plain `proctor check` script and the `data-inertia` title from slipping back.
 
-### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
+### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-1)
 
 - Fixed: the Inertia shape's progress bar wears its styles again. Inertia injects them in an inline `<style>`, and HELMET's CSP admits one only with the request's nonce, so the browser refused it on every page ("Refused to apply inline style") and the bar ran unstyled. `resources/js/app.ts` now reads the nonce from the pre-paint script's `nonce` property and hands it to Inertia 3's new `nonce` option, which stamps it on everything Inertia injects; no CSP is loosened.
 - Fixed: the Laravel templates' `UserResolver` lists its interfaces in Pint's order (`RefreshesUser` before `UserResolverContract`), so a freshly baked app passes its own `pint --test` on the first run instead of failing `composer ci`.
@@ -78,7 +89,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 - Removed: from the Inertia shape, `tailwind.config.js`, `cn()` (`resources/js/lib/utils.ts`), `tailwindcss`, `autoprefixer`, `tailwind-merge`, `clsx`, `lucide-vue-next`, `@vueuse/core`, `prettier-plugin-tailwindcss`, the Bunny Fonts link and the ten kit components they served.
 
-### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-1)
+### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-2)
 
 - Fixed: `--sail` apps answer 200 on `/` and `/up` when the checkout is one Sail's `sail` user cannot write (a Windows drive under Docker Desktop, or files a root container wrote). Every page was a 500 naming `tempnam()`, because Blade could not write `storage/framework/views`. The compose file's entrypoint now gives the `sail` user its `WWWUSER` uid first (so a `sail artisan` run the moment `sail up -d` returns no longer runs as the image's uid 1337 and leaves a log file the server cannot append to), opens the app's files to that user only when it cannot write them (`vendor/`, `node_modules/` and `.git` untouched), then starts Sail as usual.
 - Fixed: `--docker` apps with a vite service (Blade + Vue, Inertia) serve `/` on the first `composer dev-up`. Nothing installed `node_modules`, so the vite service exited with `vite: not found` and `/` was a 500 (`Vite manifest not found`). The service now runs `npm install` when Vite is missing, then `npm run dev`.
@@ -128,7 +139,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Changed: docs and package metadata name nougat as the canonical repository, with git.wayne.edu and GitHub as read-only mirrors, until git.wayne.edu has CI runners.
 - Changed: the front page tells the truth about the shapes. The Laravel + Blade, Laravel + Blade + Vue islands and Laravel + Inertia/Vue loaves come out of the oven with their real commands; the hero, the rack note and the two agent prompts name the four that bake in 0.1; and WELD reads as the Inertia/Vue shape already built from Sourdough, not the other starter. Only raw PHP with Vue stays proofing.
 
-### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-2)
+### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-3)
 
 - Fixed: the laravel-inertia bake drops the skeleton leftovers before the manifest is written: `vite.config.js` (next to the overlay's `vite.config.ts` it breaks `npm run build`), the dead `resources/js/app.js` stub, and `resources/views/welcome.blade.php` (no route renders it); the manifest no longer lists a file that is gone.
 - Fixed: `php artisan oracle:check` finds the kit where it lives, in both the laravel-blade and the laravel-inertia templates: `oracle-check.php` at the app root (Squire's Laravel layout) first, then `deploy/oracle-check.php` (WELD's home).
@@ -153,7 +164,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Changed: generated apps require SESAME ^0.2 (Entra sign-in).
 - Changed: the Squire copy comes from Squire 0.3.0.
 
-### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-3)
+### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed-4)
 
 - Fixed: `--laravel --inertia` is accepted.
 - Fixed: stale capability claims in the site and README.

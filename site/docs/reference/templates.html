@@ -183,7 +183,7 @@
 <tbody>
 <tr>
 <td>Stack packages</td>
-<td>HELMET <code>^0.3</code>, SESAME <code>^0.4</code>, PROCTOR <code>^0.6</code> (its <code>composer proctor</code> script is plain <code>proctor check</code>: PROCTOR 0.6 refuses <code>--policy</code> in CI and finds CREED's released policy in <code>vendor/waynestate/creed</code> by itself)</td>
+<td>HELMET <code>^0.4</code>, SESAME <code>^0.5</code>, PROCTOR <code>^0.7</code> (its <code>composer proctor</code> script is plain <code>proctor check</code>: PROCTOR refuses <code>--policy</code> in CI since 0.6 and finds CREED's released policy in <code>vendor/waynestate/creed</code> by itself; 0.7 adds <code>proctor gate</code>, which the Squire kit's release script runs). The raw shapes also require Guzzle and <code>nyholm/psr7</code>, the HTTP client and factory the cas driver checks tickets with</td>
 </tr>
 <tr>
 <td>Playbook</td>
@@ -195,7 +195,7 @@
 </tr>
 <tr>
 <td>Preflight</td>
-<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.1.4 release SHA (<code>79029cc2300702d0d450c42cc699e12af1b731f8</code>, with the tag in a trailing comment), because PROCTOR's <code>preflight-pinned</code> check (since 0.4) wants a 40-hex SHA</td>
+<td><code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.2.0 release SHA (<code>7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1</code>, with the tag in a trailing comment), because PROCTOR's <code>preflight-pinned</code> check (since 0.4) wants a 40-hex SHA</td>
 </tr>
 <tr>
 <td>Oracle</td>
@@ -210,7 +210,7 @@
 <p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. <code>--no-advisor</code> skips the ADVISOR wiring.</p></aside>
 <h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></h2>
-<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
+<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.6.0's kit: its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, and writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -221,7 +221,7 @@
 <tbody>
 <tr>
 <td><code>composer squire-copy:sync</code></td>
-<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.4</code>)</td>
+<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.6</code>)</td>
 </tr>
 <tr>
 <td><code>composer squire-copy:check</code></td>

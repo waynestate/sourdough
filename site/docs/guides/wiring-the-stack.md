@@ -26,7 +26,7 @@ For the Playbook and ADVISOR wiring and the flags that turn each one off, see [C
 
 ## The release script runs the check, but do not call it the gate[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#the-release-script-runs-the-check-but-do-not-call-it-the-gate)
 
-The Citadel release script runs `proctor check` and stops on exit 1. Treat that as a report. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check.
+The Citadel release script asks PROCTOR's deploy gate (`proctor gate`, from Squire's kit 0.6.0 and PROCTOR 0.7) for a go or no-go, ratcheted against the last release that went on, so a failure that is already live is held and only a new one blocks. By default it only reports a no-go; `SQUIRE_PROCTOR=enforce` stops the release on one, before the frontend build and the migrations. Treat it as a report either way. A failure in a release script cannot stop bad code from going live on a Quick Update, so the real gates are CI before merge and, later, a platform check.
 
 Warning
 
