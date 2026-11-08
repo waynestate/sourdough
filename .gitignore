@@ -4,3 +4,6 @@
 
 # scripts/proof.sh and proof.ps1 write their table and logs here.
 /proof-out/
+
+# scripts/a11y.sh and a11y.ps1 write their checker config and reports here.
+/build/
