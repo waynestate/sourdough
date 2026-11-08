@@ -35,17 +35,14 @@ final class TemplateCiCacheTest extends TestCase
     }
 
     #[DataProvider('pipelines')]
-    public function testImagePrefixFallsBackToDockerHub(string $file): void
+    public function testImageRegistryFallsBackToDockerHub(string $file): void
     {
         $ci = self::read($file);
-        // Assembled from two literals so this test never spells the old
-        // cache key's prefix line.
-        $imagePrefix = 'IMAGE_' . 'PREFIX';
 
-        self::assertMatchesRegularExpression('/^variables:\n(?:  .*\n)*  ' . $imagePrefix . ': docker\.io\n/m', $ci);
+        self::assertMatchesRegularExpression('/^variables:\n(?:  .*\n)*  IMAGE_PREFIX: docker\.io\n/m', $ci);
         self::assertStringContainsString(
             "workflow:\n  rules:\n    - if: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n      variables:\n"
-            . "        {$imagePrefix}: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n    - when: always\n",
+            . "        IMAGE_PREFIX: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n    - when: always\n",
             $ci,
         );
     }
@@ -57,7 +54,7 @@ final class TemplateCiCacheTest extends TestCase
      * image_prefix; tests/PreflightPinTest.php covers those.
      */
     #[DataProvider('pipelines')]
-    public function testEveryJobImageComesThroughImagePrefix(string $file): void
+    public function testEveryJobImageComesThroughThePrefix(string $file): void
     {
         $ci = self::read($file);
         $jobs = (string) preg_replace('/^include:\n(?:  [^\n]*\n|\n)*/m', '', $ci, 1);
