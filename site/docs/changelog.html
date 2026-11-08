@@ -44,6 +44,9 @@
 <p>All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
+<ul>
+<li>Changed: every image in the baked CI files is pinned by digest: composer:2.10.3 now carries its multi-arch list digest, like the Node image already did.</li>
+</ul>
 <h3 id="added">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added">#</a></h3>
 <ul>
 <li>Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).</li>
