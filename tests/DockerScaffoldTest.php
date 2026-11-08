@@ -82,6 +82,46 @@ final class DockerScaffoldTest extends TestCase
         $this->assertYamlStructureHolds($compose);
     }
 
+    /**
+     * A port published without a host address lands on every interface, so
+     * the whole network could reach the dev server. Every port the scaffold
+     * publishes binds to 127.0.0.1 instead.
+     */
+    public function test_compose_publishes_ports_on_loopback_only(): void
+    {
+        $target = $this->makeAppDir();
+        (new DockerScaffold())->apply($target, false);
+        $compose = (string) file_get_contents($target . '/compose.yaml');
+
+        // Collect the entries under every ports: block, whatever service
+        // they belong to.
+        $published = [];
+        $inPorts = false;
+        foreach (preg_split('/\R/', $compose) ?: [] as $line) {
+            if (preg_match('/^\s*ports:\s*$/', $line) === 1) {
+                $inPorts = true;
+                continue;
+            }
+            if (!$inPorts) {
+                continue;
+            }
+            if (preg_match('/^\s*-\s*(\S.*)$/', $line, $m) === 1) {
+                $published[] = $m[1];
+                continue;
+            }
+            $inPorts = false;
+        }
+
+        self::assertNotSame([], $published, 'the compose file publishes at least one port');
+        foreach ($published as $entry) {
+            self::assertStringStartsWith("'127.0.0.1:", $entry, $entry);
+        }
+
+        // The old all-interfaces entry is gone.
+        self::assertStringNotContainsString("'${APP_PORT:-8000}:8000'", $compose);
+        $this->assertYamlStructureHolds($compose);
+    }
+
     public function testComposeGainsTheViteServiceBeforeVolumes(): void
     {
         $target = $this->makeAppDir();
