@@ -26,6 +26,19 @@ final class ComposerSkeletonSource implements SkeletonSource
     public const PACKAGE_VERSION = '^13.0';
 
     /**
+     * The Laravel major PACKAGE_VERSION installs ("13"), the line whose PHP
+     * range in CREED's policy bounds the Laravel shapes' floor and matrix.
+     */
+    public static function laravelMajor(): string
+    {
+        if (1 !== preg_match('/(\d+)/', self::PACKAGE_VERSION, $matches)) {
+            throw new \LogicException('PACKAGE_VERSION names no Laravel major.');
+        }
+
+        return $matches[1];
+    }
+
+    /**
      * @param string|null $composerBinary the binary to run; null means the
      *   SOURDOUGH_COMPOSER environment variable, or "composer" when that is unset
      */

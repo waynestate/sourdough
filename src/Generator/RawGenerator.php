@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Generator;
 
 use Waynestate\Sourdough\Manifest;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
 
 /**
@@ -162,6 +163,9 @@ final class RawGenerator
         foreach ($this->leftovers as $leftover) {
             $this->removeLeftover($targetDir, $leftover);
         }
+        // The PHP floor and test matrix come from CREED's policy
+        // (BEST_PRACTICES 4.2); the template's literals are the fallback.
+        $this->support->applyPhpFloor($targetDir, PhpFloor::resolve());
         $this->support->installSquireFiles($targetDir);
         if ($this->shipsPackageJson()) {
             $this->support->installNpmrc($targetDir);

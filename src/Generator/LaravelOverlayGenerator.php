@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Generator;
 
 use Waynestate\Sourdough\Manifest;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
 
 /**
@@ -155,6 +156,10 @@ abstract class LaravelOverlayGenerator
             $this->mergeComposerOverlay($targetDir, $overlayDir);
             $this->appendEnvAdditions($targetDir, $overlayDir);
         }
+
+        // The PHP floor and test matrix come from CREED's policy, bounded by
+        // the Laravel major's own PHP range (BEST_PRACTICES 4.2).
+        $this->support->applyPhpFloor($targetDir, PhpFloor::resolve(ComposerSkeletonSource::laravelMajor()));
 
         $this->createSqliteDatabase($targetDir);
 

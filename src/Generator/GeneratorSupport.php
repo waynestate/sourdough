@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Generator;
 
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookAccess;
 use Waynestate\Sourdough\PlaybookMode;
 
@@ -776,6 +777,120 @@ final class GeneratorSupport
             'client config starts a program for whoever opens the project, so',
             'each developer keeps their own.',
         ];
+    }
+
+    /**
+     * Write the PHP floor from CREED's policy (PhpFloor) into the baked app:
+     * composer.json's require.php and config.platform.php, the
+     * php_versions matrix and the "requires PHP" comment in .gitlab-ci.yml,
+     * and the "test suite on PHP ..." line in the README.
+     *
+     * The templates carry the pinned fallback (PhpFloor::FALLBACK_*) as
+     * plain literals, so they stay valid JSON and YAML; this step swaps in
+     * the policy's answer. A file is only rewritten when its text changes,
+     * so a floor that matches the fallback leaves the loaf byte for byte as
+     * the template wrote it.
+     *
+     * @throws \RuntimeException when a file cannot be read, parsed or written
+     */
+    public function applyPhpFloor(string $targetDir, PhpFloor $floor): void
+    {
+        $composerPath = $targetDir . '/composer.json';
+        if (is_file($composerPath)) {
+            $this->applyPhpFloorComposer($composerPath, $floor);
+        }
+
+        $ciPath = $targetDir . '/.gitlab-ci.yml';
+        if (is_file($ciPath)) {
+            $this->rewrite($ciPath, static function (string $content) use ($floor): string {
+                $content = (string) preg_replace(
+                    '/^(\s*php_versions:\s*)\[[^\]\n]*\]/m',
+                    '${1}' . $floor->yamlList(),
+                    $content,
+                );
+
+                return (string) preg_replace(
+                    '/requires PHP \^\d+\.\d+, so the test matrix starts at \d+\.\d+\./',
+                    sprintf('requires PHP %s, so the test matrix starts at %s.', $floor->constraint(), $floor->floor),
+                    $content,
+                );
+            });
+        }
+
+        $readmePath = $targetDir . '/README.md';
+        if (is_file($readmePath)) {
+            $fallback = 'the test suite on PHP ' . PhpFloor::proseOf(PhpFloor::FALLBACK_VERSIONS);
+            $this->rewrite($readmePath, static fn(string $content): string => str_replace(
+                $fallback,
+                'the test suite on PHP ' . $floor->prose(),
+                $content,
+            ));
+        }
+    }
+
+    /**
+     * Set require.php and config.platform.php in place (the keys keep their
+     * position; a missing platform pin is added at the end of config).
+     *
+     * @throws \RuntimeException when the file is not a composer.json object or cannot be written
+     */
+    private function applyPhpFloorComposer(string $path, PhpFloor $floor): void
+    {
+        $content = file_get_contents($path);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+        $composer = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($composer)) {
+            throw new \RuntimeException(sprintf('"%s" is not a composer.json object.', $path));
+        }
+
+        $require = $composer['require'] ?? [];
+        $config = $composer['config'] ?? [];
+        if (!is_array($require) || !is_array($config)) {
+            throw new \RuntimeException(sprintf('"%s" has no usable require or config section.', $path));
+        }
+        $platform = $config['platform'] ?? [];
+        if (!is_array($platform)) {
+            throw new \RuntimeException(sprintf('"%s" has no usable config.platform section.', $path));
+        }
+
+        if (($require['php'] ?? null) === $floor->constraint() && ($platform['php'] ?? null) === $floor->platform()) {
+            return;
+        }
+
+        $require['php'] = $floor->constraint();
+        $platform['php'] = $floor->platform();
+        $config['platform'] = $platform;
+        $composer['require'] = $require;
+        $composer['config'] = $config;
+
+        $encoded = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (false === $encoded) {
+            throw new \RuntimeException(sprintf('Could not encode "%s".', $path));
+        }
+        if (false === file_put_contents($path, $encoded . "\n")) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
+    }
+
+    /**
+     * Run $edit over a text file and write it back only when it changed.
+     *
+     * @param callable(string): string $edit
+     *
+     * @throws \RuntimeException when the file cannot be read or written
+     */
+    private function rewrite(string $path, callable $edit): void
+    {
+        $content = file_get_contents($path);
+        if (false === $content) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $path));
+        }
+        $changed = $edit($content);
+        if ($changed !== $content && false === file_put_contents($path, $changed)) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $path));
+        }
     }
 
     /**
