@@ -48,7 +48,7 @@ To run a component on another image, give its `image` input the plain name, such
 
 ## On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.0.
 
 ## What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 

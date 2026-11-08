@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * One Preflight release everywhere: every shape's pipeline pins the same
  * release commit (with the tag in a trailing comment, since PROCTOR's
  * preflight-pinned check wants a full SHA or a release tag), and Sourdough's
- * own pipeline and GitHub workflow name the same release. From Preflight
+ * own GitLab pipeline names the same release. From Preflight
  * 0.3.0 each Docker Hub component adds the Dependency Proxy prefix itself
  * (image_prefix), so an image input that carries a prefix too pulls from a
  * path that does not exist. The shapes hand the components their own
@@ -54,19 +54,14 @@ final class PreflightPinTest extends TestCase
         self::assertSame([self::TAG], array_keys($versions), 'one Preflight version across every shape');
     }
 
-    public function testSourdoughsOwnPipelinesNameTheSameRelease(): void
+    public function testSourdoughsOwnPipelineNamesTheSameRelease(): void
     {
         $includes = self::includes(self::read(dirname(__DIR__) . '/.gitlab-ci.yml'));
         self::assertNotEmpty($includes, 'Sourdough includes Preflight components');
         foreach ($includes as $include) {
             self::assertSame(self::TAG, $include['ref'], "{$include['name']} is pinned to the release tag");
         }
-
-        $github = self::read(dirname(__DIR__) . '/.github/workflows/ci.yml');
-        self::assertStringContainsString(
-            'waynestate/preflight/.github/workflows/php-package.yml@' . self::SHA . ' # ' . self::TAG,
-            $github,
-        );
+        // Not .github/workflows/ci.yml: GitHub's Preflight copy stops at 0.1.4, so it stays there until D-069 is decided.
     }
 
     /**
