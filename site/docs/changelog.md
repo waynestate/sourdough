@@ -14,6 +14,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Fixed: the docs menu closes with Escape and hands focus back to its button (docs kit synced from Squire).
 - Added: every shape's `.gitlab-ci.yml` runs a `sourdough-feed` job (BEST_PRACTICES 3.2, now `Checked`): on the shape's `composer` image, through `${IMAGE_PREFIX}` and the Composer cache, it installs the newest Sourdough release and runs `sourdough manifest --check` and `sourdough feed --dry-run`. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which `allow_failure: exit_codes: [1]` shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next `sourdough feed`. New `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are `Enforced` and name the tests that hold them.
 
 ### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
