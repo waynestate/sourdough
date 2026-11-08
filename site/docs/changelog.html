@@ -49,6 +49,7 @@ Versioning once 1.0 is out.</p>
 <li>Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid_* lines.</li>
 <li>Fixed: the manifest leaves out database/database.sqlite, so sourdough feed never treats an app's database as a template file and WELD's regen gate does not see it as drift.</li>
 <li>Fixed: Laravel bakes (blade, blade-vue, inertia) create an empty database/database.sqlite when .env.example uses sqlite, as Laravel's own installer does, so the printed php artisan migrate runs without a prompt.</li>
+<li>Changed: the scheduled queue worker in the Laravel shapes sets --timeout=45, below the connection's retry_after (Laravel's default 90), and QueueWorkerScheduleTest checks the two (WELD W20).</li>
 <li>Added: the Laravel shapes can run the queue from the scheduler, for Citadel where nothing supervises a worker: with QUEUE_WORKER_MODE=scheduler (the new .env.example default) routes/console.php starts queue:work --stop-when-empty --max-time=50 --tries=3 every minute with withoutOverlapping(10); QUEUE_WORKER_MODE=none leaves the queue to a supervisor. QueueWorkerScheduleTest covers both (WELD W19).</li>
 <li>Changed: the local a11y scripts run Preflight's own checker (vendored from 0.3.1 and pinned by a test), so they check what CI checks: axe-core 4.14.0, 320 and 1280 px, and the reflow check.</li>
 <li>Added: the two Laravel shapes ship tests/Feature/SchedulerNamingTest.php, which fails on any scheduled closure without -&gt;name() (WELD W21).</li>
