@@ -1,11 +1,11 @@
 ---
 title: Plan format
-description: The JSON plan format behind resources/plan.schema.json, covering required and optional keys, permutations, parts, models and pages.
+description: The plan format behind resources/plan.schema.json, covering required and optional keys, permutations, parts, models, pages, and the .sourdough/plan.yaml every bake saves.
 ---
 
 # Plan format
 
-Reference for the JSON plan that `sourdough new --describe` asks a model for and `sourdough new --plan <file>` reads back. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](commands.md).
+Reference for the plan that `sourdough new --describe` asks a model for, `sourdough new --plan <file>` reads back (as JSON, or as YAML), and every bake saves in the app as `.sourdough/plan.yaml`. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](commands.md).
 
 ## The plan object
 
@@ -81,6 +81,54 @@ Each model object has a `name` and a `fields` list; each field has a `name` and 
 
 A list of strings, such as `["/", "/posts"]`.
 
+## The saved plan
+
+Every bake saves its plan in the app as `.sourdough/plan.yaml`, next to the manifest (ADR-0014, decision 3): the recipe card taped inside the jar's lid. It is written after the bake succeeds, on both paths that bake:
+
+| How you baked | What the saved plan holds |
+|---|---|
+| `--plan <file>` | that plan, with the name the app was baked with (`--name` wins over the plan's `name`) |
+| flags (`--raw`, `--laravel`, `--vue`, `--inertia`) | the shape, the name, and all four parts, because every shape wires all four in |
+
+`--dry-run` and a refused bake write nothing, so they save no plan. `--describe` prints a plan and writes nothing (generation from a description is not built yet), so it saves none either; pass its plan with `--plan` and that bake saves it. The plan from the example above is saved as:
+
+```yaml
+# The plan this app was baked from, saved by sourdough new (ADR-0014).
+# It matches Sourdough's plan schema, so it bakes the same shape again:
+#   sourdough new <dir> --plan=.sourdough/plan.yaml
+# Sourdough never rewrites it after the bake: sourdough feed and
+# sourdough manifest --check leave it alone. Commit it with the app.
+
+permutation: raw
+parts:
+  - sesame
+  - helmet
+name: my-app
+models:
+  - name: Post
+    fields:
+      - { name: title, type: string }
+      - { name: body, type: text }
+pages:
+  - /
+  - /posts
+```
+
+The keys are the plan object's, in the same order, and the comment lines are YAML comments, so the file still matches the schema (which allows no extra keys). `--plan` reads a file ending in `.yaml` or `.yml` as YAML and anything else as JSON, through the same schema, so the saved plan bakes the same loaf again:
+
+```bash
+sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+```
+
+### Neither managed nor seeded
+
+The saved plan is not in the manifest. The manifest lists the files the template wrote, and the plan is not template output: it is what you asked for. Like the manifest itself and `.sourdough/base/`, it is Sourdough's record about the app, not a file of the app, so it carries neither class:
+
+- `sourdough manifest --check` never reports it, however you edit it.
+- `sourdough feed` never reads, rewrites or removes it. Feed bakes from the shape and answers in the manifest, so an edited plan changes nothing a feed does, and an app baked before the plan was saved (Sourdough 0.1.7 and earlier) gets no plan written for it: feed does not guess at what nobody wrote down.
+
+Edit it as the app grows (a new model, a new page), so it stays the record of what the app is for, and commit it with the manifest.
+
 ## Getting a plan
 
 Instead of choosing flags, describe what the app does and let a model plan it:
@@ -103,7 +151,7 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A YAML plan (`.yaml` or `.yml`) works the same way, and the bake saves the plan as [the saved plan](#the-saved-plan).
 
 ### Model configuration
 

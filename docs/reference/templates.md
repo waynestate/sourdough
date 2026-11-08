@@ -112,6 +112,7 @@ sourdough new my-app --inertia
 | Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.2.0 release SHA (`7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1`, with the tag in a trailing comment), because PROCTOR's `preflight-pinned` check (since 0.4) wants a 40-hex SHA |
 | Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
 | Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
+| Plan | `.sourdough/plan.yaml`: the plan the app was baked from, written after the bake. Not in the manifest, so neither managed nor seeded; feed never touches it. See [The saved plan](plan-format.md#the-saved-plan) |
 
 Seeded files are `.env.example` and `README.md`: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record `sourdough feed` refreshes, merging in any edits you made. See [The manifest](../guides/manifest.md).
 

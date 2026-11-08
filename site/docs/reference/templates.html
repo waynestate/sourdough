@@ -205,6 +205,10 @@
 <td>Manifest</td>
 <td><code>.sourdough/manifest.json</code>: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> or <code>seeded</code></td>
 </tr>
+<tr>
+<td>Plan</td>
+<td><code>.sourdough/plan.yaml</code>: the plan the app was baked from, written after the bake. Not in the manifest, so neither managed nor seeded; feed never touches it. See <a href="plan-format.html#the-saved-plan">The saved plan</a></td>
+</tr>
 </tbody>
 </table></div>
 <p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>

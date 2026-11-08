@@ -68,7 +68,7 @@ Options:
 - `--json` with `--dry-run`, print the plan as JSON
 - `--describe "<sentence>"` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing
-- `--plan <file>` a ready-made plan file (JSON matching `resources/plan.schema.json`)
+- `--plan <file>` a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves
 - `--playbook` kept for compatibility: Playbook is now the default
 - `--no-playbook` skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook)
 - `--no-advisor` skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section)
@@ -123,7 +123,9 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in `.yaml` or `.yml` is read as YAML; anything else as JSON.
+
+Every bake saves its plan in the app as `.sourdough/plan.yaml`: the recipe card taped inside the jar's lid. A `--plan` bake saves that plan (with `--name`, if you gave one); a bake from flags saves the shape, the name and all four parts. The card is a valid plan file, so `sourdough new other-app --plan=my-app/.sourdough/plan.yaml` bakes the same loaf again. See [Plan format](docs/reference/plan-format.md#the-saved-plan).
 
 ### Model configuration
 
@@ -172,6 +174,8 @@ sourdough manifest --check
 Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
 
 Commit the manifest. It's the record that keeps `feed` honest.
+
+Next to it sits `.sourdough/plan.yaml`, the plan the app was baked from. It is not in the manifest, so it is neither managed nor seeded: `feed` and `manifest --check` never read, rewrite or flag it, and you may edit it as the app grows. Commit it too.
 
 ## Feeding an app
 

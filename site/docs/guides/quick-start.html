@@ -63,6 +63,7 @@
 <li>Playbook wiring by default: the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends your token to git.wayne.edu, the seven setting names in <code>.env.example</code>, a <code>composer playbook</code> script that shows whether Playbook is installed, and a &quot;WSU values (PLAYBOOK)&quot; README section.</li>
 <li>ADVISOR in <code>require-dev</code>, a git-ignored <code>.mcp.json</code>, and an &quot;ADVISOR&quot; README section.</li>
 <li><code>.sourdough/manifest.json</code>, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> (Sourdough owns it and will update it) or <code>seeded</code> (Sourdough wrote it once and you own it now: <code>.env.example</code> and <code>README.md</code>).</li>
+<li><code>.sourdough/plan.yaml</code>, the plan the app was baked from: the shape, the name and the stack parts (plus the models and pages, when you baked from a plan file). It bakes the same loaf again with <code>--plan</code>; see <a href="../reference/plan-format.html#the-saved-plan">The saved plan</a>.</li>
 </ul>
 <h2 id="next-steps">Next steps<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></h2>
 <ul>

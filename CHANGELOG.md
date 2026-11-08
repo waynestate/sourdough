@@ -8,6 +8,7 @@ Versioning once 1.0 is out.
 ### Added
 
 - Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
+- Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
 
 ### Changed
 
@@ -25,6 +26,7 @@ Versioning once 1.0 is out.
 ### Fixed
 
 - Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
+- Fixed: BEST_PRACTICES.md's "Keeping generated apps current" tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are `Enforced` by the manifest and `sourdough feed`, 3.2 (a check that fails CI) is `Partly enforced` (`feed --dry-run` and `manifest --check` exist; no template runs them in CI yet), 3.4 (tags and migration notes) is `Documented` in the release steps, and 3.5 (compatibility CI) is `Checked` by the smoke gate, which still only warns. They all said `Not yet` or `Documented`. 4.3 keeps `Partly enforced` and now names its templates and test.
 - Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, `manifest` and `feed` ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is `Enforced` by the generator tests in every shape; it said only the raw shape generated.
 - Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).
 - Fixed: `scripts/parity.ps1` builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.

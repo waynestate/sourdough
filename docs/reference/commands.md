@@ -33,7 +33,7 @@ sourdough new [dir] [options]
 | `--json` | with `--dry-run`, print the plan as JSON |
 | `--describe "<sentence>"` | describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars) |
 | `--plan-only` | with `--describe`, print the plan as JSON and write nothing |
-| `--plan <file>` | a ready-made plan file (JSON matching `resources/plan.schema.json`) |
+| `--plan <file>` | a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves |
 | `--playbook` | kept for compatibility: Playbook is now the default |
 | `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
 | `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |

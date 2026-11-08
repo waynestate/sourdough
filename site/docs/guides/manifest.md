@@ -58,6 +58,10 @@ Tip
 
 Commit `.sourdough/manifest.json` in your app. It's the record that keeps `feed` honest.
 
+## The saved plan is not in the manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-saved-plan-is-not-in-the-manifest)
+
+`.sourdough/plan.yaml`, the plan the app was baked from, sits next to the manifest but is not listed in it, so it is neither managed nor seeded. The manifest lists what the template wrote; the plan is what you asked for. `sourdough manifest --check` never reports it and `sourdough feed` never touches it, so edit it as the app grows and commit it with the manifest. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
+
 ## The Squire deploy files[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-squire-deploy-files)
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).

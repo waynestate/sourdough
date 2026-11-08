@@ -35,7 +35,17 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A missing file, or a file that is not valid JSON matching the schema, is refused with the reason printed.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in `.yaml` or `.yml` is read as YAML, anything else as JSON. A missing file, or a file that does not parse or does not match the schema, is refused with the reason printed.
+
+## The plan stays with the app
+
+The bake saves the plan in the app as `.sourdough/plan.yaml`, next to the manifest, so the app keeps a record of what it was asked to be. It is a valid plan file, so the same loaf bakes again from it:
+
+```bash
+sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+```
+
+Sourdough never rewrites it after the bake: `sourdough feed` and `sourdough manifest --check` leave it alone, and you may edit it as the app grows. Commit it with the manifest. See [The saved plan](../reference/plan-format.md#the-saved-plan).
 
 ## Model configuration
 

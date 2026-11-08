@@ -55,7 +55,12 @@
 <p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --plan plan.json
 </code></pre>
-<p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A missing file, or a file that is not valid JSON matching the schema, is refused with the reason printed.</p>
+<p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in <code>.yaml</code> or <code>.yml</code> is read as YAML, anything else as JSON. A missing file, or a file that does not parse or does not match the schema, is refused with the reason printed.</p>
+<h2 id="the-plan-stays-with-the-app">The plan stays with the app<a class="docs-heading-link" aria-label="Link to this section" href="#the-plan-stays-with-the-app">#</a></h2>
+<p>The bake saves the plan in the app as <code>.sourdough/plan.yaml</code>, next to the manifest, so the app keeps a record of what it was asked to be. It is a valid plan file, so the same loaf bakes again from it:</p>
+<pre tabindex="0"><code class="language-bash">sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+</code></pre>
+<p>Sourdough never rewrites it after the bake: <code>sourdough feed</code> and <code>sourdough manifest --check</code> leave it alone, and you may edit it as the app grows. Commit it with the manifest. See <a href="../reference/plan-format.html#the-saved-plan">The saved plan</a>.</p>
 <h2 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h2>
 <p><code>--describe</code> needs three environment variables (no defaults, no key in code):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -122,7 +127,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/shapes.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Pick a shape</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/manifest.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">The manifest</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#describe-it-in-a-sentence">Describe it in a sentence</a></li><li class="docs-toc__item"><a href="#see-the-plan-without-writing-anything">See the plan without writing anything</a></li><li class="docs-toc__item"><a href="#pass-a-ready-made-plan">Pass a ready-made plan</a></li><li class="docs-toc__item"><a href="#model-configuration">Model configuration</a></li><li class="docs-toc__item"><a href="#what-a-plan-looks-like">What a plan looks like</a></li><li class="docs-toc__item"><a href="#the-steps-a-plan-produces">The steps a plan produces</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#describe-it-in-a-sentence">Describe it in a sentence</a></li><li class="docs-toc__item"><a href="#see-the-plan-without-writing-anything">See the plan without writing anything</a></li><li class="docs-toc__item"><a href="#pass-a-ready-made-plan">Pass a ready-made plan</a></li><li class="docs-toc__item"><a href="#the-plan-stays-with-the-app">The plan stays with the app</a></li><li class="docs-toc__item"><a href="#model-configuration">Model configuration</a></li><li class="docs-toc__item"><a href="#what-a-plan-looks-like">What a plan looks like</a></li><li class="docs-toc__item"><a href="#the-steps-a-plan-produces">The steps a plan produces</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.7</span></span>

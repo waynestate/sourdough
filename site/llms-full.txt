@@ -60,7 +60,7 @@ Options:
 - `--json` with `--dry-run`, print the plan as JSON
 - `--describe ""` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing
-- `--plan ` a ready-made plan file (JSON matching `resources/plan.schema.json`)
+- `--plan ` a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves
 - `--playbook` kept for compatibility: Playbook is now the default
 - `--no-playbook` skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook)
 - `--no-advisor` skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section)
@@ -115,7 +115,9 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in `.yaml` or `.yml` is read as YAML; anything else as JSON.
+
+Every bake saves its plan in the app as `.sourdough/plan.yaml`: the recipe card taped inside the jar's lid. A `--plan` bake saves that plan (with `--name`, if you gave one); a bake from flags saves the shape, the name and all four parts. The card is a valid plan file, so `sourdough new other-app --plan=my-app/.sourdough/plan.yaml` bakes the same loaf again. See [Plan format](https://github.com/waynestate/sourdough/blob/HEAD/docs/reference/plan-format.md#the-saved-plan).
 
 #### Model configuration
 
@@ -164,6 +166,8 @@ sourdough manifest --check
 Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
 
 Commit the manifest. It's the record that keeps `feed` honest.
+
+Next to it sits `.sourdough/plan.yaml`, the plan the app was baked from. It is not in the manifest, so it is neither managed nor seeded: `feed` and `manifest --check` never read, rewrite or flag it, and you may edit it as the app grows. Commit it too.
 
 ### Feeding an app
 
@@ -477,7 +481,7 @@ Hand it to your agent
 
 ### Recipes for your agent
 
-Three prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
+Two prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask you before it guesses. The Laravel shapes bake now too; their prompts join the rack when they do.
 
 #### Get started with Sourdough
 
@@ -541,38 +545,6 @@ Constraints:
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
 ```
 
-#### Bake a Laravel app with Sourdough
-
-Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check.
-
-A prompt for your coding agent. Copy it as it stands:
-
-```text
-You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
-
-Read first:
-- https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
-- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs for sourdough answer from the stack's own docs, and policy_lookup gives today's PHP support from CREED. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
-
-Task:
-1. Check that PHP 8.3 or newer and Composer are on the PATH, and say which versions you found.
-2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
-3. Ask me which shape I want: Blade (`--laravel`), Blade with Vue islands (`--laravel --vue`) or Inertia/Vue (`--inertia`), and whether I want `--sail` or `--docker` for the local runtime. Then bake the app with `sourdough new my-app` and those flags, using the folder name I give you in place of my-app, and change into it.
-4. Run `composer install`, then `cp .env.example .env`, `php artisan key:generate` and `php artisan migrate`. For the islands and Inertia shapes, run `npm install` and `npm run build` before serving. With `--sail` or `--docker` the bake prints the oven's own Next steps; follow those when they differ.
-5. Wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then serve the app with `php artisan serve`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
-6. Run `sourdough manifest --check` in the app and report what it says.
-
-Constraints:
-- The app requires waynestate/playbook, WSU's private shared-values package on git.wayne.edu; the settings in .env.example come from it. If the bake refuses because this machine cannot read the package, tell me; do not pass --no-playbook, which is for CI and automated tests only.
-- .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
-- The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
-- Never commit .env, and never paste a secret into a prompt or a file.
-- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
-- Ask me before you guess: a folder name, a shape or an oven I have not named, or anything that touches a deploy.
-
-Output: what you ran and what it said, the app's files one level deep, then your questions.
-```
-
 The agent reads the same pages you do: [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://sourdough.apps.wayne.edu/llms-full.txt) holds them all in one file, and this page has a [Markdown twin](https://sourdough.apps.wayne.edu/index.md). Nothing here phones home. The buttons only copy text or open the tool you picked.
 
 The rest of the bakery
@@ -624,7 +596,7 @@ An agent that fetches `llms.txt` gets a map; it then fetches only the pages it n
 
 ### Recipes for your agent[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipes-for-your-agent)
 
-The front page carries three prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask before it guesses.
+The front page carries two prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask before it guesses.
 
 ![The Recipes for your agent section: two recipe cards, Get started with Sourdough and Check what has drifted in a Sourdough app, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](https://sourdough.apps.wayne.edu/docs/agent-ready/agents-1440.png)
 
@@ -635,10 +607,6 @@ Installs Sourdough, bakes a raw PHP app, fetches WayneUI's standalone file, serv
 #### Recipe No. 2: Check what has drifted in a Sourdough app[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-2-check-what-has-drifted-in-a-sourdough-app)
 
 Runs `sourdough manifest --check` in an app Sourdough baked, lists the managed files that changed since Sourdough wrote them, and proposes what to put back. It changes nothing, and seeded files never count as drift.
-
-#### Recipe No. 3: Bake a Laravel app with Sourdough[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-3-bake-a-laravel-app-with-sourdough)
-
-Installs Sourdough, bakes one of the three Laravel shapes (Blade, Blade with Vue islands or Inertia/Vue) with the oven the developer chooses, serves it locally and runs the manifest check. The prompt points the agent at `llms.txt` first, then walks it through `composer global require waynestate/sourdough`, `sourdough new my-app` with the shape and oven flags, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `npm install` and `npm run build` for the Vue shapes, ADVISOR wiring, `php artisan serve` and `sourdough manifest --check`.
 
 ![Recipe No. 1 with the OpenCode button chosen: the prompt rendered as a PowerShell command beside a bash or zsh tab, with a Copy command button](https://sourdough.apps.wayne.edu/docs/agent-ready/prompt-run-opencode-1440.png)
 
@@ -656,11 +624,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
-- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
+- Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
 
 #### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
-- Changed: the `--docker` setup publishes its ports on 127.0.0.1 only, so the dev server and Vite are not reachable from the network (SOURDOUGH-25).
 - Changed: the GitLab pipeline pins the Preflight components to 0.2.0 (was 0.1.4).
 - The front page's deploy layer (`deploy/`) runs Squire's kit 0.6.0 (was 0.5.0): `scripts/release.sh` asks PROCTOR's deploy gate for a go or no-go on each release (a report, not a stop, unless `SQUIRE_PROCTOR=enforce`), and `.env.squire.example` lists the new setting. The layer's pins move to HELMET `^0.4` (locked 0.4.0) and PROCTOR `^0.7` (locked 0.7.0).
 - Docs: the Docker commands in the README and docs mount the shared `stack-composer-cache` volume, so Composer downloads are cached between runs.
@@ -674,6 +641,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
 - Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
+- Fixed: BEST_PRACTICES.md's "Keeping generated apps current" tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are `Enforced` by the manifest and `sourdough feed`, 3.2 (a check that fails CI) is `Partly enforced` (`feed --dry-run` and `manifest --check` exist; no template runs them in CI yet), 3.4 (tags and migration notes) is `Documented` in the release steps, and 3.5 (compatibility CI) is `Checked` by the smoke gate, which still only warns. They all said `Not yet` or `Documented`. 4.3 keeps `Partly enforced` and now names its templates and test.
 - Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, `manifest` and `feed` ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is `Enforced` by the generator tests in every shape; it said only the raw shape generated.
 - Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).
 - Fixed: `scripts/parity.ps1` builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.
@@ -963,7 +931,17 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A missing file, or a file that is not valid JSON matching the schema, is refused with the reason printed.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in `.yaml` or `.yml` is read as YAML, anything else as JSON. A missing file, or a file that does not parse or does not match the schema, is refused with the reason printed.
+
+### The plan stays with the app[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-plan-stays-with-the-app)
+
+The bake saves the plan in the app as `.sourdough/plan.yaml`, next to the manifest, so the app keeps a record of what it was asked to be. It is a valid plan file, so the same loaf bakes again from it:
+
+```bash
+sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+```
+
+Sourdough never rewrites it after the bake: `sourdough feed` and `sourdough manifest --check` leave it alone, and you may edit it as the app grows. Commit it with the manifest. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 ### Model configuration[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#model-configuration)
 
@@ -1193,6 +1171,7 @@ Edit the file to what it should be, delete the markers, and run your checks. `gi
 - **Git, and only git.** Feed needs git on PATH (or `SOURDOUGH_GIT` pointing at it), on Windows, macOS and Linux alike. The Laravel shapes also bake on a fresh `laravel/laravel` skeleton through Composer, the same as `sourdough new`, so feeding one needs Composer and the network; Laravel's own skeleton updates arrive as template updates, merged the same way.
 - **Forward only.** A manifest written by a newer Sourdough than the one running is refused (exit `2`). Update Sourdough first: a starter only rises forward.
 - **The answers stay.** Feed bakes with the answers in the manifest (the shape, `--sail` or `--docker`, Playbook and ADVISOR). It does not change them.
+- **The plan is yours.** `.sourdough/plan.yaml`, the plan the app was baked from, is not in the manifest: feed never reads, rewrites or removes it, and never lists it in its plan, so editing it is not drift. An app baked before Sourdough saved its plan gets none written by feed. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 #### Exit codes[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#exit-codes)
 
@@ -1417,6 +1396,10 @@ Tip
 
 Commit `.sourdough/manifest.json` in your app. It's the record that keeps `feed` honest.
 
+### The saved plan is not in the manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-saved-plan-is-not-in-the-manifest)
+
+`.sourdough/plan.yaml`, the plan the app was baked from, sits next to the manifest but is not listed in it, so it is neither managed nor seeded. The manifest lists what the template wrote; the plan is what you asked for. `sourdough manifest --check` never reports it and `sourdough feed` never touches it, so edit it as the app grows and commit it with the manifest. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
+
 ### The Squire deploy files[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-squire-deploy-files)
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
@@ -1486,6 +1469,7 @@ From a machine where `sourdough` is installed (see [Install](https://sourdough.a
 - Playbook wiring by default: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section.
 - ADVISOR in `require-dev`, a git-ignored `.mcp.json`, and an "ADVISOR" README section.
 - `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+- `.sourdough/plan.yaml`, the plan the app was baked from: the shape, the name and the stack parts (plus the models and pages, when you baked from a plan file). It bakes the same loaf again with `--plan`; see [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 ### Next steps[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#next-steps)
 
@@ -2065,7 +2049,7 @@ sourdough new [dir] [options]
 | `--json` | with `--dry-run`, print the plan as JSON |
 | `--describe "<sentence>"` | describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars) |
 | `--plan-only` | with `--describe`, print the plan as JSON and write nothing |
-| `--plan <file>` | a ready-made plan file (JSON matching `resources/plan.schema.json`) |
+| `--plan <file>` | a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves |
 | `--playbook` | kept for compatibility: Playbook is now the default |
 | `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
 | `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |
@@ -2241,7 +2225,7 @@ Source: https://sourdough.apps.wayne.edu/docs/reference/plan-format.html
 
 ## Plan format[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#plan-format)
 
-Reference for the JSON plan that `sourdough new --describe` asks a model for and `sourdough new --plan <file>` reads back. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html).
+Reference for the plan that `sourdough new --describe` asks a model for, `sourdough new --plan <file>` reads back (as JSON, or as YAML), and every bake saves in the app as `.sourdough/plan.yaml`. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html).
 
 ### The plan object[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-plan-object)
 
@@ -2317,6 +2301,54 @@ Each model object has a `name` and a `fields` list; each field has a `name` and 
 
 A list of strings, such as `["/", "/posts"]`.
 
+### The saved plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan)
+
+Every bake saves its plan in the app as `.sourdough/plan.yaml`, next to the manifest (ADR-0014, decision 3): the recipe card taped inside the jar's lid. It is written after the bake succeeds, on both paths that bake:
+
+| How you baked | What the saved plan holds |
+| --- | --- |
+| `--plan <file>` | that plan, with the name the app was baked with (`--name` wins over the plan's `name`) |
+| flags (`--raw`, `--laravel`, `--vue`, `--inertia`) | the shape, the name, and all four parts, because every shape wires all four in |
+
+`--dry-run` and a refused bake write nothing, so they save no plan. `--describe` prints a plan and writes nothing (generation from a description is not built yet), so it saves none either; pass its plan with `--plan` and that bake saves it. The plan from the example above is saved as:
+
+```yaml
+# The plan this app was baked from, saved by sourdough new (ADR-0014).
+# It matches Sourdough's plan schema, so it bakes the same shape again:
+#   sourdough new <dir> --plan=.sourdough/plan.yaml
+# Sourdough never rewrites it after the bake: sourdough feed and
+# sourdough manifest --check leave it alone. Commit it with the app.
+
+permutation: raw
+parts:
+  - sesame
+  - helmet
+name: my-app
+models:
+  - name: Post
+    fields:
+      - { name: title, type: string }
+      - { name: body, type: text }
+pages:
+  - /
+  - /posts
+```
+
+The keys are the plan object's, in the same order, and the comment lines are YAML comments, so the file still matches the schema (which allows no extra keys). `--plan` reads a file ending in `.yaml` or `.yml` as YAML and anything else as JSON, through the same schema, so the saved plan bakes the same loaf again:
+
+```bash
+sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+```
+
+#### Neither managed nor seeded[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#neither-managed-nor-seeded)
+
+The saved plan is not in the manifest. The manifest lists the files the template wrote, and the plan is not template output: it is what you asked for. Like the manifest itself and `.sourdough/base/`, it is Sourdough's record about the app, not a file of the app, so it carries neither class:
+
+- `sourdough manifest --check` never reports it, however you edit it.
+- `sourdough feed` never reads, rewrites or removes it. Feed bakes from the shape and answers in the manifest, so an edited plan changes nothing a feed does, and an app baked before the plan was saved (Sourdough 0.1.7 and earlier) gets no plan written for it: feed does not guess at what nobody wrote down.
+
+Edit it as the app grows (a new model, a new page), so it stays the record of what the app is for, and commit it with the manifest.
+
 ### Getting a plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#getting-a-plan)
 
 Instead of choosing flags, describe what the app does and let a model plan it:
@@ -2339,7 +2371,7 @@ Generation from a plan is not built yet in 0.1. Save the plan to a file and pass
 sourdough new my-app --plan plan.json
 ```
 
-`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.
+`--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A YAML plan (`.yaml` or `.yml`) works the same way, and the bake saves the plan as [the saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 #### Model configuration[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#model-configuration)
 
@@ -2644,6 +2676,7 @@ sourdough new my-app --inertia
 | Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.2.0 release SHA (`7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1`, with the tag in a trailing comment), because PROCTOR's `preflight-pinned` check (since 0.4) wants a 40-hex SHA |
 | Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
 | Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
+| Plan | `.sourdough/plan.yaml`: the plan the app was baked from, written after the bake. Not in the manifest, so neither managed nor seeded; feed never touches it. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan) |
 
 Seeded files are `.env.example` and `README.md`: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record `sourdough feed` refreshes, merging in any edits you made. See [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html).
 
@@ -2997,6 +3030,8 @@ Then read the section for the version you are moving to.
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
 
 **Breaking:** none. **Deprecated:** none.
+
+New bakes save their plan in the app as `.sourdough/plan.yaml`, next to the manifest, and `--plan` reads YAML plans as well as JSON, so the saved plan bakes the same loaf again. Commit it with the manifest. Apps you already baked have no saved plan, and feed does not write one: it is not in the manifest, so feed and `manifest --check` never touch it. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 Every shape's `.gitlab-ci.yml` now caches its downloads: Docker Hub images through `${IMAGE_PREFIX}` (the group's Dependency Proxy when the GitLab has one, Docker Hub otherwise) and Composer and npm installs per lock file. See [Dependency caching](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching).
 

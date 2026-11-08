@@ -42,6 +42,8 @@ Then read the section for the version you are moving to.
 
 **Breaking:** none. **Deprecated:** none.
 
+New bakes save their plan in the app as `.sourdough/plan.yaml`, next to the manifest, and `--plan` reads YAML plans as well as JSON, so the saved plan bakes the same loaf again. Commit it with the manifest. Apps you already baked have no saved plan, and feed does not write one: it is not in the manifest, so feed and `manifest --check` never touch it. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
+
 Every shape's `.gitlab-ci.yml` now caches its downloads: Docker Hub images through `${IMAGE_PREFIX}` (the group's Dependency Proxy when the GitLab has one, Docker Hub otherwise) and Composer and npm installs per lock file. See [Dependency caching](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching).
 
 New bakes start on the Squire 0.6.0 deploy kit (was 0.4.0): `scripts/release.sh` asks PROCTOR's deploy gate (`proctor gate`) for a go or no-go before the frontend build and the migrations and keeps the verdict in `storage/squire/` as the next release's baseline. Every shape requires HELMET `^0.4`, SESAME `^0.5` and PROCTOR `^0.7`, and pins the Preflight components to the 0.2.0 release SHA. The raw shapes' `public/index.php` now hands the cas driver a Guzzle client, a request factory and the session, so they sign in with CAS in production (before, the cas driver refused to boot there).

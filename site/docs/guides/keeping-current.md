@@ -111,6 +111,7 @@ Edit the file to what it should be, delete the markers, and run your checks. `gi
 - **Git, and only git.** Feed needs git on PATH (or `SOURDOUGH_GIT` pointing at it), on Windows, macOS and Linux alike. The Laravel shapes also bake on a fresh `laravel/laravel` skeleton through Composer, the same as `sourdough new`, so feeding one needs Composer and the network; Laravel's own skeleton updates arrive as template updates, merged the same way.
 - **Forward only.** A manifest written by a newer Sourdough than the one running is refused (exit `2`). Update Sourdough first: a starter only rises forward.
 - **The answers stay.** Feed bakes with the answers in the manifest (the shape, `--sail` or `--docker`, Playbook and ADVISOR). It does not change them.
+- **The plan is yours.** `.sourdough/plan.yaml`, the plan the app was baked from, is not in the manifest: feed never reads, rewrites or removes it, and never lists it in its plan, so editing it is not drift. An app baked before Sourdough saved its plan gets none written by feed. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 ### Exit codes[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#exit-codes)
 

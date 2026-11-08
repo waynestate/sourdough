@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plan format | Sourdough docs</title>
-<meta name="description" content="The JSON plan format behind resources/plan.schema.json, covering required and optional keys, permutations, parts, models and pages.">
+<meta name="description" content="The plan format behind resources/plan.schema.json, covering required and optional keys, permutations, parts, models, pages, and the .sourdough/plan.yaml every bake saves.">
 <meta name="docs-version" content="0.1.7">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -40,7 +40,7 @@
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="plan-format">Plan format<a class="docs-heading-link" aria-label="Link to this section" href="#plan-format">#</a></h1>
-<p>Reference for the JSON plan that <code>sourdough new --describe</code> asks a model for and <code>sourdough new --plan &lt;file&gt;</code> reads back. Every plan is validated against <code>resources/plan.schema.json</code>. For the flags that produce a plan, see <a href="commands.html">Commands</a>.</p>
+<p>Reference for the plan that <code>sourdough new --describe</code> asks a model for, <code>sourdough new --plan &lt;file&gt;</code> reads back (as JSON, or as YAML), and every bake saves in the app as <code>.sourdough/plan.yaml</code>. Every plan is validated against <code>resources/plan.schema.json</code>. For the flags that produce a plan, see <a href="commands.html">Commands</a>.</p>
 <h2 id="the-plan-object">The plan object<a class="docs-heading-link" aria-label="Link to this section" href="#the-plan-object">#</a></h2>
 <p>A plan is a small JSON object:</p>
 <pre tabindex="0"><code class="language-json">{
@@ -175,6 +175,57 @@
 <p>Each model object has a <code>name</code> and a <code>fields</code> list; each field has a <code>name</code> and a <code>type</code>, both strings, as in the example above.</p>
 <h3 id="pages">Pages<a class="docs-heading-link" aria-label="Link to this section" href="#pages">#</a></h3>
 <p>A list of strings, such as <code>[&quot;/&quot;, &quot;/posts&quot;]</code>.</p>
+<h2 id="the-saved-plan">The saved plan<a class="docs-heading-link" aria-label="Link to this section" href="#the-saved-plan">#</a></h2>
+<p>Every bake saves its plan in the app as <code>.sourdough/plan.yaml</code>, next to the manifest (ADR-0014, decision 3): the recipe card taped inside the jar's lid. It is written after the bake succeeds, on both paths that bake:</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>How you baked</th>
+<th>What the saved plan holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--plan &lt;file&gt;</code></td>
+<td>that plan, with the name the app was baked with (<code>--name</code> wins over the plan's <code>name</code>)</td>
+</tr>
+<tr>
+<td>flags (<code>--raw</code>, <code>--laravel</code>, <code>--vue</code>, <code>--inertia</code>)</td>
+<td>the shape, the name, and all four parts, because every shape wires all four in</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>--dry-run</code> and a refused bake write nothing, so they save no plan. <code>--describe</code> prints a plan and writes nothing (generation from a description is not built yet), so it saves none either; pass its plan with <code>--plan</code> and that bake saves it. The plan from the example above is saved as:</p>
+<pre tabindex="0"><code class="language-yaml"># The plan this app was baked from, saved by sourdough new (ADR-0014).
+# It matches Sourdough's plan schema, so it bakes the same shape again:
+#   sourdough new &lt;dir&gt; --plan=.sourdough/plan.yaml
+# Sourdough never rewrites it after the bake: sourdough feed and
+# sourdough manifest --check leave it alone. Commit it with the app.
+
+permutation: raw
+parts:
+  - sesame
+  - helmet
+name: my-app
+models:
+  - name: Post
+    fields:
+      - { name: title, type: string }
+      - { name: body, type: text }
+pages:
+  - /
+  - /posts
+</code></pre>
+<p>The keys are the plan object's, in the same order, and the comment lines are YAML comments, so the file still matches the schema (which allows no extra keys). <code>--plan</code> reads a file ending in <code>.yaml</code> or <code>.yml</code> as YAML and anything else as JSON, through the same schema, so the saved plan bakes the same loaf again:</p>
+<pre tabindex="0"><code class="language-bash">sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
+</code></pre>
+<h3 id="neither-managed-nor-seeded">Neither managed nor seeded<a class="docs-heading-link" aria-label="Link to this section" href="#neither-managed-nor-seeded">#</a></h3>
+<p>The saved plan is not in the manifest. The manifest lists the files the template wrote, and the plan is not template output: it is what you asked for. Like the manifest itself and <code>.sourdough/base/</code>, it is Sourdough's record about the app, not a file of the app, so it carries neither class:</p>
+<ul>
+<li><code>sourdough manifest --check</code> never reports it, however you edit it.</li>
+<li><code>sourdough feed</code> never reads, rewrites or removes it. Feed bakes from the shape and answers in the manifest, so an edited plan changes nothing a feed does, and an app baked before the plan was saved (Sourdough 0.1.7 and earlier) gets no plan written for it: feed does not guess at what nobody wrote down.</li>
+</ul>
+<p>Edit it as the app grows (a new model, a new page), so it stays the record of what the app is for, and commit it with the manifest.</p>
 <h2 id="getting-a-plan">Getting a plan<a class="docs-heading-link" aria-label="Link to this section" href="#getting-a-plan">#</a></h2>
 <p>Instead of choosing flags, describe what the app does and let a model plan it:</p>
 <pre tabindex="0"><code>sourdough new --describe &quot;A blog with posts and comments&quot;
@@ -186,7 +237,7 @@
 <p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
 <pre tabindex="0"><code>sourdough new my-app --plan plan.json
 </code></pre>
-<p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.</p>
+<p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A YAML plan (<code>.yaml</code> or <code>.yml</code>) works the same way, and the bake saves the plan as <a href="#the-saved-plan">the saved plan</a>.</p>
 <h3 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h3>
 <p><code>--describe</code> needs three environment variables (no defaults, no key in code):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -267,7 +318,7 @@
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/commands.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Commands</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/templates.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Templates</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-plan-object">The plan object</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#permutation-values">Permutation values</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#parts">Parts</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#models">Models</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#pages">Pages</a></li><li class="docs-toc__item"><a href="#getting-a-plan">Getting a plan</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#model-configuration">Model configuration</a></li><li class="docs-toc__item"><a href="#the-steps-plan">The steps plan</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-plan-object">The plan object</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#permutation-values">Permutation values</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#parts">Parts</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#models">Models</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#pages">Pages</a></li><li class="docs-toc__item"><a href="#the-saved-plan">The saved plan</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#neither-managed-nor-seeded">Neither managed nor seeded</a></li><li class="docs-toc__item"><a href="#getting-a-plan">Getting a plan</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#model-configuration">Model configuration</a></li><li class="docs-toc__item"><a href="#the-steps-plan">The steps plan</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.1.7</span></span>
