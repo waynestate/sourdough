@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: BEST_PRACTICES.md marks 18 practices with their true status on main (exit codes, output, kit features off, Boost, the Laravel window, MySQL 5.6, env config, VITE_ secrets, Composer in CI, npm ci, Vite on localhost, the PHP matrix, APP_KEY, CRLF, Docker images, three OSes, templates as archives, boring startup); 9 remain Not yet.
 - Changed: every image in the baked CI files is pinned by digest: composer:2.10.3 now carries its multi-arch list digest, like the Node image already did.
 
 ### Added
