@@ -67,7 +67,7 @@ it('keeps the worker timeout below the queue connection retry_after', function (
     expect(preg_match('/--timeout=(\d+)/', $event->command, $matches))->toBe(1);
     $timeout = (int) $matches[1];
 
-    $retryAfter = config('queue.connections.' . config('queue.default') . '.retry_after');
+    $retryAfter = config('queue.connections.'.config('queue.default').'.retry_after');
 
     if ($retryAfter !== null) {
         expect($timeout)->toBeLessThan((int) $retryAfter);
