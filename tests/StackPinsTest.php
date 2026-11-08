@@ -9,8 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * PROCTOR's released 0.6 line in every composer file that pulls it in,
- * and Inertia 3 on both sides of the Inertia shape. A pin that slips back
+ * the released HELMET 0.4, SESAME 0.5 and PROCTOR 0.7 lines in every
+ * composer file that pulls them in, and Inertia 3 on both sides of the
+ * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
  */
 final class StackPinsTest extends TestCase
@@ -34,11 +35,22 @@ final class StackPinsTest extends TestCase
     }
 
     #[DataProvider('proctorComposerFiles')]
-    public function testEveryShapePinsProctorZeroSix(string $file): void
+    public function testEveryShapePinsProctorZeroSeven(string $file): void
     {
         $composer = $this->readJson($file);
 
-        self::assertSame('^0.6', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+        // 0.7 brings `proctor gate`, the deploy gate Squire 0.6.0's
+        // release.sh asks for; an older PROCTOR falls back to `check`.
+        self::assertSame('^0.7', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+    }
+
+    #[DataProvider('proctorComposerFiles')]
+    public function testEveryShapePinsTheCurrentHelmetAndSesame(string $file): void
+    {
+        $composer = $this->readJson($file);
+
+        self::assertSame('^0.4', $composer['require']['waynestate/helmet'] ?? null, $file);
+        self::assertSame('^0.5', $composer['require']['waynestate/sesame'] ?? null, $file);
     }
 
     /**

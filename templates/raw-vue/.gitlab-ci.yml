@@ -1,16 +1,16 @@
 # PREFLIGHT components, pinned to released Preflight tags. Their image inputs
 # below only add ${IMAGE_PREFIX}; the images are the components' defaults.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
     inputs:
       proctor_command: vendor/bin/proctor check --format=codequality
       image: "${IMAGE_PREFIX}/php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       test_command: vendor/bin/phpunit
       image: "${IMAGE_PREFIX}/php:${PHP_VERSION}-cli-trixie"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@79029cc2300702d0d450c42cc699e12af1b731f8 # 0.1.4
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
     inputs:
       working_dir: .
       image: "${IMAGE_PREFIX}/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
