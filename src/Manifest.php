@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough;
 
+use Waynestate\Sourdough\Feed\Feed;
+
 /**
  * The record Sourdough writes into every app it generates:
  * `.sourdough/manifest.json`.
@@ -150,7 +152,11 @@ final class Manifest
                 continue;
             }
 
-            if (hash_file('sha256', $path) !== $info['sha256']) {
+            // Line endings are forgiven, as feed forgives them: a checkout
+            // whose .gitattributes turns a file to CRLF (the raw shapes'
+            // *.ps1) has not drifted from the LF bytes Sourdough wrote.
+            $content = file_get_contents($path);
+            if (false === $content || !Feed::matches($content, $info['sha256'])) {
                 $changed[] = $relative;
             }
         }

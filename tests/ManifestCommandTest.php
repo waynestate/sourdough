@@ -61,6 +61,27 @@ final class ManifestCommandTest extends TestCase
         self::assertStringContainsString('Clean', $tester->getDisplay());
     }
 
+    /**
+     * The raw shapes' .gitattributes checks *.ps1 out with CRLF, so every
+     * clone of a fresh app has scripts/parity.ps1 in CRLF. That is a
+     * checkout, not an edit: the check forgives line endings, as feed does.
+     */
+    public function testCheckForgivesLineEndings(): void
+    {
+        $target = $this->generateApp();
+        $file = $target . '/scripts/parity.ps1';
+        $lf = (string) file_get_contents($file);
+        self::assertStringNotContainsString("\r\n", $lf);
+        file_put_contents($file, str_replace("\n", "\r\n", $lf));
+
+        $tester = $this->tester();
+        self::assertSame(0, $tester->execute(['dir' => $target, '--check' => true]), $tester->getDisplay());
+
+        file_put_contents($file, str_replace("\n", "\r\n", $lf) . "Write-Host 'edited'\r\n");
+        self::assertSame(1, $tester->execute(['dir' => $target, '--check' => true]));
+        self::assertStringContainsString('changed  scripts/parity.ps1', $tester->getDisplay());
+    }
+
     public function testCheckWithoutTheFlagExitsTwo(): void
     {
         $target = $this->generateApp();

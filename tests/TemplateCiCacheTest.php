@@ -77,7 +77,7 @@ final class TemplateCiCacheTest extends TestCase
         $npm = false;
 
         foreach ($jobs as $name => $body) {
-            if (1 === preg_match('/^    - composer (install|update|require)\b/m', $body)) {
+            if (1 === preg_match('/^    - composer (install|update|require|create-project)\b/m', $body)) {
                 $composer = true;
                 self::assertStringContainsString("  extends: .composer-cache\n", $body, "$shape: $name installs with Composer");
             }
