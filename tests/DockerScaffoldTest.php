@@ -118,7 +118,7 @@ final class DockerScaffoldTest extends TestCase
         }
 
         // The old all-interfaces entry is gone.
-        self::assertStringNotContainsString("'${APP_PORT:-8000}:8000'", $compose);
+        self::assertStringNotContainsString('\'${APP_PORT:-8000}:8000\'', $compose);
         $this->assertYamlStructureHolds($compose);
     }
 
