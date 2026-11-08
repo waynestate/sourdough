@@ -44,7 +44,9 @@ function sourdoughConsoleSchedule(string $mode): Schedule
 }
 
 it('schedules a short queue worker every minute in scheduler mode', function () {
-    $events = sourdoughConsoleSchedule('scheduler')->events();
+    // Filtered: the scheduler also runs the heartbeat closure (WELD W23),
+    // so the full event list carries more than the queue worker.
+    $events = sourdoughQueueWorkerEvents(sourdoughConsoleSchedule('scheduler'));
 
     expect($events)->toHaveCount(1);
 
