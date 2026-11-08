@@ -120,11 +120,11 @@ Seeded files are `.env.example` and `README.md`: Sourdough wrote them once and y
 
 ## The Squire-owned copy (`templates/squire/`)
 
-The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
+The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. The copy is Squire 0.6.0's kit: its `scripts/release.sh` runs PROCTOR's deploy gate (`proctor gate`) right after `composer audit`, before the frontend build and the migrations, and writes the verdict to `storage/squire/proctor-gate.json` (`SQUIRE_PROCTOR_RECORD_DIR`), the baseline the next release is ratcheted against. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
 
 | Command | What it does |
 |---|---|
-| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.4`) |
+| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.6`) |
 | `composer squire-copy:check` | exits 1 when the committed copy has drifted; part of `composer ci` |
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
