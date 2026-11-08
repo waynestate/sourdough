@@ -130,8 +130,10 @@ On Citadel the deploy files from Squire run at release time: `build.sh`
 prepares the image, `deployments/001-first-release.sh` is the one-time
 first-release hook, and `scripts/release.sh` is the idempotent release
 script. They come from Squire's checked copy, so Squire owns them. Refresh
-them with Sourdough, not by hand. Elsewhere, set the env vars above; a
-Dockerfile comes later.
+them with Sourdough, not by hand. Elsewhere, set the env vars above and
+build `.squire/portable.Dockerfile`, Squire's portable image: it runs as a
+non-root user in group 0 on port 8080, for OpenShift, Coolify and raw
+Docker.
 
 ## Laravel Boost
 

@@ -56,14 +56,14 @@ Options:
 - `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in Squire's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of ``)
-- `--no-input` never prompt (Sourdough has no prompts)
+- `--no-input` never prompt (Sourdough 0.1 has no prompts)
 - `--json` with `--dry-run`, print the plan as JSON
 - `--describe ""` describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars)
 - `--plan-only` with `--describe`, print the plan as JSON and write nothing
 - `--plan ` a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves
 - `--playbook` kept for compatibility: Playbook is now the default
 - `--no-playbook` skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook)
-- `--no-advisor` skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore line of its own, no README section; the Laravel shapes still ignore `/.mcp.json` for Laravel Boost)
+- `--no-advisor` skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section)
 
 Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
 
@@ -76,8 +76,6 @@ php vendor/bin/advisor install --client=claude --write
 ```
 
 `--no-advisor` skips all of it.
-
-The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: `laravel/boost` in `require-dev`, a guarded `composer boost-update` after `composer update`, a `.gitignore` block for what `php artisan boost:install` writes (`/.mcp.json`, `/boost.json`, `/CLAUDE.md`, `/AGENTS.md`, `/.claude/skills/`, `/.junie/`), the stack's guidelines and two starter rules in `.ai/`, and `tests/Feature/BoostDevOnlyTest.php`. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See [Laravel Boost, dev only](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/laravel.md#laravel-boost-dev-only).
 
 The app name (from `--name`, from the plan, or from the basename of ``) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
 
@@ -92,8 +90,6 @@ The app name (from `--name`, from the plan, or from the basename of ``) must sta
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
 All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
-
-Every bake takes its PHP floor from CREED's policy, not from a number baked into the template: the oldest PHP line still supported a year after the policy's refresh date (raised to what the Laravel major needs) becomes `require.php`, `config.platform.php` and the start of the CI test matrix. If the policy cannot be read, the bake falls back to the pinned `^8.3` and says so. `sourdough new` prints both a `PHP:` line and a `Support:` line, and every shape has an owner, a support window and a sunset path, so no starter goes stale on the counter. The rules are in [Support and sunset](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/support.md).
 
 Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
 
@@ -253,11 +249,6 @@ Strongly recommended: a git.wayne.edu instance runner.
 Every baked `.gitlab-ci.yml` caches its downloads: Docker Hub images come through the group's GitLab Dependency Proxy
 when the GitLab has one (`IMAGE_PREFIX`, Docker Hub otherwise), and Composer and npm installs are cached per lock
 file. See [Dependency caching](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/ci.md#dependency-caching).
-
-Every baked pipeline also carries three gates from Preflight: an accessibility check of the app's own pages
-(signed in, at WCAG 2.2 AA, blocking), a CycloneDX bill of materials for Composer and, in the front-end shapes, npm,
-and Gitleaks over the repository. A `.deploy` template keeps any deploy job on protected refs, and each generated
-README lists the GitLab settings a file cannot hold. See [CI](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/ci.md#the-accessibility-gate).
 
 ---
 
@@ -690,27 +681,9 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
-- Added: WORKER_HEARTBEAT_MAX_AGE=0 turns the scheduler heartbeat check off, so an app that runs no scheduler still answers 200 on /ready.
-- Added: new bakes take the PHP floor from CREED's `policy.json` (BEST_PRACTICES 4.2, now `Enforced`). Sourdough requires `waynestate/creed` `^0.1` and reads its policy, or the file `SOURDOUGH_POLICY` names. As of the policy's `refreshed_on`, the floor is the oldest PHP line still supported 365 days later, bounded by the Laravel major's PHP range on the Laravel shapes. It is written into `composer.json` (`require.php`, `config.platform.php`), the `.gitlab-ci.yml` matrix and the README on all five shapes. A policy that cannot be read bakes on the pinned fallback (`^8.3`, tested on 8.3, 8.4 and 8.5) and says so. Today's output is unchanged. `sourdough new` prints a `PHP:` line, and `--dry-run --json` gains a `php` object. `tests/PhpFloorTest.php` changes the policy's floor and checks every shape.
-- Added: every shape has an owner role, a support status and a sunset path (BEST_PRACTICES 3.7, now `Checked`). The new "Support and sunset" guide (`docs/guides/support.md`) is the policy (the window lengths are a proposal), and `resources/shapes.json` holds the fields. `sourdough new` prints a `Support:` line with the framework's end of security from CREED, and `--dry-run --json` gains `support`. A deprecated shape prints a notice on every `new` and `feed`, and feeding a removed shape names its replacement. `tests/ShapeSupportTest.php` holds the catalog to the rules.
-- Changed: the Laravel shapes' `config/helmet.php` holds only the app's `policy_path` override, and HELMET's provider merges the rest from the package (BEST_PRACTICES 3.6). The old 403-line copy had fallen behind HELMET: it had no Playbook lookup for `HELMET_PRESET`, and no `session.secure`, metrics storage or warn settings. Feed replaces an unchanged copy, and an edited one gets a conflict to keep your own keys. 3.6 lists the template code still waiting for a library, starting with `config/sesame.php`, which skips Playbook's CAS URL and defaults CAS to protocol 3.0.
-- Added: every shape's pipeline carries three gates from Preflight 0.3.1 (BEST_PRACTICES 4.15, 6.4 and 6.5, now `Enforced`; 3 practices remain `Not yet`). Accessibility: an `a11y-pages` job boots the app with SESAME's fake driver and saves its pages (`/`, plus `/dashboard` signed in on the Laravel shapes), and the `a11y` component checks them at WCAG 2.2 AA, blocking. Bill of materials: the `sbom` component keeps `sbom.cdx.json`, and the front-end shapes' `frontend` job adds `sbom-npm.cdx.json` from CycloneDX's npm tool. Secrets: the `secret-detection` component runs Gitleaks, and a hidden `.deploy` template keeps any future deploy job off merge requests and on protected refs. Each generated README's new "Pipeline" section lists the GitLab settings a file cannot hold. New `tests/TemplateCiGatesTest.php`, plus `testBakedPipelineCarriesTheCiGates` in every generator test, holds all five shapes to it.
-- Added: the Laravel + Blade + Vue islands shape has its own `.gitlab-ci.yml` with a `frontend` job (it used to inherit the Blade pipeline, which never built its front end).
-- Added: the Laravel shapes (Blade, Blade with Vue, Inertia) ship Laravel Boost ^2.10 in require-dev, the stack's guidelines in `.ai/guidelines/wayne-state.md` (managed) and starter rules in `.ai/rules/` (seeded), a `.gitignore` block for what `boost:install` writes (`/.mcp.json`, `/boost.json`, `/AGENTS.md`, `/CLAUDE.md`, `/.claude/skills/`, `/.junie/`; `.agents/` stays tracked for Booster), a guarded `composer boost-update` appended to Laravel's `post-update-cmd`, a README section, and `tests/Feature/BoostDevOnlyTest.php`, which fails when Boost leaves require-dev or packages-dev. `tests/BoostWiringTest.php` holds the wiring; BEST_PRACTICES 2.3 is `Enforced`.
-- Changed: a Laravel bake drops the skeleton's `CLAUDE.md` and `AGENTS.md` when they hold only Laravel's Boost bootstrap block (`boost:install` writes them again); a file with other guidance is kept and stays in git. The overlay merge appends `pre-` and `post-` Composer hooks to the skeleton's instead of replacing them, and a new `gitignore-additions.txt` control file adds ignore lines once.
-- Changed: `--no-advisor` removes only ADVISOR's own `.mcp.json` line; the Laravel shapes keep `/.mcp.json` ignored for Boost.
-- Changed: BEST_PRACTICES.md marks 18 practices with their true status on main (exit codes, output, kit features off, Boost, the Laravel window, MySQL 5.6, env config, VITE\_ secrets, Composer in CI, npm ci, Vite on localhost, the PHP matrix, APP_KEY, CRLF, Docker images, three OSes, templates as archives, boring startup); 9 remain Not yet.
-- Added: every app with a front end ships an `.npmrc` with a one-day npm cooldown (`min-release-age=1`), a `.nvmrc` and `engines.node >=22` in its `package.json`; the shapes without a front end get none of it (BEST_PRACTICES 4.9 and 4.11 are `Checked` by the generator tests).
-- Changed: every image in the baked CI files is pinned by digest: composer:2.10.3 now carries its multi-arch list digest, like the Node image already did.
-
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
-- Added: the Laravel shapes schedule a heartbeat each minute and register HELMET's readiness route at /ready with a scheduler check; while the cache stamp is missing or older than WORKER_HEARTBEAT_MAX_AGE seconds (default 180) /ready answers 503, so a stopped scheduler shows up instead of quietly dropping jobs. /up stays the liveness answer and never looks at the cache (WELD W23).
-- Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).
-- Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid\_\* lines.
-- Fixed: the manifest leaves out database/database.sqlite, so sourdough feed never treats an app's database as a template file and WELD's regen gate does not see it as drift.
-- Fixed: Laravel bakes (blade, blade-vue, inertia) create an empty database/database.sqlite when .env.example uses sqlite, as Laravel's own installer does, so the printed php artisan migrate runs without a prompt.
-- Changed: the scheduled queue worker in the Laravel shapes sets --timeout=45, below the connection's retry_after (Laravel's default 90), and QueueWorkerScheduleTest checks the two (WELD W20).
+- Changed: every shape bakes Squire 0.8.0 (was 0.7.1): generated apps get the portable image (`.squire/portable.Dockerfile` and `.squire/portable/`), one image that runs as web, worker, scheduler or migrate for OpenShift, Coolify and raw Docker, and the READMEs say how to build it.
 - Added: the Laravel shapes can run the queue from the scheduler, for Citadel where nothing supervises a worker: with QUEUE_WORKER_MODE=scheduler (the new .env.example default) routes/console.php starts queue:work --stop-when-empty --max-time=50 --tries=3 every minute with withoutOverlapping(10); QUEUE_WORKER_MODE=none leaves the queue to a supervisor. QueueWorkerScheduleTest covers both (WELD W19).
 - Changed: the local a11y scripts run Preflight's own checker (vendored from 0.3.1 and pinned by a test), so they check what CI checks: axe-core 4.14.0, 320 and 1280 px, and the reflow check.
 - Added: the two Laravel shapes ship tests/Feature/SchedulerNamingTest.php, which fails on any scheduled closure without ->name() (WELD W21).
@@ -725,8 +698,6 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
-- Changed: new bakes require SESAME ^0.6 (was ^0.5); SESAME 0.6.0 has no breaking change for an app that keeps its driver.
-- Docs: the CI guide, MAINTAINING and BEST_PRACTICES name Preflight 0.3.1 (the release the templates pin), and the --no-input help no longer names Sourdough 0.1.
 - Changed: new bakes start on the Squire 0.7.0 deploy kit: the release script restarts queue workers and the scheduler after optimize (report only; SQUIRE_ARTISAN_RESTART=0 turns it off), and the image drops shell functions from the web's PHP (SQUIRE_PHP_DISABLE_FUNCTIONS), turns on production opcache (SQUIRE_OPCACHE_VALIDATE) and reads secrets from /run/secrets. Sourdough's own deploy layer moves too.
 - Changed: every app shape's CI caches Composer and npm downloads under a fixed key, so a lock change downloads only what changed.
 - Changed: HELMET moves to `^1.0`, its first stable release, wherever this repo requires it.
@@ -961,51 +932,7 @@ Strongly recommended: a git.wayne.edu instance runner.
 
 ### On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.3.1 release commit, with the tag in a trailing comment.
-
-### The accessibility gate[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate)
-
-Every shape's pipeline checks the app's own pages in a real browser (BEST_PRACTICES 6.4). Two jobs share the work, so the checking stays Preflight's:
-
-1. `a11y-pages` boots the app the way its first run on a desk does, with SESAME's fake driver: PHP's built-in server for the raw shapes, `php artisan serve` (after `.env`, a key and an SQLite database) for the Laravel shapes. The shapes with a front end wait for the `frontend` job (`needs: [frontend]`) and serve its build. The job copies `public/`'s static files (never its PHP) into `a11y-site/` and saves each path in `A11Y_PATHS` there as `<path>/index.html`, through one cookie jar, so a page behind sign-in is saved signed in. The server's own origin is cut out of the saved pages, so their links work on any port. `A11Y_DATA` (raw + Vue only: `/api/me`) saves the JSON the page fetches as it loads, so the Vue app draws its signed-in view.
-2. Preflight's `a11y` component (`site_dir: a11y-site`, `needs: [a11y-pages]`) opens each page in Chromium with axe-core, light and dark, at 320 and 1280 px, plus the WCAG 1.4.10 reflow check, at WCAG 2.2 AA (WayneUI's floor; the ADA Title II rule names 2.1 AA, which 2.2 AA includes). It blocks: a violation fails the pipeline.
-
-| Shape | `A11Y_PATHS` | What it covers |
-| --- | --- | --- |
-| Raw PHP | `/` | the one page, signed in by the fake driver |
-| Raw PHP + Vue SPA | `/` (and `/api/me` in `A11Y_DATA`) | the Vue app with the signed-in user |
-| Laravel + Blade, Blade + Vue islands, Inertia | `/ /dashboard` | the home page signed out, then the dashboard after `/login` signs in |
-
-In production the sign-in page is the CAS server's own, so the part of the sign-in flow an app draws is the signed-in page it lands on. An app owner adds each new page to `A11Y_PATHS` and to the a11y include's `pages` (the two lists name the same pages; `tests/TemplateCiGatesTest.php` holds the templates to that). Every shape renders pages, so every shape gets the gate; an app that later becomes a pure JSON API with no pages can drop the `a11y` include and the `a11y-pages` and `a11y` jobs together.
-
-Note
-
-Automated checks find only part of the problems. axe-core checks a loaded page; it does not follow a client-side navigation, so focus after a route change and announced route changes in the Vue shapes still need a person with a keyboard and a screen reader. The generated README says so.
-
-### The bill of materials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-bill-of-materials)
-
-Preflight's `sbom` component writes `sbom.cdx.json`, a CycloneDX SBOM of the Composer packages `composer.lock` installs (dev packages left out), and keeps it for 30 days (BEST_PRACTICES 4.15). The shapes with a front end add the npm half in their `frontend` job: `@cyclonedx/cyclonedx-npm`, the CycloneDX project's own tool, pinned to an exact version and run with `--ignore-scripts`, writes `sbom-npm.cdx.json` from what the install put in `node_modules`, dev packages included, because the build tools make the bundle. npm's built-in `npm sbom` refuses a `package.json` without a `version`, which an app's never has. When the next advisory lands, the affected apps are one search per file away. Container image contents are not covered: the shapes build no image in CI.
-
-### Secrets and deploy credentials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#secrets-and-deploy-credentials)
-
-Preflight's `secret-detection` component runs Gitleaks over the checkout and fails on anything shaped like a credential, redacted in the log and in `gitleaks.json`. A freshly baked app of every shape scans clean.
-
-Citadel deploys an app with a Quick Update, so a baked pipeline holds no deploy credential and runs no deploy job (BEST_PRACTICES 6.5). Each shape ships the part a pipeline file can express, a hidden `.deploy` template for the day an app adds a deploy job:
-
-```yaml
-.deploy:
-  stage: deploy
-  resource_group: deploy
-  interruptible: false
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-    - if: $CI_COMMIT_REF_PROTECTED == "true"
-```
-
-A job that extends it never runs for a merge request and runs only on a protected branch or tag, the only refs where GitLab hands a job its protected variables. One deploy runs at a time, and a newer pipeline never cancels one halfway. `tests/TemplateCiGatesTest.php` fails Sourdough's suite when a shape's job deploys (`stage: deploy` or `environment:`) without extending `.deploy`, when a component input references any variable but the GitLab host and `IMAGE_PREFIX`, or when the file sets a variable named like a credential.
-
-The rest are project settings, so each generated README lists them under "Pipeline": protect `main` and the release tags; keep each deploy credential in a protected, masked (or masked and hidden) variable; never put a credential in the file or a component's inputs; keep the job token allowlist on and add other projects by name; read a fork's merge request before running its pipeline in the project; prefer the deploy target's own secret store for anything long-lived. All of it works on GitLab Community Edition. Protected environments, which would add an approval step, are a paid tier feature, so the file does not rely on them.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.0 release commit, with the tag in a trailing comment.
 
 ### Is the app still fed?[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
 
@@ -1042,13 +969,11 @@ To run a component on another image, give its `image` input the plain name, such
 
 **Packages.** `COMPOSER_CACHE_DIR` and `npm_config_cache` point at `.cache/composer/` and `.cache/npm/` inside the project, and every job that installs extends `.composer-cache` (keyed on `composer.lock`) or `.npm-cache` (keyed on `package-lock.json` and `package.json`). A lock change starts a fresh cache, and the install still resolves from the lock, so a cached run never gets a stale package.
 
-The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, which the Dependency Proxy does not front, so it takes no `image_prefix`; the runner's own image cache is what keeps that pull rare.
-
 `tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's own job gains an image without `${IMAGE_PREFIX}/` or an install without its cache, and `tests/PreflightPinTest.php` fails it when a shape pins another Preflight version than the rest, gives a component a prefixed `image`, or leaves out `image_prefix`.
 
 ### On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.1.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.0.
 
 ### What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 
@@ -1449,8 +1374,6 @@ A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sour
 - `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
 - `--inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia 3 pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's `components/ui` imports; Ziggy routes; the stack packages; a `frontend` CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.
 
-All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the stack's guidelines and starter rules in `.ai/` (see [Laravel Boost, dev only](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)).
-
 All five permutations generate in 0.1; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
 ### Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
@@ -1488,37 +1411,9 @@ Warning
 
 A live `/register` route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.
 
-### Laravel Boost, dev only[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)
+### Keep Boost current[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#keep-boost-current)
 
-Every Laravel bake (Blade, Blade with Vue, Inertia) ships [Laravel Boost](https://laravel.com/docs/boost) in `require-dev`: an MCP server, guidelines and skills that teach a coding agent the app's Laravel. Boost is used as published, through its own commands and file layout. Sourdough adds the stack's guidance and the guard rails around it. [ADVISOR](https://github.com/waynestate/advisor) complements Boost, never replaces it: Boost knows Laravel, ADVISOR knows the Wayne State stack.
-
-After `composer install`, each developer wires Boost into their own agent once per checkout:
-
-```bash
-php artisan boost:install
-```
-
-What the bake gives you:
-
-| Piece | Where | In git? |
-| --- | --- | --- |
-| Boost itself | `laravel/boost ^2.10` in `require-dev` | yes (`composer.json`) |
-| The stack's conventions (SESAME, WayneUI, HELMET, MySQL 5.6, Oracle, Squire) | `.ai/guidelines/wayne-state.md`, folded into every agent's file by Boost | yes, managed: `sourdough feed` refreshes it |
-| Starter project rules | `.ai/rules/migrations.md`, `.ai/rules/routes.md` and Boost's `.ai/rules/index.md` | yes, seeded: the team's from the first commit |
-| What `boost:install` writes | `CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `.claude/skills/`, `.junie/`, `boost.json` | no: a `.gitignore` block keeps them out |
-| A refresh after `composer update` | `composer boost-update`, appended to Laravel's `post-update-cmd` | yes |
-| A check that Boost stays a dev tool | `tests/Feature/BoostDevOnlyTest.php` | yes |
-
-Why each choice:
-
-- **`boost.json` is ignored.** It records the agents each developer picked, so it is personal. Boost's docs allow ignoring it.
-- **The refresh is guarded.** Boost's docs suggest `@php artisan boost:update --ansi` in `post-update-cmd`, but `boost:update` exits 1 until `boost:install` has written `boost.json`, and under `composer update --no-dev` the command does not exist. `composer boost-update` runs it only when `vendor/laravel/boost` is installed and `boost.json` names at least one agent (Boost's own precondition; a `boost:install` that found no agent leaves an empty list), and passes its exit code through, so a real failure still fails `composer update`.
-- **The agent files are ignored whole.** Git cannot ignore the generated block inside `CLAUDE.md`, and Boost rewrites that block on every `boost:update`. Team guidance goes in `.ai/guidelines/`, which Boost folds into every agent's file, so nothing is lost.
-- **The skeleton's `CLAUDE.md` and `AGENTS.md` are dropped.** Laravel 13 ships them holding only a bootstrap block that tells an agent to `composer require laravel/boost --dev` (already done) and to install PHP with a remote PowerShell one-liner the stack does not copy. `boost:install` writes them again for the agents you pick. A skeleton file with anything else in it is kept.
-- **`.agents/` stays tracked.** Booster keeps its playbooks in `.agents/skills/`, and Boost writes its Codex, OpenCode, Amp and Antigravity skills there too, so commit what you want to keep from that folder.
-- **Record rules through your agent.** Ask it to "remember" something and Boost's `record-rule` tool files it in `.ai/rules/` and rewrites the index; a rule file added by hand is not found until `php artisan boost:index-rules` runs.
-
-Boost never reaches production. Squire's `scripts/release.sh` and the `--docker` prod target both install with `composer install --no-dev`, which leaves `require-dev` behind, and `BoostDevOnlyTest` fails when `laravel/boost` moves into `require` or the lock file puts it outside `packages-dev`. Boost 2.10 needs PHP 8.2 or newer and Laravel 11.45, 12.41 or 13.
+For the Inertia reference path, install Laravel Boost with `--dev`, and refresh its generated guideline and skill files with `boost:update`; the Boost docs suggest running it from Composer's `post-update-cmd`. Stale agent guidance teaches an agent last year's API. Boost runs on Laravel 10 to 13 with PHP 8.1 or higher. Its docs say the generated `.mcp.json`, guideline files (`CLAUDE.md`, `AGENTS.md`, `junie/`) and `boost.json` may go in `.gitignore`, because `boost:install` and `boost:update` regenerate them; the `.ai/rules` directory (project rules recorded by agents) should be committed.
 
 Warning
 
@@ -1531,10 +1426,6 @@ Laravel gives each major 18 months of bug fixes and two years of security fixes.
 ### Trust the HA-Proxy, not every sender[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#trust-the-ha-proxy-not-every-sender)
 
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
-
-### A stopped scheduler shows up[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#a-stopped-scheduler-shows-up)
-
-Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`) and registers HELMET's readiness route at `/ready` with a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
 
 ### Work on the shared MySQL 5.6[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
 
@@ -1817,91 +1708,6 @@ Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAM
 
 ---
 
-Source: https://sourdough.apps.wayne.edu/docs/guides/support.html
-
-## Support and sunset[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#support-and-sunset)
-
-Starters die quietly when nobody owns them. This page is the policy for Sourdough's five shapes: who owns each one, how long it is supported, and how one is retired without surprising the apps baked from it. Even the best loaf goes stale; the point is to say so before it does.
-
-The facts behind the policy are data, not prose: `resources/shapes.json` holds each shape's owner, status and sunset fields, and `sourdough new --dry-run --json` reports them with the dates the app inherits from CREED.
-
-### Owners[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#owners)
-
-Every shape names an owner role, never a person. Today all five belong to the same role:
-
-| Shape | Owner | Status |
-| --- | --- | --- |
-| `raw` | Sourdough maintainers | supported |
-| `raw-vue` | Sourdough maintainers | supported |
-| `laravel-blade` | Sourdough maintainers | supported |
-| `laravel-blade-vue` | Sourdough maintainers | supported |
-| `laravel-inertia` | Sourdough maintainers | supported |
-
-The Sourdough maintainers are the role that releases Sourdough (Enterprise Applications). The owner keeps the shape green in the smoke and proof jobs, answers its issues, and decides when it is deprecated. A change to the Inertia shape also lands in WELD, which is generated from it, in the same round of work.
-
-### How long a shape is supported[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-long-a-shape-is-supported)
-
-Note
-
-The windows below are a proposal and are not confirmed yet. The rules for marking and announcing a deprecation are in force now.
-
-- A shape is supported while `resources/shapes.json` lists it as `supported`. Only the newest Sourdough release gets fixes; an app stays supported by feeding (`sourdough feed`), which its own `sourdough-feed` CI job reminds it to do.
-- The app inherits its framework's clock. The Laravel shapes generate the newest Laravel major, and CREED's policy holds that major's end of security support (`sourdough new` prints it; for Laravel 13 it is 2028-03-17). Proposal: Sourdough moves the Laravel shapes to a new major within 90 days of its release, so a fed app is never stuck on a major that is about to end.
-- The raw shapes follow PHP alone: their floor comes from CREED (see [The PHP floor](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor)), and `sourdough new` prints that line's end of security support.
-- Proposal: a shape is supported for as long as its framework line has a supported successor that the shape can move to. When it has none, or no one in the owner role can keep it green, it is deprecated as below.
-
-### How a shape is retired[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-a-shape-is-retired)
-
-A retirement is announced one release ahead, the same way Preflight retires a component (see [Preflight: deprecating a component](https://preflight.apps.wayne.edu/docs/guides/deprecation.html)):
-
-1. **Deprecate.** In a release, the shape's entry in `resources/shapes.json` changes to `"status": "deprecated"` with `deprecated_in` (this release), `removed_in` (a later release) and `replacement` (the shape to move to). The CHANGELOG gets a `Deprecated:` bullet naming the shape and its replacement, and the upgrading page says what to do.
-2. **Say so on every run.** From that release, `sourdough new` prints `Deprecated: The <shape> shape is deprecated since Sourdough <x> and is removed in <y>; move to <shape>.` and `sourdough feed` adds the same line to its notes, so every pipeline's `sourdough-feed` job shows it. Nothing fails because of it.
-3. **Keep it bakeable.** The shape keeps baking and feeding for at least one release, and (proposal) at least 6 months after the deprecation release.
-4. **Remove.** In the `removed_in` release the generator goes, and the entry changes to `"status": "removed"`. Feeding an app of that shape stops with the same notice, naming the replacement. Published tags are never moved, so an older Sourdough release still bakes the old shape for anyone who needs it.
-
-`tests/ShapeSupportTest.php` holds the catalog to these rules: every shape Sourdough bakes is listed with an owner; a supported shape carries no sunset fields; a deprecated or removed shape names the release that deprecated it, a later release that removes it, and a replacement Sourdough still bakes; and a removed shape is one Sourdough no longer bakes.
-
-### The fields[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-fields)
-
-`resources/shapes.json`, one entry per shape:
-
-| Field | Meaning |
-| --- | --- |
-| `owner` | the owner role (never a person) |
-| `status` | `supported`, `deprecated` or `removed` |
-| `deprecated_in` | the Sourdough release that deprecated the shape, or `null` |
-| `removed_in` | the release that removes it (later than `deprecated_in`), or `null` |
-| `replacement` | the shape to move to, or `null` |
-
-`sourdough new <dir> --dry-run --json` adds two objects to the plan:
-
-- `support`: the shape's entry plus `policy` (this page) and `runs_on`, the line the app inherits its clock from (`{"component": "laravel", "version": "13", "security_until": "2028-03-17"}` for a Laravel shape, the PHP floor line for a raw one).
-- `php`: the floor the bake writes (`constraint`, `platform`, `versions`), the floor line's `floor_security_until`, and where it came from (`source`, `origin`, `refreshed_on`, `horizon_days`, and `reason` when the fallback was used).
-
-### The PHP floor[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor)
-
-A new app's PHP floor is not a number in a template: Sourdough reads it from CREED's `policy.json` when it bakes, the same file PROCTOR's `php-floor` check reads in the app.
-
-- **Source.** The policy installed with `waynestate/creed` (a Sourdough dependency), or the file the `SOURDOUGH_POLICY` environment variable names.
-- **The rule.** As of the policy's own `refreshed_on` date, look 365 days ahead; the floor is the oldest PHP line CREED's reader still calls supported on that later date. A new app never starts on a line that ends inside its first year. The Laravel shapes raise it to the Laravel major's minimum PHP when that is higher. The policy's date is used, not today's clock, so the same Sourdough and the same policy always bake the same loaf, and the floor moves only when the policy does.
-- **What it writes.** `require.php` (`^8.3`) and `config.platform.php` (`8.3.0`) in `composer.json`; the `php_versions` matrix in `.gitlab-ci.yml` (every line from the floor up that is supported and has a Docker image in the policy, capped at the Laravel major's maximum PHP); the comment above it; and the README's test-suite line.
-- **Fallback.** When the policy cannot be read or does not answer, the bake still works on the pinned values the templates carry (`^8.3`, tested on 8.3, 8.4 and 8.5) and says `pinned fallback` with the reason. A test fails when the policy and the fallback disagree, so the pin is moved with the policy.
-- **Moving an app.** When CREED moves the floor, the next Sourdough release bakes the new one, and `sourdough feed` brings it into apps already baked, merged like any template change.
-
-Note
-
-The 365-day horizon is a proposal. CREED is the natural owner of it; until CREED's policy carries one, the number lives in `src/PhpFloor.php`.
-
-### Related[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#related)
-
-- [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
-- [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html)
-- [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html)
-- [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
-- [CREED: reading the policy](https://creed.apps.wayne.edu/docs/guides/reading-the-policy.html)
-
----
-
 Source: https://sourdough.apps.wayne.edu/docs/guides/testing.html
 
 ## Testing[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#testing)
@@ -2045,17 +1851,22 @@ Generated commands should run and exit on their own, with no prompts and no netw
 
 The US Justice Department's Title II web rule sets WCAG 2.1 Level AA for state and local government web content. An interim final rule published on 2026-04-20 moved the first compliance date to 2027-04-26 for entities of 50,000 people or more and to 2028-04-26 for smaller ones. The standard and the ongoing duty to keep content accessible did not change. Whether and when the rule applies to a given WSU app is not decided here; ask WSU's accessibility office.
 
-What Sourdough ships: every shape's pipeline renders the app's own pages and checks them with Preflight's `a11y` component at WCAG 2.2 AA (which includes 2.1 AA), blocking. The Laravel shapes check the home page signed out and the dashboard signed in through `/login`; the raw shapes check their one page, signed in by SESAME's fake driver, and raw + Vue saves `/api/me` so its Vue app draws the signed-in view. In production the sign-in page itself is the CAS server's. WayneUI's accessible templates are the default markup, and Sourdough's own pipeline runs the same component over every page under `site/`, so the "new app" page passes the gate when it lands there. How the pages are saved is in [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate).
+For Sourdough: each permutation's generated home page and sign-in flow get an automated accessibility check in CI, including the Vue paths (focus after navigation, announced route changes); WayneUI's accessible templates are the default markup; and the "new app" page passes the same gate.
 
 Note
 
-Automated checks find only part of the problems, and every generated README says so. axe-core checks a loaded page, so the Vue paths' focus after navigation and announced route changes still need a person with a keyboard and a screen reader.
+Automated checks find only part of the problems, so the generated README should say so.
 
 ### Protect deploy credentials in the generated pipeline[#](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html#protect-deploy-credentials-in-the-generated-pipeline)
 
-GitLab's docs say masking a variable does not reliably stop a malicious user from reading it; protected variables exist only in pipelines on protected branches and tags; a pipeline for a merge request from a fork should run in the parent project only after review, because malicious code can compromise masked and protected variables; and sensitive values belong in an external secrets manager. A project's job-token allowlist includes only the project itself by default, and GitLab calls disabling it a security risk. From GitLab 19.0 job tokens use the JWT format by default, and the legacy format is available only until 20.0.
+GitLab's docs say masking a variable does not reliably stop a malicious user from reading it; protected variables exist only in pipelines on protected branches and tags; a pipeline for a merge request from a fork should run in the parent project only after review, because malicious code can compromise masked and protected variables; and sensitive values belong in an external secrets manager. A project's job-token allowlist includes only the project itself by default, and GitLab calls disabling it a security risk. From GitLab 19.0 job tokens use the JWT format by default, and the legacy format is available only until 20.0. Which GitLab version WSU runs was not checked.
 
-What Sourdough ships: Citadel deploys by Quick Update, so a generated pipeline holds no credential and runs no deploy job. Each shape carries a `.deploy` template (no merge request pipelines, protected refs only, one deploy at a time) for the day an app adds one, Preflight's `secret-detection` component (Gitleaks) fails a pipeline that commits a credential, and Sourdough's suite fails when a shape's job deploys without `.deploy`, a component input carries a variable other than the host and `IMAGE_PREFIX`, or the file sets a variable named like a credential. The settings a file cannot hold are a checklist in every generated README: protected `main` and tags, protected and masked variables, the job-token allowlist on with projects added by name, fork merge requests read before they run, and the deploy target's own secret store for anything long-lived. Details in [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html#secrets-and-deploy-credentials).
+The generated `.gitlab-ci.yml` should therefore:
+
+- run deploy jobs only on a protected branch or tag with protected variables
+- put no secrets in component `inputs`
+- leave the job-token allowlist on
+- add other projects to it by name when the pipeline must fetch from them
 
 Danger
 
@@ -2238,7 +2049,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 ### CI[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
 - **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
-- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.1.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.0.
 - Green means `composer ci` passed on all three PHP versions on both.
 
 ### Smoke gate[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
@@ -2363,14 +2174,14 @@ sourdough new [dir] [options]
 | `--docker` | generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64) |
 | `--dry-run` | print the plan and write nothing |
 | `--name` | app name (default: the basename of `<dir>`) |
-| `--no-input` | never prompt (Sourdough has no prompts) |
+| `--no-input` | never prompt (Sourdough 0.1 has no prompts) |
 | `--json` | with `--dry-run`, print the plan as JSON |
 | `--describe "<sentence>"` | describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars) |
 | `--plan-only` | with `--describe`, print the plan as JSON and write nothing |
 | `--plan <file>` | a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves |
 | `--playbook` | kept for compatibility: Playbook is now the default |
 | `--no-playbook` | skip the Playbook wiring (for CI and automated tests only; WSU apps need Playbook) |
-| `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore line of its own, no README section; the Laravel shapes still ignore `/.mcp.json` for Laravel Boost) |
+| `--no-advisor` | skip the ADVISOR wiring (no `require-dev` entry, no `.mcp.json` git-ignore, no README section) |
 
 Note
 
@@ -2419,28 +2230,9 @@ php vendor/bin/advisor install --client=claude --write
 
 `--no-advisor` skips all of it.
 
-The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: `laravel/boost` in `require-dev`, a guarded `composer boost-update` after `composer update`, a `.gitignore` block for what `php artisan boost:install` writes (`/.mcp.json`, `/boost.json`, `/CLAUDE.md`, `/AGENTS.md`, `/.claude/skills/`, `/.junie/`), the stack's guidelines and two starter rules in `.ai/`, and `tests/Feature/BoostDevOnlyTest.php`. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See [Laravel Boost, dev only](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only).
-
 #### App name validation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#app-name-validation)
 
 The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
-
-#### PHP floor and support lines[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#php-floor-and-support-lines)
-
-Every plan, dry run or real, prints two lines under `Target:`:
-
-```
-PHP:         PHP ^8.3, tested on 8.3, 8.4 and 8.5 (from waynestate/creed, refreshed 2026-10-29)
-Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security fixes until 2028-03-17
-```
-
-The floor comes from CREED's policy at bake time; when the policy cannot be read, the first line ends `(pinned fallback: <reason>)` and the bake uses the pinned values. A shape that is deprecated also prints `Deprecated: The <shape> shape is deprecated since Sourdough <x> and is removed in <y>; move to <shape>. See <page>` to stderr; it never changes the exit code. With `--dry-run --json` the plan gains a `php` object and a `support` object with the same facts. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
-
-#### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
-
-- `SOURDOUGH_POLICY`: a CREED-format `policy.json` to take the PHP floor from (default: the copy installed with `waynestate/creed`). A file that cannot be read means the pinned fallback, named in the `PHP:` line.
-- `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH).
-- `SOURDOUGH_LLM_BASE_URL`, `SOURDOUGH_LLM_API_KEY`, `SOURDOUGH_LLM_MODEL`: the model `--describe` asks.
 
 #### Next steps printed after generation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#next-steps-printed-after-generation)
 
@@ -2543,13 +2335,12 @@ After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a o
 
 #### JSON[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json)
 
-`--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`. A deprecated shape's notice is one of the `notes` on every run; feeding an app whose shape was removed stops with exit `2` and names the replacement. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
+`--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`.
 
-#### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-1)
+#### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
 
 - `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
-- `SOURDOUGH_POLICY`: the CREED policy the new loaf takes its PHP floor from, as for `sourdough new`. Feed with the same policy the app was baked with, or the floor shows up as a template change.
 
 ### Related[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#related)
 
@@ -2980,21 +2771,19 @@ sourdough new my-app --inertia
 - `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
 - `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`: Squire's release script runs `npm ci` and `npm run build` once `package-lock.json` is committed.
 - Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
-- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`) to the raw pipeline.
 
 #### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
 
 - A fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
 - Ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)`, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
 - The views read the signed-in user as an array (`$user['name']`), because SESAME's `Sesame::user()` returns an array, not an object.
-- `config/helmet.php` holds only the app's own override, `policy_path` (the CREED policy the environment ribbon reads). Every other HELMET setting comes from the package's config, which HELMET's provider merges in, so `composer update` brings new settings and fixes instead of a stale copy hiding them. The other Laravel shapes ship the same file.
 - Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
 
 #### laravel-blade-vue/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade-vue)
 
 - The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
 - Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
-- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm install`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
 #### laravel-inertia/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
@@ -3013,10 +2802,8 @@ sourdough new my-app --inertia
 | Stack packages | HELMET `^1.0`, SESAME `^0.5`, PROCTOR `^0.8` (its `composer proctor` script is plain `proctor check`: PROCTOR refuses `--policy` in CI since 0.6 and finds CREED's released policy in `vendor/waynestate/creed` by itself; 0.7 adds `proctor gate`, which the Squire kit's release script runs; 0.8 fails a deploy script with Windows line endings). The raw shapes also require Guzzle and `nyholm/psr7`, the HTTP client and factory the cas driver checks tickets with |
 | Playbook | `waynestate/playbook` in `require`, the VCS repository, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access |
 | ADVISOR | `waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored (a client config starts a program for whoever opens the project), a README "ADVISOR" section; install with `php vendor/bin/advisor install --client=claude --write` |
-| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.3.1 release SHA (`b90323b5823287a7840095d0d5f0682aaeedf327`, with the tag in a trailing comment), which PROCTOR's `preflight-pinned` check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no `image` inputs, so each component runs its own default image, pinned by digest inside that release, and the ones that pull from Docker Hub pass `image_prefix: "${IMAGE_PREFIX}"`, so the components and the app's own jobs pull through the same Dependency Proxy rule (`a11y` pulls Playwright's image from Microsoft's registry and takes none) |
-| CI gates | every shape's `.gitlab-ci.yml` includes Preflight's `sbom` (Composer SBOM), `secret-detection` (Gitleaks) and `a11y` (axe-core at WCAG 2.2 AA over `a11y-site/`, which the `a11y-pages` job fills by booting the app with SESAME's fake driver and saving each page in `A11Y_PATHS`), and carries a hidden `.deploy` template that runs only on protected refs and never for a merge request. `tests/TemplateCiGatesTest.php` holds all five shapes to it; see [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate) |
+| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.3.1 release SHA (`b90323b5823287a7840095d0d5f0682aaeedf327`, with the tag in a trailing comment), which PROCTOR's `preflight-pinned` check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no `image` inputs, so each component runs its own default image, pinned by digest inside that release, and they pass `image_prefix: "${IMAGE_PREFIX}"`, so the components and the app's own jobs pull through the same Dependency Proxy rule |
 | Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
-| PHP floor | `require.php`, `config.platform.php`, the `.gitlab-ci.yml` test matrix and the README's test-suite line, read from CREED's `policy.json` at bake time (today `^8.3`, `8.3.0`, tested on 8.3, 8.4 and 8.5). The templates carry those values as the pinned fallback for a policy that cannot be read. The Docker base and the Sail runtime stay pinned, and a test holds them to a line the matrix tests. See [The PHP floor](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor) |
 | Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
 | Plan | `.sourdough/plan.yaml`: the plan the app was baked from, written after the bake. Not in the manifest, so neither managed nor seeded; feed never touches it. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan) |
 
@@ -3374,10 +3161,6 @@ Then read the section for the version you are moving to.
 **Breaking:** for apps you feed, in one case only. The fed `composer.json` moves PROCTOR to `^0.8`, whose `crlf-deploy-script` check fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF). Such a script was already broken on the Linux host; convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.8 also adds `mysql-eol`, which only warns. **Deprecated:** none.
 
 **Steps:** in each app, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/proctor --with-all-dependencies`, then `vendor/bin/proctor check`. See [PROCTOR's upgrading notes](https://proctor.apps.wayne.edu/docs/upgrading.html).
-
-**Laravel shapes: `config/helmet.php` shrinks to the app's own override.** Feed brings a short `config/helmet.php` that sets only `policy_path`; every other HELMET setting comes from the package's own config. If you never changed the file, feed replaces it and nothing else changes, except that the app now gets HELMET's current defaults: `HELMET_PRESET` can come from Playbook, a set-but-empty `HELMET_PROXIES` trusts no proxy (as HELMET documents), and the newer settings (`HELMET_SESSION_SECURE`, `HELMET_WARN_DEBUG`, the metrics storage) work. If you changed it, feed marks a conflict: keep only the keys you changed, each with the package's whole value for that key, and drop the rest. The full list is in `vendor/waynestate/helmet/config/helmet.php`.
-
-**New bakes take their PHP floor from CREED.** Nothing changes for an app today: the floor is still `^8.3`, tested on 8.3, 8.4 and 8.5. When CREED's policy moves the floor, the next Sourdough release bakes the new one and feed brings it in. `sourdough new` prints the floor, where it came from and the shape's support line; see [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html). **Deprecated:** none.
 
 ### 0.2.0 (2026-11-08)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-2-0-2026-11-08)
 

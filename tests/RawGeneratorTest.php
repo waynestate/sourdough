@@ -317,7 +317,7 @@ final class RawGeneratorTest extends TestCase
             self::assertStringContainsString('`' . $var . '`', $readme);
         }
         self::assertStringContainsString('scripts/release.sh', $readme);
-        self::assertStringContainsString('Dockerfile comes later', $readme);
+        self::assertStringContainsString('.squire/portable.Dockerfile', $readme);
     }
 
     public function testInstallsSquireDeployFilesAtCatalogPaths(): void
@@ -344,6 +344,11 @@ final class RawGeneratorTest extends TestCase
             '.squire/vhost.conf',
             '.squire/fallback/citadel-apache-entrypoint',
             '.squire/fallback/citadel-deploy',
+            '.squire/portable.Dockerfile',
+            '.squire/portable.Dockerfile.dockerignore',
+            '.squire/portable/ports.conf',
+            '.squire/portable/squire-entrypoint.sh',
+            '.squire/portable/vhost.conf',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }

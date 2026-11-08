@@ -338,6 +338,11 @@ final class LaravelBladeGeneratorTest extends TestCase
             '.squire/Dockerfile',
             '.squire/php.ini',
             '.squire/vhost.conf',
+            '.squire/portable.Dockerfile',
+            '.squire/portable.Dockerfile.dockerignore',
+            '.squire/portable/ports.conf',
+            '.squire/portable/squire-entrypoint.sh',
+            '.squire/portable/vhost.conf',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }
