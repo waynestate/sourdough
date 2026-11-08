@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Changed: the smoke jobs download Composer 2.10.3 and Node 22.23.4 once into a CI cache, check each sha256, and reuse them, instead of fetching both from the internet in every job (D-072).
 - Changed: the deploy layer and the templates/squire copy run Squire's kit 0.7.1 (was 0.7.0): .squire/php.ini no longer sets the deprecated session.sid_* lines.
 - Fixed: the manifest leaves out database/database.sqlite, so sourdough feed never treats an app's database as a template file and WELD's regen gate does not see it as drift.
 - Fixed: Laravel bakes (blade, blade-vue, inertia) create an empty database/database.sqlite when .env.example uses sqlite, as Laravel's own installer does, so the printed php artisan migrate runs without a prompt.
