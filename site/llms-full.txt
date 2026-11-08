@@ -53,7 +53,7 @@ Options:
 - `--vue` add a Vue front end
 - `--inertia` use Inertia/Vue (implies `--laravel`)
 - `--sail` run the Laravel app on Sail for local work: compose.yaml and laravel/sail in require-dev, MySQL 8.4 LTS; needs WSL2 on Windows, where `--docker` is the route that works natively
-- `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in SQUIRE's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
+- `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in Squire's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of ``)
 - `--no-input` never prompt (Sourdough 0.1 has no prompts)
@@ -1252,7 +1252,7 @@ With `--docker`, the production build takes Playbook's credentials as a BuildKit
 docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 ```
 
-The `FROM` lines in the generated `Dockerfile` are the single place to swap in SQUIRE's Citadel-parity image when it exists.
+The `FROM` lines in the generated `Dockerfile` are the single place to swap in Squire's Citadel-parity image when it exists.
 
 ### Sign-in stays SESAME[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
 
@@ -3069,13 +3069,13 @@ A pipeline that passes `--policy` or `--today` to PROCTOR fails with exit `2` on
 
 ### 0.1.0 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-1-0-2026-10-29)
 
-**Breaking:** the raw template's own `deployments/release.sh` and `deployments/release.ps1` were removed; the release steps now come from SQUIRE. The raw app installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
+**Breaking:** the raw template's own `deployments/release.sh` and `deployments/release.ps1` were removed; the release steps now come from Squire. The raw app installs Squire's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. Squire owns them; Sourdough copies them as-is and records them in the manifest.
 
 **Deprecated:** none.
 
-**Steps:** run `composer install`. For maintainers of this repository, mount a Squire checkout (or set `SQUIRE_PATH`, default `/squire`) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The SQUIRE template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch).
+**Steps:** run `composer install`. For maintainers of this repository, mount a Squire checkout (or set `SQUIRE_PATH`, default `/squire`) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The Squire template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch).
 
-**How to verify:** `composer squire-copy:check` exits 0 when the copy matches a fresh export from the SQUIRE checkout.
+**How to verify:** `composer squire-copy:check` exits 0 when the copy matches a fresh export from the Squire checkout.
 
 Tip
 

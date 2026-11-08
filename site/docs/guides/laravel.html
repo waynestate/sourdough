@@ -64,7 +64,7 @@
 <p>With <code>--docker</code>, the production build takes Playbook's credentials as a BuildKit secret, never a build arg:</p>
 <pre tabindex="0"><code class="language-bash">docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 </code></pre>
-<p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the single place to swap in SQUIRE's Citadel-parity image when it exists.</p>
+<p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the single place to swap in Squire's Citadel-parity image when it exists.</p>
 <h2 id="sign-in-stays-sesame">Sign-in stays SESAME<a class="docs-heading-link" aria-label="Link to this section" href="#sign-in-stays-sesame">#</a></h2>
 <p>Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>A live <code>/register</code> route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.</p></aside>

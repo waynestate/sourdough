@@ -45,7 +45,7 @@ With `--docker`, the production build takes Playbook's credentials as a BuildKit
 docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 ```
 
-The `FROM` lines in the generated `Dockerfile` are the single place to swap in SQUIRE's Citadel-parity image when it exists.
+The `FROM` lines in the generated `Dockerfile` are the single place to swap in Squire's Citadel-parity image when it exists.
 
 ## Sign-in stays SESAME[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
 
