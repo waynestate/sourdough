@@ -16,13 +16,13 @@ Strongly recommended: a git.wayne.edu instance runner.
 
 ## On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.0 release commit, with the tag in a trailing comment.
 
 ## Dependency caching[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
 
 A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's `.gitlab-ci.yml` keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.
 
-**Images.** Each job's image is `${IMAGE_PREFIX}/<image>`, digest pins kept. `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's [GitLab Dependency Proxy](https://docs.gitlab.com/user/packages/dependency_proxy/) (`$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX`) when the GitLab has one. The runner signs in to the proxy on its own; the proxy asks Docker Hub once and serves its copy after that. The Preflight components' `image` inputs carry the same prefix in front of the components' own default images.
+**Images.** Each job's image is `${IMAGE_PREFIX}/<image>`, digest pins kept. `IMAGE_PREFIX` defaults to `docker.io`, and a `workflow:` rule sets it to the group's [GitLab Dependency Proxy](https://docs.gitlab.com/user/packages/dependency_proxy/) (`$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX`) when the GitLab has one. The runner signs in to the proxy on its own; the proxy asks Docker Hub once and serves its copy after that. The Preflight components (0.3.0 and later) put a prefix in front of their own default images themselves, through their `image_prefix` input; every shape hands them `image_prefix: "${IMAGE_PREFIX}"`, so components and jobs follow the same rule. The shapes pass no `image` input, so each component runs the default image its pinned release carries, pinned by digest.
 
 ```yaml
 workflow:
@@ -38,9 +38,13 @@ variables:
 
 On a group whose proxy is turned off, set `IMAGE_PREFIX` to `docker.io` in **Settings > CI/CD > Variables**: a project variable beats the file's own.
 
+Warning
+
+To run a component on another image, give its `image` input the plain name, such as `php:8.4-cli-trixie@sha256:<digest>`, never `${IMAGE_PREFIX}/php:...`. The component already adds `image_prefix` in front, so a prefixed image is pulled from a path that does not exist and the job fails before it starts.
+
 **Packages.** `COMPOSER_CACHE_DIR` and `npm_config_cache` point at `.cache/composer/` and `.cache/npm/` inside the project, and every job that installs extends `.composer-cache` (keyed on `composer.lock`) or `.npm-cache` (keyed on `package-lock.json` and `package.json`). A lock change starts a fresh cache, and the install still resolves from the lock, so a cached run never gets a stale package.
 
-`tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's pipeline gains an image without `${IMAGE_PREFIX}/` or an install without its cache.
+`tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's own job gains an image without `${IMAGE_PREFIX}/` or an install without its cache, and `tests/PreflightPinTest.php` fails it when a shape pins another Preflight version than the rest, gives a component a prefixed `image`, or leaves out `image_prefix`.
 
 ## On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 

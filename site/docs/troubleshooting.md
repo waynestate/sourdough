@@ -186,9 +186,9 @@ Exits 0 when the committed copy matches.
 
 ### PROCTOR's `preflight-pinned` check warns on a bare tag[#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#proctor-s-preflight-pinned-check-warns-on-a-bare-tag)
 
-Cause: PROCTOR 0.4's `preflight-pinned` check wants a 40-hex SHA and warns on a bare tag. New apps pin the Preflight CI components to the 0.2.0 release SHA (`7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1`, with the tag in a trailing comment).
+Cause: PROCTOR 0.4 to 0.7's `preflight-pinned` check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as `@0.3.0`, and still warns on a branch, `~latest` or a partial version such as `0.3`). New apps pin the Preflight CI components to the 0.3.0 release SHA (`23038dfe767f6ef60e3b2efca1128f53d9acdff7`, with the tag in a trailing comment), which every PROCTOR accepts.
 
-Fix: pin the Preflight component includes to the release SHA, not the tag. Moving a pin is a deliberate commit.
+Fix: pin the Preflight component includes to the release SHA, with the tag in a trailing comment. Moving a pin is a deliberate commit.
 
 Check:
 
