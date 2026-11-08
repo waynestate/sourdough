@@ -66,6 +66,12 @@ variables.
 Set both in the environment before you deploy. A starter without its flour
 will not rise.
 
+The cas driver checks each ticket with the CAS server through Guzzle (10
+second timeout, no redirects, TLS verification on), and it only accepts a
+ticket for a sign-in this browser started: before it sends you to CAS it
+leaves a marker in the session, so `public/index.php` hands SESAME and the
+driver the same `NativeSession`.
+
 ## Health check
 
 HELMET answers the load balancer's ping at `/up` with `200 ok`, without

@@ -163,13 +163,21 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString("'attributes' => ['cn' => ['John Doe']]", $index);
         self::assertStringContainsString('Config::fromArray(', $index);
 
-        // The driver comes from the factory, not a direct FakeDriver.
-        self::assertStringContainsString('DriverFactory::make($config)', $index);
+        // The driver comes from the factory, not a direct FakeDriver. The
+        // cas driver needs a PSR-18 client and a PSR-17 factory to check the
+        // ticket, and (SESAME 0.5) the app's session for its pending-login
+        // marker, so the factory gets all three.
+        self::assertStringContainsString('DriverFactory::make($config, http: $http, requests: new Psr17Factory(), session: $session)', $index);
+        self::assertStringContainsString("'timeout' => 10", $index);
+        self::assertStringContainsString("'allow_redirects' => false", $index);
         self::assertStringNotContainsString('new FakeDriver(', $index);
 
-        // new Sesame(driver, resolver, session, config): four arguments.
+        // new Sesame(driver, resolver, session, config): four arguments, and
+        // the session is the one the driver got.
+        self::assertStringContainsString('$session = new NativeSession();', $index);
         self::assertMatchesRegularExpression(
-            '/new Sesame\(\s*DriverFactory::make\(\$config\),\s*new class implements UserResolver \{[\s\S]*?\},\s*new NativeSession\(\),\s*\$config,\s*\);/',
+            '/new Sesame\(\s*DriverFactory::make\(\$config, [^
+]*session: \$session\),\s*new class implements UserResolver \{[\s\S]*?\},\s*\$session,\s*\$config,\s*\);/',
             $index,
         );
 
@@ -392,8 +400,9 @@ final class RawGeneratorTest extends TestCase
         // PROCTOR 0.4's preflight-pinned check wants a 40-hex SHA, so the
         // components pin Preflight's release commit, with the tag in a
         // trailing comment.
-        self::assertStringContainsString('79029cc2300702d0d450c42cc699e12af1b731f8', $ci);
+        self::assertStringContainsString('7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0', $ci);
         self::assertStringNotContainsString('@0.1.0', $ci);
+        self::assertStringNotContainsString('79029cc2300702d0d450c42cc699e12af1b731f8', $ci);
     }
 
     public function testGeneratedAppShipsItsPhpunitFiles(): void
@@ -492,8 +501,8 @@ final class RawGeneratorTest extends TestCase
 
         // The rest of the require section is untouched.
         self::assertSame('^8.3', $composer['require']['php']);
-        self::assertSame('^0.3', $composer['require']['waynestate/helmet']);
-        self::assertSame('^0.4', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.4', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
     }
 
     public function testRequireModeAddsComposerPlaybookScript(): void

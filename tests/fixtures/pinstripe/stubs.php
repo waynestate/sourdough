@@ -31,7 +31,7 @@ namespace Waynestate\Sesame {
         public function findOrImportUser(Identity $identity): mixed;
     }
 
-    interface Session
+    interface SessionPort
     {
     }
 
@@ -53,8 +53,15 @@ namespace Waynestate\Sesame {
 
     final class DriverFactory
     {
-        public static function make(Config $config): Driver
-        {
+        public static function make(
+            Config $config,
+            ?object $http = null,
+            ?object $requests = null,
+            ?object $clock = null,
+            ?object $replayGuard = null,
+            ?object $jwksCache = null,
+            ?SessionPort $session = null,
+        ): Driver {
             throw new \RuntimeException('stub');
         }
     }
@@ -64,7 +71,7 @@ namespace Waynestate\Sesame {
         public function __construct(
             Driver $driver,
             UserResolver $userResolver,
-            Session $sessionStore,
+            SessionPort $session,
             Config $config,
         ) {
         }
@@ -73,9 +80,27 @@ namespace Waynestate\Sesame {
 
 namespace Waynestate\Sesame\Session {
 
-    // The real SESAME keeps the interface at Waynestate\Sesame\Session and
-    // this class one level down, in a namespace of the same name.
-    final class NativeSession implements \Waynestate\Sesame\Session
+    // The real SESAME keeps the interface at Waynestate\Sesame\SessionPort
+    // and this class one level down, in Waynestate\Sesame\Session.
+    final class NativeSession implements \Waynestate\Sesame\SessionPort
+    {
+    }
+}
+
+namespace GuzzleHttp {
+
+    final class Client
+    {
+        /** @param array<string, mixed> $config */
+        public function __construct(array $config = [])
+        {
+        }
+    }
+}
+
+namespace Nyholm\Psr7\Factory {
+
+    final class Psr17Factory
     {
     }
 }

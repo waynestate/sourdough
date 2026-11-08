@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use GuzzleHttp\Client;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Waynestate\Sesame\Config;
 use Waynestate\Sesame\DriverFactory;
 use Waynestate\Sesame\Identity;
@@ -122,15 +124,31 @@ if ([] !== $sessionLimits) {
 
 $config = Config::fromArray($sesameConfig);
 
+// One session port for SESAME and its driver: the cas driver keeps a
+// pending-login marker in it before it sends the browser to CAS, so a
+// ticket is only accepted for a sign-in this browser started (SESAME 0.5).
+$session = new NativeSession();
+
+// The cas driver checks each ticket with the CAS server over a PSR-18
+// client. Guzzle has no total timeout by default, so set one; redirects
+// stay off (SESAME treats any non-200 answer as a failed sign-in) and TLS
+// verification stays on. The fake driver ignores both.
+$http = new Client([
+    'timeout' => 10,
+    'connect_timeout' => 5,
+    'allow_redirects' => false,
+    'verify' => true,
+]);
+
 $sesame = new Sesame(
-    DriverFactory::make($config),
+    DriverFactory::make($config, http: $http, requests: new Psr17Factory(), session: $session),
     new class implements UserResolver {
         public function findOrImportUser(Identity $identity): mixed
         {
             return $identity->username;
         }
     },
-    new NativeSession(),
+    $session,
     $config,
 );
 sesame($sesame);

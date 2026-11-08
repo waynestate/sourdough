@@ -33,6 +33,11 @@ return [
         'base_url' => env('SESAME_CAS_BASE_URL'),
         'service_url' => env('SESAME_CAS_SERVICE_URL'),
         'protocol' => env('SESAME_CAS_PROTOCOL', '3.0'),
+        // SESAME 0.5 binds each sign-in to the browser that started it, so a
+        // ticket is only accepted for a login this session began. Leave on;
+        // off only for an app that must accept a ticket for a login it did
+        // not start (a link from the CAS login page), which opens login CSRF.
+        'require_pending_login' => env('SESAME_CAS_REQUIRE_PENDING_LOGIN', true),
     ],
 
     /*

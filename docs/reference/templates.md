@@ -106,10 +106,10 @@ sourdough new my-app --inertia
 
 | Part | What lands in the app |
 |---|---|
-| Stack packages | HELMET `^0.3`, SESAME `^0.4`, PROCTOR `^0.6` (its `composer proctor` script is plain `proctor check`: PROCTOR 0.6 refuses `--policy` in CI and finds CREED's released policy in `vendor/waynestate/creed` by itself) |
+| Stack packages | HELMET `^0.4`, SESAME `^0.5`, PROCTOR `^0.7` (its `composer proctor` script is plain `proctor check`: PROCTOR refuses `--policy` in CI since 0.6 and finds CREED's released policy in `vendor/waynestate/creed` by itself; 0.7 adds `proctor gate`, which the Squire kit's release script runs). The raw shapes also require Guzzle and `nyholm/psr7`, the HTTP client and factory the cas driver checks tickets with |
 | Playbook | `waynestate/playbook` in `require`, the VCS repository, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access |
 | ADVISOR | `waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored (a client config starts a program for whoever opens the project), a README "ADVISOR" section; install with `php vendor/bin/advisor install --client=claude --write` |
-| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.1.4 release SHA (`79029cc2300702d0d450c42cc699e12af1b731f8`, with the tag in a trailing comment), because PROCTOR's `preflight-pinned` check (since 0.4) wants a 40-hex SHA |
+| Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.2.0 release SHA (`7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1`, with the tag in a trailing comment), because PROCTOR's `preflight-pinned` check (since 0.4) wants a 40-hex SHA |
 | Oracle | wired but dormant: `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Laravel apps check the wiring with `php artisan oracle:check` |
 | Manifest | `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` |
 
