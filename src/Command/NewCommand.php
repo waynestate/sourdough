@@ -58,7 +58,7 @@ final class NewCommand extends Command
             ->addOption('docker', null, InputOption::VALUE_NONE, 'Generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64).')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the plan and write nothing.')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The app name (default: the basename of dir).')
-            ->addOption('no-input', null, InputOption::VALUE_NONE, 'Never prompt. Sourdough 0.1 has no prompts, so this is accepted and documented.')
+            ->addOption('no-input', null, InputOption::VALUE_NONE, 'Never prompt. Sourdough has no prompts, so this is accepted and documented.')
             ->addOption('json', null, InputOption::VALUE_NONE, 'With --dry-run, print the plan as JSON.')
             ->addOption('describe', null, InputOption::VALUE_REQUIRED, 'Describe what the app does in a sentence; a model plans it. Needs the SOURDOUGH_LLM_* env vars.')
             ->addOption('plan-only', null, InputOption::VALUE_NONE, 'With --describe, print the plan as JSON and write nothing.')
