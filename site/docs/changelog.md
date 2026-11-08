@@ -12,6 +12,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
+
+- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
+
 ### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
 - Changed: the `--docker` setup publishes its ports on 127.0.0.1 only, so the dev server and Vite are not reachable from the network (SOURDOUGH-25).
@@ -35,7 +39,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-7-2026-11-07)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-1)
 
 - Added: `sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what the app changed (ADR-0014, decision 4). It bakes the app's shape again with the answers in its manifest and goes file by file: files the template did not change are left alone, untouched managed files take the new version, files both sides changed are three-way merged by `git merge-file`, same-line changes get git's conflict markers (`<<<<<<< app` ... `>>>>>>> sourdough <version>`) and never a silent overwrite, new template files are added, dropped ones are removed only when untouched, binary files are never merged (the template's copy lands as `<file>.sourdough-new`), and seeded files are never touched. The base for a merge is found by its manifest hash, in `.sourdough/base/` (the template's version of each changed managed file, kept by the previous feed) or anywhere in the app's git history; with no base, both versions are marked. Feed then moves the manifest to the new base. It runs only on a clean git tree, refuses while the last feed's markers are unresolved, and refuses a manifest from a newer Sourdough. `--dry-run` prints the plan and writes nothing (exit `0` fresh, `1` feeding would change files, so it works as a CI gate), `--json` prints the plan for machines; a real feed exits `0` fed cleanly, `1` fed with conflicts, `2` tool error. It needs git and nothing else. Every shape is covered by `tests/FeedCommandTest.php`, and the smoke gate now checks that a fresh bake of each shape has nothing to feed.
 - Added: the proof harness, `scripts/proof.sh` (Linux, macOS) and `scripts/proof.ps1` (Windows), and the Proof page (`docs/reference/proof.md`) with its dated Last run table. In Docker, one after another, it runs the smoke gate on all five shapes and on every Laravel shape with `--sail` and with `--docker` (eleven runs), and feeds a bake of the last release (read from this changelog) forward in each. It writes `proof-out/last-run.md`, a summary and every step log, and exits `1` when any run fails. A GitLab `proof` job runs it by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push, and keeps the results as an artifact. `tests/ProofHarnessTest.php` keeps the two scripts, the gate, the CI job and the table listing the same runs.
@@ -65,7 +69,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.6 (2026-11-06)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-6-2026-11-06)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-1)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-2)
 
 - Added: the site accessibility gate: `scripts/a11y.sh` (Git Bash, Linux, macOS) and `scripts/a11y.ps1` (Windows) run axe-core (WCAG 2.2 AA) in Docker over every committed HTML page under `site/`, in light and dark at 360 px and 1280 px.
 - Added: `sourdough new --raw --vue` bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then `templates/raw-vue/` over it: a front controller that answers JSON under `/api/` (`/api/me` returns the signed-in user, or `401` instead of sending a `fetch()` to CAS) and sends the Vue page for `/` (and for any other path, with a `404`); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from `@waynestate/wayne-ui-vue` and `@waynestate/wayne-ui-css` 2.0.8, pinned exactly as in the Inertia shape; and `src/Vite.php`, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while `npm run dev` runs (and adds it to the CSP, never in production). Its Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`. The `--raw --vue` plan no longer ends in "not available in this release", and a `smoke-raw-vue` CI job bakes the shape and checks `/`, `/api/me` and `/up` on a live server. All five loaves bake now.
@@ -121,7 +125,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.5 (2026-11-03)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-5-2026-11-03)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-2)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-3)
 
 - Added: `sourdough new --laravel` bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan serve`. One more loaf on the bench.
 - Added: `sourdough new --inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `npm install`, `npm run build`, `php artisan serve`. Three of the five loaves bake now.
@@ -159,7 +163,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.4 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-4-2026-10-29)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-3)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-4)
 
 - Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
 
@@ -177,13 +181,13 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.3 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-3-2026-10-29)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-4)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-5)
 
 - `sourdough new` wires PLAYBOOK into generated apps. By default the app's `composer.json` gets a `suggest` for `waynestate/playbook`, `.env.example` lists the seven WSU shared setting names, the README gains a "WSU values (PLAYBOOK)" section, and the command prints a hint line pointing at it. `--playbook` adds the VCS repository and requires `waynestate/playbook` `^0.1`; `--no-playbook` skips all of it; the two flags together are refused with exit 1.
 
 ## 0.1.2 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-2-2026-10-29)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-5)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-6)
 
 - `sourdough new` validates the app name before writing anything: it must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters (`RawGenerator::assertValidName`). Hostile names (quotes, backslashes, newlines, NUL bytes, placeholders, path traversal, overlong or empty names) are refused with exit 1 and write nothing.
 
@@ -199,7 +203,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## 0.1.0 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-0-2026-10-29)
 
-### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-6)
+### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-7)
 
 - The raw app now installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
 - `composer squire-copy:check`: verify that `templates/squire/` still matches a fresh export from the SQUIRE checkout (`SQUIRE_PATH`, default `/squire`). Skips with exit 0 when no checkout is mounted.

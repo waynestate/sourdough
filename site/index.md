@@ -256,7 +256,7 @@ Hand it to your agent
 
 ## Recipes for your agent
 
-Two prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask you before it guesses. The Laravel shapes bake now too; their prompts join the rack when they do.
+Three prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
 
 ### Get started with Sourdough
 
@@ -318,6 +318,38 @@ Constraints:
 - Ask me before you guess, and before you touch anything that deploys.
 
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
+```
+
+### Bake a Laravel app with Sourdough
+
+Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+
+Read first:
+- https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
+- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs for sourdough answer from the stack's own docs, and policy_lookup gives today's PHP support from CREED. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
+
+Task:
+1. Check that PHP 8.3 or newer and Composer are on the PATH, and say which versions you found.
+2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
+3. Ask me which shape I want: Blade (`--laravel`), Blade with Vue islands (`--laravel --vue`) or Inertia/Vue (`--inertia`), and whether I want `--sail` or `--docker` for the local runtime. Then bake the app with `sourdough new my-app` and those flags, using the folder name I give you in place of my-app, and change into it.
+4. Run `composer install`, then `cp .env.example .env`, `php artisan key:generate` and `php artisan migrate`. For the islands and Inertia shapes, run `npm install` and `npm run build` before serving. With `--sail` or `--docker` the bake prints the oven's own Next steps; follow those when they differ.
+5. Wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then serve the app with `php artisan serve`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+6. Run `sourdough manifest --check` in the app and report what it says.
+
+Constraints:
+- The app requires waynestate/playbook, WSU's private shared-values package on git.wayne.edu; the settings in .env.example come from it. If the bake refuses because this machine cannot read the package, tell me; do not pass --no-playbook, which is for CI and automated tests only.
+- .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
+- The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
+- Never commit .env, and never paste a secret into a prompt or a file.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- Ask me before you guess: a folder name, a shape or an oven I have not named, or anything that touches a deploy.
+
+Output: what you ran and what it said, the app's files one level deep, then your questions.
 ```
 
 The agent reads the same pages you do: [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://sourdough.apps.wayne.edu/llms-full.txt) holds them all in one file, and this page has a [Markdown twin](https://sourdough.apps.wayne.edu/index.md). Nothing here phones home. The buttons only copy text or open the tool you picked.

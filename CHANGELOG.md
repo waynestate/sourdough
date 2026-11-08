@@ -5,6 +5,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Added
+
+- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
+
 ### Changed
 
 - Changed: the `--docker` setup publishes its ports on 127.0.0.1 only, so the dev server and Vite are not reachable from the network (SOURDOUGH-25).

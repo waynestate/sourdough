@@ -19,7 +19,7 @@ An agent that fetches `llms.txt` gets a map; it then fetches only the pages it n
 
 ## Recipes for your agent
 
-The front page carries two prompts under [Recipes for your agent](../index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask before it guesses.
+The front page carries three prompts under [Recipes for your agent](../index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask before it guesses.
 
 ![The Recipes for your agent section: two recipe cards, Get started with Sourdough and Check what has drifted in a Sourdough app, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](agent-ready/agents-1440.png)
 
@@ -30,6 +30,10 @@ Installs Sourdough, bakes a raw PHP app, fetches WayneUI's standalone file, serv
 ### Recipe No. 2: Check what has drifted in a Sourdough app
 
 Runs `sourdough manifest --check` in an app Sourdough baked, lists the managed files that changed since Sourdough wrote them, and proposes what to put back. It changes nothing, and seeded files never count as drift.
+
+### Recipe No. 3: Bake a Laravel app with Sourdough
+
+Installs Sourdough, bakes one of the three Laravel shapes (Blade, Blade with Vue islands or Inertia/Vue) with the oven the developer chooses, serves it locally and runs the manifest check. The prompt points the agent at `llms.txt` first, then walks it through `composer global require waynestate/sourdough`, `sourdough new my-app` with the shape and oven flags, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `npm install` and `npm run build` for the Vue shapes, ADVISOR wiring, `php artisan serve` and `sourdough manifest --check`.
 
 ![Recipe No. 1 with the OpenCode button chosen: the prompt rendered as a PowerShell command beside a bash or zsh tab, with a Copy command button](agent-ready/prompt-run-opencode-1440.png)
 

@@ -477,7 +477,7 @@ Hand it to your agent
 
 ### Recipes for your agent
 
-Two prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask you before it guesses. The Laravel shapes bake now too; their prompts join the rack when they do.
+Three prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
 
 #### Get started with Sourdough
 
@@ -541,6 +541,38 @@ Constraints:
 Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
 ```
 
+#### Bake a Laravel app with Sourdough
+
+Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+
+Read first:
+- https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
+- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs for sourdough answer from the stack's own docs, and policy_lookup gives today's PHP support from CREED. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
+
+Task:
+1. Check that PHP 8.3 or newer and Composer are on the PATH, and say which versions you found.
+2. Install the starter with `composer global require waynestate/sourdough`. If the sourdough command is then not found, add the folder that `composer global config bin-dir --absolute` prints to the PATH.
+3. Ask me which shape I want: Blade (`--laravel`), Blade with Vue islands (`--laravel --vue`) or Inertia/Vue (`--inertia`), and whether I want `--sail` or `--docker` for the local runtime. Then bake the app with `sourdough new my-app` and those flags, using the folder name I give you in place of my-app, and change into it.
+4. Run `composer install`, then `cp .env.example .env`, `php artisan key:generate` and `php artisan migrate`. For the islands and Inertia shapes, run `npm install` and `npm run build` before serving. With `--sail` or `--docker` the bake prints the oven's own Next steps; follow those when they differ.
+5. Wire in ADVISOR with `php vendor/bin/advisor install --client=claude --write`, then serve the app with `php artisan serve`, and tell me to open http://localhost:8000. Locally SESAME signs in with its fake driver.
+6. Run `sourdough manifest --check` in the app and report what it says.
+
+Constraints:
+- The app requires waynestate/playbook, WSU's private shared-values package on git.wayne.edu; the settings in .env.example come from it. If the bake refuses because this machine cannot read the package, tell me; do not pass --no-playbook, which is for CI and automated tests only.
+- .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
+- The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
+- Never commit .env, and never paste a secret into a prompt or a file.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- Ask me before you guess: a folder name, a shape or an oven I have not named, or anything that touches a deploy.
+
+Output: what you ran and what it said, the app's files one level deep, then your questions.
+```
+
 The agent reads the same pages you do: [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://sourdough.apps.wayne.edu/llms-full.txt) holds them all in one file, and this page has a [Markdown twin](https://sourdough.apps.wayne.edu/index.md). Nothing here phones home. The buttons only copy text or open the tool you picked.
 
 The rest of the bakery
@@ -592,7 +624,7 @@ An agent that fetches `llms.txt` gets a map; it then fetches only the pages it n
 
 ### Recipes for your agent[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipes-for-your-agent)
 
-The front page carries two prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and both tell it to ask before it guesses.
+The front page carries three prompts under [Recipes for your agent](https://sourdough.apps.wayne.edu/index.html#agents), ready for OpenCode, Claude Code, Codex CLI or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask before it guesses.
 
 ![The Recipes for your agent section: two recipe cards, Get started with Sourdough and Check what has drifted in a Sourdough app, each with its prompt text, a Copy prompt button and Run it in buttons for OpenCode, Claude Code, Codex CLI and ChatGPT](https://sourdough.apps.wayne.edu/docs/agent-ready/agents-1440.png)
 
@@ -603,6 +635,10 @@ Installs Sourdough, bakes a raw PHP app, fetches WayneUI's standalone file, serv
 #### Recipe No. 2: Check what has drifted in a Sourdough app[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-2-check-what-has-drifted-in-a-sourdough-app)
 
 Runs `sourdough manifest --check` in an app Sourdough baked, lists the managed files that changed since Sourdough wrote them, and proposes what to put back. It changes nothing, and seeded files never count as drift.
+
+#### Recipe No. 3: Bake a Laravel app with Sourdough[#](https://sourdough.apps.wayne.edu/docs/agent-ready.html#recipe-no-3-bake-a-laravel-app-with-sourdough)
+
+Installs Sourdough, bakes one of the three Laravel shapes (Blade, Blade with Vue islands or Inertia/Vue) with the oven the developer chooses, serves it locally and runs the manifest check. The prompt points the agent at `llms.txt` first, then walks it through `composer global require waynestate/sourdough`, `sourdough new my-app` with the shape and oven flags, `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `npm install` and `npm run build` for the Vue shapes, ADVISOR wiring, `php artisan serve` and `sourdough manifest --check`.
 
 ![Recipe No. 1 with the OpenCode button chosen: the prompt rendered as a PowerShell command beside a bash or zsh tab, with a Copy command button](https://sourdough.apps.wayne.edu/docs/agent-ready/prompt-run-opencode-1440.png)
 
@@ -617,6 +653,10 @@ Source: https://sourdough.apps.wayne.edu/docs/changelog.html
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic Versioning once 1.0 is out.
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
+
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
+
+- Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
 
 #### Changed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
@@ -641,7 +681,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.7 (2026-11-07)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-7-2026-11-07)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-1)
 
 - Added: `sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what the app changed (ADR-0014, decision 4). It bakes the app's shape again with the answers in its manifest and goes file by file: files the template did not change are left alone, untouched managed files take the new version, files both sides changed are three-way merged by `git merge-file`, same-line changes get git's conflict markers (`<<<<<<< app` ... `>>>>>>> sourdough <version>`) and never a silent overwrite, new template files are added, dropped ones are removed only when untouched, binary files are never merged (the template's copy lands as `<file>.sourdough-new`), and seeded files are never touched. The base for a merge is found by its manifest hash, in `.sourdough/base/` (the template's version of each changed managed file, kept by the previous feed) or anywhere in the app's git history; with no base, both versions are marked. Feed then moves the manifest to the new base. It runs only on a clean git tree, refuses while the last feed's markers are unresolved, and refuses a manifest from a newer Sourdough. `--dry-run` prints the plan and writes nothing (exit `0` fresh, `1` feeding would change files, so it works as a CI gate), `--json` prints the plan for machines; a real feed exits `0` fed cleanly, `1` fed with conflicts, `2` tool error. It needs git and nothing else. Every shape is covered by `tests/FeedCommandTest.php`, and the smoke gate now checks that a fresh bake of each shape has nothing to feed.
 - Added: the proof harness, `scripts/proof.sh` (Linux, macOS) and `scripts/proof.ps1` (Windows), and the Proof page (`docs/reference/proof.md`) with its dated Last run table. In Docker, one after another, it runs the smoke gate on all five shapes and on every Laravel shape with `--sail` and with `--docker` (eleven runs), and feeds a bake of the last release (read from this changelog) forward in each. It writes `proof-out/last-run.md`, a summary and every step log, and exits `1` when any run fails. A GitLab `proof` job runs it by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push, and keeps the results as an artifact. `tests/ProofHarnessTest.php` keeps the two scripts, the gate, the CI job and the table listing the same runs.
@@ -671,7 +711,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.6 (2026-11-06)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-6-2026-11-06)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-1)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-2)
 
 - Added: the site accessibility gate: `scripts/a11y.sh` (Git Bash, Linux, macOS) and `scripts/a11y.ps1` (Windows) run axe-core (WCAG 2.2 AA) in Docker over every committed HTML page under `site/`, in light and dark at 360 px and 1280 px.
 - Added: `sourdough new --raw --vue` bakes a raw PHP + Vue SPA over JSON app, the fifth and last shape. The raw template comes first (HELMET, the session and SESAME boot the same way, Squire's deploy files, Pinstripe, PROCTOR, Playbook and ADVISOR wiring), then `templates/raw-vue/` over it: a front controller that answers JSON under `/api/` (`/api/me` returns the signed-in user, or `401` instead of sending a `fetch()` to CAS) and sends the Vue page for `/` (and for any other path, with a `404`); Vue 3 and Vite with WayneUI's Vue components and its layered dist stylesheet from `@waynestate/wayne-ui-vue` and `@waynestate/wayne-ui-css` 2.0.8, pinned exactly as in the Inertia shape; and `src/Vite.php`, a small tested reader for Vite's manifest that prints the tags with HELMET's CSP nonce, or points at the dev server while `npm run dev` runs (and adds it to the CSP, never in production). Its Next steps: `composer install`, `npm install`, `npm run build`, `composer serve`. The `--raw --vue` plan no longer ends in "not available in this release", and a `smoke-raw-vue` CI job bakes the shape and checks `/`, `/api/me` and `/up` on a live server. All five loaves bake now.
@@ -727,7 +767,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.5 (2026-11-03)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-5-2026-11-03)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-2)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-3)
 
 - Added: `sourdough new --laravel` bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan serve`. One more loaf on the bench.
 - Added: `sourdough new --inertia` bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest. Its Next steps suit the shape: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `npm install`, `npm run build`, `php artisan serve`. Three of the five loaves bake now.
@@ -765,7 +805,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.4 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-4-2026-10-29)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-3)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-4)
 
 - Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
 
@@ -783,13 +823,13 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.3 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-3-2026-10-29)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-4)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-5)
 
 - `sourdough new` wires PLAYBOOK into generated apps. By default the app's `composer.json` gets a `suggest` for `waynestate/playbook`, `.env.example` lists the seven WSU shared setting names, the README gains a "WSU values (PLAYBOOK)" section, and the command prints a hint line pointing at it. `--playbook` adds the VCS repository and requires `waynestate/playbook` `^0.1`; `--no-playbook` skips all of it; the two flags together are refused with exit 1.
 
 ### 0.1.2 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-2-2026-10-29)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-5)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-6)
 
 - `sourdough new` validates the app name before writing anything: it must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters (`RawGenerator::assertValidName`). Hostile names (quotes, backslashes, newlines, NUL bytes, placeholders, path traversal, overlong or empty names) are refused with exit 1 and write nothing.
 
@@ -805,7 +845,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### 0.1.0 (2026-10-29)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-1-0-2026-10-29)
 
-#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-6)
+#### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added-7)
 
 - The raw app now installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
 - `composer squire-copy:check`: verify that `templates/squire/` still matches a fresh export from the SQUIRE checkout (`SQUIRE_PATH`, default `/squire`). Skips with exit 0 when no checkout is mounted.

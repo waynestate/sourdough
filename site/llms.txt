@@ -34,6 +34,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 
 - [Get started with Sourdough](https://sourdough.apps.wayne.edu/#prompt-get-started): Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
 - [Check what has drifted in a Sourdough app](https://sourdough.apps.wayne.edu/#prompt-manifest): Lists the managed files that changed since Sourdough wrote them, shows what a feed would bring in, and suggests what to put back. It changes nothing. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
+- [Bake a Laravel app with Sourdough](https://sourdough.apps.wayne.edu/#prompt-laravel): Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check. The prompt itself is in https://sourdough.apps.wayne.edu/index.md.
 
 ## Source
 
