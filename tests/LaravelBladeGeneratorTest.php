@@ -466,6 +466,22 @@ final class LaravelBladeGeneratorTest extends TestCase
         );
     }
 
+    /**
+     * Every app refuses to boot production with APP_DEBUG on: the debug
+     * page shows stack traces and environment values to anyone.
+     */
+    public function testShipsTheProductionDebugGuard(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Support/ProductionDebug.php');
+        self::assertFileExists($target . '/tests/Feature/ProductionDebugTest.php');
+        self::assertStringContainsString(
+            'ProductionDebug::refuseIn(',
+            (string) file_get_contents($target . '/app/Providers/AppServiceProvider.php'),
+        );
+    }
+
     private function generate(bool $advisor = true, PlaybookMode $playbook = PlaybookMode::Suggest): string
     {
         $target = $this->makeTempDir();

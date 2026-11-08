@@ -497,6 +497,22 @@ final class LaravelInertiaGeneratorTest extends TestCase
     }
 
     /**
+     * Every app refuses to boot production with APP_DEBUG on: the debug
+     * page shows stack traces and environment values to anyone.
+     */
+    public function testShipsTheProductionDebugGuard(): void
+    {
+        $target = $this->generate();
+
+        self::assertFileExists($target . '/app/Support/ProductionDebug.php');
+        self::assertFileExists($target . '/tests/Feature/ProductionDebugTest.php');
+        self::assertStringContainsString(
+            'ProductionDebug::refuseIn(',
+            (string) file_get_contents($target . '/app/Providers/AppServiceProvider.php'),
+        );
+    }
+
+    /**
      * WayneUI is the only component source (WELD's BEST_PRACTICES W2): the
      * Inertia shape draws with WayneUI, pinned exactly, and carries none of
      * the Tailwind kit it started from.
