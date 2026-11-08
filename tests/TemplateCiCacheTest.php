@@ -90,14 +90,14 @@ final class TemplateCiCacheTest extends TestCase
         self::assertTrue($composer, "$shape: no job installs with Composer");
         self::assertStringContainsString('COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"', $ci);
         self::assertStringContainsString(
-            ".composer-cache:\n  cache:\n    key: composer\n    paths: [.cache/composer/]\n",
+            ".composer-cache:\n  cache:\n    key: composer\n    paths: [.cache/composer/]\n    when: always\n",
             $ci,
         );
         self::assertStringNotContainsString("    key:\n      files:", $ci, "$shape: the cache key is fixed, not a lock-file hash");
         if ($npm) {
             self::assertStringContainsString('npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"', $ci);
             self::assertStringContainsString(
-                ".npm-cache:\n  cache:\n    key: npm\n    paths: [.cache/npm/]\n",
+                ".npm-cache:\n  cache:\n    key: npm\n    paths: [.cache/npm/]\n    when: always\n",
                 $ci,
             );
         }

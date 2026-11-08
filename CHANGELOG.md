@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- Changed: every app shape's CI saves its Composer and npm caches even when a job fails, so a retry after a dropped download fetches only what is missing (D-072).
 - Fixed: the Laravel shapes' ProductionDebugTest passes the app's own Pint check and every case asserts something.
 - Added: Laravel apps (Blade, Blade with Vue, Inertia) refuse to boot in production with APP_DEBUG on (ProductionDebug, beside the dummy-key guard).
 - Fixed: the docs menu closes with Escape and hands focus back to its button (docs kit synced from Squire).
