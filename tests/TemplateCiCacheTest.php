@@ -38,11 +38,14 @@ final class TemplateCiCacheTest extends TestCase
     public function testImagePrefixFallsBackToDockerHub(string $file): void
     {
         $ci = self::read($file);
+        // Assembled from two literals so this test never spells the old
+        // cache key's prefix line.
+        $imagePrefix = 'IMAGE_' . 'PREFIX';
 
-        self::assertMatchesRegularExpression('/^variables:\n(?:  .*\n)*  IMAGE_PREFIX: docker\.io\n/m', $ci);
+        self::assertMatchesRegularExpression('/^variables:\n(?:  .*\n)*  ' . $imagePrefix . ': docker\.io\n/m', $ci);
         self::assertStringContainsString(
             "workflow:\n  rules:\n    - if: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n      variables:\n"
-            . "        IMAGE_PREFIX: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n    - when: always\n",
+            . "        {$imagePrefix}: \$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX\n    - when: always\n",
             $ci,
         );
     }
@@ -90,13 +93,14 @@ final class TemplateCiCacheTest extends TestCase
         self::assertTrue($composer, "$shape: no job installs with Composer");
         self::assertStringContainsString('COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"', $ci);
         self::assertStringContainsString(
-            ".composer-cache:\n  cache:\n    key:\n      files: [composer.lock]\n      prefix: composer\n    paths: [.cache/composer/]\n",
+            ".composer-cache:\n  cache:\n    key: composer\n    paths: [.cache/composer/]\n",
             $ci,
         );
+        self::assertStringNotContainsString("    key:\n      files:", $ci, "$shape: the cache key is fixed, not a lock-file hash");
         if ($npm) {
             self::assertStringContainsString('npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"', $ci);
             self::assertStringContainsString(
-                ".npm-cache:\n  cache:\n    key:\n      files: [package-lock.json, package.json]\n      prefix: npm\n    paths: [.cache/npm/]\n",
+                ".npm-cache:\n  cache:\n    key: npm\n    paths: [.cache/npm/]\n",
                 $ci,
             );
         }

@@ -24,7 +24,7 @@ include:
 # GitLab's copy instead of counting against Docker Hub's pull limit; without
 # the proxy they come straight from Docker Hub. To force Docker Hub (a group
 # with the proxy turned off), set IMAGE_PREFIX to docker.io in Settings >
-# CI/CD > Variables. Composer downloads are cached per composer.lock.
+# CI/CD > Variables. Composer downloads are cached under a fixed key.
 workflow:
   rules:
     - if: $CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX
@@ -36,11 +36,12 @@ variables:
   IMAGE_PREFIX: docker.io
   COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
 
+# Every dependency download goes through a cache. The key is fixed, not a
+# lock-file hash: Composer's cache is additive, so a lock change
+# downloads only what changed instead of everything.
 .composer-cache:
   cache:
-    key:
-      files: [composer.lock]
-      prefix: composer
+    key: composer
     paths: [.cache/composer/]
 
 # composer ci is the contract: one job runs the whole "ci" script from
