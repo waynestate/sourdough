@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Added
 
+- CI runs Preflight's a11y component (0.3.1) on site/, every page in light and dark at 320 and 1280 px with the WCAG 1.4.10 reflow check, blocking.
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.3.1 (b90323b; fixed cache keys, and caches saved even when a job fails; D-072).
 - Added: the Laravel shapes (Blade, Blade with Vue, Inertia) test that a POST without a CSRF token gets 419, and that a matching token or a same-origin request passes (CsrfTest, WELD W27).
 - Changed: every app shape's CI saves its Composer and npm caches even when a job fails, so a retry after a dropped download fetches only what is missing (D-072).
