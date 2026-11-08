@@ -37,9 +37,11 @@ Development happens on git.wayne.edu, the canonical repository ([enterprise-apps
 With only Docker (the same lines work in PowerShell and sh):
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
+
+The `stack-composer-cache` volume keeps Composer's downloads between runs; Docker creates it the first time.
 
 `composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
 

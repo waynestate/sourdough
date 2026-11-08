@@ -84,14 +84,15 @@
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>.</p>
 <h2 id="with-only-docker">With only Docker<a class="docs-heading-link" aria-label="Link to this section" href="#with-only-docker">#</a></h2>
 <p>The same lines work in PowerShell and sh:</p>
-<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
+<p>The <code>stack-composer-cache</code> volume keeps Composer's downloads between runs; Docker creates it the first time.</p>
 <h2 id="from-the-repo-root">From the repo root<a class="docs-heading-link" aria-label="Link to this section" href="#from-the-repo-root">#</a></h2>
-<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer install --no-interaction
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2 composer install --no-interaction
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli vendor/bin/phpunit
-docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2 composer validate --strict
+docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2 composer validate --strict
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 </code></pre>
 <h2 id="the-smoke-gate">The smoke gate<a class="docs-heading-link" aria-label="Link to this section" href="#the-smoke-gate">#</a></h2>
