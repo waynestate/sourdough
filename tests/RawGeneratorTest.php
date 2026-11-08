@@ -505,7 +505,7 @@ final class RawGeneratorTest extends TestCase
 
         // The rest of the require section is untouched.
         self::assertSame('^8.3', $composer['require']['php']);
-        self::assertSame('^0.4', $composer['require']['waynestate/helmet']);
+        self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
         self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
         // The cas driver's PSR-18 client and PSR-17 factory.
         self::assertSame('^7.9 || ^8.0', $composer['require']['guzzlehttp/guzzle']);

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * the released HELMET 0.4, SESAME 0.5 and PROCTOR 0.7 lines in every
+ * the released HELMET 1.0, SESAME 0.5 and PROCTOR 0.8 lines in every
  * composer file that pulls them in, and Inertia 3 on both sides of the
  * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
@@ -50,7 +50,7 @@ final class StackPinsTest extends TestCase
     {
         $composer = $this->readJson($file);
 
-        self::assertSame('^0.4', $composer['require']['waynestate/helmet'] ?? null, $file);
+        self::assertSame('^1.0', $composer['require']['waynestate/helmet'] ?? null, $file);
         self::assertSame('^0.5', $composer['require']['waynestate/sesame'] ?? null, $file);
     }
 
