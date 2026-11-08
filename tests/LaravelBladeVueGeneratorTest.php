@@ -100,7 +100,7 @@ final class LaravelBladeVueGeneratorTest extends TestCase
 
         // The blade overlay's stack packages land...
         self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
-        self::assertSame('^0.4', $composer['require']['waynestate/helmet']);
+        self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
         // ...while the skeleton's own packages survive the merge.
         self::assertSame('^13.17', $composer['require']['laravel/framework']);
         self::assertSame('^8.3', $composer['require']['php']);
