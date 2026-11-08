@@ -34,11 +34,14 @@ use Waynestate\Sourdough\PlaybookMode;
  *
  * The overlay replaces the skeleton's files where it ships its own (the
  * routes, the config, the views) and adds the rest, with {{app_name}} and
- * {{app_slug}} replaced as in the raw template. Its two control files are
+ * {{app_slug}} replaced as in the raw template. Its three control files are
  * applied, not copied: composer.overlay.json merges into the app's
  * composer.json (require and require-dev entries added, the overlay winning
- * a clash, scripts keys added, config deep-merged with the app keeping its
- * own keys), and env-additions.txt appends to the app's .env.example.
+ * a clash, scripts keys added, Composer's event hooks appended to the
+ * skeleton's, scripts-descriptions added, config deep-merged with the app
+ * keeping its own keys), env-additions.txt appends to the app's
+ * .env.example, and gitignore-additions.txt appends the lines the app's
+ * .gitignore does not have yet.
  *
  * The generator refuses an existing non-empty target dir and writes nothing
  * outside the target dir. A good starter rises on its own.
@@ -55,6 +58,23 @@ abstract class LaravelOverlayGenerator
     public const SEEDED_FILES = [
         '.env.example',
         'README.md',
+        // Boost's project rules are the team's from the first commit: Boost
+        // rewrites the index whenever an agent records a rule, so a feed
+        // must never put the starter rules back over the team's.
+        '.ai/rules/index.md',
+        '.ai/rules/migrations.md',
+        '.ai/rules/routes.md',
+    ];
+
+    /**
+     * The overlay files that are applied to the app, not copied into it.
+     *
+     * @var list<string>
+     */
+    private const CONTROL_FILES = [
+        'composer.overlay.json',
+        'env-additions.txt',
+        'gitignore-additions.txt',
     ];
 
     private readonly GeneratorSupport $support;
@@ -116,6 +136,32 @@ abstract class LaravelOverlayGenerator
     protected function removeSkeletonLeftovers(string $targetDir): void {}
 
     /**
+     * Drop the skeleton's CLAUDE.md and AGENTS.md while they hold only
+     * Laravel's Boost bootstrap block. That block tells an agent to run
+     * `composer require laravel/boost --dev`, which the overlay has already
+     * done, and to install PHP with a remote PowerShell one-liner the stack
+     * does not copy (BEST_PRACTICES 5.5). `php artisan boost:install`
+     * writes both files again for the agents a developer picks, and the
+     * Boost block in .gitignore keeps them out of git. A file with anything
+     * outside that block is the skeleton's own guidance and stays.
+     */
+    private function removeBoostBootstrap(string $targetDir): void
+    {
+        foreach (['CLAUDE.md', 'AGENTS.md'] as $file) {
+            $path = $targetDir . '/' . $file;
+            if (!is_file($path)) {
+                continue;
+            }
+            $content = trim((string) file_get_contents($path));
+            if (str_starts_with($content, '<laravel-boost-guidelines>') && str_ends_with($content, '</laravel-boost-guidelines>')
+                && 1 === substr_count($content, '<laravel-boost-guidelines>')
+            ) {
+                unlink($path);
+            }
+        }
+    }
+
+    /**
      * Generate the app named $name into $targetDir.
      *
      * @param array<string, string|bool> $answers  each option the user chose, recorded in the manifest
@@ -151,10 +197,12 @@ abstract class LaravelOverlayGenerator
         }
 
         $this->removeSkeletonLeftovers($targetDir);
+        $this->removeBoostBootstrap($targetDir);
 
         foreach ($this->overlayDirs() as $overlayDir) {
             $this->mergeComposerOverlay($targetDir, $overlayDir);
             $this->appendEnvAdditions($targetDir, $overlayDir);
+            $this->appendGitignoreAdditions($targetDir, $overlayDir);
         }
 
         // The PHP floor and test matrix come from CREED's policy, bounded by
@@ -178,9 +226,9 @@ abstract class LaravelOverlayGenerator
 
     /**
      * Copy one overlay tree over the skeleton, replacing files, with
-     * {{app_name}} and {{app_slug}} replaced in contents and names. The two
-     * control files (composer.overlay.json and env-additions.txt) stay out
-     * of the app; they are applied by the next two steps.
+     * {{app_name}} and {{app_slug}} replaced in contents and names. The
+     * control files (CONTROL_FILES) stay out of the app; they are applied
+     * by the steps after the copy.
      *
      * @throws \RuntimeException when a file cannot be read or written
      */
@@ -193,7 +241,7 @@ abstract class LaravelOverlayGenerator
                 continue;
             }
 
-            if ('composer.overlay.json' === $item || 'env-additions.txt' === $item) {
+            if (in_array($item, self::CONTROL_FILES, true)) {
                 continue;
             }
 
@@ -221,11 +269,13 @@ abstract class LaravelOverlayGenerator
     /**
      * Merge one overlay's composer.overlay.json into the app's
      * composer.json: the require and require-dev entries are added (the
-     * overlay wins a clash), the scripts keys are added, and config is
-     * deep-merged so the app keeps its own config (a platform.php pin,
-     * plugin allowances) while the overlay wins a clash on the same key.
-     * Written pretty-printed with unescaped slashes and a trailing newline.
-     * An overlay that ships no control file is skipped.
+     * overlay wins a clash), the scripts keys are added, Composer's event
+     * hooks (pre-* and post-* scripts) are appended to the skeleton's
+     * rather than replacing them, scripts-descriptions are added, and
+     * config is deep-merged so the app keeps its own config (a platform.php
+     * pin, plugin allowances) while the overlay wins a clash on the same
+     * key. Written pretty-printed with unescaped slashes and a trailing
+     * newline. An overlay that ships no control file is skipped.
      *
      * @throws \RuntimeException when a file cannot be read, parsed or written
      */
@@ -269,7 +319,40 @@ abstract class LaravelOverlayGenerator
         if (!is_array($addedScripts)) {
             throw new \RuntimeException('composer.overlay.json has no usable scripts section.');
         }
-        $composer['scripts'] = array_merge($scripts, $addedScripts);
+        foreach ($addedScripts as $key => $command) {
+            // An event hook is a list the skeleton already fills (Laravel's
+            // post-update-cmd publishes its assets): the overlay adds its
+            // own hooks after the skeleton's instead of dropping them.
+            if (is_string($key) && 1 === preg_match('/^(pre|post)-/', $key) && isset($scripts[$key])) {
+                $hooks = array_values(array_merge((array) $scripts[$key], (array) $command));
+                $scripts[$key] = array_values(array_unique($hooks));
+                continue;
+            }
+            $scripts[$key] = $command;
+        }
+        $composer['scripts'] = $scripts;
+
+        $addedDescriptions = $overlay['scripts-descriptions'] ?? [];
+        if (is_array($addedDescriptions) && [] !== $addedDescriptions) {
+            $descriptions = $composer['scripts-descriptions'] ?? [];
+            if (!is_array($descriptions)) {
+                throw new \RuntimeException(sprintf('"%s" has no usable scripts-descriptions section.', $composerPath));
+            }
+            $merged = array_merge($descriptions, $addedDescriptions);
+            if (array_key_exists('scripts-descriptions', $composer)) {
+                $composer['scripts-descriptions'] = $merged;
+            } else {
+                // A new section sits right after scripts, where readers look for it.
+                $ordered = [];
+                foreach ($composer as $key => $value) {
+                    $ordered[$key] = $value;
+                    if ('scripts' === $key) {
+                        $ordered['scripts-descriptions'] = $merged;
+                    }
+                }
+                $composer = $ordered;
+            }
+        }
 
         $addedConfig = $overlay['config'] ?? [];
         if (is_array($addedConfig) && [] !== $addedConfig) {
@@ -323,6 +406,63 @@ abstract class LaravelOverlayGenerator
 
         if (false === file_put_contents($envPath, $existing . "\n" . $additions)) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $envPath));
+        }
+    }
+
+    /**
+     * Append one overlay's gitignore-additions.txt to the app's .gitignore:
+     * the comment lines always travel with the block, and an ignore line is
+     * written only when the skeleton's .gitignore does not carry it yet, so
+     * a Laravel release that starts ignoring the same file never doubles
+     * it. An overlay that ships no control file, or an app without a
+     * .gitignore, is skipped.
+     *
+     * @throws \RuntimeException when a file cannot be read or written
+     */
+    private function appendGitignoreAdditions(string $targetDir, string $overlayDir): void
+    {
+        $additionsPath = $overlayDir . '/gitignore-additions.txt';
+        $gitignorePath = $targetDir . '/.gitignore';
+        if (!is_file($additionsPath) || !is_file($gitignorePath)) {
+            return;
+        }
+
+        $additions = file_get_contents($additionsPath);
+        if (false === $additions) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $additionsPath));
+        }
+        $existing = file_get_contents($gitignorePath);
+        if (false === $existing) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $gitignorePath));
+        }
+
+        $present = array_map('trim', preg_split('/\R/', $existing) ?: []);
+        $block = [];
+        foreach (preg_split('/\R/', $additions) ?: [] as $line) {
+            $trimmed = trim($line);
+            if ('' === $trimmed) {
+                continue;
+            }
+            if (!str_starts_with($trimmed, '#') && in_array($trimmed, $present, true)) {
+                continue;
+            }
+            // Never ignore a file the bake itself ships (a skeleton CLAUDE.md
+            // with real guidance in it, say): the manifest tracks it, so git must too.
+            if (str_starts_with($trimmed, '/') && is_file($targetDir . $trimmed)) {
+                continue;
+            }
+            $block[] = $trimmed;
+        }
+        if ([] === $block) {
+            return;
+        }
+
+        if ('' !== $existing && !str_ends_with($existing, "\n")) {
+            $existing .= "\n";
+        }
+
+        if (false === file_put_contents($gitignorePath, $existing . "\n" . implode("\n", $block) . "\n")) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $gitignorePath));
         }
     }
 

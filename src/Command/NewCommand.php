@@ -67,7 +67,7 @@ final class NewCommand extends Command
             ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON, or YAML ending in .yaml or .yml, matching resources/plan.schema.json)')
             ->addOption('playbook', null, InputOption::VALUE_NONE, 'Kept for compatibility: Playbook is now the default.')
             ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring. For CI and automated tests only; WSU apps need Playbook.')
-            ->addOption('no-advisor', null, InputOption::VALUE_NONE, 'Skip the ADVISOR wiring: no waynestate/advisor in require-dev, no .mcp.json in .gitignore, no README section.');
+            ->addOption('no-advisor', null, InputOption::VALUE_NONE, 'Skip the ADVISOR wiring: no waynestate/advisor in require-dev, no .mcp.json line of its own in .gitignore, no README section. The Laravel shapes still ignore /.mcp.json for Laravel Boost.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

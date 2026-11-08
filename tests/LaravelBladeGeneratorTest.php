@@ -266,7 +266,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertStringNotContainsString('\/', $raw);
         self::assertSame(
             array_keys(json_decode($raw, true, 512, JSON_THROW_ON_ERROR)),
-            ['$schema', 'name', 'type', 'description', 'keywords', 'license', 'require', 'require-dev', 'autoload', 'autoload-dev', 'scripts', 'extra', 'config', 'minimum-stability', 'prefer-stable', 'suggest'],
+            ['$schema', 'name', 'type', 'description', 'keywords', 'license', 'require', 'require-dev', 'autoload', 'autoload-dev', 'scripts', 'scripts-descriptions', 'extra', 'config', 'minimum-stability', 'prefer-stable', 'suggest'],
         );
     }
 
@@ -392,15 +392,19 @@ final class LaravelBladeGeneratorTest extends TestCase
 
         self::assertFileDoesNotExist($target . '/composer.overlay.json');
         self::assertFileDoesNotExist($target . '/env-additions.txt');
+        self::assertFileDoesNotExist($target . '/gitignore-additions.txt');
     }
 
     public function testDefaultGenerationWiresAdvisor(): void
     {
         $target = $this->generate();
 
-        // The skeleton's .gitignore does not ship .mcp.json; the wiring adds it.
+        // The skeleton's .gitignore does not ship .mcp.json. Boost's block adds
+        // the anchored /.mcp.json, which already covers ADVISOR's client config,
+        // so the ADVISOR wiring adds no second line.
         $gitignore = (string) file_get_contents($target . '/.gitignore');
-        self::assertStringContainsString('.mcp.json', $gitignore);
+        self::assertContains('/.mcp.json', array_map('trim', explode("\n", $gitignore)));
+        self::assertSame(1, substr_count($gitignore, '.mcp.json'));
 
         $readme = (string) file_get_contents($target . '/README.md');
         self::assertStringContainsString('## ADVISOR', $readme);
@@ -422,8 +426,11 @@ final class LaravelBladeGeneratorTest extends TestCase
         // The overlay merge adds the package; the opt-out removes it again.
         self::assertArrayNotHasKey('waynestate/advisor', $composer['require-dev']);
 
-        $gitignore = (string) file_get_contents($target . '/.gitignore');
-        self::assertStringNotContainsString('.mcp.json', $gitignore);
+        // ADVISOR's own .mcp.json line is gone; Boost's anchored one stays,
+        // because Boost writes a .mcp.json of its own.
+        $lines = array_map('trim', explode("\n", (string) file_get_contents($target . '/.gitignore')));
+        self::assertNotContains('.mcp.json', $lines);
+        self::assertContains('/.mcp.json', $lines);
 
         $readme = (string) file_get_contents($target . '/README.md');
         self::assertStringNotContainsString('ADVISOR', $readme);

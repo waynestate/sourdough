@@ -19,6 +19,9 @@ That resolved **laravel/laravel v13.11.0**, whose `composer.json` requires
 Only the files a generated app starts life with and Sourdough needs to see:
 
 - `composer.json`, `artisan`, `.env.example`, `.gitignore`
+- `CLAUDE.md` and `AGENTS.md`, trimmed to the Boost bootstrap block's frame and
+  its Agent Setup section (laravel/laravel 13.x ships both; the real ones also
+  carry the PHP install one-liners, left out here)
 - `app/Models/User.php`, `app/Providers/AppServiceProvider.php`
 - `bootstrap/app.php`, `bootstrap/providers.php`
 - `config/app.php`, `config/auth.php`

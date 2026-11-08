@@ -677,6 +677,11 @@ final class GeneratorSupport
      * developer keeps their own); off, drop the line again. The file is
      * only rewritten when something changes.
      *
+     * The Laravel shapes ignore /.mcp.json for Laravel Boost whatever the
+     * ADVISOR answer is (gitignore-additions.txt): that anchored line already
+     * covers ADVISOR, so on adds nothing next to it, and off leaves it alone,
+     * because it belongs to Boost.
+     *
      * @throws \RuntimeException when the file cannot be read or written
      */
     public function applyAdvisorGitignore(string $path, bool $advisor): void
@@ -688,19 +693,26 @@ final class GeneratorSupport
 
         $lines = preg_split('/\R/', $existing) ?: [];
         $hasLine = false;
+        $coveredByBoost = false;
         foreach ($lines as $line) {
             if ('.mcp.json' === trim($line)) {
                 $hasLine = true;
-                break;
+            }
+            if ('/.mcp.json' === trim($line)) {
+                $coveredByBoost = true;
             }
         }
 
-        if ($advisor && !$hasLine) {
+        if ($advisor && ($hasLine || $coveredByBoost)) {
+            return;
+        }
+
+        if ($advisor) {
             if ('' !== $existing && !str_ends_with($existing, "\n")) {
                 $existing .= "\n";
             }
             $existing .= ".mcp.json\n";
-        } elseif (!$advisor && $hasLine) {
+        } elseif ($hasLine) {
             $kept = array_values(array_filter(
                 $lines,
                 static fn(string $line): bool => '.mcp.json' !== trim($line),
