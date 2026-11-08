@@ -503,6 +503,9 @@ final class RawGeneratorTest extends TestCase
         self::assertSame('^8.3', $composer['require']['php']);
         self::assertSame('^0.4', $composer['require']['waynestate/helmet']);
         self::assertSame('^0.5', $composer['require']['waynestate/sesame']);
+        // The cas driver's PSR-18 client and PSR-17 factory.
+        self::assertSame('^7.9 || ^8.0', $composer['require']['guzzlehttp/guzzle']);
+        self::assertSame('^1.8', $composer['require']['nyholm/psr7']);
     }
 
     public function testRequireModeAddsComposerPlaybookScript(): void
