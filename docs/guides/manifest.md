@@ -49,7 +49,7 @@ You can pass the app directory as an argument; the default is the current direct
 - `1` a managed file changed or is missing: one line per file, `changed  <file>` or `missing  <file>`
 - `2` tool error: no manifest in the directory, or no `--check`
 
-Seeded files are never reported. They're yours.
+Seeded files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a file a checkout turned to CRLF still matches the LF bytes Sourdough wrote. Every shape's pipeline runs the check in its `sourdough-feed` job and lists what drifted without failing on it: see [Feed in CI](./keeping-current.md#feed-in-ci).
 
 > [!TIP]
 > Commit `.sourdough/manifest.json` in your app. It's the record that keeps `feed` honest.

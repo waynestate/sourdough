@@ -507,7 +507,7 @@
             <p class="schedule__when">Feeding</p>
             <div class="schedule__what">
               <code class="chalk-cmd">sourdough feed</code>
-              <p>Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run <code>--dry-run</code> first, or in CI.</p>
+              <p>Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run <code>--dry-run</code> first; every shape's pipeline runs it too, and warns when a feed is due.</p>
               <dl class="exits">
                 <div><dt>0</dt><dd>fed (or already fresh)</dd></div>
                 <div><dt>1</dt><dd>fed, with conflicts to resolve</dd></div>

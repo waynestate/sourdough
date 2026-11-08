@@ -40,7 +40,7 @@
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="keeping-apps-current">Keeping apps current<a class="docs-heading-link" aria-label="Link to this section" href="#keeping-apps-current">#</a></h1>
-<p>A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how <code>sourdough feed</code> merges template updates in without clobbering your changes, and how to make CI tell you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, run <code>sourdough feed --dry-run</code> in CI, then read on.</p>
+<p>A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how <code>sourdough feed</code> merges template updates in without clobbering your changes, and how CI tells you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, keep the <code>sourdough-feed</code> job every shape's pipeline ships with, then read on.</p>
 <h2 id="record-where-the-app-came-from">Record where the app came from<a class="docs-heading-link" aria-label="Link to this section" href="#record-where-the-app-came-from">#</a></h2>
 <p>Every app carries a <code>.sourdough/manifest.json</code> recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> or <code>seeded</code>. Other tools do the same: Copier writes <code>.copier-answers.yml</code>, and cruft writes <code>.cruft.json</code>. Without this record there is nothing to compare against, so no update is possible.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>Do not hand-edit the manifest. It is the starter's memory: it remembers what went into the loaf, so <code>feed</code> knows what to refresh and what to leave to rise on its own.</p></aside>
@@ -49,7 +49,7 @@
 <p><code>sourdough manifest --check</code> lists the managed files that have drifted from the manifest, the ones you (or someone) edited since Sourdough wrote them:</p>
 <pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
-<p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours. Drift is not wrong: <code>feed</code> merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace.</p>
+<p>Exit codes: <code>0</code> clean, <code>1</code> a managed file changed or is missing, <code>2</code> tool error (no manifest, or no <code>--check</code>). Seeded files are never reported. They're yours. Line endings are forgiven, as <code>feed</code> forgives them: a checkout that turned a file to CRLF (the raw shapes' <code>.gitattributes</code> does it for <code>*.ps1</code>) has not drifted. Drift is not wrong: <code>feed</code> merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace, which is why the <a href="#feed-in-ci">CI job</a> reports drift and never fails on it.</p>
 <h2 id="feed-the-app-a-merge-not-an-overwrite">Feed the app: a merge, not an overwrite<a class="docs-heading-link" aria-label="Link to this section" href="#feed-the-app-a-merge-not-an-overwrite">#</a></h2>
 <p>Upgrade the Sourdough CLI first (<a href="../upgrading.html">Upgrading</a>), then, in the app, on a clean git tree, look before you leap:</p>
 <pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
@@ -192,9 +192,60 @@ the template's version
 </table></div>
 <p>Add <code>--json</code> to either for a machine-readable plan: the template, <code>from</code> and <code>to</code> versions, one entry per file (<code>path</code>, <code>action</code>, <code>detail</code>), a summary count per action, the base copies, any notes, and the exit code.</p>
 <h3 id="feed-in-ci">Feed in CI<a class="docs-heading-link" aria-label="Link to this section" href="#feed-in-ci">#</a></h3>
-<p>Put the dry run in the app's pipeline so an app that falls behind its template fails the pipeline instead of surfacing as drift later; that is what makes a starter &quot;fed&quot;:</p>
-<pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
+<p>Every shape's <code>.gitlab-ci.yml</code> ships a <code>sourdough-feed</code> job, so an app that falls behind its template says so in its own pipeline instead of surfacing as drift months later; that is what makes a starter &quot;fed&quot;. The job runs on the shape's <code>composer</code> image (multi-arch, through <code>${IMAGE_PREFIX}</code>, on the <code>.composer-cache</code>), installs the newest Sourdough release with <code>composer create-project</code>, and asks it two questions:</p>
+<pre tabindex="0"><code class="language-yaml">sourdough-feed:
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
+  variables:
+    SOURDOUGH_HOME: /tmp/sourdough
+  allow_failure:
+    exit_codes: [1]
+  script:
+    - composer create-project --no-dev --no-interaction --no-progress --prefer-dist waynestate/sourdough &quot;$SOURDOUGH_HOME&quot;
+    - mkdir -p .git/info &amp;&amp; echo .cache/ &gt;&gt; .git/info/exclude
+    - drift=0; php &quot;$SOURDOUGH_HOME/bin/sourdough&quot; manifest --check || drift=$?
+    - fed=0; php &quot;$SOURDOUGH_HOME/bin/sourdough&quot; feed --dry-run || fed=$?
+    - if [ &quot;$drift&quot; -gt 1 ] || [ &quot;$fed&quot; -gt 1 ]; then exit 2; fi
+    - if [ &quot;$fed&quot; -eq 1 ]; then echo &quot;This app has template changes to feed. Run sourdough feed, review and commit.&quot; &gt;&amp;2; exit 1; fi
 </code></pre>
+<p>What each answer does to the pipeline, read from the commands' own exit codes:</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>The app</th>
+<th><code>manifest --check</code></th>
+<th><code>feed --dry-run</code></th>
+<th>The job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fresh, as baked or fed</td>
+<td><code>0</code> clean</td>
+<td><code>0</code> fresh</td>
+<td>passes</td>
+</tr>
+<tr>
+<td>a managed file edited by hand</td>
+<td><code>1</code>, one <code>changed</code> line per file</td>
+<td><code>0</code> fresh</td>
+<td>passes, with the files listed: drift is normal, and feed merges it</td>
+</tr>
+<tr>
+<td>a newer release has template changes it has not fed</td>
+<td><code>0</code> or <code>1</code></td>
+<td><code>1</code>, the plan</td>
+<td>warns: exit <code>1</code>, which <code>allow_failure</code> shows as a warning, so a pending feed never blocks a deploy</td>
+</tr>
+<tr>
+<td>a broken record: no manifest, one from a newer Sourdough, conflicts left over from the last feed, a failed bake</td>
+<td><code>2</code></td>
+<td><code>2</code></td>
+<td>fails</td>
+</tr>
+</tbody>
+</table></div>
+<p>To clear the warning, feed the app on your machine (upgrade the CLI, <code>sourdough feed</code>, review, commit); the next pipeline is green again. The <code>.git/info/exclude</code> line keeps the restored <code>.cache/</code> download folder out of git's view, so the dry run sees the clean tree a real feed needs. <code>tests/TemplateFeedJobTest.php</code> holds every shape to the same job and runs its lines on a fresh bake of each shape: clean, edited, behind and broken.</p>
 <p>Copier's <code>copier check-update</code> is the same idea: <code>--quiet</code> makes it exit 2 when an update exists, and <code>--output-format json</code> gives machines the answer.</p>
 <h3 id="apps-sourdough-did-not-make-and-weld">Apps Sourdough did not make, and WELD<a class="docs-heading-link" aria-label="Link to this section" href="#apps-sourdough-did-not-make-and-weld">#</a></h3>
 <p>Feed needs the manifest <code>sourdough new</code> writes. An app without one (an app Sourdough did not make, or WELD itself, which was built by hand and checks its drift against a fresh Inertia bake with its own regen check) gets exit <code>2</code>. Writing a manifest into an existing app is <code>sourdough adopt</code>'s job (ADR-0014), which is not built yet.</p>

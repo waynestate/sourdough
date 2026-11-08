@@ -18,6 +18,15 @@ Strongly recommended: a git.wayne.edu instance runner.
 
 Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.0 release commit, with the tag in a trailing comment.
 
+## Is the app still fed?[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
+
+Every shape also ships a `sourdough-feed` job. It installs the newest Sourdough release (`composer create-project waynestate/sourdough`) on the shape's own `composer` image, through `${IMAGE_PREFIX}` and on the `.composer-cache`, and runs two checks against the app's manifest:
+
+- `sourdough manifest --check` lists the managed files edited since the last bake or feed. Drift is normal (feed merges it), so the list is a report and never fails the job.
+- `sourdough feed --dry-run` exits `1` when a newer release has template changes the app has not fed. The job exits `1` too, and `allow_failure: exit_codes: [1]` turns that into a warning: a pending feed never blocks a deploy.
+
+Exit `2` from either (no manifest, a manifest from a newer Sourdough, conflict markers left over from the last feed, a bake that failed) fails the job, because the app's record needs fixing before any feed can run. The full table and the job itself are in [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci).
+
 ## Dependency caching[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
 
 A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's `.gitlab-ci.yml` keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.

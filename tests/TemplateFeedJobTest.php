@@ -103,7 +103,7 @@ final class TemplateFeedJobTest extends TestCase
         $blocks = [];
         foreach (self::pipelines() as $shape => [$file]) {
             self::assertSame(1, preg_match('/\n((?:#[^\n]*\n)*' . self::JOB . ':\n(?:[ ][^\n]*\n)*)/', self::read($file), $m), "$shape: no " . self::JOB . ' block');
-            $blocks[$shape] = $m[1];
+            $blocks[$shape] = $m[1] ?? '';
         }
 
         self::assertCount(4, $blocks);

@@ -110,7 +110,7 @@
 <li><code>1</code> a managed file changed or is missing: one line per file, <code>changed  &lt;file&gt;</code> or <code>missing  &lt;file&gt;</code></li>
 <li><code>2</code> tool error: no manifest in the directory, or no <code>--check</code></li>
 </ul>
-<p>Seeded files are never reported. They're yours.</p>
+<p>Seeded files are never reported. They're yours. Line endings are forgiven, as <code>feed</code> forgives them: a file a checkout turned to CRLF still matches the LF bytes Sourdough wrote. Every shape's pipeline runs the check in its <code>sourdough-feed</code> job and lists what drifted without failing on it: see <a href="./keeping-current.html#feed-in-ci">Feed in CI</a>.</p>
 <aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Commit <code>.sourdough/manifest.json</code> in your app. It's the record that keeps <code>feed</code> honest.</p></aside>
 <h2 id="the-saved-plan-is-not-in-the-manifest">The saved plan is not in the manifest<a class="docs-heading-link" aria-label="Link to this section" href="#the-saved-plan-is-not-in-the-manifest">#</a></h2>
 <p><code>.sourdough/plan.yaml</code>, the plan the app was baked from, sits next to the manifest but is not listed in it, so it is neither managed nor seeded. The manifest lists what the template wrote; the plan is what you asked for. <code>sourdough manifest --check</code> never reports it and <code>sourdough feed</code> never touches it, so edit it as the app grows and commit it with the manifest. See <a href="../reference/plan-format.html#the-saved-plan">The saved plan</a>.</p>

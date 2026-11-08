@@ -197,7 +197,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
 
-Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files, so `sourdough feed --dry-run` in CI fails the pipeline when an app falls behind its template. `--json` prints the plan for machines.
+Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files. Every shape's pipeline runs it in a `sourdough-feed` job, next to `sourdough manifest --check`: an app that falls behind its template gets a warning (never a blocked deploy), hand edits to managed files are listed, and a broken record fails the job. `--json` prints the plan for machines.
 
 Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](docs/guides/keeping-current.md). A fed starter is a happy starter.
 

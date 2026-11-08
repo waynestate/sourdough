@@ -47,9 +47,18 @@ Versioning once 1.0 is out.</p>
 <h2 id="0-2-0-2026-11-08">0.2.0 (2026-11-08)<a class="docs-heading-link" aria-label="Link to this section" href="#0-2-0-2026-11-08">#</a></h2>
 <h3 id="added">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added">#</a></h3>
 <ul>
-<li>Added: <code>tests/PreflightPinTest.php</code>: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component <code>image</code> input with a registry prefix; every Docker Hub component in a shape takes the shape's <code>IMAGE_PREFIX</code>. BEST_PRACTICES 4.3 is <code>Enforced</code> by it. <code>tests/TemplateCiCacheTest.php</code> now checks the <code>${IMAGE_PREFIX}/</code> rule on the app's own jobs only.</li>
-<li>Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale &quot;join the rack&quot; line is gone.</li>
-<li>Added: every bake saves its plan in the app as <code>.sourdough/plan.yaml</code> (ADR-0014, decision 3), after the bake succeeds: a <code>--plan</code> bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: <code>sourdough feed</code> and <code>sourdough manifest --check</code> never read, rewrite or flag it, and feed writes none for apps baked before. <code>--plan</code> now reads YAML plans (<code>.yaml</code> or <code>.yml</code>) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires <code>symfony/yaml</code> <code>^7.4</code>. <code>tests/SavedPlanTest.php</code> and <code>tests/FeedCommandTest.php</code> cover it.</li>
+<li>
+<p>Added: every shape's <code>.gitlab-ci.yml</code> runs a <code>sourdough-feed</code> job (BEST_PRACTICES 3.2, now <code>Checked</code>): on the shape's <code>composer</code> image, through <code>${IMAGE_PREFIX}</code> and the Composer cache, it installs the newest Sourdough release and runs <code>sourdough manifest --check</code> and <code>sourdough feed --dry-run</code>. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which <code>allow_failure: exit_codes: [1]</code> shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next <code>sourdough feed</code>. New <code>tests/TemplateFeedJobTest.php</code> holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are <code>Enforced</code> and name the tests that hold them.</p>
+</li>
+<li>
+<p>Added: <code>tests/PreflightPinTest.php</code>: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component <code>image</code> input with a registry prefix; every Docker Hub component in a shape takes the shape's <code>IMAGE_PREFIX</code>. BEST_PRACTICES 4.3 is <code>Enforced</code> by it. <code>tests/TemplateCiCacheTest.php</code> now checks the <code>${IMAGE_PREFIX}/</code> rule on the app's own jobs only.</p>
+</li>
+<li>
+<p>Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale &quot;join the rack&quot; line is gone.</p>
+</li>
+<li>
+<p>Added: every bake saves its plan in the app as <code>.sourdough/plan.yaml</code> (ADR-0014, decision 3), after the bake succeeds: a <code>--plan</code> bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: <code>sourdough feed</code> and <code>sourdough manifest --check</code> never read, rewrite or flag it, and feed writes none for apps baked before. <code>--plan</code> now reads YAML plans (<code>.yaml</code> or <code>.yml</code>) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires <code>symfony/yaml</code> <code>^7.4</code>. <code>tests/SavedPlanTest.php</code> and <code>tests/FeedCommandTest.php</code> cover it.</p>
+</li>
 </ul>
 <h3 id="changed">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed">#</a></h3>
 <ul>
@@ -66,12 +75,27 @@ Versioning once 1.0 is out.</p>
 </ul>
 <h3 id="fixed">Fixed<a class="docs-heading-link" aria-label="Link to this section" href="#fixed">#</a></h3>
 <ul>
-<li>Fixed: the pipeline's PROCTOR jobs no longer pass <code>--policy</code>, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.</li>
-<li>Fixed: BEST_PRACTICES.md's &quot;Keeping generated apps current&quot; tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are <code>Enforced</code> by the manifest and <code>sourdough feed</code>, 3.2 (a check that fails CI) is <code>Partly enforced</code> (<code>feed --dry-run</code> and <code>manifest --check</code> exist; no template runs them in CI yet), 3.4 (tags and migration notes) is <code>Documented</code> in the release steps, and 3.5 (compatibility CI) is <code>Checked</code> by the smoke gate, which still only warns. They all said <code>Not yet</code> or <code>Documented</code>. 4.3 keeps <code>Partly enforced</code> and now names its templates and test.</li>
-<li>Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, <code>manifest</code> and <code>feed</code> ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is <code>Enforced</code> by the generator tests in every shape; it said only the raw shape generated.</li>
-<li>Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).</li>
-<li>Fixed: <code>scripts/parity.ps1</code> builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.</li>
-<li>Fixed: the raw shapes (<code>--raw</code>, <code>--raw --vue</code>) sign in with CAS in production. <code>public/index.php</code> called <code>DriverFactory::make($config)</code> with no HTTP client, so with <code>APP_ENV=production</code> the cas driver refused to boot; it now passes a Guzzle client (10 second timeout, no redirects, TLS verification on), a <code>nyholm/psr7</code> request factory and the app's <code>NativeSession</code>, which SESAME 0.5's cas driver needs for its pending-login marker (a ticket is accepted only for a sign-in this browser started). The raw template requires <code>guzzlehttp/guzzle</code> <code>^7.9 || ^8.0</code> and <code>nyholm/psr7</code> <code>^1.8</code>.</li>
+<li>
+<p>Fixed: <code>sourdough manifest --check</code> forgives line endings, as <code>sourdough feed</code> does. The raw shapes' <code>.gitattributes</code> checks <code>*.ps1</code> out with CRLF, so every clone of a fresh raw app reported <code>scripts/parity.ps1</code> as changed. <code>tests/ManifestCommandTest.php</code> covers it.</p>
+</li>
+<li>
+<p>Fixed: the pipeline's PROCTOR jobs no longer pass <code>--policy</code>, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.</p>
+</li>
+<li>
+<p>Fixed: BEST_PRACTICES.md's &quot;Keeping generated apps current&quot; tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are <code>Enforced</code> by the manifest and <code>sourdough feed</code>, 3.2 (a check that fails CI) is <code>Partly enforced</code> (<code>feed --dry-run</code> and <code>manifest --check</code> exist; no template runs them in CI yet), 3.4 (tags and migration notes) is <code>Documented</code> in the release steps, and 3.5 (compatibility CI) is <code>Checked</code> by the smoke gate, which still only warns. They all said <code>Not yet</code> or <code>Documented</code>. 4.3 keeps <code>Partly enforced</code> and now names its templates and test.</p>
+</li>
+<li>
+<p>Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, <code>manifest</code> and <code>feed</code> ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is <code>Enforced</code> by the generator tests in every shape; it said only the raw shape generated.</p>
+</li>
+<li>
+<p>Fixed: the local parity fallback image builds when the host's uid or gid already belongs to an account in the image (a host gid of 1001, like GitHub's runners, collided with the container user's default).</p>
+</li>
+<li>
+<p>Fixed: <code>scripts/parity.ps1</code> builds the fallback image with the host's uid and gid (1000 on Windows, the current user's ids on Linux and macOS) instead of a fixed 1000, so the app container starts when the bind-mounted source belongs to another user.</p>
+</li>
+<li>
+<p>Fixed: the raw shapes (<code>--raw</code>, <code>--raw --vue</code>) sign in with CAS in production. <code>public/index.php</code> called <code>DriverFactory::make($config)</code> with no HTTP client, so with <code>APP_ENV=production</code> the cas driver refused to boot; it now passes a Guzzle client (10 second timeout, no redirects, TLS verification on), a <code>nyholm/psr7</code> request factory and the app's <code>NativeSession</code>, which SESAME 0.5's cas driver needs for its pending-login marker (a ticket is accepted only for a sign-in this browser started). The raw template requires <code>guzzlehttp/guzzle</code> <code>^7.9 || ^8.0</code> and <code>nyholm/psr7</code> <code>^1.8</code>.</p>
+</li>
 </ul>
 <h2 id="0-1-7-2026-11-07">0.1.7 (2026-11-07)<a class="docs-heading-link" aria-label="Link to this section" href="#0-1-7-2026-11-07">#</a></h2>
 <h3 id="added-1">Added<a class="docs-heading-link" aria-label="Link to this section" href="#added-1">#</a></h3>

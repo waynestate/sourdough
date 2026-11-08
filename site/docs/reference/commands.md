@@ -128,7 +128,7 @@ Exit codes: `0` clean, `1` changed or missing, `2` tool error.
 | `changed <file>` | a managed file changed |
 | `missing <file>` | a managed file is missing |
 
-Seeded files are never reported: the app owns them.
+Seeded files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not `changed`.
 
 ## sourdough feed[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-feed)
 

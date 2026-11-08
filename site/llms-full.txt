@@ -189,7 +189,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
 
-Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files, so `sourdough feed --dry-run` in CI fails the pipeline when an app falls behind its template. `--json` prints the plan for machines.
+Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to resolve, `2` tool error (no manifest, no git, a dirty tree, conflicts left from the last feed, a manifest from a newer Sourdough). With `--dry-run` nothing is written: `0` the app is fresh, `1` feeding would change files. Every shape's pipeline runs it in a `sourdough-feed` job, next to `sourdough manifest --check`: an app that falls behind its template gets a warning (never a blocked deploy), hand edits to managed files are listed, and a broken record fails the job. `--json` prints the plan for machines.
 
 Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](https://github.com/waynestate/sourdough/blob/HEAD/docs/guides/keeping-current.md). A fed starter is a happy starter.
 
@@ -391,7 +391,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    - **2**: no manifest, or no `--check`
 3. Feeding
    `sourdough feed`
-   Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first, or in CI.
+   Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first; every shape's pipeline runs it too, and warns when a feed is due.
    - **0**: fed (or already fresh)
    - **1**: fed, with conflicts to resolve
    - **2**: no manifest, no git, or a dirty tree
@@ -662,6 +662,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
+- Added: every shape's `.gitlab-ci.yml` runs a `sourdough-feed` job (BEST_PRACTICES 3.2, now `Checked`): on the shape's `composer` image, through `${IMAGE_PREFIX}` and the Composer cache, it installs the newest Sourdough release and runs `sourdough manifest --check` and `sourdough feed --dry-run`. Drift in managed files is listed and never fails (feed merges it); a template release the app has not fed exits 1, which `allow_failure: exit_codes: [1]` shows as a warning, so it never blocks a deploy; exit 2 (no manifest, a newer manifest, leftover conflict markers, a failed bake) fails the job. Apps already baked get the job with their next `sourdough feed`. New `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on fresh, edited, older and broken bakes of all five shapes and both ovens. BEST_PRACTICES 1.1, 1.2 and 1.3 are `Enforced` and name the tests that hold them.
 - Added: `tests/PreflightPinTest.php`: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component `image` input with a registry prefix; every Docker Hub component in a shape takes the shape's `IMAGE_PREFIX`. BEST_PRACTICES 4.3 is `Enforced` by it. `tests/TemplateCiCacheTest.php` now checks the `${IMAGE_PREFIX}/` rule on the app's own jobs only.
 - Added: a third agent recipe on the front page, for the Laravel shapes (Blade, Blade with Vue islands and Inertia/Vue), and the stale "join the rack" line is gone.
 - Added: every bake saves its plan in the app as `.sourdough/plan.yaml` (ADR-0014, decision 3), after the bake succeeds: a `--plan` bake saves that plan with the name the app got, a bake from flags saves the shape, the name and all four parts. The file is not in the manifest, so it is neither managed nor seeded: `sourdough feed` and `sourdough manifest --check` never read, rewrite or flag it, and feed writes none for apps baked before. `--plan` now reads YAML plans (`.yaml` or `.yml`) as well as JSON, through the same schema, so the saved plan bakes the same loaf again. Sourdough requires `symfony/yaml` `^7.4`. `tests/SavedPlanTest.php` and `tests/FeedCommandTest.php` cover it.
@@ -681,6 +682,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Fixed[#](https://sourdough.apps.wayne.edu/docs/changelog.html#fixed)
 
+- Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
 - Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
 - Fixed: BEST_PRACTICES.md's "Keeping generated apps current" tags match the code, each naming the file that holds it: 3.1 (record where the app came from) and 3.3 (merge, not overwrite) are `Enforced` by the manifest and `sourdough feed`, 3.2 (a check that fails CI) is `Partly enforced` (`feed --dry-run` and `manifest --check` exist; no template runs them in CI yet), 3.4 (tags and migration notes) is `Documented` in the release steps, and 3.5 (compatibility CI) is `Checked` by the smoke gate, which still only warns. They all said `Not yet` or `Documented`. 4.3 keeps `Partly enforced` and now names its templates and test.
 - Fixed: BEST_PRACTICES.md describes Sourdough as it is (0.1.7, all five shapes bake, `manifest` and `feed` ship) instead of a tool with no code on main, and practice 6.1 (wire the stack in by default) is `Enforced` by the generator tests in every shape; it said only the raw shape generated.
@@ -882,6 +884,15 @@ Strongly recommended: a git.wayne.edu instance runner.
 ### On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
 Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every include is pinned to the Preflight 0.3.0 release commit, with the tag in a trailing comment.
+
+### Is the app still fed?[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
+
+Every shape also ships a `sourdough-feed` job. It installs the newest Sourdough release (`composer create-project waynestate/sourdough`) on the shape's own `composer` image, through `${IMAGE_PREFIX}` and on the `.composer-cache`, and runs two checks against the app's manifest:
+
+- `sourdough manifest --check` lists the managed files edited since the last bake or feed. Drift is normal (feed merges it), so the list is a report and never fails the job.
+- `sourdough feed --dry-run` exits `1` when a newer release has template changes the app has not fed. The job exits `1` too, and `allow_failure: exit_codes: [1]` turns that into a warning: a pending feed never blocks a deploy.
+
+Exit `2` from either (no manifest, a manifest from a newer Sourdough, conflict markers left over from the last feed, a bake that failed) fails the job, because the app's record needs fixing before any feed can run. The full table and the job itself are in [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci).
 
 ### Dependency caching[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
 
@@ -1113,7 +1124,7 @@ Source: https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html
 
 ## Keeping apps current[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keeping-apps-current)
 
-A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how `sourdough feed` merges template updates in without clobbering your changes, and how to make CI tell you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, run `sourdough feed --dry-run` in CI, then read on.
+A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how `sourdough feed` merges template updates in without clobbering your changes, and how CI tells you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, keep the `sourdough-feed` job every shape's pipeline ships with, then read on.
 
 ### Record where the app came from[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#record-where-the-app-came-from)
 
@@ -1133,7 +1144,7 @@ Do not hand-edit the manifest. It is the starter's memory: it remembers what wen
 sourdough manifest --check
 ```
 
-Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours. Drift is not wrong: `feed` merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace.
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a checkout that turned a file to CRLF (the raw shapes' `.gitattributes` does it for `*.ps1`) has not drifted. Drift is not wrong: `feed` merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace, which is why the [CI job](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci) reports drift and never fails on it.
 
 ### Feed the app: a merge, not an overwrite[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-the-app-a-merge-not-an-overwrite)
 
@@ -1229,11 +1240,35 @@ Add `--json` to either for a machine-readable plan: the template, `from` and `to
 
 #### Feed in CI[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci)
 
-Put the dry run in the app's pipeline so an app that falls behind its template fails the pipeline instead of surfacing as drift later; that is what makes a starter "fed":
+Every shape's `.gitlab-ci.yml` ships a `sourdough-feed` job, so an app that falls behind its template says so in its own pipeline instead of surfacing as drift months later; that is what makes a starter "fed". The job runs on the shape's `composer` image (multi-arch, through `${IMAGE_PREFIX}`, on the `.composer-cache`), installs the newest Sourdough release with `composer create-project`, and asks it two questions:
 
-```bash
-sourdough feed --dry-run
+```yaml
+sourdough-feed:
+  extends: .composer-cache
+  image: ${IMAGE_PREFIX}/composer:2.10.3
+  variables:
+    SOURDOUGH_HOME: /tmp/sourdough
+  allow_failure:
+    exit_codes: [1]
+  script:
+    - composer create-project --no-dev --no-interaction --no-progress --prefer-dist waynestate/sourdough "$SOURDOUGH_HOME"
+    - mkdir -p .git/info && echo .cache/ >> .git/info/exclude
+    - drift=0; php "$SOURDOUGH_HOME/bin/sourdough" manifest --check || drift=$?
+    - fed=0; php "$SOURDOUGH_HOME/bin/sourdough" feed --dry-run || fed=$?
+    - if [ "$drift" -gt 1 ] || [ "$fed" -gt 1 ]; then exit 2; fi
+    - if [ "$fed" -eq 1 ]; then echo "This app has template changes to feed. Run sourdough feed, review and commit." >&2; exit 1; fi
 ```
+
+What each answer does to the pipeline, read from the commands' own exit codes:
+
+| The app | `manifest --check` | `feed --dry-run` | The job |
+| --- | --- | --- | --- |
+| fresh, as baked or fed | `0` clean | `0` fresh | passes |
+| a managed file edited by hand | `1`, one `changed` line per file | `0` fresh | passes, with the files listed: drift is normal, and feed merges it |
+| a newer release has template changes it has not fed | `0` or `1` | `1`, the plan | warns: exit `1`, which `allow_failure` shows as a warning, so a pending feed never blocks a deploy |
+| a broken record: no manifest, one from a newer Sourdough, conflicts left over from the last feed, a failed bake | `2` | `2` | fails |
+
+To clear the warning, feed the app on your machine (upgrade the CLI, `sourdough feed`, review, commit); the next pipeline is green again. The `.git/info/exclude` line keeps the restored `.cache/` download folder out of git's view, so the dry run sees the clean tree a real feed needs. `tests/TemplateFeedJobTest.php` holds every shape to the same job and runs its lines on a fresh bake of each shape: clean, edited, behind and broken.
 
 Copier's `copier check-update` is the same idea: `--quiet` makes it exit 2 when an update exists, and `--output-format json` gives machines the answer.
 
@@ -1435,7 +1470,7 @@ You can pass the app directory as an argument; the default is the current direct
 - `1` a managed file changed or is missing: one line per file, `changed <file>` or `missing <file>`
 - `2` tool error: no manifest in the directory, or no `--check`
 
-Seeded files are never reported. They're yours.
+Seeded files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a file a checkout turned to CRLF still matches the LF bytes Sourdough wrote. Every shape's pipeline runs the check in its `sourdough-feed` job and lists what drifted without failing on it: see [Feed in CI](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci).
 
 Tip
 
@@ -2186,7 +2221,7 @@ Exit codes: `0` clean, `1` changed or missing, `2` tool error.
 | `changed <file>` | a managed file changed |
 | `missing <file>` | a managed file is missing |
 
-Seeded files are never reported: the app owns them.
+Seeded files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not `changed`.
 
 ### sourdough feed[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-feed)
 
@@ -3090,6 +3125,8 @@ This is a minor, not a patch: it adds the saved plan and YAML plans, and feeding
 Feed does not bring the saved plan (`.sourdough/plan.yaml` is written by new bakes only) and does not touch your lock files, so the `composer update` in the steps is yours to run.
 
 New bakes save their plan in the app as `.sourdough/plan.yaml`, next to the manifest, and `--plan` reads YAML plans as well as JSON, so the saved plan bakes the same loaf again. Commit it with the manifest. Apps you already baked have no saved plan, and feed does not write one: it is not in the manifest, so feed and `manifest --check` never touch it. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
+
+Every shape's `.gitlab-ci.yml` gains a `sourdough-feed` job that runs `sourdough manifest --check` and `sourdough feed --dry-run` on the newest Sourdough release. An app you already baked gets it with its next feed: `sourdough feed` adds the job to your `.gitlab-ci.yml`, merged with your own jobs. From then on a release the app has not fed shows as a warning in its pipeline (never a blocked deploy), hand edits to managed files are listed without failing, and a broken record (no manifest, conflict markers left from a feed) fails the job. `sourdough manifest --check` also forgives line endings now, as feed does, so a raw app's clone no longer reports `scripts/parity.ps1` (checked out with CRLF by the shape's `.gitattributes`) as changed. See [Feed in CI](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci).
 
 Every shape's `.gitlab-ci.yml` now caches its downloads: Docker Hub images through `${IMAGE_PREFIX}` (the group's Dependency Proxy when the GitLab has one, Docker Hub otherwise) and Composer and npm installs per lock file. See [Dependency caching](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching).
 

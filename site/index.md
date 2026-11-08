@@ -166,7 +166,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    - **2**: no manifest, or no `--check`
 3. Feeding
    `sourdough feed`
-   Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first, or in CI.
+   Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first; every shape's pipeline runs it too, and warns when a feed is due.
    - **0**: fed (or already fresh)
    - **1**: fed, with conflicts to resolve
    - **2**: no manifest, no git, or a dirty tree
