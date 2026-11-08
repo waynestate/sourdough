@@ -52,7 +52,7 @@ The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/d
 
 ## Status[#](https://sourdough.apps.wayne.edu/docs/#status)
 
-Version 0.1.7 (2026-11-07), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.2.0 (2026-11-08), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 **On the bench: the five loaves and the feeding schedule**
 

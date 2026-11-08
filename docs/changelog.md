@@ -12,6 +12,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 0.2.0 (2026-11-08)
+
 ### Added
 
 - Added: `tests/PreflightPinTest.php`: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component `image` input with a registry prefix; every Docker Hub component in a shape takes the shape's `IMAGE_PREFIX`. BEST_PRACTICES 4.3 is `Enforced` by it. `tests/TemplateCiCacheTest.php` now checks the `${IMAGE_PREFIX}/` rule on the app's own jobs only.

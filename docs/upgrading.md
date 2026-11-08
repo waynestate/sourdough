@@ -26,14 +26,27 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.1.7
+Sourdough 0.2.0
 ```
 
 Then read the section for the version you are moving to.
 
-## Unreleased
+## 0.2.0 (2026-11-08)
 
-**Breaking:** none. **Deprecated:** none.
+**Breaking:** for apps you feed, in two cases only. The fed pipeline pins Preflight 0.3.0, which needs GitLab 18.7 or later (git.wayne.edu is newer), and the fed `composer.json` moves PROCTOR to `^0.7`, whose `node-eol` check fails an app that pins Node 20 or older. **Deprecated:** none.
+
+This is a minor, not a patch: it adds the saved plan and YAML plans, and feeding it changes an app's pipeline, deploy kit and stack pins.
+
+**What `sourdough feed` brings an app baked with 0.1.7 or earlier** (it merges each file with your edits; see the steps below):
+
+- `.gitlab-ci.yml`: the Preflight components pinned to the 0.3.0 SHA with `image_prefix: "${IMAGE_PREFIX}"`, the `IMAGE_PREFIX` workflow rule, and the `.composer-cache` and `.npm-cache` download caches.
+- The Squire 0.6.0 deploy kit (`scripts/release.sh` asks `proctor gate`, `.env.squire.example` lists `SQUIRE_PROCTOR_RECORD_DIR`), plus the `scripts/parity.ps1` and fallback image fixes for host uids and gids.
+- `composer.json`: HELMET `^0.4`, SESAME `^0.5`, PROCTOR `^0.7` and Squire `^0.6`; the raw shapes add `guzzlehttp/guzzle` and `nyholm/psr7`.
+- Raw shapes (`--raw`, `--raw --vue`): `public/index.php` hands the cas driver an HTTP client, a request factory and the session, so CAS sign-in works in production.
+- Laravel shapes: `config/sesame.php` names SESAME 0.5's `cas.require_pending_login` (leave it on).
+- Apps baked with `--docker`: the compose files publish the dev server and Vite on 127.0.0.1 only.
+
+Feed does not bring the saved plan (`.sourdough/plan.yaml` is written by new bakes only) and does not touch your lock files, so the `composer update` in the steps is yours to run.
 
 New bakes save their plan in the app as `.sourdough/plan.yaml`, next to the manifest, and `--plan` reads YAML plans as well as JSON, so the saved plan bakes the same loaf again. Commit it with the manifest. Apps you already baked have no saved plan, and feed does not write one: it is not in the manifest, so feed and `manifest --check` never touch it. See [The saved plan](reference/plan-format.md#the-saved-plan).
 

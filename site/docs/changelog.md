@@ -12,6 +12,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+## 0.2.0 (2026-11-08)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-2-0-2026-11-08)
+
 ### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
 - Added: `tests/PreflightPinTest.php`: one Preflight version across every shape's pipeline and Sourdough's own GitLab pipeline; no component `image` input with a registry prefix; every Docker Hub component in a shape takes the shape's `IMAGE_PREFIX`. BEST_PRACTICES 4.3 is `Enforced` by it. `tests/TemplateCiCacheTest.php` now checks the `${IMAGE_PREFIX}/` rule on the app's own jobs only.
