@@ -13,7 +13,7 @@ The dev container runs as root on purpose (it is local only, and Docker Desktop 
 
 The app is at http://localhost:8000. `composer dev-down` stops it and `composer dev-shell` opens a shell in the app container.
 
-The base images are pinned by digest in `Dockerfile`; the `FROM` lines are the single place to swap in SQUIRE's Citadel-parity image
+The base images are pinned by digest in `Dockerfile`; the `FROM` lines are the single place to swap in Squire's Citadel-parity image
 when it exists. The database is MySQL 8.4 LTS. Citadel still runs MySQL 5.6, which Laravel 13 cannot run on, so local parity with
 Citadel's database is not possible; PROCTOR's mysql56 check covers the gap.
 

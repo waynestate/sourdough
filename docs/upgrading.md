@@ -143,13 +143,13 @@ A pipeline that passes `--policy` or `--today` to PROCTOR fails with exit `2` on
 
 ## 0.1.0 (2026-10-29)
 
-**Breaking:** the raw template's own `deployments/release.sh` and `deployments/release.ps1` were removed; the release steps now come from SQUIRE. The raw app installs SQUIRE's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. SQUIRE owns them; Sourdough copies them as-is and records them in the manifest.
+**Breaking:** the raw template's own `deployments/release.sh` and `deployments/release.ps1` were removed; the release steps now come from Squire. The raw app installs Squire's deploy files from a checked copy at `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context. Squire owns them; Sourdough copies them as-is and records them in the manifest.
 
 **Deprecated:** none.
 
-**Steps:** run `composer install`. For maintainers of this repository, mount a Squire checkout (or set `SQUIRE_PATH`, default `/squire`) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The SQUIRE template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch).
+**Steps:** run `composer install`. For maintainers of this repository, mount a Squire checkout (or set `SQUIRE_PATH`, default `/squire`) so the copy check can compare against it; the check skips with exit 0 when no checkout is mounted. The Squire template copy was refreshed from e66f07b to 2a893c0 (the Vue layer's `.npmrc` and `docker-compose.squire.yml` joined the batch).
 
-**How to verify:** `composer squire-copy:check` exits 0 when the copy matches a fresh export from the SQUIRE checkout.
+**How to verify:** `composer squire-copy:check` exits 0 when the copy matches a fresh export from the Squire checkout.
 
 > [!TIP]
 > Commit `.sourdough/manifest.json` in every app you bake, and `.sourdough/base/` once a feed writes it. They are the record that keeps `feed` honest, and the base it merges against.
