@@ -84,8 +84,8 @@ it('keeps the worker timeout below the queue connection retry_after', function (
 
     expect($withRetryAfter)->not->toBeEmpty();
 
-    foreach ($withRetryAfter as $retryAfter) {
-        expect($timeout)->toBeLessThan((int) $retryAfter);
+    foreach ($withRetryAfter as $name => $connection) {
+        expect($timeout)->toBeLessThan((int) $connection['retry_after'], "queue connection {$name}");
     }
 });
 
