@@ -11,6 +11,7 @@ use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Manifest;
 use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 /**
  * `sourdough feed`: bring template updates into an app without clobbering
@@ -136,7 +137,9 @@ final class Feed
         $template = is_string($old['template'] ?? null) ? $old['template'] : '';
         $permutation = Permutation::tryFrom($template);
         if (null === $permutation) {
-            throw new FeedException(sprintf('The manifest names the template "%s", which this Sourdough does not bake.', $template));
+            // A retired shape says where to go (docs/guides/support.md).
+            $retired = ShapeSupport::load()->notice($template);
+            throw new FeedException(sprintf('The manifest names the template "%s", which this Sourdough does not bake.', $template) . (null === $retired ? '' : ' ' . $retired));
         }
 
         $answers = [];
@@ -165,6 +168,14 @@ final class Feed
         }
 
         $notes = [];
+
+        // A deprecated shape says so on every feed until the release that
+        // removes it, so the app's sourdough-feed CI job shows the notice in
+        // every pipeline (the sunset path in docs/guides/support.md).
+        $deprecation = ShapeSupport::load()->notice($permutation->value);
+        if (null !== $deprecation) {
+            $notes[] = $deprecation;
+        }
 
         // Sourdough 0.1.6 baked --sail and --docker but wrote the manifest
         // before the oven's scaffold ran, so its answers never say which oven

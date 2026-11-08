@@ -1,0 +1,41 @@
+{
+    "schema": 1,
+    "policy": "https://sourdough.apps.wayne.edu/docs/guides/support.html",
+    "shapes": {
+        "raw": {
+            "owner": "Sourdough maintainers",
+            "status": "supported",
+            "deprecated_in": null,
+            "removed_in": null,
+            "replacement": null
+        },
+        "raw-vue": {
+            "owner": "Sourdough maintainers",
+            "status": "supported",
+            "deprecated_in": null,
+            "removed_in": null,
+            "replacement": null
+        },
+        "laravel-blade": {
+            "owner": "Sourdough maintainers",
+            "status": "supported",
+            "deprecated_in": null,
+            "removed_in": null,
+            "replacement": null
+        },
+        "laravel-blade-vue": {
+            "owner": "Sourdough maintainers",
+            "status": "supported",
+            "deprecated_in": null,
+            "removed_in": null,
+            "replacement": null
+        },
+        "laravel-inertia": {
+            "owner": "Sourdough maintainers",
+            "status": "supported",
+            "deprecated_in": null,
+            "removed_in": null,
+            "replacement": null
+        }
+    }
+}

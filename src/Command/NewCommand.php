@@ -18,9 +18,11 @@ use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Generator\SkeletonSource;
 use Waynestate\Sourdough\Part;
 use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookAccess;
 use Waynestate\Sourdough\PlaybookMode;
 use Waynestate\Sourdough\Plan;
+use Waynestate\Sourdough\ShapeSupport;
 
 /**
  * The `sourdough new` command.
@@ -232,6 +234,12 @@ final class NewCommand extends Command
             return 1;
         }
 
+        // The PHP floor comes from CREED's policy at bake time (the
+        // generators resolve it the same way), and the shape's owner and
+        // support status from resources/shapes.json.
+        $floor = PhpFloor::forPermutation($permutation);
+        $support = ShapeSupport::load();
+
         if ($dryRun) {
             // A dry run still checks access, so the developer learns about a
             // missing Playbook read before they commit to the real run. It
@@ -249,6 +257,8 @@ final class NewCommand extends Command
                         'via' => $access['via'],
                     ],
                     'steps' => $plan->steps,
+                    'php' => $floor->toArray(),
+                    'support' => $support->toArray($permutation, $floor),
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 if (false === $encoded) {
                     $this->errorOutput($output)->writeln('Could not encode the plan as JSON.');
@@ -256,7 +266,7 @@ final class NewCommand extends Command
                 }
                 $output->writeln($encoded);
             } else {
-                $this->printPlan($output, $plan);
+                $this->printPlan($output, $plan, $floor, $support);
                 $output->writeln(sprintf('Playbook: %s (access: %s)', $playbook->value, $access['status']));
                 if ('no-access' === $access['status']) {
                     $this->errorOutput($output)->writeln('No Playbook access: a real run would stop until you can read the package.');
@@ -288,7 +298,7 @@ final class NewCommand extends Command
             return 1;
         }
 
-        $this->printPlan($output, $plan);
+        $this->printPlan($output, $plan, $floor, $support);
 
         $answers = $flags;
         if (PlaybookMode::Require === $playbook) {
@@ -483,10 +493,16 @@ final class NewCommand extends Command
         return ['status' => $result['status'], 'via' => $result['via']];
     }
 
-    private function printPlan(OutputInterface $output, Plan $plan): void
+    private function printPlan(OutputInterface $output, Plan $plan, PhpFloor $floor, ShapeSupport $support): void
     {
         $output->writeln(sprintf('Permutation: %s', $plan->permutation->label()));
         $output->writeln(sprintf('Target:      %s', $plan->dir));
+        $output->writeln(sprintf('PHP:         %s', $floor->describe()));
+        $output->writeln(sprintf('Support:     %s', $support->line($plan->permutation, $floor)));
+        $notice = $support->notice($plan->permutation->value);
+        if (null !== $notice) {
+            $this->errorOutput($output)->writeln('Deprecated: ' . $notice);
+        }
         $output->writeln('Plan:');
         foreach ($plan->steps as $step) {
             $output->writeln(sprintf('  - %s', $step));
