@@ -8,6 +8,8 @@ use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use OpenAI\Contracts\ClientContract;
 use RuntimeException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Asks an OpenAI-compatible model to plan an app from a sentence, and reads
@@ -63,9 +65,11 @@ final class Describe
     }
 
     /**
-     * Read and validate a ready-made plan from a file.
+     * Read and validate a ready-made plan from a file: JSON, or YAML when
+     * the file ends in .yaml or .yml (the plan every bake saves as
+     * `.sourdough/plan.yaml`). Both go through the same schema.
      *
-     * @throws DescribeException when the file is missing, not JSON, or fails the schema
+     * @throws DescribeException when the file is missing, does not parse, or fails the schema
      */
     public function fromFile(string $path): AppPlan
     {
@@ -78,7 +82,8 @@ final class Describe
             throw new DescribeException(sprintf('Could not read the plan file "%s".', $path));
         }
 
-        [$data, $failure] = $this->parse($content);
+        $yaml = 1 === preg_match('/\.ya?ml$/i', $path);
+        [$data, $failure] = $yaml ? $this->parseYaml($content) : $this->parse($content);
         if (null !== $failure) {
             throw new DescribeException(sprintf('The plan file "%s" is not a valid plan: %s.', $path, $failure));
         }
@@ -177,6 +182,37 @@ final class Describe
         }
 
         return [$data, null];
+    }
+
+    /**
+     * Decode and validate a YAML plan file. Custom tags, objects and PHP
+     * constants are refused by the parser's defaults, so a plan stays data.
+     *
+     * @return array{0: array<string, mixed>|null, 1: string|null} the decoded plan and null, or null and the reason it failed
+     */
+    private function parseYaml(string $content): array
+    {
+        try {
+            $data = Yaml::parse($content);
+        } catch (ParseException $e) {
+            return [null, 'the file was not valid YAML: ' . $e->getMessage()];
+        }
+
+        if (!is_array($data) || ([] !== $data && array_is_list($data))) {
+            return [null, 'the file was YAML but not a mapping'];
+        }
+
+        $plan = [];
+        foreach ($data as $key => $value) {
+            $plan[(string) $key] = $value;
+        }
+
+        $errors = $this->validate($plan);
+        if ($errors !== []) {
+            return [null, 'the file did not match the plan schema: ' . implode('; ', $errors)];
+        }
+
+        return [$plan, null];
     }
 
     /**

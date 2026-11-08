@@ -7,6 +7,7 @@ namespace Waynestate\Sourdough\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Waynestate\Sourdough\AppPlan;
 use Waynestate\Sourdough\Baker;
 use Waynestate\Sourdough\Command\FeedCommand;
 use Waynestate\Sourdough\Feed\Feed;
@@ -300,6 +301,35 @@ final class FeedCommandTest extends TestCase
         self::assertSame("# Our app\n", $this->read($app, 'README.md'));
         self::assertSame("OURS=1\n", $this->read($app, '.env.example'));
         self::assertSame('seeded', Manifest::files(Manifest::read($app))['README.md']['class']);
+    }
+
+    public function testTheSavedPlanIsNeverFedOrFlagged(): void
+    {
+        // A fresh app with its saved plan has nothing to feed.
+        $fresh = $this->bake(Permutation::Raw);
+        AppPlan::forShape(Permutation::Raw, 'Feed Demo')->write($fresh);
+        $this->commitAll($fresh, 'baked');
+        $dry = $this->feed($fresh, ['--dry-run' => true]);
+        self::assertSame(0, $dry->getStatusCode(), $dry->getDisplay());
+        self::assertStringContainsString('Fresh', $dry->getDisplay());
+
+        // An older app whose plan grew since the bake: feed updates the
+        // template's file and leaves the app's plan exactly as it was.
+        $app = $this->bake(Permutation::Raw);
+        AppPlan::forShape(Permutation::Raw, 'Feed Demo')->write($app);
+        $this->put($app, AppPlan::FILE, $this->read($app, AppPlan::FILE) . "pages:\n  - /later\n");
+        $plan = $this->read($app, AppPlan::FILE);
+        $file = $this->pickFile($app);
+        $this->age($app, $file, $this->replaceLine($this->read($app, $file), -1, self::TEMPLATE_LINE));
+        $this->commitAll($app, 'baked by an older Sourdough, plan edited');
+
+        $tester = $this->feed($app);
+        self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
+        self::assertStringNotContainsString('plan.yaml', $tester->getDisplay());
+        self::assertSame($plan, $this->read($app, AppPlan::FILE));
+        self::assertArrayNotHasKey(AppPlan::FILE, Manifest::files(Manifest::read($app)));
+        self::assertSame(['changed' => [], 'missing' => []], Manifest::check($app));
+        self::assertFileDoesNotExist($app . '/' . Feed::BASE_DIR . '/' . AppPlan::FILE . '.base');
     }
 
     public function testAMissingSeededFileIsSeededAgainOnlyWhenTheTemplateAddsIt(): void

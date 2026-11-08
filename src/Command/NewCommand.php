@@ -62,7 +62,7 @@ final class NewCommand extends Command
             ->addOption('json', null, InputOption::VALUE_NONE, 'With --dry-run, print the plan as JSON.')
             ->addOption('describe', null, InputOption::VALUE_REQUIRED, 'Describe what the app does in a sentence; a model plans it. Needs the SOURDOUGH_LLM_* env vars.')
             ->addOption('plan-only', null, InputOption::VALUE_NONE, 'With --describe, print the plan as JSON and write nothing.')
-            ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON matching resources/plan.schema.json)')
+            ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'A ready-made plan file (JSON, or YAML ending in .yaml or .yml, matching resources/plan.schema.json)')
             ->addOption('playbook', null, InputOption::VALUE_NONE, 'Kept for compatibility: Playbook is now the default.')
             ->addOption('no-playbook', null, InputOption::VALUE_NONE, 'Skip the PLAYBOOK wiring. For CI and automated tests only; WSU apps need Playbook.')
             ->addOption('no-advisor', null, InputOption::VALUE_NONE, 'Skip the ADVISOR wiring: no waynestate/advisor in require-dev, no .mcp.json in .gitignore, no README section.');
@@ -150,7 +150,7 @@ final class NewCommand extends Command
             $flags['inertia'] = true;
         }
 
-        return $this->generate($input, $output, $permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $mode, !$noAdvisor);
+        return $this->generate($input, $output, AppPlan::forShape($permutation, $name), $dir, $sail, $docker, $dryRun, $json, $flags, $mode, !$noAdvisor);
     }
 
     private function runDescribe(OutputInterface $output, string $sentence, bool $planOnly): int
@@ -200,17 +200,19 @@ final class NewCommand extends Command
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : $plan->name;
         $flags = $this->flagsForPermutation($plan->permutation);
 
-        return $this->generate($input, $output, $plan->permutation, $name, $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
+        return $this->generate($input, $output, $plan->withName($name), $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
     }
 
     /**
+     * Bake $appPlan into $dir, then save the plan there as
+     * `.sourdough/plan.yaml` (ADR-0014, decision 3).
+     *
      * @param array<string, bool> $flags the raw/laravel/vue/inertia flags
      */
     private function generate(
         InputInterface $input,
         OutputInterface $output,
-        Permutation $permutation,
-        string $name,
+        AppPlan $appPlan,
         string $dir,
         bool $sail,
         bool $docker,
@@ -220,6 +222,9 @@ final class NewCommand extends Command
         PlaybookMode $playbook,
         bool $advisor = true,
     ): int {
+        $permutation = $appPlan->permutation;
+        $name = $appPlan->name;
+
         try {
             $plan = Plan::forPermutation($permutation, $dir, $sail, $docker, $advisor);
         } catch (\InvalidArgumentException $e) {
@@ -302,6 +307,11 @@ final class NewCommand extends Command
             // which records sail and docker so `sourdough feed` can bake the
             // same loaf again. Feed bakes through the same Baker.
             (new Baker($this->skeletonSource))->bake($permutation, $dir, $name, $answers, $playbook, $advisor, $sail, $docker);
+
+            // The plan goes in the jar too, next to the manifest but not in
+            // it: the app's record of what it asked for. Feed never bakes it
+            // again, so feed never rewrites it.
+            $appPlan->write($dir);
         } catch (\InvalidArgumentException $e) {
             $this->errorOutput($output)->writeln($e->getMessage());
             return 1;
