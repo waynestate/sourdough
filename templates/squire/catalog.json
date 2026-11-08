@@ -115,6 +115,36 @@
             "appMayOwn": false
         },
         {
+            "path": ".squire/portable.Dockerfile",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable.Dockerfile.dockerignore",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/squire-entrypoint.sh",
+            "group": "parity",
+            "executable": true,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/ports.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/vhost.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
             "path": "scripts/parity.sh",
             "group": "parity",
             "executable": true,
@@ -226,6 +256,36 @@
         },
         {
             "path": ".squire/vhost.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable.Dockerfile",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable.Dockerfile.dockerignore",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/squire-entrypoint.sh",
+            "group": "parity",
+            "executable": true,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/ports.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/vhost.conf",
             "group": "parity",
             "executable": false,
             "appMayOwn": false
@@ -360,6 +420,36 @@
         },
         {
             "path": ".squire/vhost.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable.Dockerfile",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable.Dockerfile.dockerignore",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/squire-entrypoint.sh",
+            "group": "parity",
+            "executable": true,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/ports.conf",
+            "group": "parity",
+            "executable": false,
+            "appMayOwn": false
+        },
+        {
+            "path": ".squire/portable/vhost.conf",
             "group": "parity",
             "executable": false,
             "appMayOwn": false
