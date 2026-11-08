@@ -397,12 +397,16 @@ final class RawGeneratorTest extends TestCase
         $target = $this->generateFromRealTemplate();
         $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
 
-        // PROCTOR 0.4's preflight-pinned check wants a 40-hex SHA, so the
-        // components pin Preflight's release commit, with the tag in a
-        // trailing comment.
-        self::assertStringContainsString('7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0', $ci);
-        self::assertStringNotContainsString('@0.1.0', $ci);
+        // PROCTOR's preflight-pinned check wants a 40-hex SHA or a release
+        // tag, so the components pin Preflight's release commit, with the
+        // tag in a trailing comment. From 0.3.0 the components add the
+        // registry prefix themselves (image_prefix, here the shape's IMAGE_PREFIX),
+        // and the baked includes keep the components' default images.
+        self::assertStringContainsString('23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0', $ci);
+        self::assertStringNotContainsString('7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1', $ci);
         self::assertStringNotContainsString('79029cc2300702d0d450c42cc699e12af1b731f8', $ci);
+        self::assertStringContainsString('      image_prefix: "${IMAGE_PREFIX}"', $ci);
+        self::assertStringNotContainsString('image: "${IMAGE_PREFIX}/', $ci);
     }
 
     public function testGeneratedAppShipsItsPhpunitFiles(): void

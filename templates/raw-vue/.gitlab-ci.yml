@@ -1,19 +1,23 @@
-# PREFLIGHT components, pinned to released Preflight tags. Their image inputs
-# below only add ${IMAGE_PREFIX}; the images are the components' defaults.
+# PREFLIGHT components, pinned to the Preflight 0.3.0 release commit. Never use
+# ~latest. From 0.3.0 each component pulls image_prefix/image, with its own
+# default image (pinned by digest in that release). image_prefix is this file's
+# ${IMAGE_PREFIX}, so the components take the same proxy rule as the jobs
+# further down. To override an image, give the plain name (php:8.4-cli-trixie@sha256:...):
+# put the prefix in it too and the loaf gets proofed twice, and the pull fails.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0
     inputs:
       proctor_command: vendor/bin/proctor check --format=codequality
-      image: "${IMAGE_PREFIX}/php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
+      image_prefix: "${IMAGE_PREFIX}"
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       test_command: vendor/bin/phpunit
-      image: "${IMAGE_PREFIX}/php:${PHP_VERSION}-cli-trixie"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1 # 0.2.0
+      image_prefix: "${IMAGE_PREFIX}"
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@23038dfe767f6ef60e3b2efca1128f53d9acdff7 # 0.3.0
     inputs:
       working_dir: .
-      image: "${IMAGE_PREFIX}/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
+      image_prefix: "${IMAGE_PREFIX}"
 
 # Dependency caching. Docker Hub images come through the group's GitLab
 # Dependency Proxy when this GitLab has one, so pipelines are served from

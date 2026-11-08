@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Every app shape's pipeline keeps its dependency downloads cached: Docker
- * Hub images through ${IMAGE_PREFIX} (the group's Dependency Proxy when the
+ * Hub images through ${IMAGE_PREFIX} (the jobs name it in their images, the
+ * Preflight components take it as image_prefix; the group's Dependency Proxy when the
  * GitLab has one, Docker Hub when it does not), and every Composer or npm
  * install on a cache keyed by the lock file. A new job that pulls or
  * installs without them fails here, before it can get a runner rate
@@ -46,13 +47,20 @@ final class TemplateCiCacheTest extends TestCase
         );
     }
 
+    /**
+     * The app's own jobs name ${IMAGE_PREFIX} in their images. The Preflight
+     * components' image inputs (the include block) are plain names, because
+     * from Preflight 0.3.0 the components add the prefix themselves through
+     * image_prefix; tests/PreflightPinTest.php covers those.
+     */
     #[DataProvider('pipelines')]
-    public function testEveryImageComesThroughImagePrefix(string $file): void
+    public function testEveryJobImageComesThroughImagePrefix(string $file): void
     {
         $ci = self::read($file);
+        $jobs = (string) preg_replace('/^include:\n(?:  [^\n]*\n|\n)*/m', '', $ci, 1);
 
         self::assertSame(0, preg_match('/^[ \t]+image:[ \t]*$/m', $ci), 'image: blocks are not used here; write the image inline');
-        preg_match_all('/^[ \t]+image:[ \t]*(\S.*)$/m', $ci, $m);
+        preg_match_all('/^[ \t]+image:[ \t]*(\S.*)$/m', $jobs, $m);
         self::assertNotEmpty($m[1]);
         foreach ($m[1] as $image) {
             self::assertStringStartsWith('${IMAGE_PREFIX}/', trim($image, '"'), basename(dirname($file)) . ': ' . $image);
