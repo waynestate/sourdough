@@ -45,6 +45,7 @@ The step-by-step version is the [Quick start](guides/quick-start.md).
 
 - [Quick start](guides/quick-start.md): bake your first app and run its checks.
 - [Install](install.md): what the machine needs, and the two ways to get Sourdough.
+- [Adopt an existing app](guides/adopt.md): give an app Sourdough did not make a manifest, so `sourdough feed` can keep it current.
 - [Reference](reference/commands.md): every command and option, the plan format, the templates.
 
 ## Status

@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: What the exit codes mean when a bake is refused, Playbook cannot be read, a managed file has drifted, or a tool error stops the job.
+description: What the exit codes mean when a bake or an adopt is refused, Playbook cannot be read, a managed file has drifted, or a tool error stops the job.
 ---
 
 # Troubleshooting
@@ -239,9 +239,9 @@ Exits 0 or 1 (a plan) instead of 2.
 
 ### `sourdough feed` exits 2: "only runs inside a git repository" or "No Sourdough manifest"
 
-Cause: feed stands on git and on the manifest `sourdough new` writes. An app outside git, or one Sourdough did not make (WELD included), cannot be fed. Writing a manifest into an existing app is `sourdough adopt`'s job, which is not built yet.
+Cause: feed stands on git and on a manifest. An app outside git cannot be fed, and neither can one Sourdough did not make (WELD included) until it has a manifest.
 
-Fix: `git init` and commit the app first. For an app with no manifest, there is no feed yet.
+Fix: `git init` and commit the app first. For an app with no manifest, adopt it: `sourdough adopt --shape <shape>`, commit `.sourdough/`, then feed. See [Adopt an existing app](guides/adopt.md).
 
 Check:
 
@@ -251,10 +251,164 @@ sourdough manifest --check
 
 Exits 0 or 1 when the app has a manifest, 2 when it has none.
 
+## Adopting: sourdough adopt
+
+### `sourdough adopt` exits 1: "--shape is required" or "Unknown shape"
+
+Cause: adopt never picks a shape; you name what the app already is. Without `--shape` it says what the app's files point at (`This app looks like laravel-inertia (it has artisan and inertiajs/inertia-laravel).`). A shape that is not one of the five is refused with the list, and a retired one with its replacement.
+
+Fix: pass one of `raw`, `raw-vue`, `laravel-blade`, `laravel-blade-vue`, `laravel-inertia`. These are the manifest's `template` values, not `sourdough new`'s flags.
+
+Check:
+
+```bash
+sourdough adopt --shape raw --dry-run
+```
+
+Exits 0 with the report.
+
+### `sourdough adopt` exits 1: an oven or a name it cannot bake
+
+Cause: `--sail` or `--docker` on a raw shape (`--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.`), both ovens (`Choose one of --sail or --docker, not both.`), or a name `sourdough new` would refuse, followed by `Pass --name "<a valid name>".` The name defaults to the folder's basename, so a folder called `my app (old)` is refused.
+
+Fix: drop the oven (an app with its own Docker setup needs neither), or pass `--name` with letters, numbers, spaces, dots, dashes and underscores, at most 63 characters, starting with a letter or number.
+
+Check:
+
+```bash
+sourdough adopt --shape laravel-blade --name parking-permits --dry-run
+```
+
+Exits 0 with the report.
+
+### `sourdough adopt` exits 1: "does not exist" or "is a file, not a directory"
+
+Cause: `<dir>` is not there, or it names a file. Adopt takes the app's root folder.
+
+Fix: pass the app's root folder, or run adopt inside it with no `<dir>`.
+
+Check:
+
+```bash
+sourdough adopt --shape raw --dry-run
+```
+
+Exits 0 with the report.
+
+### `sourdough adopt` exits 1: "already has a Sourdough manifest"
+
+Cause: Sourdough made or adopted this app already. Adopting over a manifest would lose the record feed stands on, so adopt has no `--force`.
+
+Fix: bring it up to date with `sourdough feed`. To adopt it again with another `--shape` or `--name`, delete `.sourdough/`, commit, and run adopt again.
+
+Check:
+
+```bash
+sourdough feed --dry-run
+```
+
+Exits 0 (fresh) or 1 (a plan): the app already has its record.
+
+### `sourdough adopt` exits 1: "is left from a manifest that is gone"
+
+Cause: `.sourdough/base/` is there but `.sourdough/manifest.json` is not. Those base copies belong to a record that is gone, and a later feed would merge against them as if they were still true.
+
+Fix: delete `.sourdough/`, commit, and run adopt again.
+
+Check:
+
+```bash
+sourdough adopt --shape raw --dry-run
+```
+
+Exits 0 with the report.
+
+### `sourdough adopt` exits 1: "only runs inside a git repository"
+
+Cause: the app is not in git. Adopt wants the adoption to be one commit you can review, and every later feed to be undoable.
+
+Fix:
+
+```bash
+git init
+git add -A
+git commit -m "Before Sourdough"
+```
+
+Check:
+
+```bash
+sourdough adopt --shape raw --dry-run
+```
+
+Exits 0, with no `note: Not inside a git repository` line.
+
+### `sourdough adopt` exits 1: "Commit or stash your changes first"
+
+Cause: the tree has uncommitted or untracked changes, listed under the message (up to ten, then `... and N more`). The hashes describe the files on disk, so uncommitted edits would be adopted as if they were committed, and the adoption should be a commit of its own.
+
+Fix: commit or stash, then adopt.
+
+Check:
+
+```bash
+git status --short
+```
+
+Prints nothing.
+
+### `sourdough adopt` exits 2: git, the folder or the bake
+
+Cause: one of these:
+- `sourdough adopt needs git on PATH (or SOURDOUGH_GIT set to it)`: adopt checks the tree, and feed, which comes next, merges with git.
+- `Cannot write "<dir>/.sourdough/manifest.json": the folder is not writable.`: adopt writes only that file.
+- `sourdough adopt failed: could not bake a fresh <shape> app to compare with: ...`: the Laravel shapes bake a fresh `laravel/laravel` skeleton, so they need Composer and the network (or a warm Composer cache), the same as `sourdough new`.
+- `sourdough adopt failed: ...` after the report was planned: the manifest could not be written.
+
+Fix: put git on PATH or set `SOURDOUGH_GIT`; fix the folder's permissions; for a Laravel shape, check that `composer` runs (or set `SOURDOUGH_COMPOSER`) and that the network or the Composer cache is there.
+
+Check:
+
+```bash
+git --version
+composer --version
+```
+
+Both print a version.
+
+### Many files are `yours`, and a note says the name may be wrong
+
+Cause: the template writes the app's name into files (`composer.json`, `public/index.php`, the README), and `--name` defaulted to the folder's basename. If the app goes by another name, every file that carries it differs. Adopt flags each one (`differs; the template writes the app name here as "<name>", and your file does not have it`), and two or more add `note: <n> files differ where the template writes the app name`.
+
+Fix: delete `.sourdough/`, commit, and adopt again with `--name` set to the name in `composer.json`. A `yours` file is never lost or overwritten either way; the right name only lets more files match.
+
+Check:
+
+```bash
+sourdough adopt --shape raw --name parking-permits --dry-run
+```
+
+The name note is gone and more files are `match` (add `-v` to list them).
+
+### Almost everything is `yours` on an older Laravel app
+
+Cause: adopt compares with today's `laravel/laravel` skeleton and today's PHP floor from CREED's policy. An app several majors behind differs almost everywhere. That is correct: `yours` files are safe, and feed never touches them.
+
+Fix: upgrade first with [Booster](https://booster.apps.wayne.edu/), one hop at a time, then adopt (or, if already adopted, feed: each file that now matches is recorded and managed from then on).
+
+Check:
+
+```bash
+sourdough adopt --shape laravel-blade --dry-run
+```
+
+The summary line shows more `match` than before the upgrade.
+
 ## Related
 
 - [Commands](reference/commands.md)
 - [Templates](reference/templates.md)
 - [The manifest](guides/manifest.md)
+- [Adopt an existing app](guides/adopt.md)
 - [Keeping apps current](guides/keeping-current.md)
 - [Upgrading](upgrading.md)

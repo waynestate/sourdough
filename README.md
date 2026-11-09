@@ -171,7 +171,7 @@ A plan is a small JSON object:
 
 ## The manifest
 
-Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end).
+Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end). An app `sourdough adopt` took in has a third class, `yours`: a file that differed from the template on adoption day, which you own and feed takes over once it matches the template.
 
 The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
 
@@ -181,7 +181,7 @@ The manifest is the starter's memory: it remembers what went into the loaf, so `
 sourdough manifest --check
 ```
 
-Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours.
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded and yours files are never reported. They're yours.
 
 Commit the manifest. It's the record that keeps `feed` honest.
 
@@ -189,7 +189,7 @@ Next to it sits `.sourdough/plan.yaml`, the plan the app was baked from. It is n
 
 ## Feeding an app
 
-`sourdough feed` brings template updates into an app made with `sourdough new`, without clobbering what you've changed. Install the new Sourdough, then, in the app, on a clean git tree:
+`sourdough feed` brings template updates into an app made with `sourdough new` (or taken in with `sourdough adopt`, below), without clobbering what you've changed. Install the new Sourdough, then, in the app, on a clean git tree:
 
 ```
 sourdough feed --dry-run
@@ -212,6 +212,30 @@ Exit codes: `0` fed cleanly (or nothing to feed), `1` fed with conflicts to reso
 Feed needs git and nothing else: git is the merge engine and the undo button (`git restore . && git clean -fd`). The Laravel shapes bake on a fresh `laravel/laravel` skeleton, so feeding one needs Composer and the network, the same as `sourdough new`; skeleton updates arrive as template updates. The full story is in [Keeping apps current](docs/guides/keeping-current.md). A fed starter is a happy starter.
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. The copy is Squire 0.10.0's kit, so a Laravel release first refuses to run with no `APP_KEY` or with `APP_DEBUG` on in production (and warns when `APP_ENV` is not production), then `scripts/release.sh` asks PROCTOR's deploy gate (`proctor gate`, graded on the PHP that runs the release; `SQUIRE_PHP_RUNTIME` names another or `skip`) for a go or no-go before the frontend build and the migrations, keeps the verdict in `storage/squire/` (`SQUIRE_PROCTOR_RECORD_DIR`) as the next release's baseline, and after the optimize step restarts Laravel's long-lived processes (`php artisan reload`, or `queue:restart` and `schedule:interrupt` on an older Laravel; report only, `SQUIRE_ARTISAN_RESTART=0` turns it off). The image hardens too: the web's PHP loses its shell functions (`SQUIRE_PHP_DISABLE_FUNCTIONS` sets the list), opcache runs with production settings (`SQUIRE_OPCACHE_VALIDATE`), Apache answers `ServerTokens Prod`, and secrets can be read from `/run/secrets`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
+
+## Adopting an app
+
+**Can Sourdough look after an app it did not make?** Yes: `sourdough adopt` writes the manifest an existing app would have had if Sourdough had baked it, and `feed` takes over from there. In the app, on a clean git tree, name the shape it already is (`raw`, `raw-vue`, `laravel-blade`, `laravel-blade-vue` or `laravel-inertia`):
+
+```
+sourdough adopt --shape raw --dry-run
+sourdough adopt --shape raw
+git add .sourdough && git commit -m "Adopt with Sourdough 0.3.0"
+sourdough feed --dry-run
+```
+
+```
+sourdough adopt [<dir>] --shape <shape> [--name <name>] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]
+```
+
+Adopt bakes the shape fresh in a scratch folder, through the same code as `new` and `feed`, and looks at each template path in the app, and only those:
+
+- `match`: the app's file is the template's (line endings aside), so it is `managed` and feed keeps it current;
+- `yours`: the file differs, so it is recorded as `yours` and never written, merged or reported, until the day your copy equals the template's and feed records it;
+- `seeded`: a file the template seeds (`README.md`, `.env.example`), yours as in every Sourdough app;
+- `missing`: the app has no such file; the first feed adds it, which is how Squire's kit, the pipeline with its `sourdough-feed` job, PHPStan and Pint reach an older app.
+
+It writes `.sourdough/manifest.json` and nothing else, and never reads a file the template does not ship. `--name` defaults to the folder's basename; a wrong name makes the files that carry it differ, and the report says so. Exit codes: `0` adopted (or a dry run printed its plan), `1` refused (a wrong or missing shape, bad oven flags, a missing folder, a manifest already there, a bad name, not a git repository, a dirty tree), `2` tool error (no git, a folder it cannot write, a failed bake). `--json` gives machines the report. For older Laravel apps, upgrade with Booster first: every hop brings more files level with the template. The whole walk-through is in [Adopt an existing app](docs/guides/adopt.md). Every starter was once somebody's leftover dough.
 
 ## Which command when
 

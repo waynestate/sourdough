@@ -36,6 +36,10 @@
                     "title": "The manifest"
                 },
                 {
+                    "path": "guides/adopt",
+                    "title": "Adopt an existing app"
+                },
+                {
                     "path": "guides/testing",
                     "title": "Testing"
                 },
