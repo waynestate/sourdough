@@ -896,6 +896,8 @@ h1, h2, h3 {
   border-bottom: 2px solid rgba(255, 216, 102, 0.6);
 }
 .chalk-cmd::before { content: "$ "; color: var(--sd-chalk-dim); }
+/* An option keeps its dashes: no line break between "--" and its word. */
+.chalk-cmd .opt { white-space: nowrap; }
 .chalk-soon {
   font-family: var(--wsu-font-family-mono);
   font-size: 1.05rem;
@@ -919,9 +921,84 @@ h1, h2, h3 {
 }
 .exits dt { font-family: var(--wsu-font-family-mono); font-weight: 700; color: var(--sd-gold-chalk); }
 .exits dd { margin: 0; color: var(--sd-chalk); font-size: 0.92rem; }
+.chalkboard__head a,
+.schedule__what a { color: var(--sd-gold-chalk); font-weight: 700; text-underline-offset: 0.18em; }
+.schedule__or {
+  display: block;
+  margin-top: 0.2rem;
+  font-weight: 400;
+  font-size: 1.02rem;
+  color: var(--sd-chalk-dim);
+}
+
+/* Adoption papers: the real report adopt printed, on a slip taped to the
+   board. Same tape as the recipe card; ink on flour, so it reads at any
+   size. On a phone the lines stack (status and path, then the detail). */
+.papers {
+  position: relative;
+  margin: 1.6rem 0 0.4rem;
+  padding: 1.05rem 1.15rem 1.15rem;
+  background-color: var(--sd-flour);
+  color: var(--sd-ink);
+  border-radius: 4px;
+  border-top: 5px solid var(--sd-gold);
+  box-shadow: 0 10px 18px -12px rgba(0, 0, 0, 0.7);
+  transform: rotate(-0.5deg);
+}
+.papers::before,
+.papers::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  width: 78px;
+  height: 22px;
+  background: rgba(232, 212, 171, 0.82);
+  border: 1px solid rgba(138, 79, 31, 0.14);
+}
+.papers::before { left: 5%; transform: rotate(-5deg); }
+.papers::after { right: 7%; transform: rotate(4deg); }
+.papers__cap {
+  margin: 0 0 0.55rem;
+  font-family: var(--sd-display);
+  font-size: 1.2rem;
+  color: var(--sd-green-deep);
+}
+.papers__cap span {
+  margin-left: 0.4rem;
+  font-family: var(--sd-hand);
+  font-size: 1.02rem;
+  color: var(--sd-brown-ink);
+}
+.papers__out {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--sd-ink);
+  /* Ruled in step with the lines: one faint rule under each 1.5em line. */
+  background-image: linear-gradient(transparent calc(1.5em - 1px), rgba(12, 84, 73, 0.07) calc(1.5em - 1px));
+  background-size: 100% 1.5em;
+}
+.papers__ln { display: inline-block; max-width: 100%; vertical-align: top; }
+.papers__cmd { font-weight: 700; color: var(--sd-green-deep); }
+.papers__cmd .p { color: var(--sd-muted); font-weight: 400; }
+.papers__head, .papers__tail { color: var(--sd-muted); }
+.papers__st { font-weight: 700; }
+.papers__st--yours { color: var(--sd-bake); }
+.papers__st--seeded { color: var(--sd-green); }
+.papers__st--missing { color: var(--sd-muted); }
+.papers__path { color: var(--sd-ink); font-weight: 700; }
+.papers__detail { color: var(--sd-muted); }
+.papers__sum { font-weight: 700; color: var(--sd-green-deep); }
+.papers__wrote {
+  background-image: linear-gradient(transparent 62%, rgba(255, 204, 51, 0.55) 62%);
+  background-repeat: no-repeat;
+}
+
 .jars {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -1136,6 +1213,36 @@ h1, h2, h3 {
   }
   .start { grid-template-columns: minmax(0, 1fr); }
   .schedule__row { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+  .schedule__or { display: inline; margin: 0 0 0 0.4rem; }
+  .jars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .jars__col--yours { grid-column: 1 / -1; }
+}
+
+/* Too narrow for the report's columns: each line stacks, status and path
+   on top, the detail under them, and the padding spaces fall away. */
+@media (max-width: 760px) {
+  .papers { transform: none; padding-inline: 0.9rem; }
+  .papers__out { white-space: normal; font-size: 0.78rem; background-image: none; }
+  .papers__ln { display: block; }
+  .papers__row {
+    display: grid;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+    padding-block: 0.3rem;
+    border-top: 1px dashed rgba(138, 79, 31, 0.22);
+  }
+  .papers__row--first { margin-top: 0.6rem; }
+  .papers__detail { grid-column: 2; }
+  .papers__sum { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px dashed rgba(138, 79, 31, 0.22); }
+  .papers__then { padding-left: 6ch; }
+}
+/* A small phone: status and path share the line, the detail takes the
+   whole width under them, so no path breaks mid-name. */
+@media (max-width: 400px) {
+  .papers { padding-inline: 0.75rem; }
+  .papers__out { font-size: 0.74rem; }
+  .papers__row { grid-template-columns: auto minmax(0, 1fr); }
+  .papers__detail { grid-column: 1 / -1; padding-left: 0.9rem; }
 }
 
 @media (max-width: 640px) {
@@ -1309,6 +1416,27 @@ h1, h2, h3 {
 /* Chalk writes itself on, left to right, as each row comes into view. */
 .motion [data-reveal] { clip-path: inset(0 100% 0 0); transition: clip-path 1s var(--sd-ease-out); }
 .motion [data-reveal].is-in { clip-path: inset(0 0 0 0); }
+/* The adoption papers print in, one line after another, once the chalk on
+   their row has written itself on; the summary's "Wrote" gets its gold last.
+   Inside no-preference only, so a visitor who turns motion off mid-visit
+   never keeps a blank slip. */
+@media (prefers-reduced-motion: no-preference) {
+  .motion .schedule__row--adopt .papers__ln { opacity: 0; }
+  .motion .schedule__row--adopt.is-in .papers__ln {
+    animation: print-line 0.42s var(--sd-ease-out) both;
+    animation-delay: calc(0.85s + var(--n) * 0.11s);
+  }
+  .motion .schedule__row--adopt .papers__wrote { background-size: 0 100%; }
+  .motion .schedule__row--adopt.is-in .papers__wrote { animation: underline-in 0.7s var(--sd-ease-out) 2.4s both; }
+}
+@keyframes print-line {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes underline-in {
+  from { background-size: 0 100%; }
+  to { background-size: 100% 100%; }
+}
 .motion .good:hover .good__tag { animation: swing 1.2s var(--sd-ease-out); }
 @keyframes swing {
   0% { transform: rotate(-2deg); }

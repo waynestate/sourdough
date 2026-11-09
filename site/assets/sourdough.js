@@ -232,18 +232,32 @@
   });
 
   /* ------------------------------------------------- chalk reveals */
-  /* A row's own clip-path hides it from the observer's ratio (Chromium
-     counts it as 0 % visible until it is unclipped), so a ratio threshold
-     never fires. Trip on the first edge instead, once the row is 15 % of
-     the screen above the bottom, so the chalk still wipes in view. */
-  var reveals = document.querySelectorAll("[data-reveal]");
-  if (motion && "IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (list) {
-      list.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
+  /* A row's own clip-path hides it from an IntersectionObserver: Chromium
+     sees a fully clipped row as 0 px visible, so it only trips on the very
+     edge, and a jump or a quick flick past that edge (a tall row on a
+     phone, a link to the next section) left the row blank for good. So
+     measure instead: a row is written on once its top is 15 % of the screen
+     above the bottom, and any row the reader has already passed is written
+     on too. The listener goes once every row is in. */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll("[data-reveal]"));
+  if (motion) {
+    var revealTick = 0;
+    var revealCheck = function () {
+      revealTick = 0;
+      var line = window.innerHeight * 0.85;
+      reveals = reveals.filter(function (el) {
+        if (el.getBoundingClientRect().top < line) { el.classList.add("is-in"); return false; }
+        return true;
       });
-    }, { threshold: 0, rootMargin: "0px 0px -15% 0px" });
-    reveals.forEach(function (el) { io.observe(el); });
+      if (!reveals.length) {
+        window.removeEventListener("scroll", revealQueue);
+        window.removeEventListener("resize", revealQueue);
+      }
+    };
+    var revealQueue = function () { if (!revealTick) revealTick = requestAnimationFrame(revealCheck); };
+    window.addEventListener("scroll", revealQueue, { passive: true });
+    window.addEventListener("resize", revealQueue, { passive: true });
+    revealQueue();
   } else {
     reveals.forEach(function (el) { el.classList.add("is-in"); });
   }
