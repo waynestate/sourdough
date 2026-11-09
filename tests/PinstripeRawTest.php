@@ -39,7 +39,7 @@ final class PinstripeRawTest extends TestCase
         $target = $this->bakeApp();
         $composer = $this->readJson($target . '/composer.json');
 
-        self::assertSame('^0.1', $composer['require-dev']['waynestate/pinstripe']);
+        self::assertSame('^0.3', $composer['require-dev']['waynestate/pinstripe']);
         self::assertTrue($composer['config']['allow-plugins']['phpstan/extension-installer']);
         self::assertSame('pint --test', $composer['scripts']['lint']);
         self::assertSame('pint', $composer['scripts']['fix']);

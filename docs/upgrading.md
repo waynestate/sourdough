@@ -36,8 +36,14 @@ Then read the section for the version you are moving to.
 **What `sourdough feed` will bring an app baked with 0.3.0** (it merges each file with your edits):
 
 - `.gitlab-ci.yml`: the Preflight 0.5.0 pins (`60314791565a264e97cb210813ef4f3e76512402 # 0.5.0`, was 0.4.0). Inputs and job names are unchanged, so an include you edited keeps your inputs. Every component's Composer default is now 2.11.1 by digest, and the raw shapes' proctor job keeps `proctor.json` for Rollcall.
+- `composer.json`: Pinstripe `^0.3` in `require-dev` (was `^0.1`).
+- Raw shapes: `src/Oracle.php` types `query()`'s SQL as `literal-string` (PHPDoc only; the code does the same thing).
 
-**How to verify:** the next pipeline's include list names `@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0` on every Preflight component.
+**Breaking:** for apps whose code uses what Pinstripe 0.2 and 0.3 ban, PHPStan (`vendor/bin/phpstan analyse`, inside `composer ci`) now fails. The bans are `eval()`, `extract()`, `var_dump()`, `dd()` and `dump()` (Laravel's methods of those names too), `Http::withoutVerifying()` and other ways to turn TLS checks off, and SQL joined from strings: a variable concatenated, interpolated or `sprintf()`'d into the SQL given to `oci_parse()`, PDO, mysqli or Laravel's `DB::select()` and friends. Bind values instead. A helper of your own that takes the whole SQL as a parameter passes once that parameter is typed `literal-string` in its PHPDoc, the way `src/Oracle.php` does now; PHPStan then checks the helper's callers. Each finding has a `pinstripe.banned.*` identifier for a reasoned ignore, and Pinstripe's Banned calls page lists them all.
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/pinstripe --with-all-dependencies` (feed never touches your lock files), then `composer ci`.
+
+**How to verify:** the next pipeline's include list names `@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0` on every Preflight component, `composer show waynestate/pinstripe` names 0.3, and `composer ci` passes.
 
 ## 0.3.0 (2026-11-09)
 

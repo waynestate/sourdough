@@ -57,7 +57,7 @@ final class Oracle
     /** @var array<string, string> */
     private array $settings;
 
-    /** @var \Closure(string, array<string, mixed>): list<array<string, mixed>> */
+    /** @var \Closure(literal-string, array<string, mixed>): list<array<string, mixed>> */
     private \Closure $connector;
 
     /**
@@ -82,6 +82,11 @@ final class Oracle
      * Run $sql with named binds and return the rows, each row an array of
      * column name to value. Bind names may carry a leading colon or not.
      *
+     * $sql is a literal-string: SQL written in the code (literals, class
+     * constants, literal pieces joined together), never a value joined in.
+     * Pinstripe's joined-SQL ban reads this type and checks every caller.
+     *
+     * @param literal-string $sql
      * @param array<int|string, mixed> $binds
      * @return list<array<string, mixed>>
      *
@@ -112,7 +117,7 @@ final class Oracle
         $this->settings = $settings;
         $this->connector = $connector !== null
             ? \Closure::fromCallable($connector)
-            : fn(string $sql, array $binds) => $this->runWithOci8($sql, $binds);
+            : $this->runWithOci8(...);
     }
 
     /**
@@ -144,6 +149,7 @@ final class Oracle
      * The real work, on the OCI8 driver. Every call is guarded, so a PHP
      * without the driver throws the driver sentence, not a fatal error.
      *
+     * @param literal-string $sql
      * @param array<string, mixed> $binds
      * @return list<array<string, mixed>>
      */
