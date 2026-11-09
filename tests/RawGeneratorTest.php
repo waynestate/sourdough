@@ -7,7 +7,10 @@ namespace Waynestate\Sourdough\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\RawGenerator;
+use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 final class RawGeneratorTest extends TestCase
 {
@@ -318,6 +321,19 @@ final class RawGeneratorTest extends TestCase
         }
         self::assertStringContainsString('scripts/release.sh', $readme);
         self::assertStringContainsString('.squire/portable.Dockerfile', $readme);
+    }
+
+    public function testGeneratedReadmeCarriesTheSupportLine(): void
+    {
+        $target = $this->generateFromRealTemplate();
+        $readme = (string) file_get_contents($target . '/README.md');
+
+        self::assertStringContainsString('## Support', $readme);
+        self::assertStringContainsString(
+            ShapeSupport::load()->line(Permutation::Raw, PhpFloor::resolve()),
+            $readme,
+        );
+        self::assertStringNotContainsString('{{support_line}}', $readme);
     }
 
     public function testInstallsSquireDeployFilesAtCatalogPaths(): void

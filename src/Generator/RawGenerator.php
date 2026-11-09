@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Generator;
 
 use Waynestate\Sourdough\Manifest;
+use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
 
@@ -165,7 +166,12 @@ final class RawGenerator
         }
         // The PHP floor and test matrix come from CREED's policy
         // (BEST_PRACTICES 4.2); the template's literals are the fallback.
-        $this->support->applyPhpFloor($targetDir, PhpFloor::resolve());
+        $floor = PhpFloor::resolve();
+        $this->support->applyPhpFloor($targetDir, $floor);
+        $permutation = Permutation::tryFrom($this->templateName);
+        if (null !== $permutation) {
+            $this->support->applySupportLine($targetDir, $permutation, $floor);
+        }
         $this->support->installSquireFiles($targetDir);
         if ($this->shipsPackageJson()) {
             $this->support->installNpmrc($targetDir);

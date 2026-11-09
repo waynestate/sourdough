@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Generator;
 
+use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookAccess;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 /**
  * The steps every Sourdough generator shares: refusing a non-empty target,
@@ -838,6 +840,26 @@ final class GeneratorSupport
                 $content,
             ));
         }
+    }
+
+    /**
+     * Write the support line into the baked README's "## Support" section
+     * (BEST_PRACTICES 2.4): the same line `sourdough new` prints, with the
+     * shape's status, owner and the end-of-security date its app inherits
+     * from CREED's policy. A target without a README, or one whose README
+     * carries no {{support_line}} placeholder, is left alone.
+     *
+     * @throws \RuntimeException when the file cannot be read or written
+     */
+    public function applySupportLine(string $targetDir, Permutation $permutation, PhpFloor $floor): void
+    {
+        $readmePath = $targetDir . '/README.md';
+        if (!is_file($readmePath) || !str_contains((string) file_get_contents($readmePath), '{{support_line}}')) {
+            return;
+        }
+
+        $line = ShapeSupport::load()->line($permutation, $floor);
+        $this->rewrite($readmePath, static fn(string $content): string => str_replace('{{support_line}}', $line, $content));
     }
 
     /**

@@ -6,7 +6,10 @@ namespace Waynestate\Sourdough\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\RawVueGenerator;
+use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 final class RawVueGeneratorTest extends TestCase
 {
@@ -174,6 +177,19 @@ final class RawVueGeneratorTest extends TestCase
         foreach (['preflight/sbom@', 'preflight/secret-detection@', 'preflight/a11y@', "\na11y-pages:\n", "\n.deploy:\n"] as $gate) {
             self::assertStringContainsString($gate, $ci);
         }
+    }
+
+    public function testGeneratedReadmeCarriesTheSupportLine(): void
+    {
+        $target = $this->generate();
+        $readme = (string) file_get_contents($target . '/README.md');
+
+        self::assertStringContainsString('## Support', $readme);
+        self::assertStringContainsString(
+            ShapeSupport::load()->line(Permutation::RawVue, PhpFloor::resolve()),
+            $readme,
+        );
+        self::assertStringNotContainsString('{{support_line}}', $readme);
     }
 
     private function generate(bool $advisor = true): string

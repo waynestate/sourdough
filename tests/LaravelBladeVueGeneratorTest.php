@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
+use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 final class LaravelBladeVueGeneratorTest extends TestCase
 {
@@ -225,6 +229,19 @@ final class LaravelBladeVueGeneratorTest extends TestCase
 
         // The islands shape has its own pipeline now, so the build reaches the gate.
         self::assertStringContainsString("\nfrontend:\n", $ci);
+    }
+
+    public function testGeneratedReadmeCarriesTheSupportLine(): void
+    {
+        $target = $this->generate();
+        $readme = (string) file_get_contents($target . '/README.md');
+
+        self::assertStringContainsString('## Support', $readme);
+        self::assertStringContainsString(
+            ShapeSupport::load()->line(Permutation::LaravelBladeVue, PhpFloor::resolve(ComposerSkeletonSource::laravelMajor())),
+            $readme,
+        );
+        self::assertStringNotContainsString('{{support_line}}', $readme);
     }
 
     private function generate(bool $advisor = true): string

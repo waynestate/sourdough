@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Generator;
 
 use Waynestate\Sourdough\Manifest;
+use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
 
@@ -207,7 +208,12 @@ abstract class LaravelOverlayGenerator
 
         // The PHP floor and test matrix come from CREED's policy, bounded by
         // the Laravel major's own PHP range (BEST_PRACTICES 4.2).
-        $this->support->applyPhpFloor($targetDir, PhpFloor::resolve(ComposerSkeletonSource::laravelMajor()));
+        $floor = PhpFloor::resolve(ComposerSkeletonSource::laravelMajor());
+        $this->support->applyPhpFloor($targetDir, $floor);
+        $permutation = Permutation::tryFrom($this->templateName());
+        if (null !== $permutation) {
+            $this->support->applySupportLine($targetDir, $permutation, $floor);
+        }
 
         $this->createSqliteDatabase($targetDir);
 

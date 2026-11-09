@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Waynestate\Sourdough\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
+use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
 use Waynestate\Sourdough\PlaybookMode;
+use Waynestate\Sourdough\ShapeSupport;
 
 final class LaravelBladeGeneratorTest extends TestCase
 {
@@ -524,6 +528,19 @@ final class LaravelBladeGeneratorTest extends TestCase
         foreach (['preflight/sbom@', 'preflight/secret-detection@', 'preflight/a11y@', "\na11y-pages:\n", "\n.deploy:\n"] as $gate) {
             self::assertStringContainsString($gate, $ci);
         }
+    }
+
+    public function testGeneratedReadmeCarriesTheSupportLine(): void
+    {
+        $target = $this->generate();
+        $readme = (string) file_get_contents($target . '/README.md');
+
+        self::assertStringContainsString('## Support', $readme);
+        self::assertStringContainsString(
+            ShapeSupport::load()->line(Permutation::LaravelBlade, PhpFloor::resolve(ComposerSkeletonSource::laravelMajor())),
+            $readme,
+        );
+        self::assertStringNotContainsString('{{support_line}}', $readme);
     }
 
     private function generate(bool $advisor = true, PlaybookMode $playbook = PlaybookMode::Suggest): string
