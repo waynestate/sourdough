@@ -157,7 +157,7 @@ A plan is a small JSON object:
 
 ### The manifest
 
-Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end).
 
 The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
 
@@ -189,7 +189,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 - a file you both changed is three-way merged by git (`git merge-file`), from the version Sourdough wrote last time; where you both changed the same lines, git's conflict markers go in the file (`<<<<<<< app` and `>>>>>>> sourdough `), never a silent overwrite;
 - new template files are added, and files the template dropped are removed only if you never changed them;
 - a file that already matches the template's new version is only recorded in the manifest (`record`); that is also how an app baked by 0.1.6 with `--sail` or `--docker` gets its oven into the manifest;
-- seeded files (`README.md`, `.env.example`) are never touched.
+- seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched.
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
 
@@ -690,6 +690,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Added: deprecations fail the tests, in Sourdough's own suite and in every shape it bakes (BEST_PRACTICES 4.13, now `Enforced` for the suites). The phpunit config sets `failOnDeprecation` and `failOnPhpunitDeprecation` and skips indirect deprecations; the Laravel shapes get it on the skeleton's `phpunit.xml` at bake time, plus `tests/Support/ReportsDeprecationsToPhpUnit.php`, because Laravel's error handler drops deprecations while testing. Template code bakes clean on PHP 8.5, and the one PHPUnit deprecation in Sourdough's own tests (a doc-comment data provider) is now an attribute.
+- Added: the front-end shapes (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, seeded so npm owns it after the bake, and their `frontend` job installs it with `npm ci --ignore-scripts`, then fails on a high or critical `npm audit` finding (BEST_PRACTICES 4.10, now `Enforced`). New `tests/TemplateNpmLockTest.php` keeps each lock in step with its `package.json`, the smoke jobs install with `npm ci`, and apps already baked get the template's lock from `sourdough feed` only when they have none.
 - Added: tests/KitRoutesAbsentTest.php: no Laravel shape ships Fortify, Breeze or Jetstream, a routes/auth.php, or registration, password reset, email verification or two-factor routes (BEST_PRACTICES 2.2, backlog 5).
 - Added: the generated README carries a Support section with the support line `sourdough new` prints (status, owner and the end-of-security date from CREED's policy), on every shape (BEST_PRACTICES 2.4).
 - Changed: the front-end templates floor Vite at ^6.4.1, the CVE-2025-62522 fix line, and ignore \*.local, where Vite keeps local secrets (BEST_PRACTICES 4.12).
@@ -986,6 +988,10 @@ In production the sign-in page is the CAS server's own, so the part of the sign-
 Note
 
 Automated checks find only part of the problems. axe-core checks a loaded page; it does not follow a client-side navigation, so focus after a route change and announced route changes in the Vue shapes still need a person with a keyboard and a screen reader. The generated README says so.
+
+### The npm install and audit[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-npm-install-and-audit)
+
+The shapes with a front end (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, written against the template's `package.json` with npm's one-day release cooldown honored, so a fresh app's first pipeline installs exactly what Sourdough tested (BEST_PRACTICES 4.10). The `frontend` job runs `npm ci --ignore-scripts`, which installs the lock as it is, runs no package's install script, and stops when `package.json` and the lock disagree, then `npm audit --audit-level=high`, which fails the job on a high or critical advisory (moderate and low ones are listed, not fatal). The lock is seeded: after the bake it is yours, and npm writes it. Change a dependency with `npm install` and commit `package.json` and `package-lock.json` together. A package that truly needs its install script (a native addon, a binary download) gets an `npm rebuild <name>` line after `npm ci`, by name, so nothing else runs one.
 
 ### The bill of materials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-bill-of-materials)
 
@@ -1326,7 +1332,7 @@ Feed is the update model of Copier and cruft (ADR-0014), built on plain git inst
 
 A `record` line changes no file, only the manifest, so `sourdough manifest --check` stops calling the file changed. It is how an app baked by Sourdough 0.1.6 with `--sail` or `--docker` catches up: 0.1.6 wrote the manifest before the oven's scaffold ran, so feed reads the oven from the app's files (it says so in a `note:` line) and records them.
 
-Seeded files (`README.md`, `.env.example`) are never touched; a seeded file new to the template is written only where you have none. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
+Seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched; a seeded file new to the template is written only where you have none. A feed that changes `package.json` leaves your lock file alone, so run `npm install` and commit both files, or the pipeline's `npm ci` stops on the mismatch. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
 
 4. It moves the manifest to the new base (the new loaf's hashes and the new Sourdough version) and keeps the template's version of every managed file you have changed in `.sourdough/base/<file>.base`. Commit both.
 
@@ -1611,7 +1617,7 @@ The JSON is pretty-printed with sorted keys and a trailing newline, and paths us
 | Class | Who owns it |
 | --- | --- |
 | `managed` | Sourdough owns the file and will update it |
-| `seeded` | Sourdough wrote the file once; you own it now (`.env.example` and `README.md`) |
+| `seeded` | Sourdough wrote the file once; you own it now (`.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end) |
 
 The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed: see [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html).
 
@@ -1711,7 +1717,7 @@ From a machine where `sourdough` is installed (see [Install](https://sourdough.a
 - A Wayne State app with the stack already wired in: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components.
 - Playbook wiring by default: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section.
 - ADVISOR in `require-dev`, a git-ignored `.mcp.json`, and an "ADVISOR" README section.
-- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end).
 - `.sourdough/plan.yaml`, the plan the app was baked from: the shape, the name and the stack parts (plus the models and pages, when you baked from a plan file). It bakes the same loaf again with `--plan`; see [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
 ### Next steps[#](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html#next-steps)
@@ -1929,7 +1935,7 @@ Maintainers: how to build, test and release this project, and where its data com
 | Refresh the Squire copy | `composer squire-copy:sync`, then commit `templates/squire/` |
 | Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The tests fail on any PHP or PHPUnit deprecation (`failOnDeprecation` and `failOnPhpunitDeprecation` in `phpunit.xml.dist`), and the report names the test that raised it, the same gate every baked app gets.
 
 ### With only Docker[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#with-only-docker)
 
@@ -1959,9 +1965,9 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
 - `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `raw-vue`: the raw steps plus `npm ci --ignore-scripts` (from the shipped `package-lock.json`) and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
 - `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
-- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `blade-vue`: the blade steps with `npm ci --ignore-scripts` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
 - `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
 
 With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
@@ -2253,9 +2259,9 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
 - `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `raw-vue`: the raw steps plus `npm ci --ignore-scripts` (from the shipped `package-lock.json`) and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
 - `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
-- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `blade-vue`: the blade steps with `npm ci --ignore-scripts` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
 - `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
 
 With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
@@ -2312,6 +2318,18 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 ```
 
 Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Apps generated earlier pick up the refreshed files with their next `sourdough feed`.
+
+### Refreshing a template's lock file[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-a-template-s-lock-file)
+
+Each template that ships a `package.json` (`raw-vue`, `laravel-blade-vue`, `laravel-inertia`) ships the `package-lock.json` that goes with it, so a fresh app passes `npm ci` on its first pipeline. `tests/TemplateNpmLockTest.php` fails when the two drift. After editing a template's `package.json`, write its lock again in the pinned Node image the pipelines use (`node:22.21.1-alpine3.22`, by digest), in a scratch folder that holds a copy of that `package.json` and of `templates/squire/vue/.npmrc`:
+
+```
+sed -i 's/{{app_slug}}/app-slug-placeholder/' package.json
+npm install --package-lock-only --ignore-scripts --no-audit --no-fund --before=<yesterday, as 2026-11-07T00:00:00Z>
+sed 's/"app-slug-placeholder"/"{{app_slug}}"/g' package-lock.json > <repo>/templates/<shape>/package-lock.json
+```
+
+The stand-in name keeps npm away from the `{{app_slug}}` placeholder, which is not a valid package name. `--before` keeps the one-day release cooldown the app's `.npmrc` sets, which npm 10 ignores. Then run `npm ci --ignore-scripts`, `npm audit --audit-level=high` and `npm run build` on a bake of the shape (the smoke jobs run the install and the build), and commit the lock with its `package.json`. Apps already baked keep their own lock: it is seeded.
 
 ### What belongs here[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
 
@@ -2843,7 +2861,7 @@ Every run goes through `scripts/smoke-shape.sh`, the same gate the per-shape smo
 2. **The manifest is clean.** `sourdough manifest --check` exits 0 right after the bake: every managed file matches `.sourdough/manifest.json`.
 3. **The bake is reproducible.** The fresh app is committed to a scratch git repository and `sourdough feed --dry-run` must find nothing to feed. A loaf that came out different every time would make every feed of it a conflict.
 4. **Yesterday's loaf feeds forward.** The same shape is baked with the last release, installed from Packagist, and committed as an app would be. This checkout's `sourdough feed` must bring it up to date without a conflict, `sourdough manifest --check` must be clean afterwards, and a second `sourdough feed --dry-run` must find nothing left to do.
-5. **It installs.** `composer install` (and `npm install` for the Vue shapes) from the baked `composer.json` and `package.json`.
+5. **It installs.** `composer install` (and `npm ci --ignore-scripts` for the Vue shapes) from the baked `composer.json` and the shipped `package-lock.json`.
 6. **Its own suite passes.** `composer test` for the raw shapes (PHPUnit), `php artisan test` for the Laravel shapes (Pest 4). The table quotes the suite's own count.
 7. **PROCTOR passes.** `composer proctor`: the stack's checks against CREED's policy, from inside the app.
 8. **Its own gate passes.** `composer ci`, plus `npm run build` for the Vue shapes and `npm run typecheck` for Inertia.
@@ -2971,6 +2989,7 @@ sourdough new my-app --inertia
 - Ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), with `waynestate/pinstripe` in require-dev and the extension-installer plugin allowed.
 - Ships `scripts` (`test`, `lint`, `fix`, `analyse`, `proctor`, `ci`) and `scripts-descriptions`, so a generated raw app can run its own gate locally with `composer ci`, which runs test, lint, analyse, proctor and audit in that order.
 - Its `.gitlab-ci.yml` runs an explicit `composer-ci` job (`composer install`, then `composer ci`), mirroring the Laravel overlay, so PROCTOR sees a `composer ci` in the pipeline instead of warning that no job runs it.
+- `phpunit.xml.dist` fails the run on any PHP or PHPUnit deprecation and names the test that raised it (`failOnDeprecation`, `failOnPhpunitDeprecation`), counting the app's own code (`src/`, `public/`, not the fetched `public/wayne-ui.php`) and skipping indirect deprecations, the ones one package raises because of another.
 - Ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
 - The front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
 - Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
@@ -2983,15 +3002,16 @@ sourdough new my-app --inertia
 - `public/index.php` boots HELMET, the session and SESAME exactly as `raw/` does. Paths under `/api/` answer JSON: `/api/me` returns the signed-in user (`username` and `name`), an unknown endpoint is a JSON `404`, and a request without a session is a JSON `401` instead of a redirect to CAS. `/` sends the page that loads the Vue app; any other path sends the same page with a `404`, and Vue says the page does not exist.
 - `src/Vite.php` prints the stylesheet, `modulepreload` and script tags for `resources/js/app.js` from `public/build/manifest.json` (imported chunks and their CSS included), each with HELMET's CSP nonce. While `npm run dev` runs, `public/hot` holds the dev server's origin and the helper points at it instead, and adds it to the CSP; with `APP_ENV=production` the hot file is ignored. `tests/ViteTest.php` covers both paths.
 - `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
-- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`: Squire's release script runs `npm ci` and `npm run build` once `package-lock.json` is committed.
+- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`. The template ships `package-lock.json` (seeded: yours after the bake), so CI and Squire's release script run `npm ci` from it on the first push.
 - Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
-- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm ci --ignore-scripts` from the shipped `package-lock.json`, `npm audit --audit-level=high`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
 
 #### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
 
 - A fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
 - Ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)`, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
 - The views read the signed-in user as an array (`$user['name']`), because SESAME's `Sesame::user()` returns an array, not an object.
+- Deprecations fail the suite: the bake adds `failOnDeprecation`, `failOnPhpunitDeprecation` and the two `displayDetailsOn...` flags to the skeleton's `phpunit.xml` and `ignoreIndirectDeprecations` to its `<source>`, leaving the rest of the file as Laravel wrote it. `tests/TestCase.php` uses `tests/Support/ReportsDeprecationsToPhpUnit.php`, which hands deprecations back to PHPUnit's handler during each test, because Laravel's handler drops them while testing. The other Laravel shapes ship the same.
 - `config/helmet.php` holds only the app's own override, `policy_path` (the CREED policy the environment ribbon reads). Every other HELMET setting comes from the package's config, which HELMET's provider merges in, so `composer update` brings new settings and fixes instead of a stale copy hiding them. The other Laravel shapes ship the same file.
 - Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
 
@@ -2999,7 +3019,7 @@ sourdough new my-app --inertia
 
 - The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
 - Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
-- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm install`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
+- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm ci --ignore-scripts`, `npm audit --audit-level=high`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
 #### laravel-inertia/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
@@ -3376,9 +3396,13 @@ Then read the section for the version you are moving to.
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
 
-**Breaking:** for apps you feed, in one case only. The fed `composer.json` moves PROCTOR to `^0.8`, whose `crlf-deploy-script` check fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF). Such a script was already broken on the Linux host; convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.8 also adds `mysql-eol`, which only warns. **Deprecated:** none.
+**Breaking:** for apps you feed, in three cases. First, the fed `composer.json` moves PROCTOR to `^0.8`, whose `crlf-deploy-script` check fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF). Such a script was already broken on the Linux host; convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.8 also adds `mysql-eol`, which only warns. Second, a front-end app's `frontend` job now fails on a lock file that does not match `package.json` and on a high or critical `npm audit` finding (below). Third, the test suite fails on a deprecation the app's own code raises or causes (below). **Deprecated:** none.
 
 **Steps:** in each app, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/proctor --with-all-dependencies`, then `vendor/bin/proctor check`. See [PROCTOR's upgrading notes](https://proctor.apps.wayne.edu/docs/upgrading.html).
+
+**Front-end shapes: the pipeline installs from the lock file.** Feed moves the `frontend` job to `npm ci --ignore-scripts` and `npm audit --audit-level=high`. `npm ci` needs a `package-lock.json` that matches `package.json`: an app that has none gets the template's (a seeded file, written only where you have none), and an app that already commits one keeps it. If you added or changed a dependency, run `npm install` once and commit both files before you push. A high or critical advisory now fails the job: update the package (`npm audit fix`, or `npm install <package>@<fixed version>`), then commit the lock.
+
+**Every shape: deprecations fail the tests.** Feed adds `failOnDeprecation`, `failOnPhpunitDeprecation` and the two `displayDetailsOn...` flags to `phpunit.xml` (Laravel) or `phpunit.xml.dist` (raw), and `ignoreIndirectDeprecations` to its `<source>`, so only a deprecation your code raises or causes counts. The Laravel shapes also take a new `tests/Support/ReportsDeprecationsToPhpUnit.php` and a `tests/TestCase.php` that uses it: Laravel's own error handler drops deprecations while testing, so without it PHPUnit never sees one. If the suite now fails, its report names the test and the line: fix the code (on PHP 8.4 and 8.5 that is usually an implicitly nullable parameter, `string $x = null`, which becomes `?string $x = null`). A deprecation you cannot fix yet can go in a PHPUnit baseline (write it with the `--generate-baseline <file>` option, then name the file in `<source baseline="...">`), which keeps the gate on for everything else.
 
 **Laravel shapes: `config/helmet.php` shrinks to the app's own override.** Feed brings a short `config/helmet.php` that sets only `policy_path`; every other HELMET setting comes from the package's own config. If you never changed the file, feed replaces it and nothing else changes, except that the app now gets HELMET's current defaults: `HELMET_PRESET` can come from Playbook, a set-but-empty `HELMET_PROXIES` trusts no proxy (as HELMET documents), and the newer settings (`HELMET_SESSION_SECURE`, `HELMET_WARN_DEBUG`, the metrics storage) work. If you changed it, feed marks a conflict: keep only the keys you changed, each with the package's whole value for that key, and drop the rest. The full list is in `vendor/waynestate/helmet/config/helmet.php`.
 

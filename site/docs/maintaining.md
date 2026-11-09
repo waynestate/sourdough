@@ -58,9 +58,9 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
 - `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `raw-vue`: the raw steps plus `npm ci --ignore-scripts` (from the shipped `package-lock.json`) and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
 - `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
-- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `blade-vue`: the blade steps with `npm ci --ignore-scripts` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
 - `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
 
 With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
@@ -117,6 +117,18 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 ```
 
 Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Apps generated earlier pick up the refreshed files with their next `sourdough feed`.
+
+## Refreshing a template's lock file[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-a-template-s-lock-file)
+
+Each template that ships a `package.json` (`raw-vue`, `laravel-blade-vue`, `laravel-inertia`) ships the `package-lock.json` that goes with it, so a fresh app passes `npm ci` on its first pipeline. `tests/TemplateNpmLockTest.php` fails when the two drift. After editing a template's `package.json`, write its lock again in the pinned Node image the pipelines use (`node:22.21.1-alpine3.22`, by digest), in a scratch folder that holds a copy of that `package.json` and of `templates/squire/vue/.npmrc`:
+
+```
+sed -i 's/{{app_slug}}/app-slug-placeholder/' package.json
+npm install --package-lock-only --ignore-scripts --no-audit --no-fund --before=<yesterday, as 2026-11-07T00:00:00Z>
+sed 's/"app-slug-placeholder"/"{{app_slug}}"/g' package-lock.json > <repo>/templates/<shape>/package-lock.json
+```
+
+The stand-in name keeps npm away from the `{{app_slug}}` placeholder, which is not a valid package name. `--before` keeps the one-day release cooldown the app's `.npmrc` sets, which npm 10 ignores. Then run `npm ci --ignore-scripts`, `npm audit --audit-level=high` and `npm run build` on a bake of the shape (the smoke jobs run the install and the build), and commit the lock with its `package.json`. Apps already baked keep their own lock: it is seeded.
 
 ## What belongs here[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
 

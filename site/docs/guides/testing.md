@@ -26,7 +26,7 @@ Maintainers: how to build, test and release this project, and where its data com
 | Refresh the Squire copy | `composer squire-copy:sync`, then commit `templates/squire/` |
 | Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The tests fail on any PHP or PHPUnit deprecation (`failOnDeprecation` and `failOnPhpunitDeprecation` in `phpunit.xml.dist`), and the report names the test that raised it, the same gate every baked app gets.
 
 ## With only Docker[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#with-only-docker)
 
@@ -56,9 +56,9 @@ The smoke gate is the proofing bench: it proofs one shape at a time before that 
 Right after the bake, every shape proves its manifest and its bake: `sourdough manifest --check` must be clean, and with the fresh app committed to a scratch git repository `sourdough feed --dry-run` must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:
 
 - `raw`: `composer install`, `composer test`, `composer proctor` and `composer ci`, then a live check: fetch the pinned WayneUI release once into `public/wayne-ui.php`, start the app with `APP_ENV=local` and expect `/` 200 with the app's home page in WayneUI's shell, `/nope` 404 and `/up` 200 (the front controller defaults `APP_ENV` to production when it is unset, so the server must set it)
-- `raw-vue`: the raw steps plus `npm install` and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
+- `raw-vue`: the raw steps plus `npm ci --ignore-scripts` (from the shipped `package-lock.json`) and `npm run build`, then the same live server, which must answer `/` with the built app mounted on `id="app"`, `/api/me` with the signed-in user (and `401` without a session), `/nope` with `404` and the app, and `/up` with `200`
 - `blade`: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan test`, `composer proctor` and `composer ci`, then Laravel's own router (the one `php artisan serve` runs) must answer `/` with the Blade home page, `/dashboard` after SESAME's fake sign-in, `/nope` with `404` and `/up` with `200`
-- `blade-vue`: the blade steps with `npm install` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
+- `blade-vue`: the blade steps with `npm ci --ignore-scripts` and `npm run build` before the tests; `/` must also load the built assets and `/dashboard` carry the Vue island
 - `inertia`: the blade-vue steps plus `npm run typecheck`; `/` must hand Vue the Inertia `Home` page and `/dashboard` the `Dashboard` page
 
 With `--sail` or `--docker` after the shape (`smoke-shape.sh blade --docker`), a Laravel shape proves its oven instead: the scaffold's files are there, then `composer install`, `php artisan key:generate`, `php artisan test` and `composer proctor`. The gate never lights the oven: it has no Docker daemon.
