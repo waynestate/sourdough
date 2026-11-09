@@ -12,13 +12,13 @@ A project that was fresh on the day it was generated is stale a month later, so 
 
 ## Record where the app came from[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#record-where-the-app-came-from)
 
-Every app carries a `.sourdough/manifest.json` recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded`. Other tools do the same: Copier writes `.copier-answers.yml`, and cruft writes `.cruft.json`. Without this record there is nothing to compare against, so no update is possible.
+Every app carries a `.sourdough/manifest.json` recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` (or `yours`, in an app Sourdough adopted). Other tools do the same: Copier writes `.copier-answers.yml`, and cruft writes `.cruft.json`. Without this record there is nothing to compare against, so no update is possible.
 
 Warning
 
 Do not hand-edit the manifest. It is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own.
 
-[The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html) has the full key list and the managed/seeded split.
+[The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html) has the full key list and the managed, seeded and yours split.
 
 ## Check for drift[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#check-for-drift)
 
@@ -28,7 +28,7 @@ Do not hand-edit the manifest. It is the starter's memory: it remembers what wen
 sourdough manifest --check
 ```
 
-Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a checkout that turned a file to CRLF (the raw shapes' `.gitattributes` does it for `*.ps1`) has not drifted. Drift is not wrong: `feed` merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace, which is why the [CI job](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci) reports drift and never fails on it.
+Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded and yours files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a checkout that turned a file to CRLF (the raw shapes' `.gitattributes` does it for `*.ps1`) has not drifted. Drift is not wrong: `feed` merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace, which is why the [CI job](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci) reports drift and never fails on it.
 
 ## Feed the app: a merge, not an overwrite[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-the-app-a-merge-not-an-overwrite)
 
@@ -81,7 +81,7 @@ Feed is the update model of Copier and cruft (ADR-0014), built on plain git inst
 
 A `record` line changes no file, only the manifest, so `sourdough manifest --check` stops calling the file changed. It is how an app baked by Sourdough 0.1.6 with `--sail` or `--docker` catches up: 0.1.6 wrote the manifest before the oven's scaffold ran, so feed reads the oven from the app's files (it says so in a `note:` line) and records them.
 
-Seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched; a seeded file new to the template is written only where you have none. A feed that changes `package.json` leaves your lock file alone, so run `npm install` and commit both files, or the pipeline's `npm ci` stops on the mismatch. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
+Seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched; a seeded file new to the template is written only where you have none. In an adopted app, `yours` files are never touched either, and get no line in the plan, until your copy equals the template's: then feed records it, and it is `managed` from then on. A feed that changes `package.json` leaves your lock file alone, so run `npm install` and commit both files, or the pipeline's `npm ci` stops on the mismatch. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
 
 4. It moves the manifest to the new base (the new loaf's hashes and the new Sourdough version) and keeps the template's version of every managed file you have changed in `.sourdough/base/<file>.base`. Commit both.
 
@@ -158,7 +158,18 @@ Copier's `copier check-update` is the same idea: `--quiet` makes it exit 2 when 
 
 ### Apps Sourdough did not make, and WELD[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#apps-sourdough-did-not-make-and-weld)
 
-Feed needs the manifest `sourdough new` writes. An app without one (an app Sourdough did not make, or WELD itself, which was built by hand and checks its drift against a fresh Inertia bake with its own regen check) gets exit `2`. Writing a manifest into an existing app is `sourdough adopt`'s job (ADR-0014), which is not built yet.
+Feed needs a manifest. An app without one gets exit `2`, with the way in: `sourdough adopt <dir> --shape <shape>` (ADR-0014). Adopt bakes the shape fresh, compares the app with it file by file, and writes the manifest the app would have had: files that match become `managed`, files that differ stay `yours` and are never touched, and files the app lacks arrive with the first feed. [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html) walks through it, from picking the shape to the first feed.
+
+```
+sourdough adopt --shape raw --dry-run
+sourdough adopt --shape raw
+git add .sourdough && git commit -m "Adopt with Sourdough 0.3.0"
+sourdough feed --dry-run
+```
+
+A `yours` file gets no step in any feed, so the `sourdough-feed` job stays green on every release; the day your copy equals the template's, feed records it (`record`) and manages it from then on.
+
+WELD itself is not adopted yet: it was built by hand and checks its drift against a fresh Inertia bake with its own regen check.
 
 ## Versioned template releases[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#versioned-template-releases)
 

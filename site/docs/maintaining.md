@@ -8,7 +8,7 @@ generator: Squire agent-ready
 
 # MAINTAINING: feeding the starter[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#maintaining-feeding-the-starter)
 
-How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, `manifest` and `feed`. Planned: `adopt`. Like any starter, it needs regular feeding, or it goes flat.
+How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, `manifest`, `feed` and `adopt`. Like any starter, it needs regular feeding, or it goes flat.
 
 ## What Sourdough is and what it depends on[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-sourdough-is-and-what-it-depends-on)
 
@@ -16,7 +16,7 @@ How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne St
 - Runtime dependencies: `symfony/console`, `symfony/http-client`, `justinrainbow/json-schema`, `openai-php/client` (only for `new --describe`, which can ask an OpenAI-compatible model for a plan; optional). No other stack package at runtime.
 - **Generated apps** require `waynestate/helmet`, `waynestate/sesame` and `waynestate/proctor` from Packagist.
 - **It carries a copy of Squire's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`). Squire owns those files; Sourdough never hand-edits them. `composer squire-copy:sync` rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.7`), and `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
-- `feed` needs only git on the developer's machine: it bakes the app's shape again with the manifest's answers and three-way merges each file with `git merge-file`, the base found by its manifest hash in `.sourdough/base/` or the app's git history (see `docs/guides/keeping-current.md`). `new` and `feed` bake through the same `Baker`, so a change to a generator reaches both.
+- `feed` needs only git on the developer's machine: it bakes the app's shape again with the manifest's answers and three-way merges each file with `git merge-file`, the base found by its manifest hash in `.sourdough/base/` or the app's git history (see `docs/guides/keeping-current.md`). `new`, `feed` and `adopt` bake through the same `Baker`, so a change to a generator reaches all three: `adopt` bakes the shape into a scratch folder and compares the app with that loaf, so it records what `new` would bake today.
 
 ## Where it lives[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#where-it-lives)
 

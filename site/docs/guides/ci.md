@@ -75,6 +75,8 @@ Every shape also ships a `sourdough-feed` job. It installs the newest Sourdough 
 
 Exit `2` from either (no manifest, a manifest from a newer Sourdough, conflict markers left over from the last feed, a bake that failed) fails the job, because the app's record needs fixing before any feed can run. The full table and the job itself are in [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci).
 
+An app `sourdough adopt` took in has the job only if its `.gitlab-ci.yml` came from the template: when the app had none, the first feed adds the shape's whole file, job included. When the app keeps a `.gitlab-ci.yml` of its own (`yours` in the manifest), copy the `sourdough-feed` job by hand from a fresh bake of the same shape, with the `.composer-cache` template and the `IMAGE_PREFIX` variable it leans on: see [Your own .gitlab-ci.yml](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#your-own-gitlab-ci-yml). The job's answers mean the same on an adopted app, and `yours` files never turn it yellow.
+
 ## Dependency caching[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
 
 A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's `.gitlab-ci.yml` keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.

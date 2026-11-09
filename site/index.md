@@ -155,18 +155,42 @@ Pinned above the bench
 
 ## Feeding schedule
 
-A starter you never feed goes flat. Every app Sourdough makes carries `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how `sourdough feed` knows which files it can update, and which ones you've kneaded.
+A starter you never feed goes flat. Every app Sourdough makes carries `.sourdough/manifest.json`: the Sourdough version, the template, the answers you chose, and a sha256 of every file. That's how `sourdough feed` knows which files it can update, and which ones you've kneaded. An app Sourdough did not make can get one too, on adoption day.
 
 1. Bake day
    `sourdough new my-app`
    Makes the app and writes the manifest. Commit the manifest with the rest of the app.
-2. Any day
+2. Adoption day for a loaf we did not bake
+   `sourdough adopt --shape raw`
+   Sourdough can now look after an app it did not make. In the app, on a clean git tree, name the shape it already is: `raw`, `raw-vue`, `laravel-blade`, `laravel-blade-vue` or `laravel-inertia`. Adopt bakes that shape fresh, compares your files with it, and writes the one thing the app was missing: the manifest. Files that match get fed from then on, files that differ stay yours and are never overwritten, and files you lack arrive with the first feed. Your code is never touched. [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html) walks through it.
+   - **0**: adopted (or a dry run)
+   - **1**: refused: not in git, a dirty tree, already adopted
+   - **2**: no git, or the bake failed
+   Adoption papers an old course finder, taken in
+   ```
+   $ sourdough adopt --shape raw
+   Adopting "course-finder" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.3.0.
+   Compared your app with a fresh raw bake: 41 template files.
+   
+     yours    composer.json     differs from the template: yours, never overwritten
+     yours    public/index.php  differs from the template: yours, never overwritten
+     seeded   .env.example      yours, as in every Sourdough app
+     seeded   README.md         yours, as in every Sourdough app
+     missing  .gitlab-ci.yml    the next sourdough feed adds it
+     missing  phpstan.neon      the next sourdough feed adds it
+   
+   Adopted: 35 match, 2 yours, 2 seeded, 2 missing. Wrote .sourdough/manifest.json.
+   Files the template does not ship are not recorded: Sourdough never reads or touches them.
+   Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.3.0"
+         then sourdough feed --dry-run lists the 2 files the first feed adds.
+   ```
+3. Any day
    `sourdough manifest --check`
    Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app any time; every shape's pipeline runs it too, in the `sourdough-feed` job, and only lists what drifted.
    - **0**: clean
    - **1**: a managed file changed or is missing
    - **2**: no manifest, or no `--check`
-3. Feeding
+4. Feeding
    `sourdough feed`
    Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first; every shape's pipeline runs it too, and warns when a feed is due.
    - **0**: fed (or already fresh)
@@ -188,6 +212,13 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
 - `package-lock.json`
 
 The lock comes only with a front end. Seeded files are never reported. They're yours to knead.
+
+### Yours adopted, kept as you made them
+
+- `composer.json`
+- `public/index.php`
+
+Whatever differed on adoption day, like these two in the course finder. Never written, merged or reported. Make one match the template and the next feed takes it over.
 
 Quick start
 
@@ -259,7 +290,7 @@ Hand it to your agent
 
 ## Recipes for your agent
 
-Three prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
+Four prompts for whatever coding agent you use. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT. Each tells the agent what Sourdough put in the app and what it must leave alone, and each tells it to ask you before it guesses.
 
 ### Get started with Sourdough
 
@@ -300,10 +331,10 @@ Lists the managed files that changed since Sourdough wrote them, shows what a fe
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent checking an app that Sourdough baked, at Wayne State University. Sourdough is the app starter of WELD, the Wayne State application stack. Every app it bakes carries .sourdough/manifest.json: the Sourdough version, the template, the answers chosen, and a sha256 hash of every file it wrote, each marked managed or seeded.
+You are a coding agent checking an app that Sourdough baked, at Wayne State University. Sourdough is the app starter of WELD, the Wayne State application stack. Every app it bakes carries .sourdough/manifest.json: the Sourdough version, the template, the answers chosen, and a sha256 hash of every file it wrote, each marked managed or seeded, or yours in an app Sourdough adopted.
 
 Read first:
-- https://sourdough.apps.wayne.edu/llms.txt, then llms-full.txt beside it: the README's manifest section says what managed and seeded mean.
+- https://sourdough.apps.wayne.edu/llms.txt, then llms-full.txt beside it: the README's manifest section says what managed, seeded and yours mean.
 - ADVISOR, the stack's MCP server, if it is connected: read_project_docs for sourdough and squire, and run_proctor_check for this app. If it is not connected, say so and work from the pages.
 - .sourdough/manifest.json, composer.json and public/index.php in this app.
 
@@ -315,12 +346,12 @@ Task:
 5. Change nothing. For each drifted file, propose whether to put it back or keep the change, and why. A kept change is fine: feed merges it with the template's.
 
 Constraints:
-- Seeded files (.env.example and README.md) are mine and never count as drift.
+- Seeded files (.env.example and README.md), and yours files in an adopted app, are mine and never count as drift.
 - The deploy files come from Squire, through Sourdough. Never hand-edit them to make a check pass.
 - Never run sourdough feed without --dry-run unless I say so: a real feed writes files.
 - Ask me before you guess, and before you touch anything that deploys.
 
-Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
+Output: a table (file, managed, seeded or yours, state, deliberate or not), the PROCTOR findings, then your proposals and your questions.
 ```
 
 ### Bake a Laravel app with Sourdough
@@ -353,6 +384,38 @@ Constraints:
 - Ask me before you guess: a folder name, a shape or an oven I have not named, or anything that touches a deploy.
 
 Output: what you ran and what it said, the app's files one level deep, then your questions.
+```
+
+### Adopt an existing app with Sourdough
+
+Looks at an existing app with a dry run, picks the shape and the name with you, then writes the manifest and shows what the first feed would add. It changes no code.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent helping a Wayne State University developer bring an existing app under Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough did not make this app. sourdough adopt writes the manifest the app would have had, .sourdough/manifest.json, so sourdough feed can keep it current from then on. It writes that one file and changes no code: files that match the template become managed, files that differ stay the app's own (yours) and are never overwritten, and files the app lacks are added by the first feed.
+
+Read first:
+- https://sourdough.apps.wayne.edu/llms.txt, then the Adopt an existing app guide it lists. Fetch what you need; do not work from memory.
+- ADVISOR, the stack's MCP server, if it is connected: read_project_docs for sourdough, and run_proctor_check for this app. If it is not connected, say so and work from the pages.
+- composer.json, package.json if there is one, and whether an artisan file sits at the app's root.
+
+Task:
+1. Check that PHP 8.3 or newer, Composer and git are on the PATH, and say which versions you found. If the sourdough command is missing, install it with `composer global require waynestate/sourdough`.
+2. Run `git status --short` at the app's root. If the folder is not a git repository, or the tree has changes, stop and tell me. Do not commit for me.
+3. Propose the shape, one of raw, raw-vue, laravel-blade, laravel-blade-vue or laravel-inertia, with the evidence (artisan, inertiajs/inertia-laravel in composer.json, vue in package.json). Propose the name the app goes by, from composer.json. Ask me to confirm both.
+4. Run `sourdough adopt --shape  --name  --dry-run` and summarize it: how many files match, are yours, seeded and missing, and any note (a name that looks wrong, an older Squire kit).
+5. Only when I say so, run the same command without --dry-run, then `sourdough feed --dry-run`, and list the files the first feed would add.
+
+Constraints:
+- Pass --sail or --docker only for a Laravel app that runs on Sourdough's own oven files. An app with its own Docker setup gets neither.
+- Many yours files is a normal outcome, not a failure. For a Laravel app several majors behind, suggest upgrading with Booster first (https://booster.apps.wayne.edu/llms.txt): every hop brings more files level with the template.
+- Never edit, rename or delete the app's files to make more of them match. Never run sourdough feed without --dry-run unless I say so: a real feed writes files.
+- Never commit .env, and never paste a secret into a prompt or a file.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- Ask me before you guess: the shape, the name, or anything that touches a deploy.
+
+Output: the shape and the name you propose with their evidence, the dry run's summary line with its yours and missing lists, then your questions.
 ```
 
 The agent reads the same pages you do: [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://sourdough.apps.wayne.edu/llms-full.txt) holds them all in one file, and this page has a [Markdown twin](https://sourdough.apps.wayne.edu/index.md). Nothing here phones home. The buttons only copy text or open the tool you picked.

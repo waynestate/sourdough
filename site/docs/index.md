@@ -48,6 +48,7 @@ The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/d
 
 - [Quick start](https://sourdough.apps.wayne.edu/docs/guides/quick-start.html): bake your first app and run its checks.
 - [Install](https://sourdough.apps.wayne.edu/docs/install.html): what the machine needs, and the two ways to get Sourdough.
+- [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html): give an app Sourdough did not make a manifest, so `sourdough feed` can keep it current.
 - [Reference](https://sourdough.apps.wayne.edu/docs/reference/commands.html): every command and option, the plan format, the templates.
 
 ## Status[#](https://sourdough.apps.wayne.edu/docs/#status)

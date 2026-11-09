@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commands | Sourdough docs</title>
-<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check and sourdough feed, with their exit codes.">
+<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check, sourdough adopt and sourdough feed, with their exit codes.">
 <meta name="docs-version" content="0.2.0">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -34,9 +34,9 @@
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
     <summary>Menu</summary>
-    <nav class="docs-nav" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
+    <nav class="docs-nav" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   </details>
-  <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
+  <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
       <article class="docs-article"><h1 id="commands">Commands<a class="docs-heading-link" aria-label="Link to this section" href="#commands">#</a></h1>
@@ -313,7 +313,280 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<p>Seeded files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not <code>changed</code>.</p>
+<p>Seeded and yours files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not <code>changed</code>.</p>
+<h2 id="sourdough-adopt">sourdough adopt<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt">#</a></h2>
+<p>Write the Sourdough manifest for an app Sourdough did not make, so <code>sourdough feed</code> can keep it current. The walk-through is <a href="../guides/adopt.html">Adopt an existing app</a>.</p>
+<pre tabindex="0"><code>sourdough adopt [&lt;dir&gt;] --shape &lt;shape&gt; [--name &lt;name&gt;] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]
+</code></pre>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dir</code></td>
+<td>the app's root folder (default: the current directory), resolved with <code>realpath()</code>, so a symlinked path works</td>
+</tr>
+<tr>
+<td><code>--shape &lt;shape&gt;</code></td>
+<td>required: what the app already is, one of <code>raw</code>, <code>raw-vue</code>, <code>laravel-blade</code>, <code>laravel-blade-vue</code>, <code>laravel-inertia</code> (the values the manifest records as <code>template</code>)</td>
+</tr>
+<tr>
+<td><code>--name &lt;name&gt;</code></td>
+<td>the name the template writes into files (default: the basename of the resolved folder), validated as for <code>sourdough new</code></td>
+</tr>
+<tr>
+<td><code>--sail</code>, <code>--docker</code></td>
+<td>the oven, Laravel shapes only, as for <code>sourdough new</code>; leave both off when the app has its own Docker setup</td>
+</tr>
+<tr>
+<td><code>--no-playbook</code>, <code>--no-advisor</code></td>
+<td>as for <code>sourdough new</code>; recorded in the answers, so every later feed bakes the same way</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>print the report and write nothing; git and the folder give notes instead of refusals</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print the report as JSON, with or without <code>--dry-run</code></td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>also list the <code>match</code> lines, and every file of a folded folder</td>
+</tr>
+</tbody>
+</table></div>
+<p>Adopt bakes the shape into a scratch folder through the same <code>Baker</code> as <code>new</code> and <code>feed</code>, looks at each template path in the app (and only those), and writes <code>.sourdough/manifest.json</code>. It writes no other file: no <code>.sourdough/base/</code>, no <code>.sourdough/plan.yaml</code>. The answers gain <code>adopted: true</code>. There is no <code>--php</code> (the PHP floor comes from CREED's policy at bake time, so feed could never reproduce one) and no <code>--force</code> (every refusal has a plain fix).</p>
+<h3 id="report-lines">Report lines<a class="docs-heading-link" aria-label="Link to this section" href="#report-lines">#</a></h3>
+<p>One line per template path that needs a look, <code>  &lt;status&gt;  &lt;path&gt;  &lt;detail&gt;</code>: <code>yours</code>, then <code>seeded</code>, then <code>missing</code>, each sorted by path; <code>match</code> lines only with <code>-v</code>. Without <code>-v</code>, a top-level folder whose every template file is missing folds into one line, <code>missing  src/ (2 files)  the next sourdough feed adds them</code>.</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Detail</th>
+<th>Recorded as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>match</code></td>
+<td><code>same as the template: Sourdough keeps it current</code></td>
+<td><code>managed</code>, the template's hash</td>
+</tr>
+<tr>
+<td><code>yours</code></td>
+<td><code>differs from the template: yours, never overwritten</code></td>
+<td><code>yours</code>, the template's hash</td>
+</tr>
+<tr>
+<td><code>yours</code></td>
+<td><code>differs; the template writes the app name here as &quot;&lt;name&gt;&quot;, and your file does not have it: ...</code></td>
+<td><code>yours</code></td>
+</tr>
+<tr>
+<td><code>yours</code></td>
+<td><code>a symlink: Sourdough never writes through links</code> (a link, a file under a linked folder, or a file whose real path leaves the app)</td>
+<td><code>yours</code></td>
+</tr>
+<tr>
+<td><code>yours</code></td>
+<td><code>named &lt;actual&gt; here; the template calls it &lt;path&gt;</code></td>
+<td><code>yours</code></td>
+</tr>
+<tr>
+<td><code>seeded</code></td>
+<td><code>yours, as in every Sourdough app</code></td>
+<td><code>seeded</code>, the template's hash</td>
+</tr>
+<tr>
+<td><code>missing</code></td>
+<td><code>the next sourdough feed adds it</code></td>
+<td>not recorded</td>
+</tr>
+</tbody>
+</table></div>
+<p>After the lines: any <code>note:</code> lines (a deprecated shape, a vendored Squire kit older or newer than the one this Sourdough bakes), then the summary, <code>Adopted: &lt;n&gt; match, &lt;n&gt; yours, &lt;n&gt; seeded, &lt;n&gt; missing. Wrote .sourdough/manifest.json.</code> (<code>Plan: ...</code> on a dry run). With two or more name hints, the name note prints right after the summary: <code>note: &lt;n&gt; files differ where the template writes the app name; if the app goes by another name, delete .sourdough/ and adopt again with --name.</code> Then <code>Files the template does not ship are not recorded: Sourdough never reads or touches them.</code> and the next steps: the commit line, then <code>then sourdough feed --dry-run lists the &lt;n&gt; files the first feed adds.</code>, or with nothing missing, <code>then sourdough feed --dry-run shows the app is fresh.</code> A dry run ends <code>Run sourdough adopt without --dry-run to write the manifest.</code></p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Dry-run note</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Not inside a git repository: a real adopt would refuse.</code></td>
+<td><code>git init</code> and commit first</td>
+</tr>
+<tr>
+<td><code>Uncommitted changes: a real adopt would refuse until the tree is clean.</code></td>
+<td>commit or stash first</td>
+</tr>
+<tr>
+<td><code>The folder is not writable: a real adopt would fail.</code></td>
+<td>check the folder's permissions</td>
+</tr>
+<tr>
+<td><code>git is not available: a real adopt would fail.</code></td>
+<td>put git on PATH, or set <code>SOURDOUGH_GIT</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="exit-codes-1">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-1">#</a></h3>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Exit</th>
+<th>Meaning</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>adopted, or a dry run printed its plan</td>
+<td>any mix of <code>match</code>, <code>yours</code>, <code>seeded</code> and <code>missing</code>: none of them raises the exit code</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>refused</td>
+<td>a missing or unknown shape, bad oven flags, a folder that is missing or a file, a manifest already there, a leftover <code>.sourdough/base/</code>, a bad name, not a git repository, a dirty tree</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>tool error</td>
+<td>no git, a folder adopt cannot write, a failed bake, a failed write</td>
+</tr>
+</tbody>
+</table></div>
+<p>A dry run refuses only for the first eight (the shape, the oven, the folder, the manifest, the leftover base, the name), and fails only when the bake fails or <code>git status</code> fails (both exit <code>2</code>). Refusals go to stderr, in this order:</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Refusal</th>
+<th>Message starts with</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no <code>--shape</code></td>
+<td><code>--shape is required: raw, raw-vue, laravel-blade, laravel-blade-vue or laravel-inertia.</code> and, when the app's files point at one, <code>This app looks like &lt;shape&gt; (&lt;reason&gt;).</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>an unknown shape</td>
+<td><code>Unknown shape &quot;&lt;x&gt;&quot;. The five shapes are: ...</code>, plus the replacement for a retired shape</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>an oven on a raw shape, or both ovens</td>
+<td><code>--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.</code> or <code>Choose one of --sail or --docker, not both.</code>, the words <code>sourdough new</code> uses</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>the folder does not exist</td>
+<td><code>The app directory &quot;&lt;dir&gt;&quot; does not exist.</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>the folder is a file</td>
+<td><code>&quot;&lt;dir&gt;&quot; is a file, not a directory: pass the app's root folder.</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>a manifest is already there</td>
+<td><code>&quot;&lt;dir&gt;&quot; already has a Sourdough manifest: Sourdough made or adopted this app.</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>.sourdough/base/</code> with no manifest</td>
+<td><code>&quot;&lt;dir&gt;/.sourdough/base/&quot; is left from a manifest that is gone.</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>a name <code>sourdough new</code> would refuse</td>
+<td>the generator's message, then <code>Pass --name &quot;&lt;a valid name&gt;&quot;.</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>git is not on PATH</td>
+<td><code>sourdough adopt needs git on PATH (or SOURDOUGH_GIT set to it)</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>not inside a git work tree</td>
+<td><code>sourdough adopt only runs inside a git repository</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>uncommitted or untracked changes</td>
+<td><code>Commit or stash your changes first</code> and up to ten <code>git status</code> lines</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>the folder cannot be written</td>
+<td><code>Cannot write &quot;&lt;dir&gt;/.sourdough/manifest.json&quot;: the folder is not writable.</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the bake failed</td>
+<td><code>sourdough adopt failed: could not bake a fresh &lt;shape&gt; app to compare with:</code> (the Laravel shapes add that they need Composer and the network, or a warm Composer cache)</td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>the manifest could not be written</td>
+<td><code>sourdough adopt failed:</code></td>
+<td><code>2</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="json">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json">#</a></h3>
+<p><code>--json</code> prints one object with sorted keys: <code>dir</code>, <code>dry_run</code>, <code>exit</code>, <code>files</code>, <code>name</code>, <code>notes</code>, <code>shape</code>, <code>sourdough_version</code> and <code>summary</code>. <code>files</code> lists every template path, <code>match</code> included, sorted and never folded, as <code>{path, status, detail}</code>; <code>summary</code> counts each status.</p>
+<pre tabindex="0"><code class="language-json">{
+    &quot;dir&quot;: &quot;/srv/apps/course-finder&quot;,
+    &quot;dry_run&quot;: true,
+    &quot;exit&quot;: 0,
+    &quot;files&quot;: [
+        {
+            &quot;path&quot;: &quot;.env.example&quot;,
+            &quot;status&quot;: &quot;seeded&quot;,
+            &quot;detail&quot;: &quot;yours, as in every Sourdough app&quot;
+        },
+        {
+            &quot;path&quot;: &quot;.env.squire.example&quot;,
+            &quot;status&quot;: &quot;match&quot;,
+            &quot;detail&quot;: &quot;same as the template: Sourdough keeps it current&quot;
+        },
+        {
+            &quot;path&quot;: &quot;phpstan.neon&quot;,
+            &quot;status&quot;: &quot;missing&quot;,
+            &quot;detail&quot;: &quot;the next sourdough feed adds it&quot;
+        }
+    ],
+    &quot;name&quot;: &quot;course-finder&quot;,
+    &quot;notes&quot;: [],
+    &quot;shape&quot;: &quot;raw&quot;,
+    &quot;sourdough_version&quot;: &quot;0.3.0&quot;,
+    &quot;summary&quot;: {
+        &quot;match&quot;: 38,
+        &quot;missing&quot;: 1,
+        &quot;seeded&quot;: 2,
+        &quot;yours&quot;: 0
+    }
+}
+</code></pre>
+<p>(<code>files</code> is cut to three of its 41 entries here: a raw app that lacks <code>phpstan.neon</code>, on a dry run.) A refusal with <code>--json</code> prints its message to stderr and no JSON, as <code>feed</code> does.</p>
+<h3 id="environment-1">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment-1">#</a></h3>
+<ul>
+<li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>
+<li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
+<li><code>SOURDOUGH_POLICY</code>: the CREED policy the fresh bake takes its PHP floor from, as for <code>sourdough new</code>. Adopt with the policy the app's later feeds will use, or the floor shows up as a template change.</li>
+</ul>
 <h2 id="sourdough-feed">sourdough feed<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed">#</a></h2>
 <p>Bring Sourdough template updates into an app without clobbering what it has changed.</p>
 <pre tabindex="0"><code>sourdough feed [dir] [--dry-run] [--json]
@@ -406,7 +679,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="exit-codes-1">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-1">#</a></h3>
+<h3 id="exit-codes-2">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-2">#</a></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -441,8 +714,8 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </thead>
 <tbody>
 <tr>
-<td>no manifest in the directory</td>
-<td><code>No Sourdough manifest found in &quot;&lt;dir&gt;&quot;.</code></td>
+<td>no manifest in the directory (an app Sourdough did not make: adopt it first)</td>
+<td><code>No Sourdough manifest found in &quot;&lt;dir&gt;&quot;.</code>, then <code>an app Sourdough did not make needs adopting first: sourdough adopt &lt;dir&gt; --shape &lt;shape&gt;.</code></td>
 <td><code>2</code></td>
 </tr>
 <tr>
@@ -487,9 +760,9 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="json">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json">#</a></h3>
+<h3 id="json-1">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json-1">#</a></h3>
 <p><code>--json</code> prints one object: <code>dir</code>, <code>template</code>, <code>from</code> and <code>to</code> (the Sourdough versions), <code>dry_run</code>, <code>fresh</code>, <code>files</code> (one <code>{path, action, detail}</code> per plan line), <code>summary</code> (a count per action), <code>base_copies</code> (the files kept in <code>.sourdough/base/</code>), <code>notes</code>, and <code>exit</code>. A deprecated shape's notice is one of the <code>notes</code> on every run; feeding an app whose shape was removed stops with exit <code>2</code> and names the replacement. See <a href="../guides/support.html">Support and sunset</a>.</p>
-<h3 id="environment-1">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment-1">#</a></h3>
+<h3 id="environment-2">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment-2">#</a></h3>
 <ul>
 <li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>
 <li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
@@ -498,6 +771,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 <h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
 <ul>
 <li><a href="../guides/keeping-current.html">Keeping apps current</a></li>
+<li><a href="../guides/adopt.html">Adopt an existing app</a></li>
 <li><a href="plan-format.html">Plan format</a></li>
 <li><a href="../guides/wiring-the-stack.html">Wiring the stack in</a></li>
 </ul>
@@ -505,7 +779,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/wiring-the-stack.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Wiring the stack in</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/plan-format.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Plan format</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#php-floor-and-support-lines">PHP floor and support lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment">Environment</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#sourdough-feed">sourdough feed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#plan-lines">Plan lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-1">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-1">Environment</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#php-floor-and-support-lines">PHP floor and support lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment">Environment</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#sourdough-adopt">sourdough adopt</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#report-lines">Report lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-1">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-1">Environment</a></li><li class="docs-toc__item"><a href="#sourdough-feed">sourdough feed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#plan-lines">Plan lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-2">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json-1">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-2">Environment</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.2.0</span></span>
