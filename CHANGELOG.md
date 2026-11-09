@@ -63,6 +63,7 @@ Versioning once 1.0 is out.
 
 ### Fixed
 
+- Fixed: scripts/a11y.ps1 works on a Windows checkout with CRLF line endings; it strips the carriage returns from the shell command it hands to Docker, which sh rejected with a syntax error.
 - Fixed: the docs kit's copy button no longer covers the first line of code when it says Copied or Failed: over the code it keeps its resting width and shows a check or a cross when the word does not fit (docs kit synced from Squire).
 - Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
 - Fixed: BEST_PRACTICES.md practice 3.4 counts the 0.2.0 tag among the releases that follow the release steps.
