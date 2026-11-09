@@ -46,6 +46,7 @@ Versioning once 1.0 is out.</p>
 <h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
 <ul>
 <li>Added: tests/KitRoutesAbsentTest.php: no Laravel shape ships Fortify, Breeze or Jetstream, a routes/auth.php, or registration, password reset, email verification or two-factor routes (BEST_PRACTICES 2.2, backlog 5).</li>
+<li>Added: the generated README carries a Support section with the support line <code>sourdough new</code> prints (status, owner and the end-of-security date from CREED's policy), on every shape (BEST_PRACTICES 2.4).</li>
 <li>Changed: the front-end templates floor Vite at ^6.4.1, the CVE-2025-62522 fix line, and ignore *.local, where Vite keeps local secrets (BEST_PRACTICES 4.12).</li>
 <li>Changed: every app shape and Sourdough's own CI pin Preflight 0.4.0 (87d9b6f; the proctor job clones the full history, so the override-approver check can read git blame).</li>
 <li>Added: WORKER_HEARTBEAT_MAX_AGE=0 turns the scheduler heartbeat check off, so an app that runs no scheduler still answers 200 on /ready.</li>
