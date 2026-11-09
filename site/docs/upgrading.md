@@ -33,23 +33,36 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.3.0
+Sourdough 0.4.0
 ```
 
 Then read the section for the version you are moving to.
 
-## Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
+## 0.4.0 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-4-0-2026-11-09)
 
-**What `sourdough feed` will bring an app baked with 0.3.0** (it merges each file with your edits):
+**Breaking: Pinstripe 0.3 may fail apps that join SQL from strings.** Feed moves every shape to Pinstripe `^0.3`, and PHPStan now fails code that builds SQL by gluing a variable into the query text. The fix is to bind the value, with the details below. Everything else in this release is pins, pipeline and kit moves.
+
+```php
+// Fails on Pinstripe 0.3: the value is joined into the SQL.
+$rows = $pdo->query("SELECT name FROM courses WHERE term = '$term'");
+
+// Passes: the SQL is a literal and the value is bound.
+$stmt = $pdo->prepare('SELECT name FROM courses WHERE term = :term');
+$stmt->execute(['term' => $term]);
+```
+
+This is a minor, not a patch: feeding it moves an app's dev tools across two Pinstripe minors that ban calls, and moves its pipeline pins and deploy kit.
+
+**What `sourdough feed` brings an app baked with 0.3.0** (it merges each file with your edits):
 
 - `.gitlab-ci.yml`: the Preflight 0.5.0 pins (`60314791565a264e97cb210813ef4f3e76512402 # 0.5.0`, was 0.4.0). Inputs and job names are unchanged, so an include you edited keeps your inputs. Every component's Composer default is now 2.11.1 by digest, and the raw shapes' proctor job keeps `proctor.json` for Rollcall.
 - `composer.json`: Pinstripe `^0.3` (was `^0.1`) and ADVISOR `^0.2` (was `^0.1`) in `require-dev`; an app baked with `--no-advisor` gets no ADVISOR line.
 - Raw shapes: `src/Oracle.php` types `query()`'s SQL as `literal-string` (PHPDoc only; the code does the same thing).
 - The Squire 0.10.3 deploy kit (was 0.10.2): comments only. The kit's comments say in plain words what they used to cite by internal item ID; nothing the kit does changes.
 
-**Breaking:** for apps whose code uses what Pinstripe 0.2 and 0.3 ban, PHPStan (`vendor/bin/phpstan analyse`, inside `composer ci`) now fails. The bans are `eval()`, `extract()`, `var_dump()`, `dd()` and `dump()` (Laravel's methods of those names too), `Http::withoutVerifying()` and other ways to turn TLS checks off, and SQL joined from strings: a variable concatenated, interpolated or `sprintf()`'d into the SQL given to `oci_parse()`, PDO, mysqli or Laravel's `DB::select()` and friends. Bind values instead. A helper of your own that takes the whole SQL as a parameter passes once that parameter is typed `literal-string` in its PHPDoc, the way `src/Oracle.php` does now; PHPStan then checks the helper's callers. Each finding has a `pinstripe.banned.*` identifier for a reasoned ignore, and Pinstripe's Banned calls page lists them all.
+**Breaking, in full:** for apps whose code uses what Pinstripe 0.2 and 0.3 ban, PHPStan (`vendor/bin/phpstan analyse`, inside `composer ci`) now fails. The bans are `eval()`, `extract()`, `var_dump()`, `dd()` and `dump()` (Laravel's methods of those names too), `Http::withoutVerifying()` and other ways to turn TLS checks off, and SQL joined from strings: a variable concatenated, interpolated or `sprintf()`'d into the SQL given to `oci_parse()`, PDO, mysqli or Laravel's `DB::select()` and friends. Bind values instead. A helper of your own that takes the whole SQL as a parameter passes once that parameter is typed `literal-string` in its PHPDoc, the way `src/Oracle.php` does now; PHPStan then checks the helper's callers. Each finding has a `pinstripe.banned.*` identifier for a reasoned ignore, and Pinstripe's [Banned calls](https://pinstripe.apps.wayne.edu/docs/reference/banned-calls.html#sql-joined-from-strings) page lists them all.
 
-**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/pinstripe waynestate/advisor --with-all-dependencies` (feed never touches your lock files), then `composer ci`.
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/pinstripe waynestate/advisor --with-all-dependencies` (feed never touches your lock files), then `composer ci`. Fix each `pinstripe.banned.*` finding PHPStan reports before you push. **Deprecated:** none.
 
 **How to verify:** the next pipeline's include list names `@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0` on every Preflight component, `composer show waynestate/pinstripe waynestate/advisor` names 0.3 and 0.2, and `composer ci` passes.
 

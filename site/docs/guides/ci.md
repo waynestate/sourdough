@@ -117,7 +117,7 @@ Green means `composer ci` passed on all three PHP versions on both.
 
 ## The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
-On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. All are `allow_failure: true` until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
+On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix keeps `continue-on-error: true` until it has been seen green too. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
 The `proof` job runs the whole [proof harness](https://sourdough.apps.wayne.edu/docs/reference/proof.html) on GitLab: every shape and every oven, with the last release fed forward, and keeps the Last run table and every step log as an artifact. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets `SOURDOUGH_PROOF` to `1`.
 

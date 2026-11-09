@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Upgrading | Sourdough docs</title>
 <meta name="description" content="How to upgrade Sourdough itself and bring the apps it baked up to date with the manifest and sourdough feed.">
-<meta name="docs-version" content="0.3.0">
+<meta name="docs-version" content="0.4.0">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.3.0</span>
+    <span class="ticket" title="Sourdough version">No. 0.4.0</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -50,19 +50,28 @@
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre tabindex="0"><code>Sourdough 0.3.0
+<pre tabindex="0"><code>Sourdough 0.4.0
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
-<h2 id="unreleased">Unreleased<a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></h2>
-<p><strong>What <code>sourdough feed</code> will bring an app baked with 0.3.0</strong> (it merges each file with your edits):</p>
+<h2 id="0-4-0-2026-11-09">0.4.0 (2026-11-09)<a class="docs-heading-link" aria-label="Link to this section" href="#0-4-0-2026-11-09">#</a></h2>
+<p><strong>Breaking: Pinstripe 0.3 may fail apps that join SQL from strings.</strong> Feed moves every shape to Pinstripe <code>^0.3</code>, and PHPStan now fails code that builds SQL by gluing a variable into the query text. The fix is to bind the value, with the details below. Everything else in this release is pins, pipeline and kit moves.</p>
+<pre tabindex="0"><code class="language-php">// Fails on Pinstripe 0.3: the value is joined into the SQL.
+$rows = $pdo-&gt;query(&quot;SELECT name FROM courses WHERE term = '$term'&quot;);
+
+// Passes: the SQL is a literal and the value is bound.
+$stmt = $pdo-&gt;prepare('SELECT name FROM courses WHERE term = :term');
+$stmt-&gt;execute(['term' =&gt; $term]);
+</code></pre>
+<p>This is a minor, not a patch: feeding it moves an app's dev tools across two Pinstripe minors that ban calls, and moves its pipeline pins and deploy kit.</p>
+<p><strong>What <code>sourdough feed</code> brings an app baked with 0.3.0</strong> (it merges each file with your edits):</p>
 <ul>
 <li><code>.gitlab-ci.yml</code>: the Preflight 0.5.0 pins (<code>60314791565a264e97cb210813ef4f3e76512402 # 0.5.0</code>, was 0.4.0). Inputs and job names are unchanged, so an include you edited keeps your inputs. Every component's Composer default is now 2.11.1 by digest, and the raw shapes' proctor job keeps <code>proctor.json</code> for Rollcall.</li>
 <li><code>composer.json</code>: Pinstripe <code>^0.3</code> (was <code>^0.1</code>) and ADVISOR <code>^0.2</code> (was <code>^0.1</code>) in <code>require-dev</code>; an app baked with <code>--no-advisor</code> gets no ADVISOR line.</li>
 <li>Raw shapes: <code>src/Oracle.php</code> types <code>query()</code>'s SQL as <code>literal-string</code> (PHPDoc only; the code does the same thing).</li>
 <li>The Squire 0.10.3 deploy kit (was 0.10.2): comments only. The kit's comments say in plain words what they used to cite by internal item ID; nothing the kit does changes.</li>
 </ul>
-<p><strong>Breaking:</strong> for apps whose code uses what Pinstripe 0.2 and 0.3 ban, PHPStan (<code>vendor/bin/phpstan analyse</code>, inside <code>composer ci</code>) now fails. The bans are <code>eval()</code>, <code>extract()</code>, <code>var_dump()</code>, <code>dd()</code> and <code>dump()</code> (Laravel's methods of those names too), <code>Http::withoutVerifying()</code> and other ways to turn TLS checks off, and SQL joined from strings: a variable concatenated, interpolated or <code>sprintf()</code>'d into the SQL given to <code>oci_parse()</code>, PDO, mysqli or Laravel's <code>DB::select()</code> and friends. Bind values instead. A helper of your own that takes the whole SQL as a parameter passes once that parameter is typed <code>literal-string</code> in its PHPDoc, the way <code>src/Oracle.php</code> does now; PHPStan then checks the helper's callers. Each finding has a <code>pinstripe.banned.*</code> identifier for a reasoned ignore, and Pinstripe's Banned calls page lists them all.</p>
-<p><strong>Steps:</strong> in each app, on a clean git tree, <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, then <code>composer update waynestate/pinstripe waynestate/advisor --with-all-dependencies</code> (feed never touches your lock files), then <code>composer ci</code>.</p>
+<p><strong>Breaking, in full:</strong> for apps whose code uses what Pinstripe 0.2 and 0.3 ban, PHPStan (<code>vendor/bin/phpstan analyse</code>, inside <code>composer ci</code>) now fails. The bans are <code>eval()</code>, <code>extract()</code>, <code>var_dump()</code>, <code>dd()</code> and <code>dump()</code> (Laravel's methods of those names too), <code>Http::withoutVerifying()</code> and other ways to turn TLS checks off, and SQL joined from strings: a variable concatenated, interpolated or <code>sprintf()</code>'d into the SQL given to <code>oci_parse()</code>, PDO, mysqli or Laravel's <code>DB::select()</code> and friends. Bind values instead. A helper of your own that takes the whole SQL as a parameter passes once that parameter is typed <code>literal-string</code> in its PHPDoc, the way <code>src/Oracle.php</code> does now; PHPStan then checks the helper's callers. Each finding has a <code>pinstripe.banned.*</code> identifier for a reasoned ignore, and Pinstripe's <a rel="noopener" href="https://pinstripe.apps.wayne.edu/docs/reference/banned-calls.html#sql-joined-from-strings">Banned calls</a> page lists them all.</p>
+<p><strong>Steps:</strong> in each app, on a clean git tree, <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, then <code>composer update waynestate/pinstripe waynestate/advisor --with-all-dependencies</code> (feed never touches your lock files), then <code>composer ci</code>. Fix each <code>pinstripe.banned.*</code> finding PHPStan reports before you push. <strong>Deprecated:</strong> none.</p>
 <p><strong>How to verify:</strong> the next pipeline's include list names <code>@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0</code> on every Preflight component, <code>composer show waynestate/pinstripe waynestate/advisor</code> names 0.3 and 0.2, and <code>composer ci</code> passes.</p>
 <h2 id="0-3-0-2026-11-09">0.3.0 (2026-11-09)<a class="docs-heading-link" aria-label="Link to this section" href="#0-3-0-2026-11-09">#</a></h2>
 <p><strong>New: <code>sourdough adopt</code> for apps Sourdough did not make.</strong> An existing app in git gets a manifest with <code>sourdough adopt --shape &lt;shape&gt;</code>, and from then on <code>sourdough feed</code> looks after it like any loaf it baked. See <a href="guides/adopt.html">Adopt an existing app</a> and the section on it below.</p>
@@ -175,10 +184,10 @@ php artisan view:clear
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#unreleased">Unreleased</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.3.0</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.4.0</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="upgrading.md">Markdown</a></span>
 </footer>
 </body>

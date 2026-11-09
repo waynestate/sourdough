@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adopt an existing app | Sourdough docs</title>
 <meta name="description" content="How sourdough adopt writes the manifest for an app Sourdough did not make, so sourdough feed can keep it current from then on.">
-<meta name="docs-version" content="0.3.0">
+<meta name="docs-version" content="0.4.0">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
 <link rel="stylesheet" href="../../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../../index.html#start-title">Quick start</a>
       <a href="../../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.3.0</span>
+    <span class="ticket" title="Sourdough version">No. 0.4.0</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -115,7 +115,7 @@ note: 2 files differ where the template writes the app name; if the app goes by 
 <h2 id="read-the-report">Read the report<a class="docs-heading-link" aria-label="Link to this section" href="#read-the-report">#</a></h2>
 <p>Here is a small, older raw PHP app, <code>parking-permits</code>, with a hand-built <code>public/index.php</code>, a <code>composer.json</code> that requires PHP 7.4, its own <code>public/.htaccess</code> and a README:</p>
 <pre tabindex="0"><code>$ sourdough adopt --shape raw
-Adopting &quot;parking-permits&quot; as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.3.0.
+Adopting &quot;parking-permits&quot; as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.0.
 Compared your app with a fresh raw bake: 41 template files.
 
   yours    composer.json              differs from the template: yours, never overwritten
@@ -144,7 +144,7 @@ Compared your app with a fresh raw bake: 41 template files.
 
 Adopted: 0 match, 3 yours, 1 seeded, 37 missing. Wrote .sourdough/manifest.json.
 Files the template does not ship are not recorded: Sourdough never reads or touches them.
-Next: git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.3.0&quot;
+Next: git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.4.0&quot;
       then sourdough feed --dry-run lists the 37 files the first feed adds.
 </code></pre>
 <p>Only one file carries the name hint here, and it takes two for the note: a hand-built <code>index.php</code> simply never had the name in it. Every template path gets one status. The report lists <code>yours</code> first, then <code>seeded</code>, then <code>missing</code>; <code>match</code> lines show only with <code>-v</code>. A top-level folder whose every template file is missing folds into one line (<code>.squire/ (15 files)</code>); <code>-v</code> lists each file.</p>
@@ -189,7 +189,7 @@ Next: git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.3
 <p>A vendored Squire kit gets a note too. When <code>.squire.json</code> says an older kit than the one this Sourdough bakes, the note says to run <code>vendor/bin/squire update</code> and commit; the next feed takes over each kit file that then matches.</p>
 <h2 id="commit-the-adoption">Commit the adoption<a class="docs-heading-link" aria-label="Link to this section" href="#commit-the-adoption">#</a></h2>
 <pre tabindex="0"><code>git add .sourdough
-git commit -m &quot;Adopt with Sourdough 0.3.0&quot;
+git commit -m &quot;Adopt with Sourdough 0.4.0&quot;
 </code></pre>
 <p>The adoption is its own commit, so <code>git revert</code> takes it back cleanly. Commit the manifest and do not hand-edit it: it is the starter's memory.</p>
 <h2 id="the-first-feed">The first feed<a class="docs-heading-link" aria-label="Link to this section" href="#the-first-feed">#</a></h2>
@@ -197,7 +197,7 @@ git commit -m &quot;Adopt with Sourdough 0.3.0&quot;
 </code></pre>
 <p>The first feed adds every <code>missing</code> file. A raw app that had lost its <code>.gitlab-ci.yml</code> and <code>phpstan.neon</code>, with its own <code>composer.json</code> and <code>public/index.php</code>:</p>
 <pre tabindex="0"><code>$ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.3.0 to 0.3.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
   add       .gitlab-ci.yml (new in the template)
   add       phpstan.neon (new in the template)
 Plan: 2 add.
@@ -218,7 +218,7 @@ git diff
 <h2 id="take-a-yours-file-over">Take a yours file over<a class="docs-heading-link" aria-label="Link to this section" href="#take-a-yours-file-over">#</a></h2>
 <p>A <code>yours</code> file is never written, merged or reported, until the day your copy equals the template's. To hand one to Sourdough, make it match the template (copy it from a fresh bake of the same shape and name, or bring your copy level), commit, and feed:</p>
 <pre tabindex="0"><code>$ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.3.0 to 0.3.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
   record    composer.json (your file now matches the template's: Sourdough manages it from here)
 Plan: 1 record.
 Run sourdough feed without --dry-run to apply it.
@@ -272,7 +272,7 @@ Run sourdough feed without --dry-run to apply it.
   <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#when-to-adopt">When to adopt</a></li><li class="docs-toc__item"><a href="#before-you-start">Before you start</a></li><li class="docs-toc__item"><a href="#pick-the-shape-and-the-name">Pick the shape and the name</a></li><li class="docs-toc__item"><a href="#look-first">Look first</a></li><li class="docs-toc__item"><a href="#read-the-report">Read the report</a></li><li class="docs-toc__item"><a href="#commit-the-adoption">Commit the adoption</a></li><li class="docs-toc__item"><a href="#the-first-feed">The first feed</a></li><li class="docs-toc__item"><a href="#your-own-gitlab-ci-yml">Your own .gitlab-ci.yml</a></li><li class="docs-toc__item"><a href="#take-a-yours-file-over">Take a yours file over</a></li><li class="docs-toc__item"><a href="#start-over">Start over</a></li><li class="docs-toc__item"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.3.0</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.4.0</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="adopt.md">Markdown</a></span>
 </footer>
 </body>

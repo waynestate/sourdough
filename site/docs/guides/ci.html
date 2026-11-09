@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CI | Sourdough docs</title>
 <meta name="description" content="Set up the generated app&#039;s CI with the Preflight components on GitLab and GitHub, and why a git.wayne.edu instance runner is strongly recommended.">
-<meta name="docs-version" content="0.3.0">
+<meta name="docs-version" content="0.4.0">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
 <link rel="stylesheet" href="../../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../../index.html#start-title">Quick start</a>
       <a href="../../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.3.0</span>
+    <span class="ticket" title="Sourdough version">No. 0.4.0</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -127,7 +127,7 @@ variables:
 <h2 id="what-green-means">What green means<a class="docs-heading-link" aria-label="Link to this section" href="#what-green-means">#</a></h2>
 <p>Green means <code>composer ci</code> passed on all three PHP versions on both.</p>
 <h2 id="the-smoke-jobs-on-ci">The smoke jobs on CI<a class="docs-heading-link" aria-label="Link to this section" href="#the-smoke-jobs-on-ci">#</a></h2>
-<p>On CI the smoke gate runs as one job per shape: <code>smoke</code> (matrix) on GitHub, <code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code> and <code>smoke-inertia</code> on GitLab. All are <code>allow_failure: true</code> until the lead has seen every shape green on CI once; flip them to blocking after that proof. The full recipe is in <a href="./testing.html">Testing</a>.</p>
+<p>On CI the smoke gate runs as one job per shape: <code>smoke</code> (matrix) on GitHub, <code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code> and <code>smoke-inertia</code> on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix keeps <code>continue-on-error: true</code> until it has been seen green too. The full recipe is in <a href="./testing.html">Testing</a>.</p>
 <p>The <code>proof</code> job runs the whole <a href="../reference/proof.html">proof harness</a> on GitLab: every shape and every oven, with the last release fed forward, and keeps the Last run table and every step log as an artifact. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets <code>SOURDOUGH_PROOF</code> to <code>1</code>.</p>
 <h2 id="on-the-bench">On the bench<a class="docs-heading-link" aria-label="Link to this section" href="#on-the-bench">#</a></h2>
 <p><img src="../readme/gallery.jpg" alt="Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard" /></p>
@@ -147,7 +147,7 @@ variables:
   <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#on-gitlab">On GitLab</a></li><li class="docs-toc__item"><a href="#the-accessibility-gate">The accessibility gate</a></li><li class="docs-toc__item"><a href="#the-npm-install-and-audit">The npm install and audit</a></li><li class="docs-toc__item"><a href="#the-bill-of-materials">The bill of materials</a></li><li class="docs-toc__item"><a href="#secrets-and-deploy-credentials">Secrets and deploy credentials</a></li><li class="docs-toc__item"><a href="#is-the-app-still-fed">Is the app still fed?</a></li><li class="docs-toc__item"><a href="#dependency-caching">Dependency caching</a></li><li class="docs-toc__item"><a href="#on-github">On GitHub</a></li><li class="docs-toc__item"><a href="#what-green-means">What green means</a></li><li class="docs-toc__item"><a href="#the-smoke-jobs-on-ci">The smoke jobs on CI</a></li><li class="docs-toc__item"><a href="#on-the-bench">On the bench</a></li><li class="docs-toc__item"><a href="#the-recipe-card">The recipe card</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.3.0</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.4.0</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="ci.md">Markdown</a></span>
 </footer>
 </body>

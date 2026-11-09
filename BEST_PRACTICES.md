@@ -20,7 +20,7 @@ Each practice ends with one tag that says how the stack holds it today.
 - `Documented`: written down in an ADR or design doc only. Where the design says a test will cover it, the text says so, but the test does not exist yet.
 - `Not yet`: a gap. Nothing holds it.
 
-Sourdough is a working tool (0.3.0): `sourdough new` bakes all five shapes (raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, Laravel with Inertia and Vue), `sourdough manifest --check` and `sourdough feed` ship, `sourdough adopt` writes the manifest for an app Sourdough did not make so feed can look after it too, and the smoke gate bakes every shape for real. Many tags below were first written while Sourdough was still a design, so some may undersell what the code now does; each is re-checked against the code when its practice is next touched. Sibling projects (SESAME, HELMET, PROCTOR, Preflight) hold part of several practices, and where one leans on them the tag says so.
+Sourdough is a working tool (0.4.0): `sourdough new` bakes all five shapes (raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, Laravel with Inertia and Vue), `sourdough manifest --check` and `sourdough feed` ship, `sourdough adopt` writes the manifest for an app Sourdough did not make so feed can look after it too, and the smoke gate bakes every shape for real. Many tags below were first written while Sourdough was still a design, so some may undersell what the code now does; each is re-checked against the code when its practice is next touched. Sibling projects (SESAME, HELMET, PROCTOR, Preflight) hold part of several practices, and where one leans on them the tag says so.
 
 ---
 

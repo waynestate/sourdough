@@ -49,10 +49,10 @@ composer-ci:
 # (see MAINTAINING.md, "Smoke gate"). A shape may only be claimed when its
 # gate is green. The runner has no Docker daemon, so the script runs directly
 # in a php image with Composer and Node 22 installed at job start.
-# allow_failure: true until the lead has seen every shape green once; flip to false after.
+# The smoke jobs block: every shape baked green on pipelines 5212 and 5219, so a
+# red loaf now stops the pipeline instead of cooling quietly on the rack.
 .smoke-base:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.5-cli-trixie
-  allow_failure: true
   # Download Composer and Node once, check each sha256, and reuse them from the cache.
   cache:
     key: smoke-tools-composer-2.11.1-node-22.23.4
