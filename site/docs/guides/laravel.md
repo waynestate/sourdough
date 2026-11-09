@@ -101,9 +101,25 @@ Laravel gives each major 18 months of bug fixes and two years of security fixes.
 
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
 
+## /up for liveness, /ready for traffic[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#up-for-liveness-ready-for-traffic)
+
+`/up` is Laravel's health route and the liveness answer: 200 whenever the app boots, and it never looks at the database or the cache, so a database blip cannot restart every container at once. `/ready` asks the other question, "should this instance get traffic right now?". Every Laravel shape registers HELMET's readiness route there, in `bootstrap/app.php` (the `then:` callback, outside the web group, so a probe writes no session row and sets no cookie), with three app checks next to HELMET's own:
+
+| Check | Class | Fails when |
+| --- | --- | --- |
+| `database` | `app/Health/DatabaseReady.php` | the default connection cannot be opened (down, refusing the login, or a lost SQLite file) |
+| `cache` | `app/Health/CacheReady.php` | the default cache store cannot write a value and read it back |
+| `scheduler` | `app/Health/SchedulerHeartbeat.php` | the scheduler heartbeat is missing or stale (below) |
+
+Any failure answers 503 with the check names and statuses only; the reason goes to the log as `helmet.readiness_check_failed`. Point a readiness probe or a balancer at `/ready` and anything that restarts the app at `/up`. A hung database holds the probe for as long as the connection's own connect timeout, so on MySQL set `PDO::ATTR_TIMEOUT` in the connection's `options`. `tests/Feature/ReadyChecksTest.php` breaks the database and the cache in turn and expects 503.
+
 ## A stopped scheduler shows up[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#a-stopped-scheduler-shows-up)
 
-Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`) and registers HELMET's readiness route at `/ready` with a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
+Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`), and `/ready` carries a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
+
+## Every queued job has limits[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#every-queued-job-has-limits)
+
+A queued job with no limits retries as often as the worker allows and can hold a worker until the platform kills it. Every class under `app/Jobs` that implements `ShouldQueue` declares Laravel's `#[Tries]` and `#[Timeout]` attributes (on the class, a parent or a trait; the older `$tries` and `$timeout` properties count too), and the timeout stays below the queue connection's `retry_after` (Laravel's default is 90 seconds), or a second worker picks the job up while the first is still running it. `tests/Feature/JobLimitsTest.php` fails the suite on a job that breaks either rule, and passes while there are no jobs. The app ships `stubs/job.queued.stub` and `stubs/job.batched.queued.stub`, so `php artisan make:job` writes `#[Tries(3)]` and `#[Timeout(45)]` from the first job on.
 
 ## Work on the shared MySQL 5.6[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
 
