@@ -16,7 +16,8 @@ include:
     inputs:
       image: "composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
-  # allow_failure: current findings: unbounded dev-main constraints; CI files missing in deploy/.
+  # allow_failure: set while deploy/ had findings (unbounded dev-main constraints, CI files missing). Neither
+  # shows up on PROCTOR 0.11: `proctor check` on deploy/ passes, with warnings only.
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.4.0
     inputs:
       working_dir: deploy

@@ -1,4 +1,4 @@
-# PREFLIGHT components, pinned to the Preflight 0.3.0 release commit. Never use
+# PREFLIGHT components, pinned to the Preflight 0.4.0 release commit. Never use
 # ~latest. From 0.3.0 each component pulls image_prefix/image, with its own
 # default image (pinned by digest in that release). image_prefix is this file's
 # ${IMAGE_PREFIX}, so the components take the same proxy rule as the jobs
