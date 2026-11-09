@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Sourdough\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
@@ -45,10 +46,9 @@ final class KitRoutesAbsentTest extends TestCase
     }
 
     /**
-     * @dataProvider laravelShapes
-     *
      * @param class-string<LaravelBladeGenerator|LaravelBladeVueGenerator|LaravelInertiaGenerator> $generator
      */
+    #[DataProvider('laravelShapes')]
     public function testNoLaravelShapeShipsAKitOrItsAuthRoutes(string $generator): void
     {
         $target = $this->makeTempDir();

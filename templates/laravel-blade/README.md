@@ -27,7 +27,10 @@ driver (`SESAME_DRIVER=fake`).
 
 `composer test` runs Pest. Write new tests in Pest. `tests/Pest.php` binds
 Feature tests to the app and a fresh database. Tests read `.env` when it exists,
-otherwise `.env.example`, on top of `phpunit.xml`.
+otherwise `.env.example`, on top of `phpunit.xml`. A deprecation your code raises
+or causes fails the suite (`failOnDeprecation` in `phpunit.xml`), so the CI
+matrix's newest PHP finds it before an upgrade does; `tests/TestCase.php` hands
+deprecations to PHPUnit, because Laravel's own handler drops them while testing.
 
 ## Deploying
 

@@ -66,7 +66,9 @@ The app ships with Pinstripe's coding standard wired in. After
 
 `composer ci` runs the test suite (including `tests/ViteTest.php`), both
 checks, PROCTOR and `composer audit`, in that order. A well-kneaded starter
-passes all of them.
+passes all of them. The test suite fails on any deprecation your code raises
+or causes (`failOnDeprecation` in `phpunit.xml.dist`), so the CI matrix's
+newest PHP finds it before an upgrade does.
 
 The GitLab pipeline (`.gitlab-ci.yml`) carries the same checks: the Preflight
 components for PROCTOR, the test suite on PHP 8.3, 8.4 and 8.5,

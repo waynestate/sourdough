@@ -219,6 +219,11 @@ abstract class LaravelOverlayGenerator
             $this->support->applySupportLine($targetDir, $permutation, $floor);
         }
 
+        // Deprecations fail the app's suite (BEST_PRACTICES 4.13); the
+        // shipped tests/TestCase.php hands them back to PHPUnit, because
+        // Laravel's own handler drops them while testing.
+        $this->support->applyDeprecationGate($targetDir);
+
         $this->createSqliteDatabase($targetDir);
 
         $this->applyAppName($targetDir, $name, $slug);

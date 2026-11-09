@@ -22,7 +22,7 @@ This page is the proofing bench: how to run Sourdough's own checks day to day, a
 | Refresh the Squire copy | `composer squire-copy:sync`, then commit `templates/squire/` |
 | Try a generation | `php bin/sourdough new ./demo --raw --dry-run` |
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The tests fail on any PHP or PHPUnit deprecation (`failOnDeprecation` and `failOnPhpunitDeprecation` in `phpunit.xml.dist`), and the report names the test that raised it, the same gate every baked app gets.
 
 ## With only Docker
 

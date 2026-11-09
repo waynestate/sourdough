@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Deprecations are failures: a PHP or PHPUnit deprecation fails the run,
+    with the test that raised it named, so the CI matrix's newest PHP finds
+    them before an upgrade does. A deprecation raised inside a package and
+    caused by another package (indirect) is that package's to fix, so it is
+    not counted; one your code raises, or causes, is.
+-->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="false"
-         cacheDirectory=".phpunit.cache">
+         cacheDirectory=".phpunit.cache"
+         failOnDeprecation="true"
+         failOnPhpunitDeprecation="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnPhpunitDeprecations="true">
     <testsuites>
         <testsuite name="smoke">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <source ignoreIndirectDeprecations="true">
+        <include>
+            <directory>src</directory>
+            <directory>public</directory>
+        </include>
+        <exclude>
+            <file>public/wayne-ui.php</file>
+        </exclude>
+    </source>
 </phpunit>

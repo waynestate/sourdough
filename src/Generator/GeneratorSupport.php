@@ -863,6 +863,89 @@ final class GeneratorSupport
     }
 
     /**
+     * The attributes the deprecation gate sets on the root <phpunit> element
+     * (BEST_PRACTICES 4.13): a PHP or PHPUnit deprecation fails the run, and
+     * the report names the test that raised it.
+     */
+    public const DEPRECATION_GATE = [
+        'failOnDeprecation' => 'true',
+        'failOnPhpunitDeprecation' => 'true',
+        'displayDetailsOnTestsThatTriggerDeprecations' => 'true',
+        'displayDetailsOnPhpunitDeprecations' => 'true',
+    ];
+
+    /**
+     * Turn deprecations into failures in the app's phpunit.xml, the file a
+     * Laravel skeleton ships (BEST_PRACTICES 4.13). The root <phpunit>
+     * element gets DEPRECATION_GATE, and <source> gets
+     * ignoreIndirectDeprecations="true": a deprecation one package raises
+     * because of another is that package's to fix, while one the app's code
+     * raises or causes still fails. An attribute the file already sets keeps
+     * its value (an app that chose false has chosen), and the rest of the file
+     * is left byte for byte, so the next Laravel skeleton's env lines arrive
+     * untouched. A target without a phpunit.xml is skipped; the raw template
+     * ships its own phpunit.xml.dist with the gate written in.
+     *
+     * @throws \RuntimeException when the file cannot be read or written, or has no <phpunit> element
+     */
+    public function applyDeprecationGate(string $targetDir): void
+    {
+        $path = $targetDir . '/phpunit.xml';
+        if (!is_file($path)) {
+            return;
+        }
+
+        $this->rewrite($path, static function (string $content) use ($path): string {
+            $withRoot = self::addXmlAttributes($content, 'phpunit', self::DEPRECATION_GATE);
+            if (null === $withRoot) {
+                throw new \RuntimeException(sprintf('"%s" has no <phpunit> element to put the deprecation gate on.', $path));
+            }
+
+            return self::addXmlAttributes($withRoot, 'source', ['ignoreIndirectDeprecations' => 'true']) ?? $withRoot;
+        });
+    }
+
+    /**
+     * Add attributes to the first opening tag named $element, each on its own
+     * line under the tag's existing attributes when the tag spans lines, and
+     * skipping any attribute the tag already carries. Null when there is no
+     * such tag.
+     *
+     * @param array<string, string> $attributes
+     */
+    private static function addXmlAttributes(string $content, string $element, array $attributes): ?string
+    {
+        if (1 !== preg_match('/<' . $element . '(?=[\s>\/])[^>]*?(\s*\/?>)/', $content, $match, PREG_OFFSET_CAPTURE)) {
+            return null;
+        }
+        $tag = $match[0][0];
+        $offset = $match[0][1];
+        $close = $match[1][0];
+        $head = substr($tag, 0, strlen($tag) - strlen($close));
+
+        // Line the new attributes up under the tag's own when it already
+        // spans lines (Laravel's and the raw template's do).
+        $separator = ' ';
+        if (1 === preg_match('/\n([ \t]+)\S[^\n]*$/', $head, $indent)) {
+            $separator = "\n" . $indent[1];
+        }
+
+        $added = '';
+        foreach ($attributes as $name => $value) {
+            if (1 === preg_match('/\s' . preg_quote($name, '/') . '\s*=/', $head)) {
+                continue;
+            }
+            $added .= $separator . $name . '="' . $value . '"';
+        }
+        if ('' === $added) {
+            return $content;
+        }
+
+        // A closing ">" that sat on its own line keeps doing so.
+        return substr($content, 0, $offset) . $head . $added . ltrim($close, " \t") . substr($content, $offset + strlen($tag));
+    }
+
+    /**
      * Set require.php and config.platform.php in place (the keys keep their
      * position; a missing platform pin is added at the end of config).
      *
