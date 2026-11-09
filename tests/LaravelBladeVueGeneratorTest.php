@@ -237,6 +237,21 @@ final class LaravelBladeVueGeneratorTest extends TestCase
         self::assertStringContainsString("\nfrontend:\n", $ci);
     }
 
+    /**
+     * Practice 4.14, release half: Squire's kit (0.9.0 and later) refuses a
+     * Laravel release with no APP_KEY or with APP_DEBUG on in production,
+     * and warns when APP_ENV is not production, before anything installs.
+     */
+    public function testReleaseScriptChecksTheAppKeyAndDebug(): void
+    {
+        $target = $this->generate();
+        $release = (string) file_get_contents($target . '/scripts/release.sh');
+
+        self::assertStringContainsString('fail "APP_KEY is not set;', $release);
+        self::assertStringContainsString('fail "APP_DEBUG must be false in production', $release);
+        self::assertStringContainsString('warn "APP_ENV is \'$app_env\', not production;', $release);
+    }
+
     public function testGeneratedReadmeCarriesTheSupportLine(): void
     {
         $target = $this->generate();
