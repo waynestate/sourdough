@@ -30,6 +30,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 ### Docs[#](https://sourdough.apps.wayne.edu/docs/changelog.html#docs)
 
 - Docs: the Docker commands in the README's and the Testing guide's "From the repo root" blocks pin the CI image, `composer:2.11.1@sha256:8de2184c...`, instead of the floating `composer:2`, like MAINTAINING and the `composer ci` line already did.
+- Docs: the README's which-command table no longer says `rollcall report` always exits 0: it exits 0, or 2 on a tool error (no scan yet, a bad option, an unreadable policy), the same words as WELD's table.
 
 ## 0.3.0 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-3-0-2026-11-09)
 
