@@ -48,7 +48,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 ## CI[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
 - **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
-- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.4.0.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.
 - Green means `composer ci` passed on all three PHP versions on both.
 
 ## Smoke gate[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)

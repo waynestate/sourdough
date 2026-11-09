@@ -128,7 +128,7 @@ composer serve
 </code></pre>
 <p>Exits 0 when the committed copy matches.</p>
 <h3 id="proctor-s-preflight-pinned-check-warns-on-a-bare-tag">PROCTOR's <code>preflight-pinned</code> check warns on a bare tag<a class="docs-heading-link" aria-label="Link to this section" href="#proctor-s-preflight-pinned-check-warns-on-a-bare-tag">#</a></h3>
-<p>Cause: PROCTOR 0.4 to 0.7's <code>preflight-pinned</code> check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as <code>@0.3.0</code>, and still warns on a branch, <code>~latest</code> or a partial version such as <code>0.3</code>). New apps pin the Preflight CI components to the 0.4.0 release SHA (<code>87d9b6fc6b0ed302dd729986525282cd7b567ebd</code>, with the tag in a trailing comment), which every PROCTOR accepts.</p>
+<p>Cause: PROCTOR 0.4 to 0.7's <code>preflight-pinned</code> check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as <code>@0.3.0</code>, and still warns on a branch, <code>~latest</code> or a partial version such as <code>0.3</code>). New apps pin the Preflight CI components to the 0.5.0 release SHA (<code>60314791565a264e97cb210813ef4f3e76512402</code>, with the tag in a trailing comment), which every PROCTOR accepts.</p>
 <p>Fix: pin the Preflight component includes to the release SHA, with the tag in a trailing comment. Moving a pin is a deliberate commit.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">composer ci

@@ -16,7 +16,7 @@ Strongly recommended: a git.wayne.edu instance runner.
 
 ## On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.4.0 release commit (`87d9b6fc6b0ed302dd729986525282cd7b567ebd`), with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.5.0 release commit (`60314791565a264e97cb210813ef4f3e76512402`), with the tag in a trailing comment.
 
 ## The accessibility gate[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate)
 
@@ -109,7 +109,7 @@ The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, 
 
 ## On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.4.0.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.
 
 ## What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 

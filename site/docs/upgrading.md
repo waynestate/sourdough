@@ -38,6 +38,14 @@ Sourdough 0.3.0
 
 Then read the section for the version you are moving to.
 
+## Unreleased[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#unreleased)
+
+**What `sourdough feed` will bring an app baked with 0.3.0** (it merges each file with your edits):
+
+- `.gitlab-ci.yml`: the Preflight 0.5.0 pins (`60314791565a264e97cb210813ef4f3e76512402 # 0.5.0`, was 0.4.0). Inputs and job names are unchanged, so an include you edited keeps your inputs. Every component's Composer default is now 2.11.1 by digest, and the raw shapes' proctor job keeps `proctor.json` for Rollcall.
+
+**How to verify:** the next pipeline's include list names `@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0` on every Preflight component.
+
 ## 0.3.0 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-3-0-2026-11-09)
 
 **New: `sourdough adopt` for apps Sourdough did not make.** An existing app in git gets a manifest with `sourdough adopt --shape <shape>`, and from then on `sourdough feed` looks after it like any loaf it baked. See [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html) and the section on it below.
