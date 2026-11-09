@@ -17,7 +17,7 @@ A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sour
 
 All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the stack's guidelines and starter rules in `.ai/` (see [Laravel Boost, dev only](#laravel-boost-dev-only)).
 
-All five permutations generate in 0.1; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
+All five permutations bake; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
 ## Build on the official installer
 

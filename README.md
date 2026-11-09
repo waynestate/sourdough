@@ -2,13 +2,19 @@
 
 [![Sourdough: dough in a jar, risen past its gold band](docs/readme/hero.jpg)](site/index.html)
 
+</div>
+
+<!-- The title stays outside the centered block: the agent-ready kit drops HTML blocks and names
+     llms.txt after the README's first top-level heading. -->
 # Sourdough
+
+<div align="center">
 
 ![php](docs/readme/badges/php.svg) ![license](docs/readme/badges/license.svg) ![exit codes](docs/readme/badges/exit-codes.svg) [![GitHub CI](https://github.com/waynestate/sourdough/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/sourdough/actions/workflows/ci.yml)
 
-**Feed it and it grows.**
-
 </div>
+
+**Feed it and it grows.**
 
 A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in.
 
@@ -26,7 +32,7 @@ On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a S
 
 The canonical repository is [enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough) on git.wayne.edu. Open issues and merge requests there; tags are made there, by the maintainer, with an approver. GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror of it: nobody pushes to it, and Packagist reads from it. git.wayne.edu is the starter culture now; GitHub is the slice Packagist eats.
 
-Sourdough is the app starter for the WSU stack. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+Sourdough is the app starter for the WSU stack, and it starts every app shape: raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, and Laravel with Inertia and Vue. WELD is that last shape already built from it. One command scaffolds a new app with WayneUI (the interface), SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components, Squire's deploy files and ADVISOR (the stack's MCP server) already in place, with its PHP floor read from CREED's policy. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 <div align="center">
 
@@ -99,11 +105,11 @@ The app name (from `--name`, from the plan, or from the basename of `<dir>`) mus
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
+All five permutations bake: raw PHP since 0.1.0, the three Laravel shapes since 0.1.5 and raw PHP + Vue since 0.1.6. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
 Every bake takes its PHP floor from CREED's policy, not from a number baked into the template: the oldest PHP line still supported a year after the policy's refresh date (raised to what the Laravel major needs) becomes `require.php`, `config.platform.php` and the start of the CI test matrix. If the policy cannot be read, the bake falls back to the pinned `^8.3` and says so. `sourdough new` prints both a `PHP:` line and a `Support:` line, and every shape has an owner, a support window and a sunset path, so no starter goes stale on the counter. The rules are in [Support and sunset](docs/guides/support.md).
 
-Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
+Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The Laravel shapes require `yajra/laravel-oci8` and declare `ext-oci8` 3.4.1 as a platform package, so the driver is ready the day the settings are filled in: most WSU apps need Oracle, and Citadel's images carry oci8 and Instant Client. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
 
 ## Describe a plan
 
@@ -121,7 +127,7 @@ To see the plan as JSON without writing anything:
 sourdough new --describe "A blog with posts and comments" --plan-only
 ```
 
-Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with `--plan`:
+`--describe` stops at the plan: baking straight from a description is not built yet. Save the plan to a file and pass it with `--plan`, which bakes it:
 
 ```
 sourdough new my-app --plan plan.json
@@ -250,7 +256,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 
 The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](docs/reference/proof.md) page.
 
-The site accessibility gate runs Preflight's own a11y checker (vendored in `tools/a11y/check.mjs` from the 0.3.1 tag CI pins, held there by `tests/A11yCheckerPinTest.php`) over every page under `site/` in Docker, in light and dark at 320 px and 1280 px with the WCAG 1.4.10 reflow check: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows. It uses the same image and inputs as the a11y job in CI, so a page that passes here passes the pipeline.
+The site accessibility gate runs Preflight's own a11y checker (vendored in `tools/a11y/check.mjs` from the 0.4.0 tag CI pins, held there by `tests/A11yCheckerPinTest.php`) over every page under `site/` in Docker, in light and dark at 320 px and 1280 px with the WCAG 1.4.10 reflow check: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows. It uses the same image and inputs as the a11y job in CI, so a page that passes here passes the pipeline.
 
 ### Tests in the apps it bakes
 

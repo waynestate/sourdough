@@ -49,7 +49,7 @@
 <li><code>--inertia</code> bakes a Laravel + Inertia/Vue app: the same Laravel skeleton, the laravel-inertia overlay (Inertia 3 pages rendered by Vue and drawn by WayneUI: its app bar, sidebar, drawer, footer and components from <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8, pinned exactly; no Tailwind; ESLint bans the old kit's <code>components/ui</code> imports; Ziggy routes; the stack packages; a <code>frontend</code> CI job that lints, type-checks and builds), Squire's laravel deploy files and the manifest.</li>
 </ul>
 <p>All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the stack's guidelines and starter rules in <code>.ai/</code> (see <a href="#laravel-boost-dev-only">Laravel Boost, dev only</a>).</p>
-<p>All five permutations generate in 0.1; the raw ones (<code>--raw</code>, <code>--raw --vue</code>) start from the raw base instead of a Laravel skeleton.</p>
+<p>All five permutations bake; the raw ones (<code>--raw</code>, <code>--raw --vue</code>) start from the raw base instead of a Laravel skeleton.</p>
 <h2 id="build-on-the-official-installer">Build on the official installer<a class="docs-heading-link" aria-label="Link to this section" href="#build-on-the-official-installer">#</a></h2>
 <p>For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. <code>composer create-project laravel/laravel</code> picks the newest major, which is right. The installer also accepts a community starter kit published on Packagist:</p>
 <pre tabindex="0"><code class="language-bash">laravel new my-app --using=vendor/kit

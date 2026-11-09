@@ -16,7 +16,7 @@ Strongly recommended: a git.wayne.edu instance runner.
 
 ## On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.3.1 release commit, with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.4.0 release commit (`87d9b6fc6b0ed302dd729986525282cd7b567ebd`), with the tag in a trailing comment.
 
 ## The accessibility gate[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate)
 
@@ -39,7 +39,7 @@ Automated checks find only part of the problems. axe-core checks a loaded page; 
 
 ## The npm install and audit[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-npm-install-and-audit)
 
-The shapes with a front end (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, written against the template's `package.json` with npm's one-day release cooldown honored, so a fresh app's first pipeline installs exactly what Sourdough tested (BEST_PRACTICES 4.10). The `frontend` job runs `npm ci --ignore-scripts`, which installs the lock as it is, runs no package's install script, and stops when `package.json` and the lock disagree, then `npm audit --audit-level=high`, which fails the job on a high or critical advisory (moderate and low ones are listed, not fatal). The lock is seeded: after the bake it is yours, and npm writes it. Change a dependency with `npm install` and commit `package.json` and `package-lock.json` together. A package that truly needs its install script (a native addon, a binary download) gets an `npm rebuild <name>` line after `npm ci`, by name, so nothing else runs one.
+The shapes with a front end (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, written against the template's `package.json` with npm's one-day release cooldown honored, so a fresh app's first pipeline installs exactly what Sourdough tested (BEST_PRACTICES 4.10). The `frontend` job runs `npm ci --ignore-scripts`, which installs the lock as it is, runs no package's install script, and stops when `package.json` and the lock disagree, then `npm audit --audit-level=high --omit=dev`, which fails the job on a high or critical advisory in a runtime dependency (moderate and low ones are listed, not fatal), then a second `npm audit` that lists every finding, dev tools included, and never fails. The lock is seeded: after the bake it is yours, and npm writes it. Change a dependency with `npm install` and commit `package.json` and `package-lock.json` together. A package that truly needs its install script (a native addon, a binary download) gets an `npm rebuild <name>` line after `npm ci`, by name, so nothing else runs one.
 
 ## The bill of materials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-bill-of-materials)
 
@@ -107,7 +107,7 @@ The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, 
 
 ## On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.1.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.4.0.
 
 ## What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 

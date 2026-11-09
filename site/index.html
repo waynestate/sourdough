@@ -251,9 +251,9 @@
           <li class="log__entry" data-at="0.14"><span class="log__time">08:20</span> <span class="log__what"><strong>Flour: WayneUI.</strong> The interface, from WayneUI's standalone PHP file, which you download once.</span></li>
           <li class="log__entry" data-at="0.28"><span class="log__time">08:40</span> <span class="log__what"><strong>Water: SESAME.</strong> Sign-in. A fake driver locally, CAS in production.</span></li>
           <li class="log__entry" data-at="0.40"><span class="log__time">09:00</span> <span class="log__what"><strong>Salt: HELMET.</strong> Security headers, a hardened session, and <code>/up</code> for the load balancer.</span></li>
-          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The standards check. Preflight's CI components run it on every push, along with the tests and a Composer audit.</span></li>
+          <li class="log__entry" data-at="0.52"><span class="log__time">10:30</span> <span class="log__what"><strong>Levain: PROCTOR.</strong> The standards check. Preflight's CI components run it on every push, along with the tests, a Composer audit, an accessibility check of your own pages, a bill of materials and a secret scan.</span></li>
           <li class="log__entry" data-at="0.66"><span class="log__time">13:00</span> <span class="log__what"><strong>Doubled.</strong> Well past the gold band. A label goes on: <code>.sourdough/manifest.json</code>.</span></li>
-          <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> Cut into the five shapes the stack plans for.</span></li>
+          <li class="log__entry" data-at="0.80"><span class="log__time">14:00</span> <span class="log__what"><strong>Divide and shape.</strong> Cut into the five shapes the stack supports, every one of them ready to bake.</span></li>
         </ol>
 
       </div>
@@ -272,7 +272,7 @@
       <div class="rack">
 
         <!-- Commands as documented in README.md and src/Command/NewCommand.php.
-             All five generate in 0.1. -->
+             Each tag names the release that first baked the shape (docs/upgrading.md). -->
         <article class="loaf loaf--baked">
           <button class="loaf__score" type="button" aria-expanded="true" aria-controls="crumb-raw" aria-label="Score it: what's baked in the Raw PHP loaf" data-score>
             <svg viewBox="0 0 140 90" aria-hidden="true" focusable="false">
@@ -287,7 +287,7 @@
             <p class="loaf__kind">Country boule</p>
             <h3>Raw PHP</h3>
             <p class="loaf__label">Raw PHP with WayneUI's standalone path. No framework, no build.</p>
-            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <p><span class="tag tag--baked">Out of the oven since 0.1.0</span></p>
             <div class="cmd">
               <code id="cmd-raw">sourdough new my-app --raw</code>
               <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --raw">Copy</button>
@@ -296,9 +296,9 @@
               <p class="crumb__title">The crumb</p>
               <ul class="crumb__list">
                 <li><code>public/index.php</code> HELMET boots first, then SESAME signs you in</li>
-                <li><code>composer.json</code> helmet and sesame, with pinstripe and proctor for dev</li>
+                <li><code>composer.json</code> helmet, sesame and Playbook, with pinstripe, proctor and advisor for dev</li>
                 <li><code>pint.json</code> and <code>phpstan.neon</code> Pinstripe's standard: Pint on the per preset, PHPStan at level 8</li>
-                <li><code>.gitlab-ci.yml</code> Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit</li>
+                <li><code>.gitlab-ci.yml</code> Preflight components: PROCTOR, tests on PHP 8.3 to 8.5, audit, accessibility, SBOM and a secret scan, plus a <code>sourdough-feed</code> job</li>
                 <li><code>build.sh</code> and <code>scripts/release.sh</code> Squire's Citadel deploy files</li>
                 <li><code>.env.example</code> and <code>README.md</code> seeded: yours from day one</li>
                 <li><code>.sourdough/manifest.json</code> the label on the jar</li>
@@ -320,7 +320,7 @@
             <p class="loaf__kind">Bâtard</p>
             <h3>Raw PHP + Vue</h3>
             <p class="loaf__label">A Vue single-page app over JSON, on raw PHP. No framework, one build.</p>
-            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <p><span class="tag tag--baked">Out of the oven since 0.1.6</span></p>
             <div class="cmd">
               <code id="cmd-rawvue">sourdough new my-app --raw --vue</code>
               <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --raw --vue">Copy</button>
@@ -350,14 +350,14 @@
             <p class="loaf__kind">Baguette</p>
             <h3>Laravel + Blade</h3>
             <p class="loaf__label">The classic Wayne State shape: Laravel with Blade views.</p>
-            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <p><span class="tag tag--baked">Out of the oven since 0.1.5</span></p>
             <div class="cmd">
               <code id="cmd-laravel">sourdough new my-app --laravel</code>
               <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --laravel">Copy</button>
             </div>
             <div class="crumb" id="crumb-blade">
               <p class="crumb__title">The crumb</p>
-              <p>A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config and <code>/up</code>, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Next steps: <code>composer install</code>, <code>cp .env.example .env</code>, <code>php artisan key:generate</code>, <code>php artisan migrate</code>, <code>php artisan serve</code>.</p>
+              <p>A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config, <code>/up</code> for liveness and <code>/ready</code> that asks the database, the cache and the scheduler, Pest 4, Laravel Boost for dev, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Oracle's <code>oci8</code> driver is required and waits, dormant, for its settings. Next steps: <code>composer install</code>, <code>cp .env.example .env</code>, <code>php artisan key:generate</code>, <code>php artisan migrate</code>, <code>php artisan serve</code>.</p>
             </div>
           </div>
         </article>
@@ -376,7 +376,7 @@
             <p class="loaf__kind">Seeded loaf</p>
             <h3>Laravel + Blade + Vue islands</h3>
             <p class="loaf__label">Blade pages with Vue islands, like seeds in the crust.</p>
-            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <p><span class="tag tag--baked">Out of the oven since 0.1.5</span></p>
             <div class="cmd">
               <code id="cmd-islands">sourdough new my-app --laravel --vue</code>
               <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --laravel --vue">Copy</button>
@@ -401,7 +401,7 @@
             <p class="loaf__kind">Tin loaf</p>
             <h3>Laravel + Inertia/Vue</h3>
             <p class="loaf__label">Laravel with Inertia and Vue, as one app.</p>
-            <p><span class="tag tag--baked">Out of the oven · 0.1</span></p>
+            <p><span class="tag tag--baked">Out of the oven since 0.1.5</span></p>
             <div class="cmd">
               <code id="cmd-inertia">sourdough new my-app --inertia</code>
               <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --inertia">Copy</button>
@@ -448,22 +448,32 @@
               <tr>
                 <th scope="row"><span class="pct">2%</span> Salt</th>
                 <td><span class="part"><a class="part-link" href="https://helmet.apps.wayne.edu/"><img src="assets/marks/helmet.png" width="34" height="34" alt="">HELMET</a></span></td>
-                <td>The runtime baseline: security headers, session cookie flags, trusted proxies from <code>HELMET_PROXIES</code>, and <code>/up</code> answering <code>200 ok</code>.</td>
+                <td>The runtime baseline: security headers, session cookie flags, trusted proxies from <code>HELMET_PROXIES</code>, and <code>/up</code> answering <code>200 ok</code>. The Laravel shapes add <code>/ready</code>, which answers 503 while the database, the cache or the scheduler is down.</td>
               </tr>
               <tr>
                 <th scope="row"><span class="pct">20%</span> Levain</th>
                 <td><span class="part"><a class="part-link" href="https://proctor.apps.wayne.edu/"><img src="assets/marks/proctor.png" width="34" height="34" alt="">PROCTOR</a></span></td>
-                <td>The standards check. CI runs <code>vendor/bin/proctor check</code> on every push. The release script runs PROCTOR too, as a report unless you set <code>SQUIRE_PROCTOR=enforce</code>.</td>
+                <td>The standards check. CI runs <code>vendor/bin/proctor check</code> on every push. The release script asks <code>proctor gate</code> for a go or no-go too, as a report unless you set <code>SQUIRE_PROCTOR=enforce</code>.</td>
               </tr>
               <tr>
                 <th scope="row"><span class="pct">1</span> Oven</th>
                 <td><span class="part"><a class="part-link" href="https://preflight.apps.wayne.edu/"><img src="assets/marks/preflight.png" width="34" height="34" alt="">Preflight</a></span></td>
-                <td>CI from <code>.gitlab-ci.yml</code>: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, and a Composer audit.</td>
+                <td>CI from <code>.gitlab-ci.yml</code>, pinned to Preflight 0.4.0: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, a Composer audit, an accessibility check of your own pages at WCAG 2.2 AA that blocks, a bill of materials and a Gitleaks secret scan.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">1</span> Recipe</th>
+                <td><span class="part"><a class="part-link" href="https://creed.apps.wayne.edu/"><img src="assets/marks/creed.png" width="34" height="34" alt="">CREED</a></span></td>
+                <td>The rules the loaf is judged by. Every bake reads its PHP floor from CREED's policy, and PROCTOR grades the app against the same file.</td>
               </tr>
               <tr>
                 <th scope="row"><span class="pct">1</span> Basket</th>
                 <td><span class="part"><span class="part__glyph" aria-hidden="true">⇢</span>Release script</span></td>
                 <td><code>build.sh</code> and <code>scripts/release.sh</code> come from Squire and run on Citadel at build and release time. Off Citadel, the app reads the same environment variables on OpenShift, Coolify or raw Docker.</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="pct">1</span> Pinch</th>
+                <td><span class="part"><a class="part-link" href="https://advisor.apps.wayne.edu/"><img src="assets/marks/advisor.png" width="34" height="34" alt="">ADVISOR</a></span></td>
+                <td>For your AI assistant: the stack's MCP server, in <code>require-dev</code>, answers from the stack's own docs. <code>--no-advisor</code> leaves it out.</td>
               </tr>
             </tbody>
           </table>
@@ -495,7 +505,7 @@
             <p class="schedule__when">Any day</p>
             <div class="schedule__what">
               <code class="chalk-cmd">sourdough manifest --check</code>
-              <p>Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app; the generated CI doesn't run it for you.</p>
+              <p>Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app any time; every shape's pipeline runs it too, in the <code>sourdough-feed</code> job, and only lists what drifted.</p>
               <dl class="exits">
                 <div><dt>0</dt><dd>clean</dd></div>
                 <div><dt>1</dt><dd>a managed file changed or is missing</dd></div>
@@ -524,8 +534,8 @@
           </div>
           <div class="jars__col">
             <h3>Seeded <span>written once, yours now</span></h3>
-            <ul><li><code>.env.example</code></li><li><code>README.md</code></li></ul>
-            <p class="jars__aside">Seeded files are never reported. They're yours to knead.</p>
+            <ul><li><code>.env.example</code></li><li><code>README.md</code></li><li><code>package-lock.json</code></li></ul>
+            <p class="jars__aside">The lock comes only with a front end. Seeded files are never reported. They're yours to knead.</p>
           </div>
         </div>
         <span class="chalk-smudge" aria-hidden="true"></span>
@@ -609,7 +619,7 @@ composer serve</pre>
        agent reading this page (or index.md) gets it without the script; agent-ready.js only adds
         the buttons. Keep the commands in step with the README and the quick start above:
         bin/agent-ready.php --check fails a prompt that runs a command the docs do not. All five
-        loaves bake in 0.1: Recipe No. 1 is the raw loaf, No. 3 the Laravel ones. -->
+        loaves bake: Recipe No. 1 is the raw loaf, No. 3 the Laravel ones. -->
   <section class="section agents-section" id="agents" aria-labelledby="agents-title">
     <div class="wsu-container">
       <div class="section__head">
@@ -628,7 +638,7 @@ composer serve</pre>
               <p class="ar-prompt__desc">Installs Sourdough, makes a raw PHP app with WayneUI, serves it locally and runs the manifest check.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes all five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough bakes all five shapes: raw PHP on WayneUI's standalone path (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -643,7 +653,7 @@ Task:
 6. Run `sourdough manifest --check` in the app and report what it says.
 
 Constraints:
-- Sourdough 0.1 bakes all five shapes: raw PHP (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). A --raw --vue app needs npm install and npm run build before composer serve shows the page. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
+- Sourdough bakes all five shapes: raw PHP (--raw or no flag), raw PHP + Vue SPA over JSON (--raw --vue), Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). A --raw --vue app needs npm install and npm run build before composer serve shows the page. WELD is the Inertia/Vue shape already built, with the stack's product docs and site on top: https://weld.apps.wayne.edu/llms.txt
 - .sourdough/manifest.json records every file Sourdough wrote. Managed files are Sourdough's; .env.example and README.md are seeded and mine. Commit the manifest.
 - The deploy files (build.sh, scripts/release.sh, the .squire/ config) come from Squire. Never edit them by hand.
 - Never commit .env, and never paste a secret into a prompt or a file.
@@ -694,7 +704,7 @@ Output: a table (file, managed or seeded, state, deliberate or not), the PROCTOR
               <p class="ar-prompt__desc">Installs Sourdough, bakes one of the three Laravel shapes, serves it locally and runs the manifest check.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough 0.1 bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer bake a new Laravel app with Sourdough, the app starter of WELD, the Wayne State application stack. Sourdough bakes three Laravel shapes: Laravel + Blade (--laravel), Laravel + Blade + Vue islands (--laravel --vue) and Laravel + Inertia/Vue (--inertia). Each comes with SESAME (sign-in), HELMET (security headers and the /up check), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components and Squire's deploy files already in it.
 
 Read first:
 - https://sourdough.apps.wayne.edu/llms.txt, the index of Sourdough's pages, each one as Markdown; llms-full.txt beside it holds the README too. Fetch what you need; do not work from memory.
@@ -774,7 +784,7 @@ Output: what you ran and what it said, the app's files one level deep, then your
   <div class="wsu-container site-footer__inner">
     <img src="brand/sourdough-avatar-256.png" width="48" height="48" alt="">
     <p class="site-footer__joke">Proofed before it ships.</p>
-    <p class="site-footer__org">Wayne State University · Enterprise Applications · <a href="https://github.com/waynestate/sourdough">Source</a></p>
+    <p class="site-footer__org">Wayne State University · Enterprise Applications · <a href="docs/index.html">Docs</a> · <a href="https://git.wayne.edu/enterprise-apps/sourdough">Source on git.wayne.edu</a> · <a href="https://github.com/waynestate/sourdough">GitHub mirror</a></p>
   </div>
 </footer>
 

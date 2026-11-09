@@ -43,7 +43,7 @@
 <h1 id="sourdough">Sourdough<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough">#</a></h1>
 <p><img src="readme/badges/php.svg" alt="php" /> <img src="readme/badges/license.svg" alt="license" /> <img src="readme/badges/exit-codes.svg" alt="exit codes" /> <a rel="noopener" href="https://github.com/waynestate/sourdough/actions/workflows/ci.yml">GitHub CI</a></p>
 <p><strong>Feed it and it grows.</strong></p>
-<p>A starter you feed: <code>sourdough new</code> makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.</p>
+<p>A starter you feed: <code>sourdough new</code> makes a Wayne State app with the stack already wired in. It starts every app shape: raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, and Laravel with Inertia and Vue (<a rel="noopener" href="https://weld.apps.wayne.edu/">WELD</a> is that last shape already built). One command scaffolds a new app with WayneUI (the interface), SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components, Squire's deploy files and ADVISOR (the stack's MCP server) already in place, with its PHP floor read from CREED's policy. It is one PHP command, so it works on Windows, macOS, and Linux.</p>
 <p>Every loaf gets proofed before it ships. Checks: <code>composer ci</code> (the same command runs on GitLab and GitHub).</p>
 <p><img src="readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
 <p><sub>The proofing log from the front page: what goes into the tub when you run <code>sourdough new</code>, and the day-to-day check that keeps it alive.</sub></p>
@@ -65,7 +65,7 @@
 <li><a href="reference/commands.html">Reference</a>: every command and option, the plan format, the templates.</li>
 </ul>
 <h2 id="status">Status<a class="docs-heading-link" aria-label="Link to this section" href="#status">#</a></h2>
-<p>Version 0.2.0 (2026-11-08), MIT license. Agents: this site ships <a rel="noopener" href="https://sourdough.apps.wayne.edu/llms.txt">llms.txt</a> for LLM readers.</p>
+<p>Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.9.0's kit, Preflight 0.4.0 pins, <code>/ready</code> that asks the database and the cache): the <a href="changelog.html">changelog</a> lists it under Unreleased, and <a href="upgrading.html">Upgrading</a> says what a feed brings. Agents: this site ships <a rel="noopener" href="https://sourdough.apps.wayne.edu/llms.txt">llms.txt</a> for LLM readers.</p>
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>
 <img src="readme/gallery.jpg" alt="Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard">

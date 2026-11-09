@@ -48,7 +48,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 ## CI[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
 - **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
-- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.3.1.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.4.0.
 - Green means `composer ci` passed on all three PHP versions on both.
 
 ## Smoke gate[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
@@ -128,7 +128,7 @@ npm install --package-lock-only --ignore-scripts --no-audit --no-fund --before=<
 sed 's/"app-slug-placeholder"/"{{app_slug}}"/g' package-lock.json > <repo>/templates/<shape>/package-lock.json
 ```
 
-The stand-in name keeps npm away from the `{{app_slug}}` placeholder, which is not a valid package name. `--before` keeps the one-day release cooldown the app's `.npmrc` sets, which npm 10 ignores. Then run `npm ci --ignore-scripts`, `npm audit --audit-level=high` and `npm run build` on a bake of the shape (the smoke jobs run the install and the build), and commit the lock with its `package.json`. Apps already baked keep their own lock: it is seeded.
+The stand-in name keeps npm away from the `{{app_slug}}` placeholder, which is not a valid package name. `--before` keeps the one-day release cooldown the app's `.npmrc` sets, which npm 10 ignores. Then run `npm ci --ignore-scripts`, `npm audit --audit-level=high --omit=dev` and `npm run build` on a bake of the shape (the smoke jobs run the install and the build), and commit the lock with its `package.json`. Apps already baked keep their own lock: it is seeded.
 
 ## What belongs here[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
 

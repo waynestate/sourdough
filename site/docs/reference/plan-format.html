@@ -234,7 +234,7 @@ pages:
 <p>To see the plan as JSON without writing anything:</p>
 <pre tabindex="0"><code>sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
-<p>Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with <code>--plan</code>:</p>
+<p><code>--describe</code> stops at the plan: baking straight from a description is not built yet. Save the plan to a file and pass it with <code>--plan</code>, which bakes it:</p>
 <pre tabindex="0"><code>sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A YAML plan (<code>.yaml</code> or <code>.yml</code>) works the same way, and the bake saves the plan as <a href="#the-saved-plan">the saved plan</a>.</p>

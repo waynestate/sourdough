@@ -41,7 +41,7 @@
     <main id="main">
       <article class="docs-article"><h1 id="templates">Templates<a class="docs-heading-link" aria-label="Link to this section" href="#templates">#</a></h1>
 <p>Reference for the template directories under <code>templates/</code>: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in <a href="../guides/shapes.html">Pick a shape</a>, then come back here for the exact values.</p>
-<p>Five jars on the shelf, all five full in 0.1.</p>
+<p>Five jars on the shelf, all five full.</p>
 <p><img src="../readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
 <h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -49,7 +49,7 @@
 <tr>
 <th>Directory</th>
 <th>Shape</th>
-<th>Status in 0.1</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
@@ -116,7 +116,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>All five permutations generate in 0.1. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
+<p>All five permutations bake: raw PHP since 0.1.0, the three Laravel shapes since 0.1.5 and raw PHP + Vue since 0.1.6. <code>--raw --vue</code> is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under <code>/api/</code>, Vite builds the Vue app, and <code>src/Vite.php</code> loads it from the build or the dev server.</p>
 <p>Bake commands for the five shapes:</p>
 <div class="docs-tabs" data-tabs="raw|raw + vue|laravel|laravel + vue|inertia"><div class="docs-tabs__panel" data-tab-label="raw"><p class="docs-tabs__label">raw</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --raw
 </code></pre></div>
@@ -149,7 +149,7 @@
 <li><code>package.json</code> pins <code>@waynestate/wayne-ui-css</code> and <code>@waynestate/wayne-ui-vue</code> 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. <code>resources/css/app.css</code> imports WayneUI's layered <code>dist/wayne-ui.css</code>, and <code>resources/js/App.vue</code> draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).</li>
 <li><code>vite.config.js</code> builds into <code>public/build</code> with the manifest at its top, keeps <code>public/</code> (PHP's document root) out of the copy, and writes and removes <code>public/hot</code> around the dev server. <code>.gitignore</code> adds <code>/node_modules/</code>, <code>/public/build/</code> and <code>/public/hot</code>. The template ships <code>package-lock.json</code> (seeded: yours after the bake), so CI and Squire's release script run <code>npm ci</code> from it on the first push.</li>
 <li>Drops <code>stubs/wayne-ui.php</code> and <code>phpstan.neon</code>'s <code>scanFiles</code>: Vue draws the chrome, so there is no fetched <code>public/wayne-ui.php</code>.</li>
-<li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm ci --ignore-scripts</code> from the shipped <code>package-lock.json</code>, <code>npm audit --audit-level=high</code>, <code>npm run build</code>, and <code>sbom-npm.cdx.json</code> from CycloneDX's npm tool) to the raw pipeline, and its <code>a11y-pages</code> job waits for that build and also saves <code>/api/me</code>, so the accessibility gate sees the Vue app signed in.</li>
+<li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm ci --ignore-scripts</code> from the shipped <code>package-lock.json</code>, <code>npm audit --audit-level=high --omit=dev</code> (runtime dependencies; a second run lists dev-only findings without failing), <code>npm run build</code>, and <code>sbom-npm.cdx.json</code> from CycloneDX's npm tool) to the raw pipeline, and its <code>a11y-pages</code> job waits for that build and also saves <code>/api/me</code>, so the accessibility gate sees the Vue app signed in.</li>
 </ul>
 <h3 id="laravel-blade">laravel-blade/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade">#</a></h3>
 <ul>
@@ -164,7 +164,7 @@
 <ul>
 <li>The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a <code>resources/js/app.js</code> registry that mounts a Vue 3 app on every <code>[data-vue-island]</code> element, and a Counter island live on the dashboard view.</li>
 <li>Ships <code>tests/Feature/ExampleTest.php</code> with <code>$this-&gt;withoutVite()</code>, so <code>composer ci</code> in a freshly baked islands app does not fail on the missing Vite manifest before <code>npm run build</code> has run.</li>
-<li>Its own <code>.gitlab-ci.yml</code>: the Laravel + Blade pipeline plus a <code>frontend</code> job (<code>npm ci --ignore-scripts</code>, <code>npm audit --audit-level=high</code>, <code>npm run build</code>, the npm SBOM), whose <code>public/build/</code> the <code>a11y-pages</code> job serves, because Blade's <code>@vite</code> reads the build's manifest.</li>
+<li>Its own <code>.gitlab-ci.yml</code>: the Laravel + Blade pipeline plus a <code>frontend</code> job (<code>npm ci --ignore-scripts</code>, <code>npm audit --audit-level=high --omit=dev</code>, <code>npm run build</code>, the npm SBOM), whose <code>public/build/</code> the <code>a11y-pages</code> job serves, because Blade's <code>@vite</code> reads the build's manifest.</li>
 <li>Next steps: the Laravel + Blade steps plus <code>npm install</code> and <code>npm run build</code>.</li>
 </ul>
 <h3 id="laravel-inertia">laravel-inertia/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-inertia">#</a></h3>
@@ -187,7 +187,7 @@
 <tbody>
 <tr>
 <td>Stack packages</td>
-<td>HELMET <code>^1.0</code>, SESAME <code>^0.5</code>, PROCTOR <code>^0.8</code> (its <code>composer proctor</code> script is plain <code>proctor check</code>: PROCTOR refuses <code>--policy</code> in CI since 0.6 and finds CREED's released policy in <code>vendor/waynestate/creed</code> by itself; 0.7 adds <code>proctor gate</code>, which the Squire kit's release script runs; 0.8 fails a deploy script with Windows line endings). The raw shapes also require Guzzle and <code>nyholm/psr7</code>, the HTTP client and factory the cas driver checks tickets with</td>
+<td>HELMET <code>^1.0</code>, SESAME <code>^0.6</code>, PROCTOR <code>^0.8</code> (its <code>composer proctor</code> script is plain <code>proctor check</code>: PROCTOR refuses <code>--policy</code> in CI since 0.6 and finds CREED's released policy in <code>vendor/waynestate/creed</code> by itself; 0.7 adds <code>proctor gate</code>, which the Squire kit's release script runs; 0.8 fails a deploy script with Windows line endings). The raw shapes also require Guzzle and <code>nyholm/psr7</code>, the HTTP client and factory the cas driver checks tickets with</td>
 </tr>
 <tr>
 <td>Playbook</td>
@@ -226,7 +226,7 @@
 <p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. <code>--no-advisor</code> skips the ADVISOR wiring.</p></aside>
 <h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></h2>
-<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.7.0's kit: its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (<code>php artisan reload</code>, or <code>queue:restart</code> and <code>schedule:interrupt</code> on an older Laravel; report only, <code>SQUIRE_ARTISAN_RESTART=0</code> turns it off). The image hardens too: the web's PHP loses its shell functions (<code>SQUIRE_PHP_DISABLE_FUNCTIONS</code> sets the list), opcache runs with production settings (<code>SQUIRE_OPCACHE_VALIDATE</code>), Apache answers <code>ServerTokens Prod</code>, and secrets can be read from <code>/run/secrets</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
+<p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.9.0's kit: a Laravel release first refuses to run with no <code>APP_KEY</code> or with <code>APP_DEBUG</code> on in production (and warns when <code>APP_ENV</code> is not production); then its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (<code>php artisan reload</code>, or <code>queue:restart</code> and <code>schedule:interrupt</code> on an older Laravel; report only, <code>SQUIRE_ARTISAN_RESTART=0</code> turns it off). The image hardens too: the web's PHP loses its shell functions (<code>SQUIRE_PHP_DISABLE_FUNCTIONS</code> sets the list), opcache runs with production settings (<code>SQUIRE_OPCACHE_VALIDATE</code>), Apache answers <code>ServerTokens Prod</code>, and secrets can be read from <code>/run/secrets</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -237,7 +237,7 @@
 <tbody>
 <tr>
 <td><code>composer squire-copy:sync</code></td>
-<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.7</code>)</td>
+<td>rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.9</code>)</td>
 </tr>
 <tr>
 <td><code>composer squire-copy:check</code></td>

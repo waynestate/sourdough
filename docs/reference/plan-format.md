@@ -145,7 +145,7 @@ To see the plan as JSON without writing anything:
 sourdough new --describe "A blog with posts and comments" --plan-only
 ```
 
-Generation from a plan is not built yet in 0.1. Save the plan to a file and pass it with `--plan`:
+`--describe` stops at the plan: baking straight from a description is not built yet. Save the plan to a file and pass it with `--plan`, which bakes it:
 
 ```
 sourdough new my-app --plan plan.json

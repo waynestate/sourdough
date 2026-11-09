@@ -11,7 +11,7 @@ description: "What Sourdough bakes: install, flags, permutations, plans, the man
 
 **Feed it and it grows.**
 
-A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in. One command scaffolds a new app with SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), and the Preflight CI components already in place. It is one PHP command, so it works on Windows, macOS, and Linux.
+A starter you feed: `sourdough new` makes a Wayne State app with the stack already wired in. It starts every app shape: raw PHP, raw PHP with a Vue SPA, Laravel with Blade, Laravel with Blade and Vue islands, and Laravel with Inertia and Vue ([WELD](https://weld.apps.wayne.edu/) is that last shape already built). One command scaffolds a new app with WayneUI (the interface), SESAME (auth), HELMET (baseline runtime), Pinstripe (coding standard), PROCTOR (checks), the Preflight CI components, Squire's deploy files and ADVISOR (the stack's MCP server) already in place, with its PHP floor read from CREED's policy. It is one PHP command, so it works on Windows, macOS, and Linux.
 
 Every loaf gets proofed before it ships. Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
@@ -49,7 +49,7 @@ The step-by-step version is the [Quick start](guides/quick-start.md).
 
 ## Status
 
-Version 0.2.0 (2026-11-08), MIT license. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.9.0's kit, Preflight 0.4.0 pins, `/ready` that asks the database and the cache): the [changelog](changelog.md) lists it under Unreleased, and [Upgrading](upgrading.md) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>

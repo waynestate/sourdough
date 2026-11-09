@@ -10,13 +10,13 @@ generator: Squire agent-ready
 
 Reference for the template directories under `templates/`: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for the exact values.
 
-Five jars on the shelf, all five full in 0.1.
+Five jars on the shelf, all five full.
 
 ![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
 
 ## The template directories[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-template-directories)
 
-| Directory | Shape | Status in 0.1 |
+| Directory | Shape | Status |
 | --- | --- | --- |
 | `raw/` | Raw PHP with WayneUI's standalone path | generates |
 | `raw-vue/` | Raw PHP + Vue SPA over JSON, layered over `raw/` | generates |
@@ -35,7 +35,7 @@ The flags that select a shape:
 | `--laravel --vue` | Laravel + Blade + Vue islands |
 | `--laravel --inertia` (or `--inertia`) | Laravel + Inertia/Vue |
 
-All five permutations generate in 0.1. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
+All five permutations bake: raw PHP since 0.1.0, the three Laravel shapes since 0.1.5 and raw PHP + Vue since 0.1.6. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
 Bake commands for the five shapes:
 
@@ -92,7 +92,7 @@ sourdough new my-app --inertia
 - `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
 - `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`. The template ships `package-lock.json` (seeded: yours after the bake), so CI and Squire's release script run `npm ci` from it on the first push.
 - Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
-- Its `.gitlab-ci.yml` adds a `frontend` job (`npm ci --ignore-scripts` from the shipped `package-lock.json`, `npm audit --audit-level=high`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm ci --ignore-scripts` from the shipped `package-lock.json`, `npm audit --audit-level=high --omit=dev` (runtime dependencies; a second run lists dev-only findings without failing), `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
 
 ### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
 
@@ -107,7 +107,7 @@ sourdough new my-app --inertia
 
 - The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
 - Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
-- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm ci --ignore-scripts`, `npm audit --audit-level=high`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
+- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm ci --ignore-scripts`, `npm audit --audit-level=high --omit=dev`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
 ### laravel-inertia/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
@@ -123,7 +123,7 @@ sourdough new my-app --inertia
 
 | Part | What lands in the app |
 | --- | --- |
-| Stack packages | HELMET `^1.0`, SESAME `^0.5`, PROCTOR `^0.8` (its `composer proctor` script is plain `proctor check`: PROCTOR refuses `--policy` in CI since 0.6 and finds CREED's released policy in `vendor/waynestate/creed` by itself; 0.7 adds `proctor gate`, which the Squire kit's release script runs; 0.8 fails a deploy script with Windows line endings). The raw shapes also require Guzzle and `nyholm/psr7`, the HTTP client and factory the cas driver checks tickets with |
+| Stack packages | HELMET `^1.0`, SESAME `^0.6`, PROCTOR `^0.8` (its `composer proctor` script is plain `proctor check`: PROCTOR refuses `--policy` in CI since 0.6 and finds CREED's released policy in `vendor/waynestate/creed` by itself; 0.7 adds `proctor gate`, which the Squire kit's release script runs; 0.8 fails a deploy script with Windows line endings). The raw shapes also require Guzzle and `nyholm/psr7`, the HTTP client and factory the cas driver checks tickets with |
 | Playbook | `waynestate/playbook` in `require`, the VCS repository, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access |
 | ADVISOR | `waynestate/advisor` in `require-dev`, `.mcp.json` git-ignored (a client config starts a program for whoever opens the project), a README "ADVISOR" section; install with `php vendor/bin/advisor install --client=claude --write` |
 | Preflight | `.gitlab-ci.yml` pins the Preflight CI components to the 0.4.0 release SHA (`87d9b6fc6b0ed302dd729986525282cd7b567ebd`, with the tag in a trailing comment), which PROCTOR's `preflight-pinned` check accepts on every PROCTOR the shapes allow (0.4 to 0.7 want a 40-hex SHA; 0.8 also takes a release tag). The includes pass no `image` inputs, so each component runs its own default image, pinned by digest inside that release, and the ones that pull from Docker Hub pass `image_prefix: "${IMAGE_PREFIX}"`, so the components and the app's own jobs pull through the same Dependency Proxy rule (`a11y` pulls Playwright's image from Microsoft's registry and takes none) |
@@ -141,11 +141,11 @@ Note
 
 ## The Squire-owned copy (`templates/squire/`)[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-squire-owned-copy-templates-squire)
 
-The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. The copy is Squire 0.7.0's kit: its `scripts/release.sh` runs PROCTOR's deploy gate (`proctor gate`) right after `composer audit`, before the frontend build and the migrations, writes the verdict to `storage/squire/proctor-gate.json` (`SQUIRE_PROCTOR_RECORD_DIR`), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (`php artisan reload`, or `queue:restart` and `schedule:interrupt` on an older Laravel; report only, `SQUIRE_ARTISAN_RESTART=0` turns it off). The image hardens too: the web's PHP loses its shell functions (`SQUIRE_PHP_DISABLE_FUNCTIONS` sets the list), opcache runs with production settings (`SQUIRE_OPCACHE_VALIDATE`), Apache answers `ServerTokens Prod`, and secrets can be read from `/run/secrets`. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
+The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. The copy is Squire 0.9.0's kit: a Laravel release first refuses to run with no `APP_KEY` or with `APP_DEBUG` on in production (and warns when `APP_ENV` is not production); then its `scripts/release.sh` runs PROCTOR's deploy gate (`proctor gate`) right after `composer audit`, before the frontend build and the migrations, writes the verdict to `storage/squire/proctor-gate.json` (`SQUIRE_PROCTOR_RECORD_DIR`), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (`php artisan reload`, or `queue:restart` and `schedule:interrupt` on an older Laravel; report only, `SQUIRE_ARTISAN_RESTART=0` turns it off). The image hardens too: the web's PHP loses its shell functions (`SQUIRE_PHP_DISABLE_FUNCTIONS` sets the list), opcache runs with production settings (`SQUIRE_OPCACHE_VALIDATE`), Apache answers `ServerTokens Prod`, and secrets can be read from `/run/secrets`. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
 
 | Command | What it does |
 | --- | --- |
-| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.7`) |
+| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.9`) |
 | `composer squire-copy:check` | exits 1 when the committed copy has drifted; part of `composer ci` |
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
