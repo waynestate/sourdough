@@ -46,7 +46,7 @@ use Waynestate\Sourdough\ShapeSupport;
  * - a file too big to match, even after a CRLF expansion, is yours without
  *   being read, so a stray dump at a template path costs nothing.
  * A yours file that lacks the name the template writes into it says so,
- * and three of those add a note: the --name is probably wrong. A vendored
+ * and two of those add a note: the --name is probably wrong. A vendored
  * Squire kit older or newer than the one Sourdough bakes, and a deprecated
  * shape, add notes too.
  *
@@ -85,8 +85,12 @@ final class Adopt
 
     private const NOTE_KIT_NEWER = '.squire.json says Squire\'s kit %s, newer than the kit this Sourdough bakes (%s); kit files that differ stay yours until Sourdough catches up, and the feed after that takes them over.';
 
-    /** How many name hints it takes before the name itself looks wrong. */
-    private const NAME_NOTE_AT = 3;
+    /**
+     * How many name hints it takes before the name itself looks wrong. Two,
+     * not three: a raw or laravel-blade bake writes the name into only two
+     * files that can be yours, so three never fired there.
+     */
+    private const NAME_NOTE_AT = 2;
 
     /** The file `squire init` and `squire update` write into an app. */
     private const SQUIRE_RECORD = '.squire.json';
@@ -129,8 +133,7 @@ final class Adopt
             ));
         }
 
-        $dir = self::resolveDir($dir);
-        self::assertAdoptable($dir);
+        $dir = self::target($dir);
 
         $sail = true === ($options['sail'] ?? false);
         $docker = true === ($options['docker'] ?? false);
@@ -199,6 +202,30 @@ final class Adopt
         ];
 
         return new AdoptPlan($dir, $shape, $name, $version, $entries, $manifest, $notes);
+    }
+
+    /**
+     * $dir resolved (forward slashes, no trailing slash), once it is known
+     * to be a folder adopt may write a manifest into. The command calls it
+     * before its git checks, so the refusals come in the spec's order.
+     *
+     * @throws AdoptException when the dir is not there, is a file, already has a manifest, or has a `.sourdough/base/` left over
+     */
+    public static function target(string $dir): string
+    {
+        $dir = self::resolveDir($dir);
+        self::assertAdoptable($dir);
+
+        return $dir;
+    }
+
+    /**
+     * Whether $note is the wrong-name note, which the report prints after
+     * the summary rather than with the other notes.
+     */
+    public static function isNameNote(string $note): bool
+    {
+        return 1 === preg_match('/^\d+ files differ where the template writes the app name;/', $note);
     }
 
     /**

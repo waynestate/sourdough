@@ -4,6 +4,7 @@
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Waynestate\Sourdough\Command\AdoptCommand;
 use Waynestate\Sourdough\Command\FeedCommand;
 use Waynestate\Sourdough\Command\ManifestCommand;
 use Waynestate\Sourdough\Command\NewCommand;
@@ -36,6 +37,7 @@ $application = new class ('Sourdough', '0.2.0') extends Application {
 
 $application->addCommand(new NewCommand());
 $application->addCommand(new ManifestCommand());
+$application->addCommand(new AdoptCommand());
 $application->addCommand(new FeedCommand());
 
 exit($application->run());

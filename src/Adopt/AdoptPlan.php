@@ -20,7 +20,7 @@ final class AdoptPlan
      * @param array<string, mixed> $manifest the manifest to write
      * @param list<string>         $notes    things worth saying that are not about one file, with no "note: "
      *                                       prefix, in this order: the deprecated-shape notice, the Squire
-     *                                       kit note, and the wrong-name note (three or more name hints)
+     *                                       kit note, and the wrong-name note (two or more name hints)
      */
     public function __construct(
         public readonly string $dir,

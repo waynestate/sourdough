@@ -21,7 +21,7 @@ use Waynestate\Sourdough\ShapeSupport;
 
 /**
  * The adopt engine's edge cases (design/sourdough-adopt-spec.md, section 6),
- * called directly: there is no `sourdough adopt` command yet.
+ * called directly (AdoptCommandTest drives the command).
  *
  * F4, a wrong name; F5, a vendored Squire kit of another release; F7,
  * symlinks; F10, a big tree; then one test each for a name in another case,
@@ -42,6 +42,8 @@ final class AdoptEdgeCasesTest extends TestCase
     private const YOURS = 'differs from the template: yours, never overwritten';
 
     private const NAME_HINT = 'differs; the template writes the app name here as "%s", and your file does not have it: if the app goes by another name, delete .sourdough/ and adopt again with --name';
+
+    private const NAME_NOTE = '%d files differ where the template writes the app name; if the app goes by another name, delete .sourdough/ and adopt again with --name.';
 
     /** @var list<string> */
     private array $tempDirs = [];
@@ -64,14 +66,16 @@ final class AdoptEdgeCasesTest extends TestCase
     /**
      * F4: an app baked as "alpha" in a folder named "beta". Adopted under
      * the folder's name, each file the template writes the name into is
-     * yours with the hint; raw has fewer than three of them, so no note.
-     * Under its real name it matches throughout.
+     * yours with the hint. Raw writes the name into two of them, and two
+     * hints make the note (lead decision 2026-11-09: it took three, which
+     * raw and laravel-blade never reach). Under its real name it matches
+     * throughout.
      */
     public function testAWrongNameHintsAtEachFileThatCarriesIt(): void
     {
         $app = $this->bake(Permutation::Raw, 'alpha', 'beta');
         $named = $this->filesNamed(Permutation::Raw, 'alpha', 'beta');
-        self::assertNotEmpty($named, 'the raw template writes the name somewhere');
+        self::assertGreaterThanOrEqual(2, count($named), 'the raw template writes the name into two files or more: ' . implode(', ', $named));
         $this->loseManifest($app);
         $this->commitAll($app, 'baked as alpha in a folder named beta');
 
@@ -82,8 +86,8 @@ final class AdoptEdgeCasesTest extends TestCase
             self::assertSame(sprintf(self::NAME_HINT, 'beta'), $this->entry($plan, $path)->detail, $path);
         }
         self::assertSame(0, $plan->count(AdoptStatus::Missing), $this->describe($plan));
-        self::assertLessThan(3, count($named));
-        self::assertSame([], $plan->notes, 'fewer than three hints make no note');
+        self::assertSame([sprintf(self::NAME_NOTE, count($named))], $plan->notes, 'two hints make the note');
+        self::assertTrue(Adopt::isNameNote($plan->notes[0]));
 
         $right = $this->adopter()->plan($app, Permutation::Raw, 'alpha', $this->options());
         self::assertSame(0, $right->count(AdoptStatus::Yours), $this->describe($right));
@@ -92,24 +96,46 @@ final class AdoptEdgeCasesTest extends TestCase
     }
 
     /**
-     * F4 on the Inertia shape, which writes the name into three or more
-     * files it manages: the hints add up to the note.
+     * One hint alone is no note: a single file that lacks the name is more
+     * likely the app's own edit than a wrong --name.
      */
-    public function testThreeNameHintsAddTheNote(): void
+    public function testOneNameHintMakesNoNote(): void
+    {
+        $app = $this->bake(Permutation::Raw, 'alpha', 'beta');
+        $named = $this->filesNamed(Permutation::Raw, 'alpha', 'beta');
+        self::assertGreaterThanOrEqual(2, count($named));
+        $this->loseManifest($app);
+
+        // Every named file but the first takes the bytes a bake named "beta" writes.
+        $beta = $this->bake(Permutation::Raw, 'beta');
+        foreach (array_slice($named, 1) as $path) {
+            $this->put($app, $path, $this->read($beta, $path));
+        }
+        $this->commitAll($app, 'all but one file renamed to beta');
+
+        $plan = $this->adopter()->plan($app, Permutation::Raw, 'beta', $this->options());
+
+        self::assertSame([$named[0]], $this->pathsWith($plan, AdoptStatus::Yours), $this->describe($plan));
+        self::assertSame(sprintf(self::NAME_HINT, 'beta'), $this->entry($plan, $named[0])->detail);
+        self::assertSame([], $plan->notes, 'one hint makes no note');
+    }
+
+    /**
+     * F4 on the Inertia shape, which writes the name into more files it
+     * manages: the hints add up to the note too.
+     */
+    public function testNameHintsOnTheInertiaShapeAddTheNote(): void
     {
         $app = $this->bake(Permutation::LaravelInertia, 'alpha', 'beta');
         $named = $this->filesNamed(Permutation::LaravelInertia, 'alpha', 'beta');
-        self::assertGreaterThanOrEqual(3, count($named), implode(', ', $named));
+        self::assertGreaterThanOrEqual(2, count($named), implode(', ', $named));
         $this->loseManifest($app);
         $this->commitAll($app, 'baked as alpha in a folder named beta');
 
         $plan = $this->adopter()->plan($app, Permutation::LaravelInertia, 'beta', $this->options());
 
         self::assertSame($named, $this->pathsWith($plan, AdoptStatus::Yours), $this->describe($plan));
-        self::assertSame([sprintf(
-            '%d files differ where the template writes the app name; if the app goes by another name, delete .sourdough/ and adopt again with --name.',
-            count($named),
-        )], $plan->notes);
+        self::assertSame([sprintf(self::NAME_NOTE, count($named))], $plan->notes);
         self::assertSame($plan->notes, $plan->toArray(false)['notes']);
 
         $right = $this->adopter()->plan($app, Permutation::LaravelInertia, 'alpha', $this->options());

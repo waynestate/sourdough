@@ -1,0 +1,13 @@
+{
+    "name": "example/parking-permits",
+    "description": "A small, older raw PHP app, kept as a fixture for sourdough adopt.",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "ParkingPermits\\": "lib/"
+        }
+    }
+}

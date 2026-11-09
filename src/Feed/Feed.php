@@ -124,7 +124,7 @@ final class Feed
         try {
             $old = Manifest::read($appDir);
         } catch (\RuntimeException $e) {
-            throw new FeedException($e->getMessage() . ' sourdough feed needs the manifest sourdough new writes; an app Sourdough did not make needs sourdough adopt (not built yet).', 0, $e);
+            throw new FeedException($e->getMessage() . ' sourdough feed needs the manifest sourdough new writes; an app Sourdough did not make needs adopting first: sourdough adopt <dir> --shape <shape>.', 0, $e);
         }
 
         $oldFiles = Manifest::files($old);

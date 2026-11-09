@@ -25,7 +25,7 @@ use Waynestate\Sourdough\PlaybookMode;
 
 /**
  * The adopt engine (design/sourdough-adopt-spec.md, sections 2 and 5),
- * called directly: there is no `sourdough adopt` command yet.
+ * called directly (AdoptCommandTest drives the command).
  *
  * Every fixture starts from a fresh bake that is then changed, so nothing
  * goes stale when the templates move: F1, a bake that lost its manifest, on

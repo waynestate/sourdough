@@ -1,0 +1,4 @@
+# Hand-written before Sourdough: send everything that is not a file to index.php.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
