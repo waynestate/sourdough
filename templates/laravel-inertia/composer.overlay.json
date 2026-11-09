@@ -2,8 +2,8 @@
     "require": {
         "inertiajs/inertia-laravel": "^3.0",
         "tightenco/ziggy": "^2.4",
-        "waynestate/helmet": "^1.0",
-        "waynestate/sesame": "^0.6",
+        "waynestate/helmet": "^1.3",
+        "waynestate/sesame": "^0.7",
         "yajra/laravel-oci8": "^13.14"
     },
     "config": {
@@ -22,9 +22,9 @@
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
         "waynestate/advisor": "^0.1",
-        "waynestate/creed": "^0.1",
+        "waynestate/creed": "^0.1.8",
         "waynestate/pinstripe": "^0.1",
-        "waynestate/proctor": "^0.8"
+        "waynestate/proctor": "^0.11"
     },
     "scripts": {
         "boost-update": "@php -r \"exit(is_dir('vendor/laravel/boost') && is_file('boost.json') && ! empty(json_decode(file_get_contents('boost.json'), true)['agents']) ? pclose(popen(escapeshellarg(PHP_BINARY) . ' artisan boost:update --ansi', 'w')) : 0);\"",

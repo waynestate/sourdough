@@ -99,8 +99,8 @@ final class LaravelInertiaGeneratorTest extends TestCase
         // The Inertia packages land in require alongside the stack's...
         self::assertSame('^3.0', $composer['require']['inertiajs/inertia-laravel']);
         self::assertSame('^2.4', $composer['require']['tightenco/ziggy']);
-        self::assertSame('^0.6', $composer['require']['waynestate/sesame']);
-        self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.7', $composer['require']['waynestate/sesame']);
+        self::assertSame('^1.3', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);

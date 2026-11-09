@@ -68,14 +68,14 @@ final class LaravelBladeGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The stack's runtime packages land in require...
-        self::assertSame('^0.6', $composer['require']['waynestate/sesame']);
-        self::assertSame('^1.0', $composer['require']['waynestate/helmet']);
+        self::assertSame('^0.7', $composer['require']['waynestate/sesame']);
+        self::assertSame('^1.3', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
-        self::assertSame('^0.1', $composer['require-dev']['waynestate/creed']);
+        self::assertSame('^0.1.8', $composer['require-dev']['waynestate/creed']);
         self::assertSame('^0.1', $composer['require-dev']['waynestate/pinstripe']);
-        self::assertSame('^0.8', $composer['require-dev']['waynestate/proctor']);
+        self::assertSame('^0.11', $composer['require-dev']['waynestate/proctor']);
         // ...and Pest is the test runner for new tests...
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);

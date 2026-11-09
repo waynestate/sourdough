@@ -9,8 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * the released HELMET 1.0, SESAME 0.6 and PROCTOR 0.8 lines in every
- * composer file that pulls them in, and Inertia 3 on both sides of the
+ * the released HELMET 1.3, SESAME 0.7, PROCTOR 0.11 and CREED 0.1.8 lines in
+ * every composer file that pulls them in, and Inertia 3 on both sides of the
  * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
  */
@@ -35,14 +35,15 @@ final class StackPinsTest extends TestCase
     }
 
     #[DataProvider('proctorComposerFiles')]
-    public function testEveryShapePinsProctorZeroSeven(string $file): void
+    public function testEveryShapePinsTheCurrentProctor(string $file): void
     {
         $composer = $this->readJson($file);
 
-        // 0.7 brings `proctor gate`, the deploy gate Squire 0.6.0's
-        // release.sh asks for; an older PROCTOR falls back to `check`.
-        // 0.8 adds crlf-deploy-script, which fails a CRLF deploy script.
-        self::assertSame('^0.8', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+        // 0.7 brings `proctor gate`, the deploy gate Squire's release.sh
+        // asks for; an older PROCTOR falls back to `check`. 0.8 adds
+        // crlf-deploy-script, 0.9 case-clash, 0.10 vite-secrets and
+        // 0.11 `--record`, the JSON Rollcall reads.
+        self::assertSame('^0.11', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
     }
 
     #[DataProvider('proctorComposerFiles')]
@@ -50,8 +51,33 @@ final class StackPinsTest extends TestCase
     {
         $composer = $this->readJson($file);
 
-        self::assertSame('^1.0', $composer['require']['waynestate/helmet'] ?? null, $file);
-        self::assertSame('^0.6', $composer['require']['waynestate/sesame'] ?? null, $file);
+        self::assertSame('^1.3', $composer['require']['waynestate/helmet'] ?? null, $file);
+        self::assertSame('^0.7', $composer['require']['waynestate/sesame'] ?? null, $file);
+    }
+
+    /**
+     * The Laravel overlays and the front page's deploy layer name CREED's
+     * floor: 0.1.8 is the policy PROCTOR 0.11 is graded against.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function creedComposerFiles(): array
+    {
+        return [
+            'laravel-blade' => ['templates/laravel-blade/composer.overlay.json'],
+            'laravel-inertia' => ['templates/laravel-inertia/composer.overlay.json'],
+            'deploy' => ['deploy/composer.json'],
+        ];
+    }
+
+    #[DataProvider('creedComposerFiles')]
+    public function testCreedFloorIsTheCurrentRelease(string $file): void
+    {
+        $decoded = json_decode((string) file_get_contents(__DIR__ . '/../' . $file), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($decoded, $file);
+        $creed = $decoded['require-dev']['waynestate/creed'] ?? $decoded['require']['waynestate/creed'] ?? null;
+
+        self::assertSame('^0.1.8', $creed, $file);
     }
 
     /**
