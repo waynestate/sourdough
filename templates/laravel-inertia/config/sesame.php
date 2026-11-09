@@ -32,7 +32,8 @@ return [
     'cas' => [
         'base_url' => env('SESAME_CAS_BASE_URL'),
         'service_url' => env('SESAME_CAS_SERVICE_URL'),
-        'protocol' => env('SESAME_CAS_PROTOCOL', '3.0'),
+        // 2.0, as SESAME defaults: WSU's CAS is believed to refuse cookieless /p3/ calls. Set 3.0 only for a CAS server that answers them.
+        'protocol' => env('SESAME_CAS_PROTOCOL', '2.0'),
         // SESAME 0.5 binds each sign-in to the browser that started it, so a
         // ticket is only accepted for a login this session began. Leave on;
         // off only for an app that must accept a ticket for a login it did
