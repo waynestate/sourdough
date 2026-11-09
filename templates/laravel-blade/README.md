@@ -54,7 +54,10 @@ Preflight components pinned to one release:
   days. An app with a `frontend` job (the Vue islands shape has one) also
   keeps `sbom-npm.cdx.json`, the npm packages, beside the build. When the
   next advisory lands, search these files to see whether this app has the
-  package.
+  package. That `frontend` job installs from the shipped `package-lock.json`
+  with `npm ci --ignore-scripts` and fails on a high or critical `npm audit`
+  finding, so change a dependency with `npm install` and commit
+  `package.json` and `package-lock.json` together.
 - **Secrets.** Preflight's `secret-detection` job runs Gitleaks over the
   repository and fails on anything shaped like a credential (redacted in the
   log).

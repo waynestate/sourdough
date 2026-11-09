@@ -57,10 +57,15 @@ final class RawGenerator
      *   real values per environment, so Sourdough must not clobber them.
      * - README.md: the app's own documentation. The developer rewrites it
      *   for their app, so overwriting it would destroy their work.
+     * - package-lock.json (the shapes with a front end): the record of what
+     *   the app installed. The first one comes from the template, so a fresh
+     *   bake passes `npm ci`; after that npm writes it, and a three-way text
+     *   merge of two lock files is a pile of crumbs, not a loaf.
      */
     public const SEEDED_FILES = [
         '.env.example',
         'README.md',
+        'package-lock.json',
     ];
 
     /**

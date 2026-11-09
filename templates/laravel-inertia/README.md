@@ -40,7 +40,10 @@ as you edit.
 
 `composer test` runs Pest, and so does the CI's php-test matrix. `npm run lint`,
 `npm run format:check` and `npm run typecheck` check the front end; the
-`frontend` CI job runs them and the build. Write new tests in Pest. `tests/Pest.php` binds
+`frontend` CI job runs them and the build. It installs from the shipped
+`package-lock.json` with `npm ci --ignore-scripts` and fails on a high or
+critical `npm audit` finding, so change a dependency with `npm install` and
+commit `package.json` and `package-lock.json` together. Write new tests in Pest. `tests/Pest.php` binds
 Feature tests to the app and a fresh database. Tests read `.env` when it exists,
 otherwise `.env.example`, on top of `phpunit.xml`.
 

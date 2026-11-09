@@ -76,9 +76,9 @@ sourdough new my-app --inertia
 - `public/index.php` boots HELMET, the session and SESAME exactly as `raw/` does. Paths under `/api/` answer JSON: `/api/me` returns the signed-in user (`username` and `name`), an unknown endpoint is a JSON `404`, and a request without a session is a JSON `401` instead of a redirect to CAS. `/` sends the page that loads the Vue app; any other path sends the same page with a `404`, and Vue says the page does not exist.
 - `src/Vite.php` prints the stylesheet, `modulepreload` and script tags for `resources/js/app.js` from `public/build/manifest.json` (imported chunks and their CSS included), each with HELMET's CSP nonce. While `npm run dev` runs, `public/hot` holds the dev server's origin and the helper points at it instead, and adds it to the CSP; with `APP_ENV=production` the hot file is ignored. `tests/ViteTest.php` covers both paths.
 - `package.json` pins `@waynestate/wayne-ui-css` and `@waynestate/wayne-ui-vue` 2.0.8 exactly, as the Inertia shape does, with Vue 3 and Vite 6. `resources/css/app.css` imports WayneUI's layered `dist/wayne-ui.css`, and `resources/js/App.vue` draws the page with WayneUI's app bar, environment ribbon, cards and footer, served from the app's own origin (no CDN).
-- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`: Squire's release script runs `npm ci` and `npm run build` once `package-lock.json` is committed.
+- `vite.config.js` builds into `public/build` with the manifest at its top, keeps `public/` (PHP's document root) out of the copy, and writes and removes `public/hot` around the dev server. `.gitignore` adds `/node_modules/`, `/public/build/` and `/public/hot`. The template ships `package-lock.json` (seeded: yours after the bake), so CI and Squire's release script run `npm ci` from it on the first push.
 - Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
-- Its `.gitlab-ci.yml` adds a `frontend` job (`npm install`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
+- Its `.gitlab-ci.yml` adds a `frontend` job (`npm ci --ignore-scripts` from the shipped `package-lock.json`, `npm audit --audit-level=high`, `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
 
 ### laravel-blade/
 
@@ -92,7 +92,7 @@ sourdough new my-app --inertia
 
 - The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
 - Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
-- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm install`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
+- Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm ci --ignore-scripts`, `npm audit --audit-level=high`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
 ### laravel-inertia/

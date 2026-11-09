@@ -375,7 +375,7 @@ case "$shape" in
         suite_step "composer test" composer test
         step "composer proctor" composer proctor
         step "composer ci" composer ci
-        step "npm install" npm install --no-audit --no-fund
+        step "npm ci" npm ci --ignore-scripts --no-audit --no-fund
         step "npm run build" npm run build
 
         # Live check, as for raw: APP_ENV=local so SESAME uses its fake
@@ -394,7 +394,7 @@ case "$shape" in
         laravel_setup
         step "php artisan migrate" php artisan migrate
         if [ "$shape" != blade ]; then
-            step "npm install" npm install --no-audit --no-fund
+            step "npm ci" npm ci --ignore-scripts --no-audit --no-fund
             step "npm run build" npm run build
         fi
         if [ "$shape" = inertia ]; then

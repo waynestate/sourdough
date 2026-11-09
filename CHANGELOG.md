@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: the front-end shapes (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, seeded so npm owns it after the bake, and their `frontend` job installs it with `npm ci --ignore-scripts`, then fails on a high or critical `npm audit` finding (BEST_PRACTICES 4.10, now `Enforced`). New `tests/TemplateNpmLockTest.php` keeps each lock in step with its `package.json`, the smoke jobs install with `npm ci`, and apps already baked get the template's lock from `sourdough feed` only when they have none.
 - Added: tests/KitRoutesAbsentTest.php: no Laravel shape ships Fortify, Breeze or Jetstream, a routes/auth.php, or registration, password reset, email verification or two-factor routes (BEST_PRACTICES 2.2, backlog 5).
 - Added: the generated README carries a Support section with the support line `sourdough new` prints (status, owner and the end-of-security date from CREED's policy), on every shape (BEST_PRACTICES 2.4).
 - Changed: the front-end templates floor Vite at ^6.4.1, the CVE-2025-62522 fix line, and ignore *.local, where Vite keeps local secrets (BEST_PRACTICES 4.12).

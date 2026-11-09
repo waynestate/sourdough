@@ -27,7 +27,7 @@ The JSON is pretty-printed with sorted keys and a trailing newline, and paths us
 | Class | Who owns it |
 |---|---|
 | `managed` | Sourdough owns the file and will update it |
-| `seeded` | Sourdough wrote the file once; you own it now (`.env.example` and `README.md`) |
+| `seeded` | Sourdough wrote the file once; you own it now (`.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end) |
 
 The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed: see [Keeping apps current](./keeping-current.md).
 

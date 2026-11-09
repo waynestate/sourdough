@@ -165,7 +165,7 @@ A plan is a small JSON object:
 
 ## The manifest
 
-Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+Every app Sourdough generates carries a `.sourdough/manifest.json` recording what was generated: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end).
 
 The manifest is the starter's memory: it remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed.
 
@@ -197,7 +197,7 @@ Feed bakes your app's shape again with the answers in its manifest, then goes fi
 - a file you both changed is three-way merged by git (`git merge-file`), from the version Sourdough wrote last time; where you both changed the same lines, git's conflict markers go in the file (`<<<<<<< app` and `>>>>>>> sourdough <version>`), never a silent overwrite;
 - new template files are added, and files the template dropped are removed only if you never changed them;
 - a file that already matches the template's new version is only recorded in the manifest (`record`); that is also how an app baked by 0.1.6 with `--sail` or `--docker` gets its oven into the manifest;
-- seeded files (`README.md`, `.env.example`) are never touched.
+- seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched.
 
 Then the manifest moves to the new base, and the template's version of each managed file you've changed is kept in `.sourdough/base/`, so the next feed can merge from it even when git history can't. Commit both.
 

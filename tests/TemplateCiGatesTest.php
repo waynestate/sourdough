@@ -134,6 +134,13 @@ final class TemplateCiGatesTest extends TestCase
             $frontend = self::job($ci, 'frontend');
             self::assertStringContainsString("  needs: [frontend]\n", $job, "$shape: a11y-pages takes the frontend build");
             self::assertStringContainsString("      - public/build/\n      - sbom-npm.cdx.json\n", $frontend, "$shape: frontend keeps the build and the npm SBOM");
+            // 4.10: install the lock exactly, install scripts off, then the audit gate.
+            self::assertStringContainsString(
+                "  script:\n    - npm ci --ignore-scripts --no-audit --no-fund\n    - npm audit --audit-level=high\n",
+                $frontend,
+                "$shape: frontend installs from the lock with no install scripts, then audits at high",
+            );
+            self::assertDoesNotMatchRegularExpression('/^    - npm (install|i)\b/m', $frontend, "$shape: frontend never resolves new versions with npm install");
             self::assertMatchesRegularExpression(
                 '#^    - npm exec --yes --ignore-scripts --package=@cyclonedx/cyclonedx-npm@[0-9]+\.[0-9]+\.[0-9]+ -- cyclonedx-npm .*--validate --output-file sbom-npm\.cdx\.json$#m',
                 $frontend,

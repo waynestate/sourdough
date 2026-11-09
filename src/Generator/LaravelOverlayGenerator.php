@@ -59,6 +59,10 @@ abstract class LaravelOverlayGenerator
     public const SEEDED_FILES = [
         '.env.example',
         'README.md',
+        // The front-end shapes' first lock comes from the template, so a
+        // fresh bake passes `npm ci`; after that npm owns it (RawGenerator
+        // says why a feed never merges one).
+        'package-lock.json',
         // Boost's project rules are the team's from the first commit: Boost
         // rewrites the index whenever an agent records a rule, so a feed
         // must never put the starter rules back over the team's.

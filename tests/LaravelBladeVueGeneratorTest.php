@@ -207,6 +207,12 @@ final class LaravelBladeVueGeneratorTest extends TestCase
         self::assertSame('>=22', $package['engines']['node']);
     }
 
+    /** The islands overlay's lock file comes along, named for the app and seeded (BEST_PRACTICES 4.10). */
+    public function testShipsTheLockFileNamedForTheApp(): void
+    {
+        TemplateNpmLockTest::assertBakedLockFile($this->generate(), 'my-cool-app');
+    }
+
     private function generator(): LaravelBladeVueGenerator
     {
         return new LaravelBladeVueGenerator(new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton'));

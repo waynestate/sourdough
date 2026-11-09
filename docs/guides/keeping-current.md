@@ -77,7 +77,7 @@ Feed is the update model of Copier and cruft (ADR-0014), built on plain git inst
 
 A `record` line changes no file, only the manifest, so `sourdough manifest --check` stops calling the file changed. It is how an app baked by Sourdough 0.1.6 with `--sail` or `--docker` catches up: 0.1.6 wrote the manifest before the oven's scaffold ran, so feed reads the oven from the app's files (it says so in a `note:` line) and records them.
 
-Seeded files (`README.md`, `.env.example`) are never touched; a seeded file new to the template is written only where you have none. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
+Seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touched; a seeded file new to the template is written only where you have none. A feed that changes `package.json` leaves your lock file alone, so run `npm install` and commit both files, or the pipeline's `npm ci` stops on the mismatch. Line endings are forgiven: a Windows checkout with CRLF endings still matches what Sourdough wrote, and the files feed writes keep your checkout's endings. Binary files are never merged: the template's copy lands next to yours as `<file>.sourdough-new`.
 
 4. It moves the manifest to the new base (the new loaf's hashes and the new Sourdough version) and keeps the template's version of every managed file you have changed in `.sourdough/base/<file>.base`. Commit both.
 

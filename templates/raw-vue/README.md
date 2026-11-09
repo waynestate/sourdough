@@ -32,7 +32,9 @@ composer serve
 
 Open http://localhost:8000 either way. `npm run dev` writes `public/hot` and removes it when it stops;
 while that file exists, `src/Vite.php` loads the app from the dev server instead of `public/build`.
-Commit `package-lock.json` after the first `npm install`: the release script installs from it.
+The app ships with a `package-lock.json`, and CI and the release script install from it with `npm ci`. Change a
+dependency with `npm install`, then commit `package.json` and `package-lock.json` together: `npm ci` stops when they
+disagree.
 
 `composer serve` sets `APP_ENV=local` for you, so the app signs in with
 SESAME's fake driver; a plain `php -S localhost:8000 -t public` would boot
@@ -69,7 +71,9 @@ passes all of them.
 The GitLab pipeline (`.gitlab-ci.yml`) carries the same checks: the Preflight
 components for PROCTOR, the test suite on PHP 8.3, 8.4 and 8.5,
 `composer audit`, one `composer-ci` job that runs `composer install`
-followed by `composer ci`, and a `frontend` job that runs `npm run build`.
+followed by `composer ci`, and a `frontend` job that installs from the lock
+file with `npm ci --ignore-scripts`, fails on a high or critical
+`npm audit` finding, and runs `npm run build`.
 
 ## Pipeline
 

@@ -159,6 +159,7 @@ final class RawGeneratorTest extends TestCase
         // Plain raw has no package.json, so it gets neither the npm release
         // cooldown nor the Node floor; only the front-end shapes do.
         self::assertFileDoesNotExist($target . '/package.json');
+        self::assertFileDoesNotExist($target . '/package-lock.json');
         self::assertFileDoesNotExist($target . '/.npmrc');
         self::assertFileDoesNotExist($target . '/.nvmrc');
     }

@@ -98,13 +98,18 @@ proctor-root:
 # The front end: WayneUI is the only component source. ESLint bans the
 # Tailwind kit's components/ui imports and helper packages, Prettier and
 # vue-tsc keep the code honest, and the build proves WayneUI's CSS and icon
-# sprite still resolve. Commit package-lock.json and switch to npm ci for
-# repeatable installs. Multi-arch image, pinned by its list digest.
+# sprite still resolve. npm ci installs exactly what package-lock.json pins,
+# with install scripts off (BEST_PRACTICES 4.10), and stops when the lock and
+# package.json disagree: change a dependency with npm install and commit both
+# files. A package that needs its install script gets an `npm rebuild <name>`
+# line after npm ci. npm audit fails the job on a high or critical advisory.
+# Multi-arch image, pinned by its list digest.
 frontend:
   extends: .npm-cache
   image: ${IMAGE_PREFIX}/node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
   script:
-    - npm install --no-audit --no-fund
+    - npm ci --ignore-scripts --no-audit --no-fund
+    - npm audit --audit-level=high
     - npm run lint
     - npm run format:check
     - npm run typecheck

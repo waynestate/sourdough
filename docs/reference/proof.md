@@ -84,7 +84,7 @@ Every run goes through `scripts/smoke-shape.sh`, the same gate the per-shape smo
 2. **The manifest is clean.** `sourdough manifest --check` exits 0 right after the bake: every managed file matches `.sourdough/manifest.json`.
 3. **The bake is reproducible.** The fresh app is committed to a scratch git repository and `sourdough feed --dry-run` must find nothing to feed. A loaf that came out different every time would make every feed of it a conflict.
 4. **Yesterday's loaf feeds forward.** The same shape is baked with the last release, installed from Packagist, and committed as an app would be. This checkout's `sourdough feed` must bring it up to date without a conflict, `sourdough manifest --check` must be clean afterwards, and a second `sourdough feed --dry-run` must find nothing left to do.
-5. **It installs.** `composer install` (and `npm install` for the Vue shapes) from the baked `composer.json` and `package.json`.
+5. **It installs.** `composer install` (and `npm ci --ignore-scripts` for the Vue shapes) from the baked `composer.json` and the shipped `package-lock.json`.
 6. **Its own suite passes.** `composer test` for the raw shapes (PHPUnit), `php artisan test` for the Laravel shapes (Pest 4). The table quotes the suite's own count.
 7. **PROCTOR passes.** `composer proctor`: the stack's checks against CREED's policy, from inside the app.
 8. **Its own gate passes.** `composer ci`, plus `npm run build` for the Vue shapes and `npm run typecheck` for Inertia.

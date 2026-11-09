@@ -32,7 +32,7 @@ From a machine where `sourdough` is installed (see [Install](../install.md)), ba
 - A Wayne State app with the stack already wired in: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components.
 - Playbook wiring by default: the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section.
 - ADVISOR in `require-dev`, a git-ignored `.mcp.json`, and an "ADVISOR" README section.
-- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example` and `README.md`).
+- `.sourdough/manifest.json`, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` (Sourdough owns it and will update it) or `seeded` (Sourdough wrote it once and you own it now: `.env.example`, `README.md`, and `package-lock.json` on the shapes with a front end).
 - `.sourdough/plan.yaml`, the plan the app was baked from: the shape, the name and the stack parts (plus the models and pages, when you baked from a plan file). It bakes the same loaf again with `--plan`; see [The saved plan](../reference/plan-format.md#the-saved-plan).
 
 ## Next steps

@@ -118,6 +118,12 @@ final class RawVueGeneratorTest extends TestCase
         self::assertSame('>=22', $package['engines']['node']);
     }
 
+    /** The lock file comes along, named for the app and seeded (BEST_PRACTICES 4.10). */
+    public function testShipsTheLockFileNamedForTheApp(): void
+    {
+        TemplateNpmLockTest::assertBakedLockFile($this->generate(), 'my-cool-app');
+    }
+
     public function testDropsTheStandaloneWayneUiStubAndIgnoresTheBuild(): void
     {
         $target = $this->generate();
