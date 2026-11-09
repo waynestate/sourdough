@@ -200,7 +200,7 @@ final class NewCommand extends Command
 
         // The plan carries the app name; an explicit --name still wins.
         $name = null !== $nameOption && '' !== $nameOption ? (string) $nameOption : $plan->name;
-        $flags = $this->flagsForPermutation($plan->permutation);
+        $flags = $plan->permutation->flags();
 
         return $this->generate($input, $output, $plan->withName($name), $dir, $sail, $docker, $dryRun, $json, $flags, $playbook, $advisor);
     }
@@ -401,30 +401,6 @@ final class NewCommand extends Command
         }
 
         return 0;
-    }
-
-    /**
-     * The raw/laravel/vue/inertia flags implied by a permutation.
-     *
-     * @return array<string, bool>
-     */
-    private function flagsForPermutation(Permutation $permutation): array
-    {
-        $flags = [];
-        if (Permutation::Raw === $permutation || Permutation::RawVue === $permutation) {
-            $flags['raw'] = true;
-        }
-        if (Permutation::LaravelBlade === $permutation || Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
-            $flags['laravel'] = true;
-        }
-        if (Permutation::RawVue === $permutation || Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
-            $flags['vue'] = true;
-        }
-        if (Permutation::LaravelInertia === $permutation) {
-            $flags['inertia'] = true;
-        }
-
-        return $flags;
     }
 
     private function printAppPlan(OutputInterface $output, AppPlan $plan): void

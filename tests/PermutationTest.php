@@ -72,4 +72,23 @@ final class PermutationTest extends TestCase
         self::assertSame('Laravel + Blade + Vue islands', Permutation::LaravelBladeVue->label());
         self::assertSame('Laravel + Inertia/Vue', Permutation::LaravelInertia->label());
     }
+
+    public function testFlagsNameEveryFlagTheShapeImplies(): void
+    {
+        self::assertSame(['raw' => true], Permutation::Raw->flags());
+        self::assertSame(['raw' => true, 'vue' => true], Permutation::RawVue->flags());
+        self::assertSame(['laravel' => true], Permutation::LaravelBlade->flags());
+        self::assertSame(['laravel' => true, 'vue' => true], Permutation::LaravelBladeVue->flags());
+        self::assertSame(['laravel' => true, 'vue' => true, 'inertia' => true], Permutation::LaravelInertia->flags());
+
+        foreach (Permutation::cases() as $shape) {
+            $flags = $shape->flags();
+            self::assertSame($shape, Permutation::fromFlags(
+                $flags['raw'] ?? false,
+                $flags['laravel'] ?? false,
+                ($flags['vue'] ?? false) && !($flags['inertia'] ?? false),
+                $flags['inertia'] ?? false,
+            ), 'the flags select the shape again');
+        }
+    }
 }

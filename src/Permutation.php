@@ -54,6 +54,25 @@ enum Permutation: string
     }
 
     /**
+     * The raw/laravel/vue/inertia flags this shape implies, as `sourdough new`
+     * records them in the manifest's answers. `new --plan` and the adopt
+     * engine both answer for a shape they were handed rather than flagged,
+     * so the record reads as if the flags had been typed.
+     *
+     * @return array<string, bool>
+     */
+    public function flags(): array
+    {
+        return match ($this) {
+            self::Raw => ['raw' => true],
+            self::RawVue => ['raw' => true, 'vue' => true],
+            self::LaravelBlade => ['laravel' => true],
+            self::LaravelBladeVue => ['laravel' => true, 'vue' => true],
+            self::LaravelInertia => ['laravel' => true, 'vue' => true, 'inertia' => true],
+        };
+    }
+
+    /**
      * The five shapes and the flags that select each, for error messages.
      */
     private static function shapeList(): string
