@@ -39,10 +39,10 @@ sourdough --version
 Expected:
 
 ```
-Sourdough 0.2.0
+Sourdough 0.3.0
 ```
 
-The CLI is a Symfony Console application named Sourdough, version 0.2.0 (`bin/sourdough`), so `--version` prints the name and the version.
+The CLI is a Symfony Console application named Sourdough, version 0.3.0 (`bin/sourdough`), so `--version` prints the name and the version.
 
 ## Next steps
 

@@ -26,16 +26,31 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.2.0
+Sourdough 0.3.0
 ```
 
 Then read the section for the version you are moving to.
 
-## Unreleased
+## 0.3.0 (2026-11-09)
 
-**Breaking:** for apps you feed, in four cases. First, the fed `composer.json` moves PROCTOR to `^0.8`, whose `crlf-deploy-script` check fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF). Such a script was already broken on the Linux host; convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.8 also adds `mysql-eol`, which only warns. Second, a front-end app's `frontend` job now fails on a lock file that does not match `package.json` and on a high or critical `npm audit` finding (below). Third, the test suite fails on a deprecation the app's own code raises or causes (below). Fourth, feed brings Squire's 0.9.0 kit, whose `scripts/release.sh` stops a Laravel release before anything installs when `APP_KEY` is unset or `APP_DEBUG` is true in production (it warns when `APP_ENV` is not production): set the key in `.env` or as a masked variable in the Citadel dashboard, and `APP_DEBUG=false`. **Deprecated:** none.
+**New: `sourdough adopt` for apps Sourdough did not make.** An existing app in git gets a manifest with `sourdough adopt --shape <shape>`, and from then on `sourdough feed` looks after it like any loaf it baked. See [Adopt an existing app](guides/adopt.md) and the section on it below.
 
-**Steps:** in each app, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/proctor --with-all-dependencies`, then `vendor/bin/proctor check`. See [PROCTOR's upgrading notes](https://proctor.apps.wayne.edu/docs/upgrading.html).
+**Breaking:** for apps you feed, in five cases. First, the fed `composer.json` moves PROCTOR to `^0.11` (0.2.0 baked `^0.7`). PROCTOR 0.8's `crlf-deploy-script` fails an app whose `build.sh`, `release.sh` or a `.sh` under `deployments/`, `deploy/` or `scripts/` has Windows line endings (CRLF); such a script was already broken on the Linux host, so convert it to LF and add `*.sh text eol=lf` to `.gitattributes`. PROCTOR 0.9's `case-clash` fails two paths that differ only by letter case, and its `dev-only-packages` fails Laravel Boost or Debugbar in `require` (they belong in `require-dev`, where the shapes put Boost). The other checks PROCTOR added from 0.8 to 0.11 (0.8's `mysql-eol` among them) only warn. Second, a front-end app's `frontend` job now fails on a lock file that does not match `package.json` and on a high or critical `npm audit` finding (below). Third, the test suite fails on a deprecation the app's own code raises or causes (below). Fourth, feed brings Squire's 0.10.2 kit, whose `scripts/release.sh` stops a Laravel release before anything installs when `APP_KEY` is unset or `APP_DEBUG` is true in production (it warns when `APP_ENV` is not production): set the key in `.env` or as a masked variable in the Citadel dashboard, and `APP_DEBUG=false`. Fifth, HELMET moves from `^0.4` to `^1.3`, and since 1.0 an unknown quoted source in the CSP (the `csp` option, or `HELMET_CSP` in Laravel) throws at boot instead of shipping a token the browser ignores: read every quoted source you set. **Deprecated:** none.
+
+This is a minor, not a patch: it adds a command, and feeding it moves an app's stack pins, deploy kit and pipeline images.
+
+**What `sourdough feed` brings an app baked with 0.2.0** (it merges each file with your edits):
+
+- `composer.json`: HELMET `^1.3` (was `^0.4`), SESAME `^0.7` (was `^0.5`) and PROCTOR `^0.11` (was `^0.7`); the Laravel shapes' CREED floor moves to `^0.1.8` (was `^0.1`).
+- `.gitlab-ci.yml`: Composer 2.11.1, pinned by its multi-arch digest, in `composer-ci`, `sourdough-feed` and `a11y-pages` (was 2.10.3, which is no longer maintained; 2.11.1 fixes two Composer advisories); the Preflight 0.4.0 pins (was 0.3.0); and the `sourdough-feed` job and the a11y, SBOM and secret-detection gates, which the [changelog](changelog.md) lists under 0.3.0.
+- The Squire 0.10.2 deploy kit (was 0.6.0; the [changelog](changelog.md) lists each kit move): `.squire/php.ini` sets `session.cookie_samesite = Lax`, the kit's Dockerfiles name every image in full (`docker.io/library/...`) so Buildah and Podman build them, the fallback base copies Composer 2.11.1, and the portable image ships without `node_modules/`.
+- Apps baked with `--docker`: the `composer-bin` stage of the `Dockerfile` copies Composer 2.11.1.
+
+**SESAME 0.7 and the session cookie.** Laravel apps are not affected. A raw app's `NativeSession` now raises one warning per request when the session cookie lacks HttpOnly, Secure (on https) or a Lax or Strict SameSite. The raw shapes call `helmet_boot()` before `session_start()`, which sets all three, and the 0.10.2 kit's `php.ini` sets Lax, so a fed app that kept that order sees nothing. If you moved `session_start()` above `helmet_boot()`, put it back below, or follow [SESAME's upgrading notes](https://sesame.apps.wayne.edu/docs/upgrading.html).
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/helmet waynestate/sesame waynestate/proctor waynestate/creed --with-all-dependencies` (feed never touches your lock files), then `composer test` and `vendor/bin/proctor check`. See [HELMET's](https://helmet.apps.wayne.edu/docs/upgrading.html), [SESAME's](https://sesame.apps.wayne.edu/docs/upgrading.html), [PROCTOR's](https://proctor.apps.wayne.edu/docs/upgrading.html) and [Squire's](https://squire.apps.wayne.edu/docs/upgrading.html) upgrading notes.
+
+**How to verify:** `sourdough manifest --check` is clean after you commit the feed, `composer show waynestate/helmet waynestate/sesame waynestate/proctor` names 1.3, 0.7 and 0.11, `vendor/bin/proctor check` ends with `RESULT: pass`, and the next pipeline's `composer-ci` job log names `composer:2.11.1`.
 
 **Front-end shapes: the pipeline installs from the lock file.** Feed moves the `frontend` job to `npm ci --ignore-scripts` and `npm audit --audit-level=high --omit=dev` (runtime dependencies only; a second run lists dev-only findings without failing). `npm ci` needs a `package-lock.json` that matches `package.json`: an app that has none gets the template's (a seeded file, written only where you have none), and an app that already commits one keeps it. If you added or changed a dependency, run `npm install` once and commit both files before you push. A high or critical advisory in a runtime dependency now fails the job: update the package (`npm audit fix`, or `npm install <package>@<fixed version>`), then commit the lock.
 
