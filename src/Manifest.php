@@ -16,6 +16,11 @@ use Waynestate\Sourdough\Feed\Feed;
  *
  * - "managed": Sourdough owns the file and will update it.
  * - "seeded":  Sourdough wrote the file once; the app owns it now.
+ * - "yours":   the app's own version of a template file (the coming
+ *              `sourdough adopt` records one where the app's copy differs
+ *              from the template's). Feed never touches it, and takes it
+ *              over as managed once the app's copy equals the template's.
+ *              Your starter, your rules.
  *
  * The JSON is pretty-printed with sorted keys and a trailing newline, and
  * paths use forward slashes on every OS, so two runs with the same answers
@@ -141,7 +146,7 @@ final class Manifest
     /**
      * Compare the app in $dir against its manifest.
      *
-     * Seeded files are never reported: the app owns them.
+     * Seeded and yours files are never reported: the app owns them.
      *
      * @return array{changed: list<string>, missing: list<string>}
      *
@@ -218,8 +223,9 @@ final class Manifest
 
     /**
      * The files map of a decoded manifest, with every entry normalized to a
-     * class and a hash. An entry with no class counts as managed, as it
-     * always has; an entry with no usable hash is dropped.
+     * class and a hash. "seeded" and "yours" stay as they are; any other
+     * class, or none, counts as managed, as it always has. An entry with no
+     * usable hash is dropped.
      *
      * @param array<string, mixed> $manifest
      *
@@ -234,7 +240,7 @@ final class Manifest
             }
             $class = $info['class'] ?? 'managed';
             $files[(string) $relative] = [
-                'class' => 'seeded' === $class ? 'seeded' : 'managed',
+                'class' => 'seeded' === $class || 'yours' === $class ? $class : 'managed',
                 'sha256' => $info['sha256'],
             ];
         }

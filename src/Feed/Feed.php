@@ -217,6 +217,8 @@ final class Feed
 
         $steps = [];
         $bases = [];
+        // Yours files that now match the template: managed from this feed on.
+        $takenOver = [];
         $paths = array_unique(array_merge(array_keys($oldFiles), array_keys($newFiles)));
         sort($paths);
 
@@ -235,6 +237,19 @@ final class Feed
             if ('seeded' === ($o['class'] ?? null) || 'seeded' === ($n['class'] ?? null)) {
                 if (null === $o && null !== $n && null === $app) {
                     $steps[] = new FeedStep($path, FeedAction::Add, 'new seeded file: yours from now on', $newContents[$path], $executable[$path]);
+                }
+                continue;
+            }
+
+            // Yours (an adopted app's own version of a template file): never
+            // written, merged, removed or reported, so the sourdough-feed CI
+            // job stays green release after release. The day the app's copy
+            // equals the template's, feed records it and manages it from
+            // then on. Not every loaf has to come from our starter.
+            if ('yours' === ($o['class'] ?? null)) {
+                if (null !== $n && null !== $app && self::matches($app, $n['sha256'])) {
+                    $steps[] = new FeedStep($path, FeedAction::Record, 'your file now matches the template\'s: Sourdough manages it from here');
+                    $takenOver[$path] = true;
                 }
                 continue;
             }
@@ -314,11 +329,19 @@ final class Feed
         }
 
         // Once seeded, always the app's, even if a later template calls it managed.
+        // Yours stays yours until the app's copy matches the template's (a
+        // record step above); a path the template dropped simply leaves the
+        // manifest, and one the template now seeds is seeded.
         if (is_array($newManifest['files'] ?? null)) {
             $files = $newManifest['files'];
             foreach ($oldFiles as $path => $info) {
-                if ('seeded' === $info['class'] && is_array($files[$path] ?? null)) {
+                if (!is_array($files[$path] ?? null)) {
+                    continue;
+                }
+                if ('seeded' === $info['class']) {
                     $files[$path]['class'] = 'seeded';
+                } elseif ('yours' === $info['class'] && !isset($takenOver[$path]) && 'seeded' !== ($newFiles[$path]['class'] ?? null)) {
+                    $files[$path]['class'] = 'yours';
                 }
             }
             $newManifest['files'] = $files;

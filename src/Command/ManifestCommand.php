@@ -17,8 +17,8 @@ use Waynestate\Sourdough\Manifest;
  *
  * `sourdough manifest --check` compares the app in the given directory
  * (default: the current directory) against its Sourdough manifest and lists
- * the managed files that changed or are missing. Seeded files are never
- * reported: the app owns them.
+ * the managed files that changed or are missing. Seeded and yours files are
+ * never reported: the app owns them.
  *
  * Exit codes (matching PROCTOR): 0 clean, 1 changed or missing, 2 tool error.
  */
