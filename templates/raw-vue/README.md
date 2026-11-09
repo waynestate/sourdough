@@ -75,7 +75,8 @@ components for PROCTOR, the test suite on PHP 8.3, 8.4 and 8.5,
 `composer audit`, one `composer-ci` job that runs `composer install`
 followed by `composer ci`, and a `frontend` job that installs from the lock
 file with `npm ci --ignore-scripts`, fails on a high or critical
-`npm audit` finding, and runs `npm run build`.
+`npm audit` finding in a runtime dependency (dev-only advisories are listed
+but do not fail), and runs `npm run build`.
 
 ## Pipeline
 

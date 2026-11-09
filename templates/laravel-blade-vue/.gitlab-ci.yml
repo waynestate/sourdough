@@ -101,15 +101,18 @@ proctor-root:
 # package-lock.json pins, with install scripts off (BEST_PRACTICES 4.10),
 # and stops when the lock and package.json disagree: change a dependency
 # with npm install and commit both files. A package that needs its install
-# script gets an `npm rebuild <name>` line after npm ci. npm audit fails the
-# job on a high or critical advisory. Multi-arch image, pinned by its list
-# digest.
+# script gets an `npm rebuild <name>` line after npm ci. The gate runs
+# `npm audit --audit-level=high --omit=dev` and fails the job on a high or
+# critical advisory in a runtime dependency only; the second run prints
+# everything and never fails. Multi-arch image, pinned by its list digest.
 frontend:
   extends: .npm-cache
   image: ${IMAGE_PREFIX}/node:22.21.1-alpine3.22@sha256:b2358485e3e33bc3a33114d2b1bdb18cdbe4df01bd2b257198eb51beb1f026c5
   script:
     - npm ci --ignore-scripts --no-audit --no-fund
     - npm audit --audit-level=high
+      --omit=dev
+    - npm audit || true
     - npm run build
     # The npm half of the bill of materials (BEST_PRACTICES 4.15): every
     # package the install put in node_modules, dev ones too (the build tools

@@ -42,8 +42,9 @@ as you edit.
 `npm run format:check` and `npm run typecheck` check the front end; the
 `frontend` CI job runs them and the build. It installs from the shipped
 `package-lock.json` with `npm ci --ignore-scripts` and fails on a high or
-critical `npm audit` finding, so change a dependency with `npm install` and
-commit `package.json` and `package-lock.json` together. Write new tests in Pest. `tests/Pest.php` binds
+critical `npm audit` finding in a runtime dependency; dev-only advisories are
+listed but do not fail. Change a dependency with `npm install` and commit
+`package.json` and `package-lock.json` together. Write new tests in Pest. `tests/Pest.php` binds
 Feature tests to the app and a fresh database. Tests read `.env` when it exists,
 otherwise `.env.example`, on top of `phpunit.xml`. A deprecation your code raises
 or causes fails the suite (`failOnDeprecation` in `phpunit.xml`), so the CI
