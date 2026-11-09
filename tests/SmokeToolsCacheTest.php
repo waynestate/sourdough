@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The smoke jobs' tools come from one cached, checksummed download: Composer
- * 2.10.3 and Node 22.23.4 land in .cache/smoke-tools/ once, each checked by
+ * 2.11.1 and Node 22.23.4 land in .cache/smoke-tools/ once, each checked by
  * sha256, and every smoke job reuses them. A before_script that goes back to
  * piping the Composer installer into php, or to a Node tarball nobody has
  * verified, fails here before five pipelines pay the download again. A
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class SmokeToolsCacheTest extends TestCase
 {
-    private const COMPOSER_SHA256 = '7a2d379d5b8ffdaa028580ef26494c36d2feef4b178d3dd1473a4dbc5e17c8d6';
+    private const COMPOSER_SHA256 = '6f1b891e1d4927d62740276c540fb490e47689e19e102c49e8da849794882f8c';
 
     private const NODE_X64_SHA256 = '1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce';
 
@@ -26,7 +26,7 @@ final class SmokeToolsCacheTest extends TestCase
     {
         $ci = self::read();
 
-        self::assertStringContainsString('key: smoke-tools-composer-2.10.3-node-22.23.4', $ci);
+        self::assertStringContainsString('key: smoke-tools-composer-2.11.1-node-22.23.4', $ci);
         self::assertStringContainsString('paths: [.cache/smoke-tools/]', $ci);
         self::assertStringContainsString('when: always', $ci);
     }

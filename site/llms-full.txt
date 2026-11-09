@@ -784,6 +784,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: Composer 2.11.1 everywhere a pipeline, Dockerfile or documented command names it (was 2.10.3, which Squire calls unmaintained; 2.11.1 fixes GHSA-c968-33g3-wh7p and GHSA-fm2w-xgf2-f9fh), pinned by its multi-arch list digest (`sha256:8de2184c...`, arm64 included): every shape's `composer-ci`, `sourdough-feed` and `a11y-pages` jobs, the Docker oven's `composer-bin` stage, Sourdough's own `composer-ci` and `wayneui-copies` jobs, the smoke image and the smoke jobs' checksummed phar (cache key `smoke-tools-composer-2.11.1-node-22.23.4`). A fresh bake picks it up; an existing app takes it on its next `sourdough feed`.
 - Docs: `sourdough adopt` is documented. A new guide, Adopt an existing app (`docs/guides/adopt.md`, in the nav after The manifest), joins a `sourdough adopt` section in the commands reference, the `yours` class in the manifest guide, a troubleshooting entry for each refusal, and updates to the README, MAINTAINING, BEST_PRACTICES, keeping-current, CI, upgrading and docs index pages. On the front page, the feeding schedule gains an Adoption day row with a real adopt report and a Yours jar, a fourth agent prompt adopts an existing app, and the chalk rows now write themselves on even when a jump or a quick scroll skips past their edge.
 - Added: the `sourdough adopt` command, so `sourdough feed` can look after an app Sourdough did not make: `sourdough adopt [<dir>] --shape <shape> [--name <name>] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]`. It writes `.sourdough/manifest.json` and nothing else, and prints each template path as `yours`, `seeded` or `missing` (`match` too with `-v`); a top-level folder whose every file is missing prints as one line, and `--json` lists every path. `--shape` is required (the refusal names the shape the app looks like), and the name defaults to the folder's. It refuses, with exit 1, an existing manifest, a leftover `.sourdough/base/`, a name the template cannot use, a folder outside git and a dirty tree; no git, a folder it cannot write and a failed bake are exit 2. A dry run writes nothing and turns the git and writable checks into notes. The wrong-name note now comes at two hinted files, not three, so a raw or laravel-blade app gets it too. Feed's "no manifest" message now says `sourdough adopt <dir> --shape <shape>`. New `tests/AdoptCommandTest.php`, `tests/AdoptFeedTest.php` and the fixture `tests/fixtures/adopt/legacy-raw/`.
 - Added: the adopt engine's edge cases, still with no command. A template path that is a symlink, or sits under a symlinked folder, is `yours` ("a symlink: Sourdough never writes through links") even when the link points nowhere, and so is a file whose `realpath()` leaves the app (a Windows junction). A file named in another case (`readme.md` for `README.md` on a case-insensitive disk) is `yours`, named as the disk has it. A file more than twice the template's size plus 1 KiB is `yours` without being read. A `yours` file that lacks the name the template writes into it says so, and two of those add a note that the `--name` may be wrong. The plan's notes also carry the deprecated-shape notice and a note when `.squire.json` records an older or newer Squire kit than the one Sourdough bakes. Adopt refuses a `.sourdough/base/` left from a manifest that is gone. New `tests/AdoptEdgeCasesTest.php`.
@@ -1713,7 +1714,7 @@ Every shape's `.gitlab-ci.yml` ships a `sourdough-feed` job, so an app that fall
 ```yaml
 sourdough-feed:
   extends: .composer-cache
-  image: ${IMAGE_PREFIX}/composer:2.10.3
+  image: ${IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   variables:
     SOURDOUGH_HOME: /tmp/sourdough
   allow_failure:
@@ -2306,7 +2307,7 @@ Maintainers: how to build, test and release this project, and where its data com
 The same lines work in PowerShell and sh:
 
 ```
-docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c "composer install --no-interaction && composer ci"
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
@@ -2603,7 +2604,7 @@ Development happens on git.wayne.edu, the canonical repository ([enterprise-apps
 With only Docker (the same lines work in PowerShell and sh):
 
 ```
-docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c "composer install --no-interaction && composer ci"
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
@@ -3299,7 +3300,7 @@ The run above closed the last failure, in all six oven runs: **a 0.1.6 oven bake
 
 ### Run it[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#run-it)
 
-The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.10.3, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
+The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.11.1, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
 
 sh
 

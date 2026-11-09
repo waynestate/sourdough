@@ -42,7 +42,7 @@ The run above closed the last failure, in all six oven runs: **a 0.1.6 oven bake
 
 ## Run it
 
-The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.10.3, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
+The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.11.1, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
 
 ```bash tab="sh"
 sh scripts/proof.sh            # every run

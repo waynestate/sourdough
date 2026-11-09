@@ -84,7 +84,7 @@
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>. The tests fail on any PHP or PHPUnit deprecation (<code>failOnDeprecation</code> and <code>failOnPhpunitDeprecation</code> in <code>phpunit.xml.dist</code>), and the report names the test that raised it, the same gate every baked app gets.</p>
 <h2 id="with-only-docker">With only Docker<a class="docs-heading-link" aria-label="Link to this section" href="#with-only-docker">#</a></h2>
 <p>The same lines work in PowerShell and sh:</p>
-<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
 <p>The <code>stack-composer-cache</code> volume keeps Composer's downloads between runs; Docker creates it the first time.</p>

@@ -46,7 +46,7 @@ final class DockerScaffoldTest extends TestCase
         $dockerfile = (string) file_get_contents($target . '/Dockerfile');
 
         foreach ([
-            'sha256:2cf275428757e5435a667bfc0d038b14520ca02be2b1b70d44a05c8c19e2de48',
+            'sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0',
             'sha256:9236fd373d3bcda0659cf94838a744bd79791419292958963f8c6b34a0071554',
             'sha256:4cc63b3d4e05c40da73e7af5d39364ca2678ac07208919497bda3bbab975be95',
         ] as $digest) {

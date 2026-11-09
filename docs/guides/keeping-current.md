@@ -125,7 +125,7 @@ Every shape's `.gitlab-ci.yml` ships a `sourdough-feed` job, so an app that fall
 ```yaml
 sourdough-feed:
   extends: .composer-cache
-  image: ${IMAGE_PREFIX}/composer:2.10.3
+  image: ${IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   variables:
     SOURDOUGH_HOME: /tmp/sourdough
   allow_failure:
