@@ -98,7 +98,7 @@ final class RawGenerator
      */
     public const ADVISOR_PACKAGE = 'waynestate/advisor';
 
-    public const ADVISOR_VERSION = '^0.1';
+    public const ADVISOR_VERSION = '^0.2';
 
     /**
      * The seven setting names Playbook holds, listed in .env.example.

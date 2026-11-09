@@ -103,7 +103,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertSame('^1.3', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
-        self::assertSame('^0.1', $composer['require-dev']['waynestate/advisor']);
+        self::assertSame('^0.2', $composer['require-dev']['waynestate/advisor']);
         // ...and Pest is the test runner for new tests...
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);
