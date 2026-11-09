@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: the Laravel shapes' SESAME config defaults the CAS protocol to 2.0, as SESAME does, because WSU's CAS is believed to refuse the cookieless /p3/ validation CAS 3.0 uses; set SESAME_CAS_PROTOCOL=3.0 for a CAS server that answers it.
 - Changed: BEST_PRACTICES.md closes backlog 6, now that PROCTOR has all four checks it asked for: 4.6 is `Checked` on PROCTOR main (`vite-secrets` warns on secret-looking `VITE_` names, not released yet), 4.4 names `app-key` and `env-outside-config` for a committed `.env` and `env()` outside config, and 5.2 names 0.9.0's `case-clash`. Baked apps get `vite-secrets` and `case-clash` once the shapes move past PROCTOR `^0.8`.
 - Changed: every shape bakes Squire 0.9.0 (was 0.8.0; the dev dependency is `^0.9`), and the front page's deploy layer moves from kit 0.7.1 to 0.9.0, gaining the portable image files. A Laravel release now stops before anything installs when `APP_KEY` is unset or `APP_DEBUG` is true in production and warns when `APP_ENV` is not production (BEST_PRACTICES 4.14, `Checked` for the release half; every Laravel shape's generator test pins it), and the release gate grades the PHP that runs it (`SQUIRE_PHP_RUNTIME`).
 - Changed: the Vue shapes' npm audit blocks on high or critical advisories in runtime dependencies only (--omit=dev); a second run lists dev-only findings without failing.
