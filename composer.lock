@@ -4465,16 +4465,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.10.2",
+            "version": "0.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "84ff491e43f2230522721d9f6708b1781c62076c"
+                "reference": "0567cb37c445b56ee518f1035a4c1e9a3eb43a6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/84ff491e43f2230522721d9f6708b1781c62076c",
-                "reference": "84ff491e43f2230522721d9f6708b1781c62076c",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/0567cb37c445b56ee518f1035a4c1e9a3eb43a6c",
+                "reference": "0567cb37c445b56ee518f1035a4c1e9a3eb43a6c",
                 "shasum": ""
             },
             "require": {
@@ -4487,7 +4487,7 @@
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^11.5",
                 "waynestate/advisor": "^0.1.2",
-                "waynestate/pinstripe": "^0.1"
+                "waynestate/pinstripe": "^0.1.4"
             },
             "suggest": {
                 "waynestate/advisor": "ADVISOR module: lets your coding agent run squire_doctor and squire_drift read-only."
@@ -4521,8 +4521,8 @@
                 "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-09T14:36:15+00:00",
-            "published-time": "2026-11-09T14:52:44+00:00"
+            "time": "2026-11-09T22:48:17+00:00",
+            "published-time": "2026-11-09T23:09:19+00:00"
         }
     ],
     "aliases": [],
