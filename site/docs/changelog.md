@@ -12,6 +12,10 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+### Docs[#](https://sourdough.apps.wayne.edu/docs/changelog.html#docs)
+
+- Docs: the Docker commands in the README's and the Testing guide's "From the repo root" blocks pin the CI image, `composer:2.11.1@sha256:8de2184c...`, instead of the floating `composer:2`, like MAINTAINING and the `composer ci` line already did.
+
 ## 0.3.0 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-3-0-2026-11-09)
 
 ### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
@@ -83,7 +87,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 - Fixed: `sourdough manifest --check` forgives line endings, as `sourdough feed` does. The raw shapes' `.gitattributes` checks `*.ps1` out with CRLF, so every clone of a fresh raw app reported `scripts/parity.ps1` as changed. `tests/ManifestCommandTest.php` covers it.
 - Fixed: BEST_PRACTICES.md practice 3.4 counts the 0.2.0 tag among the releases that follow the release steps.
 
-### Docs[#](https://sourdough.apps.wayne.edu/docs/changelog.html#docs)
+### Docs[#](https://sourdough.apps.wayne.edu/docs/changelog.html#docs-1)
 
 - Docs: the upgrading guide's 0.3.0 section says what a feed brings an app baked with 0.2.0 (the HELMET, SESAME, PROCTOR and CREED moves, Composer 2.11.1, the Squire 0.10.2 kit), the five breaking cases with a fix for each, what SESAME 0.7's cookie check means for a raw app, and the steps and checks, with `sourdough adopt` at the top for apps Sourdough did not make. The README gains a status line, and the install guide, docs index and front page ticket say 0.3.0.
 - Docs: MAINTAINING's "Who maintains it" names the stack maintainer as a role, not a person, and says to open an issue on git.wayne.edu to reach them; a CI comment, a test comment and BEST_PRACTICES 4.3 stop citing internal decision numbers.
