@@ -50,7 +50,7 @@ The step-by-step version is the [Quick start](guides/quick-start.md).
 
 ## Status
 
-Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.10.0's kit, Preflight 0.4.0 pins, `/ready` that asks the database and the cache): the [changelog](changelog.md) lists it under Unreleased, and [Upgrading](upgrading.md) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.10.2's kit, Preflight 0.4.0 pins, `/ready` that asks the database and the cache): the [changelog](changelog.md) lists it under Unreleased, and [Upgrading](upgrading.md) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>

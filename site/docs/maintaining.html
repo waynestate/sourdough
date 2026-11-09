@@ -52,7 +52,7 @@ at runtime.</li>
 <li><strong>Generated apps</strong> require <code>waynestate/helmet</code>, <code>waynestate/sesame</code> and <code>waynestate/proctor</code> from Packagist.</li>
 <li><strong>It carries a copy of Squire's templates</strong> in <code>templates/squire/</code> (<code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>,
 <code>catalog.json</code>, <code>manifest.json</code>). Squire owns those files; Sourdough never hand-edits them. <code>composer squire-copy:sync</code>
-rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.7</code>), and
+rewrites the copy from the installed <code>waynestate/squire</code> package (dev dependency <code>^0.10</code>), and
 <code>composer squire-copy:check</code> (part of <code>composer ci</code>) exits 1 when the committed copy has drifted.</li>
 <li><code>feed</code> needs only git on the developer's machine: it bakes the app's shape again with the manifest's answers and
 three-way merges each file with <code>git merge-file</code>, the base found by its manifest hash in <code>.sourdough/base/</code> or the
