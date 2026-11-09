@@ -9,3 +9,5 @@
 /CLAUDE.md
 /.claude/skills/
 /.junie/
+# Vite keeps local secrets in .env.*.local files; they never get committed.
+*.local

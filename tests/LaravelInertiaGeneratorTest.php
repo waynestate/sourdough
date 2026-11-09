@@ -68,6 +68,25 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/resources/views/layouts/app.blade.php');
     }
 
+    public function testFloorsViteAtTheCveFixLine(): void
+    {
+        $target = $this->generate();
+        $package = json_decode((string) file_get_contents($target . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        // The floor is the CVE-2025-62522 fix line (BEST_PRACTICES 4.12).
+        self::assertSame('^6.4.1', $package['dependencies']['vite']);
+    }
+
+    public function testIgnoresLocalEnvFiles(): void
+    {
+        $target = $this->generate();
+
+        // Vite keeps local secrets in .env.*.local files, so the overlay's
+        // gitignore additions keep *.local out of git.
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertContains('*.local', array_map('trim', explode("\n", $gitignore)));
+    }
+
     public function testMergesTheComposerOverlay(): void
     {
         $target = $this->generate();

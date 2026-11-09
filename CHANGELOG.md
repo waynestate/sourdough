@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: the front-end templates floor Vite at ^6.4.1, the CVE-2025-62522 fix line, and ignore *.local, where Vite keeps local secrets (BEST_PRACTICES 4.12).
 - Changed: every app shape and Sourdough's own CI pin Preflight 0.4.0 (87d9b6f; the proctor job clones the full history, so the override-approver check can read git blame).
 - Added: WORKER_HEARTBEAT_MAX_AGE=0 turns the scheduler heartbeat check off, so an app that runs no scheduler still answers 200 on /ready.
 - Added: new bakes take the PHP floor from CREED's `policy.json` (BEST_PRACTICES 4.2, now `Enforced`). Sourdough requires `waynestate/creed` `^0.1` and reads its policy, or the file `SOURDOUGH_POLICY` names. As of the policy's `refreshed_on`, the floor is the oldest PHP line still supported 365 days later, bounded by the Laravel major's PHP range on the Laravel shapes. It is written into `composer.json` (`require.php`, `config.platform.php`), the `.gitlab-ci.yml` matrix and the README on all five shapes. A policy that cannot be read bakes on the pinned fallback (`^8.3`, tested on 8.3, 8.4 and 8.5) and says so. Today's output is unchanged. `sourdough new` prints a `PHP:` line, and `--dry-run --json` gains a `php` object. `tests/PhpFloorTest.php` changes the policy's floor and checks every shape.

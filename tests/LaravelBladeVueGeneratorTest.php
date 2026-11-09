@@ -50,6 +50,11 @@ final class LaravelBladeVueGeneratorTest extends TestCase
             self::assertFileExists($target . '/' . $path, $path);
         }
 
+        // Vite keeps local secrets in .env.*.local files, so the blade
+        // overlay's gitignore additions keep *.local out of git.
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertContains('*.local', array_map('trim', explode("\n", $gitignore)));
+
         // The blade overlay's routes survive: the welcome route is gone, the
         // dashboard route is there.
         $web = (string) file_get_contents($target . '/routes/web.php');
@@ -66,7 +71,7 @@ final class LaravelBladeVueGeneratorTest extends TestCase
         // The pins match the Inertia template's front end...
         self::assertSame('^3.5.13', $package['dependencies']['vue']);
         self::assertSame('^5.2.1', $package['dependencies']['@vitejs/plugin-vue']);
-        self::assertSame('^6.0.3', $package['dependencies']['vite']);
+        self::assertSame('^6.4.1', $package['dependencies']['vite']);
         self::assertSame('^1.0', $package['dependencies']['laravel-vite-plugin']);
 
         // ...but no Inertia and no Ziggy: Blade still renders the page.

@@ -86,7 +86,7 @@ final class RawVueGeneratorTest extends TestCase
         self::assertSame('2.0.8', $package['dependencies']['@waynestate/wayne-ui-css']);
         self::assertSame('2.0.8', $package['dependencies']['@waynestate/wayne-ui-vue']);
         self::assertSame('^3.5.13', $package['dependencies']['vue']);
-        self::assertSame('^6.0.3', $package['dependencies']['vite']);
+        self::assertSame('^6.4.1', $package['dependencies']['vite']);
         self::assertArrayNotHasKey('laravel-vite-plugin', $package['dependencies']);
 
         $css = (string) file_get_contents($target . '/resources/css/app.css');
@@ -127,6 +127,10 @@ final class RawVueGeneratorTest extends TestCase
         foreach (['/vendor/', '/node_modules/', '/public/build/', '/public/hot'] as $line) {
             self::assertStringContainsString($line, $gitignore);
         }
+
+        // Vite keeps local secrets in .env.*.local files, so *.local is
+        // ignored too.
+        self::assertContains('*.local', array_map('trim', explode("\n", $gitignore)));
 
         self::assertStringContainsString('frontend:', (string) file_get_contents($target . '/.gitlab-ci.yml'));
     }
