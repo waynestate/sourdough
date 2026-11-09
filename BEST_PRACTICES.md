@@ -146,7 +146,7 @@ Stack: `Documented`. Audited 2026-11-08 against the four libraries (HELMET, SESA
 - `app/Support/ProductionDebug.php` and `app/Support/DummyAppKey.php` in both Laravel overlays: boot guards that fit HELMET's runtime baseline. HELMET only warns on debug (`warn_debug`) and does not refuse, so they stay until it offers the refusal.
 - `templates/raw/src/Oracle.php`, `templates/raw/src/OracleException.php`, and `app/Support/OracleErrors.php`, `app/Console/Commands/OracleCheck.php` and `config/oracle.php` in both Laravel overlays: Oracle wiring that almost every WSU app needs and no stack library owns yet.
 - `templates/raw-vue/src/Vite.php`: the raw-PHP Vite manifest reader (4.7). No stack library offers one; a maintained package should be looked for first.
-- The two Laravel overlays carry identical copies of `app/Support/*`, `app/Sesame/UserResolver.php`, `config/oracle.php`, `config/worker.php` and the username migration. That is shared inside Sourdough rather than library code: a common Laravel layer would carry one copy.
+- The two Laravel overlays carry identical copies of `app/Support/*`, `app/Health/*` (the `/ready` checks, held equal by `tests/LaravelReadyChecksTest.php`), `app/Sesame/UserResolver.php`, `config/oracle.php`, `config/worker.php` and the username migration. That is shared inside Sourdough rather than library code: a common Laravel layer would carry one copy.
 `app/Sesame/UserResolver.php` stays in the template: it maps SESAME's identity onto the app's own `User` model, which is glue. Nothing yet fails CI when a template grows new library-shaped code, so the tag is `Documented`.
 
 ### 3.7 Give every template an owner, a support window and a sunset path (second pass)

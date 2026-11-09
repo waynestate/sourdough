@@ -120,7 +120,17 @@ flour will not rise.
 ## Health check
 
 HELMET answers the load balancer's ping at `/up` with `200 ok`, without
-touching the database.
+touching the database: that is the liveness answer, for anything that
+restarts the app.
+
+`/ready` is the traffic answer, HELMET's readiness route, registered in
+`bootstrap/app.php` outside the web group (no session, no cookie). It
+checks the database (`app/Health/DatabaseReady.php`), the cache
+(`app/Health/CacheReady.php`) and the scheduler heartbeat
+(`app/Health/SchedulerHeartbeat.php`), and answers 503 when one fails, so
+a balancer skips the instance instead of anything restarting it. The body
+names only the checks and their statuses; the reason goes to the log as
+`helmet.readiness_check_failed`.
 
 ## Running off Citadel
 
