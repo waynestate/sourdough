@@ -14,14 +14,12 @@ include:
       image: "php:${PHP_VERSION}-cli-trixie"
   # No image input: from 0.5.0 composer-audit's default is composer 2.11.1, pinned by its list digest.
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.5.0
-  # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
-  # allow_failure: set while deploy/ had findings (unbounded dev-main constraints, CI files missing). Neither
-  # shows up on PROCTOR 0.11: `proctor check` on deploy/ passes, with warnings only.
+  # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy, and a finding
+  # fails the pipeline.
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.5.0
     inputs:
       working_dir: deploy
       proctor_command: vendor/bin/proctor check --format=codequality
-      allow_failure: true
       image: "php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
   # Accessibility: Preflight's a11y component serves site/ and checks every page with axe-core 4.14.0, light and
   # dark, at 320 and 1280 px, plus WCAG 1.4.10 reflow, at WCAG 2.2 AA. Its Playwright image comes from

@@ -15,6 +15,7 @@ Versioning once 1.0 is out.
 ### Changed
 
 - Changed: every shape's `.gitlab-ci.yml` pins the Preflight CI components to the 0.5.0 release SHA (`60314791565a264e97cb210813ef4f3e76512402` with `# 0.5.0`, was 0.4.0), and Sourdough's own pipeline names the `0.5.0` tag. Inputs and job names are unchanged. What 0.5.0 brings a baked app: every Composer default is 2.11.1 by digest, and on PROCTOR 0.11 (which the shapes require) the raw shapes' proctor job also keeps PROCTOR's JSON report as `proctor.json`, the file Rollcall reads. Sourdough's own composer-audit include drops its `image` input (a `composer:2` digest), because 0.5.0's default is `composer:2.11.1` by digest. The vendored a11y checker is unchanged at 0.5.0; `tests/PreflightPinTest.php`, `tests/A11yCheckerPinTest.php` and `tests/RawGeneratorTest.php` expect the new pin.
+- Changed: the proctor job on Sourdough's own deploy layer (`deploy/`) blocks the pipeline: its `allow_failure: true` is gone, because `proctor check` on `deploy/` passes on PROCTOR 0.11.1 (warnings only).
 
 ### Docs
 

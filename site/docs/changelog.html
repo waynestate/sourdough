@@ -47,6 +47,7 @@ Versioning once 1.0 is out.</p>
 <h3 id="changed">Changed<a class="docs-heading-link" aria-label="Link to this section" href="#changed">#</a></h3>
 <ul>
 <li>Changed: every shape's <code>.gitlab-ci.yml</code> pins the Preflight CI components to the 0.5.0 release SHA (<code>60314791565a264e97cb210813ef4f3e76512402</code> with <code># 0.5.0</code>, was 0.4.0), and Sourdough's own pipeline names the <code>0.5.0</code> tag. Inputs and job names are unchanged. What 0.5.0 brings a baked app: every Composer default is 2.11.1 by digest, and on PROCTOR 0.11 (which the shapes require) the raw shapes' proctor job also keeps PROCTOR's JSON report as <code>proctor.json</code>, the file Rollcall reads. Sourdough's own composer-audit include drops its <code>image</code> input (a <code>composer:2</code> digest), because 0.5.0's default is <code>composer:2.11.1</code> by digest. The vendored a11y checker is unchanged at 0.5.0; <code>tests/PreflightPinTest.php</code>, <code>tests/A11yCheckerPinTest.php</code> and <code>tests/RawGeneratorTest.php</code> expect the new pin.</li>
+<li>Changed: the proctor job on Sourdough's own deploy layer (<code>deploy/</code>) blocks the pipeline: its <code>allow_failure: true</code> is gone, because <code>proctor check</code> on <code>deploy/</code> passes on PROCTOR 0.11.1 (warnings only).</li>
 </ul>
 <h3 id="docs">Docs<a class="docs-heading-link" aria-label="Link to this section" href="#docs">#</a></h3>
 <ul>
