@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Bus\Batchable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
+
+/**
+ * Three tries, then the job fails. Each try may run 45 seconds, below the
+ * queue connection's retry_after (90 by default), so no second worker
+ * picks it up mid-run (tests/Feature/JobLimitsTest.php checks both).
+ */
+#[Tries(3)]
+#[Timeout(45)]
+class {{ class }} implements ShouldQueue
+{
+    use Batchable, Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        if ($this->batch()->cancelled()) {
+            // The batch has been cancelled...
+
+            return;
+        }
+
+        //
+    }
+}

@@ -118,6 +118,15 @@ a balancer skips the instance instead of anything restarting it. The body
 names only the checks and their statuses; the reason goes to the log as
 `helmet.readiness_check_failed`.
 
+## Queued jobs
+
+Every queued job under `app/Jobs` declares Laravel's `#[Tries]` and
+`#[Timeout]`, and the timeout stays below the queue connection's
+`retry_after` (90 seconds by default), or a second worker picks the job up
+while the first is still running it. `tests/Feature/JobLimitsTest.php`
+fails the suite otherwise. `php artisan make:job` writes both for you
+(`stubs/job.queued.stub`): three tries, 45 seconds each.
+
 ## Running off Citadel
 
 The app reads its platform facts from the environment, so it runs on
