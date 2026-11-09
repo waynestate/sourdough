@@ -52,7 +52,7 @@ The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/d
 
 ## Status[#](https://sourdough.apps.wayne.edu/docs/#status)
 
-Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.9.0's kit, Preflight 0.4.0 pins, `/ready` that asks the database and the cache): the [changelog](https://sourdough.apps.wayne.edu/docs/changelog.html) lists it under Unreleased, and [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.2.0 (2026-11-08), MIT license. Main carries more since then (Squire 0.10.0's kit, Preflight 0.4.0 pins, `/ready` that asks the database and the cache): the [changelog](https://sourdough.apps.wayne.edu/docs/changelog.html) lists it under Unreleased, and [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 **On the bench: the five loaves and the feeding schedule**
 
