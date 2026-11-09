@@ -55,7 +55,7 @@ composer-ci:
 .smoke-base:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.5-cli-trixie
   allow_failure: true
-  # Download Composer and Node once, check each sha256, and reuse them from the cache (D-072).
+  # Download Composer and Node once, check each sha256, and reuse them from the cache.
   cache:
     key: smoke-tools-composer-2.11.1-node-22.23.4
     paths: [.cache/smoke-tools/]
