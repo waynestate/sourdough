@@ -10,6 +10,10 @@ generator: Squire agent-ready
 
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic Versioning once 1.0 is out.
 
+## Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
+
+- Version mentions: ADVISOR ^0.3 in the templates and generator, Squire kit 0.10.5 re-export, docs stamps current.
+
 ## 0.4.2 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-4-2-2026-11-09)
 
 ### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
