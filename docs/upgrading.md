@@ -26,10 +26,22 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.4.1
+Sourdough 0.4.2
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.4.2 (2026-11-09)
+
+A patch on 0.4.1: new bakes meet [Parity](https://git.wayne.edu/enterprise-apps/parity), the stack's tool that runs Citadel on your computer. Every shape's README gains "Run it like Citadel" at the end of "Run it locally", and the docs say when to use it.
+
+**What `sourdough feed` brings an app baked with 0.4.1:** nothing. The new text lives in `README.md`, which is a seeded file: Sourdough wrote it once and you own it. Templates, pins and the Squire kit are unchanged.
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** none required. To run an existing app like Citadel, install Parity, copy the "Run it like Citadel" subsection from a fresh bake of the same shape into your README, and follow it. Apps baked with `--docker` or `--sail` set `DB_CONNECTION=sqlite` in `.env` for Parity runs, because their `.env` points at the oven's own MySQL.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.4.2`, and a fresh bake's README has "Run it like Citadel".
 
 ## 0.4.1 (2026-11-09)
 

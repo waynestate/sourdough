@@ -249,7 +249,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
     "name": "course-finder",
     "notes": [],
     "shape": "raw",
-    "sourdough_version": "0.4.1",
+    "sourdough_version": "0.4.2",
     "summary": {
         "match": 38,
         "missing": 1,

@@ -20,7 +20,7 @@ A starter you feed: `sourdough new` makes a Wayne State app with the stack alrea
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
-Status: 0.4.1 (2026-11-09), MIT license: Pinstripe 0.3 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](CHANGELOG.md); what a feed brings is in [Upgrading](docs/upgrading.md).
+Status: 0.4.2 (2026-11-09), MIT license: Pinstripe 0.3 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](CHANGELOG.md); what a feed brings is in [Upgrading](docs/upgrading.md).
 
 Every loaf gets proofed before it ships.
 
@@ -222,7 +222,7 @@ The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` c
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.4.2"
 sourdough feed --dry-run
 ```
 

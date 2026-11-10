@@ -22,7 +22,7 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$application = new class ('Sourdough', '0.4.1') extends Application {
+$application = new class ('Sourdough', '0.4.2') extends Application {
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $name = $this->getCommandName($input);
