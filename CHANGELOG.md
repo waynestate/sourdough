@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Site: `assets/stack-env.js` knows Parity, so a pre-production page links Parity's pre-production site and a dev page links its local `site/` folder. Until now Parity, of all parts, was the one link that ignored its environment.
 - Version mentions: ADVISOR ^0.3 in the templates and generator, Squire kit 0.10.5 re-export, docs stamps current.
 
 ## 0.4.2 (2026-11-09)
