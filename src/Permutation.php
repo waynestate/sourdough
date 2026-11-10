@@ -73,6 +73,26 @@ enum Permutation: string
     }
 
     /**
+     * The flags a person types for this shape, in the spelling the README,
+     * the front page and the order ticket use: the shortest one that
+     * fromFlags() resolves back to this case. Not the same as flags(),
+     * which records what the shape implies (Inertia records --vue too, and
+     * typing --vue with --inertia is refused).
+     *
+     * @return list<string>
+     */
+    public function cliFlags(): array
+    {
+        return match ($this) {
+            self::Raw => ['--raw'],
+            self::RawVue => ['--raw', '--vue'],
+            self::LaravelBlade => ['--laravel'],
+            self::LaravelBladeVue => ['--laravel', '--vue'],
+            self::LaravelInertia => ['--inertia'],
+        };
+    }
+
+    /**
      * The five shapes and the flags that select each, for error messages.
      */
     private static function shapeList(): string

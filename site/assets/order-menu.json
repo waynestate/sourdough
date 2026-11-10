@@ -1,0 +1,459 @@
+{
+    "about": "Written by bin/order-menu.php from the code sourdough new --dry-run --json runs. Do not edit; run composer site:order-menu.",
+    "dir": "{dir}",
+    "name": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._-]{0,62}$",
+        "rule": "Start with a letter or number; then letters, numbers, spaces, dots, dashes and underscores, at most 63 characters."
+    },
+    "ovens": {
+        "bench": [],
+        "sail": [
+            "--sail"
+        ],
+        "docker": [
+            "--docker"
+        ]
+    },
+    "no_advisor": "--no-advisor",
+    "shapes": {
+        "raw": {
+            "label": "Raw PHP with WayneUI's standalone path",
+            "flags": [
+                "--raw"
+            ],
+            "ovens": [
+                "bench"
+            ],
+            "status": "supported",
+            "notice": null,
+            "plans": {
+                "bench": {
+                    "advisor": {
+                        "steps": [
+                            "Copy the raw template into {dir}",
+                            "Replace {{app_name}} and {{app_slug}} in file names and contents",
+                            "Wire ADVISOR into the app"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "composer serve"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Copy the raw template into {dir}",
+                            "Replace {{app_name}} and {{app_slug}} in file names and contents"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "composer serve"
+                        ]
+                    }
+                }
+            }
+        },
+        "raw-vue": {
+            "label": "Raw PHP + Vue SPA over JSON",
+            "flags": [
+                "--raw",
+                "--vue"
+            ],
+            "ovens": [
+                "bench"
+            ],
+            "status": "supported",
+            "notice": null,
+            "plans": {
+                "bench": {
+                    "advisor": {
+                        "steps": [
+                            "Copy the raw template, then the raw-vue template over it, into {dir}",
+                            "Replace {{app_name}} and {{app_slug}} in file names and contents",
+                            "Wire ADVISOR into the app"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "npm install",
+                            "npm run build",
+                            "composer serve",
+                            "(npm run dev in a second terminal for hot reload)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Copy the raw template, then the raw-vue template over it, into {dir}",
+                            "Replace {{app_name}} and {{app_slug}} in file names and contents"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "npm install",
+                            "npm run build",
+                            "composer serve",
+                            "(npm run dev in a second terminal for hot reload)"
+                        ]
+                    }
+                }
+            }
+        },
+        "laravel-blade": {
+            "label": "Laravel + Blade",
+            "flags": [
+                "--laravel"
+            ],
+            "ovens": [
+                "bench",
+                "sail",
+                "docker"
+            ],
+            "status": "supported",
+            "notice": null,
+            "plans": {
+                "bench": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}",
+                            "Wire ADVISOR into the app"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "php artisan serve"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "php artisan serve"
+                        ]
+                    }
+                },
+                "sail": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    }
+                },
+                "docker": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade app in {dir}",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate"
+                        ]
+                    }
+                }
+            }
+        },
+        "laravel-blade-vue": {
+            "label": "Laravel + Blade + Vue islands",
+            "flags": [
+                "--laravel",
+                "--vue"
+            ],
+            "ovens": [
+                "bench",
+                "sail",
+                "docker"
+            ],
+            "status": "supported",
+            "notice": null,
+            "plans": {
+                "bench": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}",
+                            "Wire ADVISOR into the app"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "npm install",
+                            "npm run build",
+                            "php artisan serve"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "npm install",
+                            "npm run build",
+                            "php artisan serve"
+                        ]
+                    }
+                },
+                "sail": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "./vendor/bin/sail npm install",
+                            "./vendor/bin/sail npm run dev",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "./vendor/bin/sail npm install",
+                            "./vendor/bin/sail npm run dev",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    }
+                },
+                "docker": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate",
+                            "(Vite runs as its own service on port 5173)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Blade + Vue islands app in {dir}",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate",
+                            "(Vite runs as its own service on port 5173)"
+                        ]
+                    }
+                }
+            }
+        },
+        "laravel-inertia": {
+            "label": "Laravel + Inertia/Vue",
+            "flags": [
+                "--inertia"
+            ],
+            "ovens": [
+                "bench",
+                "sail",
+                "docker"
+            ],
+            "status": "supported",
+            "notice": null,
+            "plans": {
+                "bench": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}",
+                            "Wire ADVISOR into the app"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "npm install",
+                            "npm run build",
+                            "php artisan serve"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "php artisan key:generate",
+                            "php artisan migrate",
+                            "npm install",
+                            "npm run build",
+                            "php artisan serve"
+                        ]
+                    }
+                },
+                "sail": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "./vendor/bin/sail npm install",
+                            "./vendor/bin/sail npm run dev",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}",
+                            "Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "./vendor/bin/sail up -d",
+                            "./vendor/bin/sail artisan key:generate",
+                            "./vendor/bin/sail artisan migrate",
+                            "./vendor/bin/sail npm install",
+                            "./vendor/bin/sail npm run dev",
+                            "(Windows: run sail from WSL2, or use --docker)"
+                        ]
+                    }
+                },
+                "docker": {
+                    "advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}",
+                            "Wire ADVISOR into the app",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "php vendor/bin/advisor install --client=claude --write",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate",
+                            "(Vite runs as its own service on port 5173)"
+                        ]
+                    },
+                    "no-advisor": {
+                        "steps": [
+                            "Create the Laravel + Inertia/Vue app in {dir}",
+                            "Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)"
+                        ],
+                        "next_steps": [
+                            "cd {dir}",
+                            "composer install",
+                            "cp .env.example .env",
+                            "composer dev-up",
+                            "docker compose exec app php artisan key:generate",
+                            "docker compose exec app php artisan migrate",
+                            "(Vite runs as its own service on port 5173)"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -19,6 +19,7 @@
      2. frame and header      6. recipe card, chalkboard
      3. hero                  7. quick start, shelves, footer, toast
      4. the proof             8. responsive  9. motion (only under .motion)
+     10. the order counter (its own responsive and motion rules)
    ========================================================================== */
 
 /* ------------------------------------------------------- 1. fonts, tokens */
@@ -1581,4 +1582,405 @@ li.good:has(.good__link:hover) :is(.good__mark, .good__tile) { filter: brightnes
 @media print {
   .ar-prompt__actions, .ar-cmd, .ar-prompt__more, .hero__agent { display: none; }
   .ar-prompt.is-collapsed .ar-prompt__text { max-height: none; -webkit-mask-image: none; mask-image: none; }
+}
+
+/* ----------------------------------------------------------- 10. counter */
+/* The order counter: a form on the left, the ticket printer on the right.
+   Every pick is a native radio or checkbox, so the arrow keys, the labels
+   and the form semantics stay the browser's. The ticket is thermal paper
+   with a torn edge; with motion it prints a fresh copy on every order. */
+
+.counter-section { padding-block-start: 0; }
+.counter {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.25rem);
+  align-items: start;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.order {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: var(--sd-flour);
+  border: 1px solid rgba(138, 79, 31, 0.22);
+  border-radius: 20px;
+  box-shadow: var(--sd-shadow);
+  container: order / inline-size;
+}
+.order__group {
+  margin: 0 0 1.6rem;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.order__group:last-child { margin-bottom: 0; }
+.order__legend {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0 0 0.8rem;
+  font-family: var(--sd-hand);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--sd-brown-ink);
+}
+.order__num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--sd-green);
+  color: #fff;
+  font: 400 1.05rem/1 var(--sd-display);
+}
+.order__picks {
+  display: grid;
+  gap: 0.75rem;
+}
+/* Five loaves: three on the top shelf, two wider below, so no gap is left
+   on the rack. On a narrow order card: two by two, the tin loaf across. */
+.order__picks--loaves { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.order__picks--loaves .pick { grid-column: span 2; }
+.order__picks--loaves .pick:nth-child(n+4) { grid-column: span 3; }
+@container order (max-width: 30rem) {
+  .order__picks--loaves { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .order__picks--loaves .pick,
+  .order__picks--loaves .pick:nth-child(n+4) { grid-column: span 1; }
+  .order__picks--loaves .pick:last-child { grid-column: span 2; }
+}
+.order__picks--ovens { grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); }
+
+.pick {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+/* The real control sits over the face: clicks, taps and the arrow keys are the browser's own. */
+.pick input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.pick__face {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.1rem;
+  height: 100%;
+  padding: 0.7rem 0.6rem 0.8rem;
+  text-align: center;
+  background: #fffefa;
+  border: 2px solid rgba(138, 79, 31, 0.24);
+  border-radius: 16px;
+}
+.pick--oven .pick__face {
+  justify-items: start;
+  text-align: start;
+  padding: 0.75rem 2.4rem 0.8rem 0.95rem;
+}
+.pick__loaf {
+  width: 84px;
+  height: auto;
+  overflow: visible;
+  margin-bottom: 0.2rem;
+  transform-origin: 50% 85%;
+}
+.pick__score { fill: none; stroke: rgba(255, 255, 255, 0.6); stroke-width: 5; stroke-linecap: round; }
+.pick__seeds ellipse { fill: #f4e6c4; }
+.pick__tin { fill: #33433f; }
+.pick__name {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--sd-ink);
+}
+.pick__kind {
+  font-family: var(--sd-hand);
+  font-size: 0.98rem;
+  line-height: 1.25;
+  color: var(--sd-brown-ink);
+}
+.pick:hover .pick__face { border-color: rgba(12, 84, 73, 0.55); }
+.pick input:checked + .pick__face {
+  border-color: var(--sd-green);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--sd-green), 0 14px 24px -18px rgba(12, 84, 73, 0.9);
+}
+.pick input:checked + .pick__face .pick__loaf { transform: scale(1.08, 1.12); }
+/* The ticket's tick, in gold with green ink. */
+.pick input:checked + .pick__face::after {
+  content: "✓";
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--sd-gold);
+  color: var(--sd-green-deep);
+  font: 700 0.85rem/1 var(--wsu-font-family-body);
+}
+.pick input:focus-visible + .pick__face {
+  outline: 3px solid var(--sd-green);
+  outline-offset: 3px;
+}
+/* An oven the loaf cannot use: still readable, plainly not on offer. */
+.pick input:disabled { cursor: not-allowed; }
+.pick input:disabled + .pick__face {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+.pick input:disabled + .pick__face .pick__name { color: var(--sd-muted); }
+.pick:hover input:disabled + .pick__face { border-color: rgba(138, 79, 31, 0.24); }
+
+.order__hint {
+  margin: 0.75rem 0 0;
+  padding-left: 0;
+  font-size: 0.95rem;
+  color: var(--sd-muted);
+  border-left: 0 solid var(--sd-gold);
+}
+.order__hint.is-noted {
+  padding-left: 0.7rem;
+  border-left-width: 4px;
+  color: var(--sd-ink);
+}
+.order__hint a { color: var(--sd-green); font-weight: 700; }
+.order__label {
+  display: block;
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+}
+.order__input {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  font: 1.05rem/1.3 var(--wsu-font-family-mono);
+  color: var(--sd-ink);
+  background: #fff;
+  border: 2px solid rgba(138, 79, 31, 0.4);
+  border-radius: 12px;
+}
+.order__input::placeholder { color: #6b7570; }
+.order__input:focus-visible {
+  outline: 3px solid var(--sd-green);
+  outline-offset: 2px;
+  border-color: var(--sd-green);
+}
+.order__input[aria-invalid="true"] { border-color: #a3261b; }
+.order__rule {
+  margin: 0.45rem 0 0;
+  font-size: 0.93rem;
+  color: var(--sd-muted);
+}
+.order__rule.is-error { color: #8f1d14; font-weight: 700; }
+.order__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+.order__check input {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--sd-green);
+  cursor: pointer;
+}
+
+/* The printer, and the slip it feeds. */
+.slip-wrap {
+  position: sticky;
+  top: 1.5rem;
+  filter: drop-shadow(0 18px 22px rgba(74, 46, 18, 0.28));
+}
+.slip-printer {
+  position: relative;
+  z-index: 2;
+  height: 24px;
+  margin: 0 -10px;
+  border-radius: 12px 12px 8px 8px;
+  background: linear-gradient(#34433f, var(--sd-term));
+}
+.slip-printer__slot {
+  position: absolute;
+  inset: 50% 22px auto;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 4px;
+  background: #050b09;
+}
+/* the ready light */
+.slip-printer::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6fd3a8;
+}
+.slip {
+  --zz: 9px;
+  position: relative;
+  margin: -12px 0 0;
+  padding: 1.7rem clamp(1.1rem, 3vw, 1.6rem) calc(1.6rem + var(--zz));
+  background:
+    linear-gradient(rgba(29, 41, 37, 0.14), rgba(29, 41, 37, 0) 22px),
+    #fffdf6;
+  transform: rotate(0.5deg);
+  transform-origin: 50% 0;
+  /* the torn bottom edge */
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--zz)) 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--zz)) 100%;
+}
+.slip__head {
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 2px dashed rgba(29, 41, 37, 0.25);
+}
+.slip__shop {
+  margin: 0;
+  font: 700 0.78rem/1 var(--wsu-font-family-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+.slip__title { margin: 0.35rem 0 0.15rem; font-size: 1.9rem; line-height: 1.05; }
+.slip__no {
+  margin: 0;
+  font-family: var(--sd-hand);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--sd-brown-ink);
+}
+.slip__for {
+  margin: 0;
+  font: 0.95rem/1.5 var(--wsu-font-family-mono);
+  overflow-wrap: anywhere;
+}
+.slip__label {
+  margin-right: 0.35rem;
+  font: 700 0.75rem/1 var(--wsu-font-family-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+}
+.slip__cmd { margin-top: 0.75rem; }
+.slip__cmd code { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+/* Words wrap as wholes; only a word wider than the ticket breaks inside. */
+.slip__cmd code .w { display: inline-block; max-width: 100%; }
+.slip__status { margin: 0.5rem 0 0; font-size: 0.93rem; color: #8f1d14; font-weight: 700; }
+.slip__status:empty { display: none; }
+.slip.is-stale .slip__for,
+.slip.is-stale .slip__cmd,
+.slip.is-stale .slip__steps,
+.slip.is-stale .slip__next { opacity: 0.45; }
+.slip.is-stale [data-copy] { visibility: hidden; }
+.slip__h {
+  margin: 1.15rem 0 0.4rem;
+  font-family: var(--sd-hand);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--sd-brown-ink);
+}
+.slip__steps {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+.slip__steps li::marker { color: var(--sd-brown-ink); font-weight: 700; }
+.slip__next {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 0.65rem 0.75rem 0.9rem;
+  background: var(--sd-term);
+  border-radius: 12px;
+}
+.slip__next pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: #e7ece9;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.slip__next .c { color: #a9bdb6; }
+.slip__foot {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--sd-muted);
+}
+/* The rubber stamp: decoration, in the shop's green. */
+.slip__stamp {
+  position: absolute;
+  top: 1.9rem;
+  right: 1.1rem;
+  padding: 0.15rem 0.55rem 0.1rem;
+  font: 400 1.15rem/1.1 var(--sd-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sd-green);
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  transform: rotate(-11deg);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+@media (max-width: 960px) {
+  .counter { grid-template-columns: minmax(0, 1fr); max-width: 40rem; }
+  .slip-wrap { position: relative; top: auto; }
+}
+@media (max-width: 420px) {
+  .pick__loaf { width: 64px; }
+  .slip__title { font-size: 1.55rem; }
+  /* On a phone the title fills the top line, so the stamp lands beside the No. */
+  .slip__stamp { top: 4.1rem; right: 0.9rem; font-size: 0.95rem; }
+}
+
+/* With motion: picks spring, the loaf rises, and every order prints. */
+@media (prefers-reduced-motion: no-preference) {
+  .motion .pick__face { transition: transform 0.3s var(--sd-ease-rise), border-color 0.2s, box-shadow 0.25s, background-color 0.2s; }
+  .motion .pick:hover .pick__face { transform: translateY(-3px); }
+  .motion .pick:hover input:disabled + .pick__face { transform: none; }
+  .motion .pick__loaf { transition: transform 0.5s var(--sd-ease-rise); }
+  .motion .order__hint { transition: padding 0.3s var(--sd-ease-out), border-left-width 0.3s var(--sd-ease-out); }
+  .motion .slip.is-stale .slip__cmd,
+  .motion .slip.is-stale .slip__steps,
+  .motion .slip.is-stale .slip__next { transition: opacity 0.25s; }
+  .motion .slip-wrap.is-printing .slip { animation: slip-print 0.6s var(--sd-ease-out) both; }
+  .motion .slip-wrap.is-printing .slip__stamp { animation: stamp-thump 0.45s var(--sd-ease-rise) 0.42s both; }
+  .motion .slip-wrap.is-printing .slip-printer::after { animation: ready-blink 0.2s steps(2, jump-none) 3; }
+}
+@keyframes slip-print {
+  from { transform: translateY(-2.2rem) rotate(0deg); clip-path: inset(2.2rem 0 0 0); }
+  to { transform: translateY(0) rotate(0.5deg); clip-path: inset(0 0 0 0); }
+}
+@keyframes stamp-thump {
+  from { transform: rotate(-24deg) scale(1.9); opacity: 0; }
+  70% { opacity: 0.9; }
+  to { transform: rotate(-11deg) scale(1); opacity: 0.85; }
+}
+@keyframes ready-blink {
+  from { background: #6fd3a8; }
+  to { background: var(--sd-gold); }
 }

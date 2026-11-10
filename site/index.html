@@ -50,6 +50,7 @@
       <a href="docs/index.html">Docs</a>
       <a href="#proof-title">The proof</a>
       <a href="#loaves-title">Loaves</a>
+      <a href="#order-title">Order</a>
       <a href="#feeding-title">Feeding</a>
       <a href="#start-title">Quick start</a>
       <a href="#agents-title">Agents</a>
@@ -415,7 +416,152 @@
 
       </div>
 
-      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <code>sourdough new my-app --dry-run</code> prints the plan and writes nothing. It works with every shape's flags.</p>
+      <p class="rack__note"><span class="rack__note-hand">Not sure yet?</span> <a href="#order">Place an order at the counter</a> and the ticket writes the command for you, or add <code>--dry-run</code> to any of these: it prints the plan and writes nothing.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================= counter -->
+  <!-- The order ticket: the command half of the "new app" page (BEST_PRACTICES 1.8).
+       Every line it writes comes from assets/order-menu.json, which bin/order-menu.php
+       builds from the code `sourdough new --dry-run --json` runs; tests/OrderMenuTest.php
+       runs every order it can write through the real command. The HTML below is the
+       default order, so the ticket reads right before the script (or without it). -->
+  <section class="section counter-section" id="order" aria-labelledby="order-title" data-order data-order-menu="assets/order-menu.json">
+    <div class="wsu-container">
+      <div class="section__head">
+        <p class="eyebrow">At the counter</p>
+        <h2 id="order-title">Place your order</h2>
+        <p>Pick a loaf, an oven and a name. The ticket writes the command, the bake and what to run after it, from the same code <code>sourdough new --dry-run --json</code> runs, so what you copy is what you get.</p>
+      </div>
+
+      <div class="counter">
+        <form class="order" aria-label="Your order" data-order-form>
+          <fieldset class="order__group">
+            <legend class="order__legend"><span class="order__num" aria-hidden="true">1</span>The loaf</legend>
+            <div class="order__picks order__picks--loaves">
+              <label class="pick">
+                <input type="radio" name="order-loaf" value="raw" checked>
+                <span class="pick__face">
+                  <svg class="pick__loaf" viewBox="0 0 140 90" aria-hidden="true" focusable="false"><path d="M16 54 C16 14 124 14 124 54 C124 70 100 78 70 78 C40 78 16 70 16 54Z" fill="url(#g-crust)"/><path class="pick__score" d="M48 30 L92 62 M92 30 L48 62"/></svg>
+                  <span class="pick__name">Raw PHP</span>
+                  <span class="pick__kind">Country boule</span>
+                </span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="order-loaf" value="raw-vue">
+                <span class="pick__face">
+                  <svg class="pick__loaf" viewBox="0 0 140 90" aria-hidden="true" focusable="false"><path d="M8 56 C8 26 132 26 132 56 C132 70 108 76 70 76 C32 76 8 70 8 56Z" fill="url(#g-crust)"/><path class="pick__score" d="M26 54 C50 38 82 36 114 46"/></svg>
+                  <span class="pick__name">Raw PHP + Vue</span>
+                  <span class="pick__kind">Bâtard</span>
+                </span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="order-loaf" value="laravel-blade">
+                <span class="pick__face">
+                  <svg class="pick__loaf" viewBox="0 0 140 90" aria-hidden="true" focusable="false"><path d="M4 58 C4 42 136 34 136 46 C136 60 128 68 70 70 C14 72 4 68 4 58Z" fill="url(#g-crust)"/><path class="pick__score" d="M20 58 L34 46 M44 56 L58 44 M68 54 L82 42 M92 52 L106 40 M114 50 L126 40"/></svg>
+                  <span class="pick__name">Laravel + Blade</span>
+                  <span class="pick__kind">Baguette</span>
+                </span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="order-loaf" value="laravel-blade-vue">
+                <span class="pick__face">
+                  <svg class="pick__loaf" viewBox="0 0 140 90" aria-hidden="true" focusable="false"><path d="M16 54 C16 14 124 14 124 54 C124 70 100 78 70 78 C40 78 16 70 16 54Z" fill="url(#g-crust)"/><path class="pick__score" d="M70 24 L70 66 M70 34 L54 24 M70 34 L86 24 M70 48 L52 38 M70 48 L88 38"/><g class="pick__seeds"><ellipse cx="36" cy="50" rx="3.4" ry="1.8"/><ellipse cx="102" cy="56" rx="3.4" ry="1.8"/><ellipse cx="96" cy="36" rx="3.4" ry="1.8"/><ellipse cx="30" cy="60" rx="3.4" ry="1.8"/></g></svg>
+                  <span class="pick__name">Laravel + Blade + Vue islands</span>
+                  <span class="pick__kind">Seeded loaf</span>
+                </span>
+              </label>
+              <label class="pick">
+                <input type="radio" name="order-loaf" value="laravel-inertia">
+                <span class="pick__face">
+                  <svg class="pick__loaf" viewBox="0 0 140 90" aria-hidden="true" focusable="false"><rect class="pick__tin" x="20" y="46" width="100" height="34" rx="5"/><path d="M22 50 C22 12 118 12 118 50Z" fill="url(#g-crust)"/><path class="pick__score" d="M38 34 Q70 18 102 34"/></svg>
+                  <span class="pick__name">Laravel + Inertia/Vue</span>
+                  <span class="pick__kind">Tin loaf</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="order__group">
+            <legend class="order__legend"><span class="order__num" aria-hidden="true">2</span>The oven</legend>
+            <div class="order__picks order__picks--ovens">
+              <label class="pick pick--oven">
+                <input type="radio" name="order-oven" value="bench" checked>
+                <span class="pick__face">
+                  <span class="pick__name">The bench</span>
+                  <span class="pick__kind">PHP on your computer</span>
+                </span>
+              </label>
+              <label class="pick pick--oven">
+                <input type="radio" name="order-oven" value="sail" aria-describedby="order-oven-hint">
+                <span class="pick__face">
+                  <span class="pick__name">Sail</span>
+                  <span class="pick__kind">Laravel's Docker; WSL2 on Windows</span>
+                </span>
+              </label>
+              <label class="pick pick--oven">
+                <input type="radio" name="order-oven" value="docker" aria-describedby="order-oven-hint">
+                <span class="pick__face">
+                  <span class="pick__name">Docker</span>
+                  <span class="pick__kind">Native on every OS, MySQL 8.4</span>
+                </span>
+              </label>
+            </div>
+            <p class="order__hint" id="order-oven-hint" data-order-oven-hint>Sail and Docker are for the Laravel loaves; the raw ones bake on plain PHP. Before a release, <a href="https://parity.apps.wayne.edu/">Parity</a> runs any of them like Citadel.</p>
+          </fieldset>
+
+          <fieldset class="order__group">
+            <legend class="order__legend"><span class="order__num" aria-hidden="true">3</span>The name</legend>
+            <label class="order__label" for="order-name">What is the app called?</label>
+            <input class="order__input" id="order-name" name="order-name" type="text" placeholder="my-app" maxlength="63" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="order-name-rule">
+            <p class="order__rule" id="order-name-rule" data-order-name-rule>Start with a letter or number; then letters, numbers, spaces, dots, dashes and underscores. The folder is the name in lower case, with dashes.</p>
+          </fieldset>
+
+          <fieldset class="order__group">
+            <legend class="order__legend"><span class="order__num" aria-hidden="true">4</span>Extras</legend>
+            <label class="order__check">
+              <input type="checkbox" name="order-advisor" checked>
+              <span>ADVISOR, the stack's MCP server, for your AI assistant (dev only)</span>
+            </label>
+          </fieldset>
+        </form>
+
+        <div class="slip-wrap">
+          <div class="slip-printer" aria-hidden="true"><span class="slip-printer__slot"></span></div>
+          <article class="slip" aria-labelledby="slip-title" data-slip>
+            <header class="slip__head">
+              <p class="slip__shop">Sourdough bakery</p>
+              <h3 class="slip__title" id="slip-title">Order ticket</h3>
+              <p class="slip__no">No. <span data-slip-no>1</span></p>
+            </header>
+            <p class="slip__for"><span class="slip__label">For</span> <b data-slip-name>my-app</b>, <span data-slip-loaf>Raw PHP</span><span data-slip-oven></span></p>
+            <div class="cmd slip__cmd">
+              <code data-order-cmd>sourdough new my-app --raw</code>
+              <button class="copy-btn copy-btn--small" type="button" data-copy="sourdough new my-app --raw" data-order-copy aria-label="Copy the command">Copy</button>
+            </div>
+            <p class="slip__status" role="status" data-order-status></p>
+            <h4 class="slip__h">The bake</h4>
+            <ol class="slip__steps" data-order-steps>
+              <li>Copy the raw template into my-app</li>
+              <li>Replace {{app_name}} and {{app_slug}} in file names and contents</li>
+              <li>Wire ADVISOR into the app</li>
+            </ol>
+            <h4 class="slip__h">Then run</h4>
+            <div class="slip__next">
+              <pre data-order-next>cd my-app
+composer install
+php vendor/bin/advisor install --client=claude --write
+composer serve</pre>
+              <button class="copy-btn copy-btn--small" type="button" data-copy="cd my-app
+composer install
+php vendor/bin/advisor install --client=claude --write
+composer serve" data-order-next-copy aria-label="Copy the next steps">Copy</button>
+            </div>
+            <p class="slip__foot">The same plan <code>--dry-run --json</code> prints. Add <code>--dry-run</code> to see it on your own machine first.</p>
+            <span class="slip__stamp" aria-hidden="true" data-slip-stamp>Fresh</span>
+          </article>
+        </div>
+      </div>
     </div>
   </section>
 

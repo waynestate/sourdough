@@ -44,7 +44,7 @@ docker run --rm -v "${PWD}:/app" -w /app composer:2.11.1@sha256:8de2184c6de224f4
 docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 ```
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The baked Laravel apps run Pest 4 (PHP 8.3 floor) while Sourdough's own suite stays PHPUnit.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the order menu check, the docs site check and `composer audit`. The baked Laravel apps run Pest 4 (PHP 8.3 floor) while Sourdough's own suite stays PHPUnit.
 
 ## CI
 
@@ -156,6 +156,15 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 
 `site/` is the static front page, for `https://sourdough.apps.wayne.edu/` on Citadel, served through a small raw-PHP
 `deploy/` layer generated with Squire.
+
+The order counter (`#order`) is the command half of the "new app" page (BEST_PRACTICES 1.8). Its ticket keeps no
+recipe of its own: `site/assets/sourdough.js` reads `site/assets/order-menu.json`, which `composer site:order-menu`
+(`bin/order-menu.php`, through `src/OrderMenu.php`) writes from `Plan::forPermutation()`, the code behind
+`sourdough new --dry-run --json`. Whenever a shape, an oven, a step, a next step or the name rule changes, run
+`composer site:order-menu` and commit the JSON; `composer ci` runs `site:order-menu-check` and fails while it is
+stale. The HTML holds the default order (raw PHP, the bench, ADVISOR on, `my-app`), so the ticket reads right
+without the script; `tests/OrderMenuTest.php` checks that default, the page's loaves and ovens, and runs every order
+the ticket can write through `NewCommand`.
 
 ## Things that trip people up
 

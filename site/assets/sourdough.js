@@ -261,4 +261,170 @@
   } else {
     reveals.forEach(function (el) { el.classList.add("is-in"); });
   }
+
+  /* --------------------------------------------------------- the counter */
+  /* The order ticket reads assets/order-menu.json, which bin/order-menu.php
+     writes from the code `sourdough new --dry-run --json` runs, so the page
+     never keeps a recipe of its own: the shapes and their flags, the ovens
+     each one takes, the steps, the next steps and the name rule all come
+     from the menu. Without the menu (or the script) the ticket keeps the
+     default order the HTML already holds. */
+  var counter = document.querySelector("[data-order]");
+  if (counter && window.fetch) {
+    fetch(counter.getAttribute("data-order-menu"), { headers: { Accept: "application/json" } })
+      .then(function (r) { if (!r.ok) throw new Error("menu " + r.status); return r.json(); })
+      .then(function (menu) { openCounter(counter, menu); })
+      .catch(function () { /* the default order stays on the ticket */ });
+  }
+
+  function openCounter(section, menu) {
+    var form = section.querySelector("[data-order-form]");
+    var slip = section.querySelector("[data-slip]");
+    var wrap = slip.parentNode;
+    var nameInput = form.querySelector("#order-name");
+    var rule = form.querySelector("[data-order-name-rule]");
+    var hint = form.querySelector("[data-order-oven-hint]");
+    var advisorBox = form.querySelector('input[name="order-advisor"]');
+    var ovens = Array.prototype.slice.call(form.querySelectorAll('input[name="order-oven"]'));
+    var out = {
+      no: slip.querySelector("[data-slip-no]"),
+      name: slip.querySelector("[data-slip-name]"),
+      loaf: slip.querySelector("[data-slip-loaf]"),
+      oven: slip.querySelector("[data-slip-oven]"),
+      cmd: slip.querySelector("[data-order-cmd]"),
+      copy: slip.querySelector("[data-order-copy]"),
+      status: slip.querySelector("[data-order-status]"),
+      steps: slip.querySelector("[data-order-steps]"),
+      next: slip.querySelector("[data-order-next]"),
+      nextCopy: slip.querySelector("[data-order-next-copy]")
+    };
+    var namePattern = new RegExp(menu.name.pattern);
+    var ovenWords = { bench: "", sail: ", on Sail", docker: ", in Docker" };
+    var number = 1;
+
+    /* RawGenerator::slugify(), letter for letter: the folder sourdough new makes. */
+    var slugify = function (name) { return name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, ""); };
+    /* Names are letters, numbers, spaces, dots, dashes and underscores, so
+       double quotes are enough in sh, PowerShell and cmd alike. */
+    var quote = function (s) { return /\s/.test(s) ? '"' + s + '"' : s; };
+    var picked = function (group) {
+      var el = form.querySelector('input[name="' + group + '"]:checked');
+      return el ? el.value : null;
+    };
+    var withDir = function (lines, dir) {
+      return lines.map(function (line) { return line.split(menu.dir).join(dir); });
+    };
+
+    function render(print) {
+      var loaf = picked("order-loaf");
+      var shape = menu.shapes[loaf];
+      if (!shape) return;
+
+      /* Offer only the ovens the command takes for this loaf. */
+      ovens.forEach(function (radio) {
+        var takes = shape.ovens.indexOf(radio.value) !== -1;
+        radio.disabled = !takes;
+        if (!takes && radio.checked) {
+          radio.checked = false;
+          ovens[0].checked = true;
+        }
+      });
+      hint.classList.toggle("is-noted", shape.ovens.length === 1);
+      var oven = picked("order-oven") || "bench";
+      var advisor = advisorBox.checked;
+
+      var typed = nameInput.value.trim();
+      var name = typed === "" ? "my-app" : typed;
+      var ok = namePattern.test(name) && slugify(name) !== "";
+      nameInput.setAttribute("aria-invalid", ok ? "false" : "true");
+      rule.classList.toggle("is-error", !ok);
+      slip.classList.toggle("is-stale", !ok);
+      if (!ok) {
+        out.status.textContent = "Not on the menu: " + menu.name.rule;
+        return;
+      }
+      out.status.textContent = shape.notice || "";
+
+      var dir = slugify(name);
+      var argv = ["sourdough", "new", dir];
+      if (name !== dir) argv.push("--name", quote(name));
+      argv = argv.concat(shape.flags, menu.ovens[oven] || []);
+      if (!advisor) argv.push(menu.no_advisor);
+      var command = argv.join(" ");
+      var plan = shape.plans[oven][advisor ? "advisor" : "no-advisor"];
+
+      /* One span per word, so a narrow ticket wraps between flags and
+         never inside one (--no-advisor stays in one piece). */
+      out.cmd.textContent = "";
+      argv.forEach(function (word, n) {
+        if (n) out.cmd.appendChild(document.createTextNode(" "));
+        var w = document.createElement("span");
+        w.className = "w";
+        w.textContent = word;
+        out.cmd.appendChild(w);
+      });
+      out.copy.setAttribute("data-copy", command);
+      out.name.textContent = name;
+      out.loaf.textContent = form.querySelector('input[value="' + loaf + '"] + .pick__face .pick__name').textContent;
+      out.oven.textContent = ovenWords[oven] || "";
+
+      out.steps.textContent = "";
+      withDir(plan.steps, dir).forEach(function (step) {
+        var li = document.createElement("li");
+        li.textContent = step;
+        out.steps.appendChild(li);
+      });
+
+      /* A note in parentheses becomes a shell comment, so the whole block
+         pastes into sh or PowerShell as it is. */
+      var next = withDir(plan.next_steps, dir).map(function (line) {
+        return /^\(.*\)$/.test(line) ? "# " + line.slice(1, -1) : line;
+      });
+      out.next.textContent = "";
+      next.forEach(function (line, n) {
+        if (n) out.next.appendChild(document.createTextNode("\n"));
+        if (line.charAt(0) === "#") {
+          var note = document.createElement("span");
+          note.className = "c";
+          note.textContent = line;
+          out.next.appendChild(note);
+        } else {
+          out.next.appendChild(document.createTextNode(line));
+        }
+      });
+      out.nextCopy.setAttribute("data-copy", next.join("\n"));
+
+      if (print) reprint();
+    }
+
+    function reprint() {
+      number += 1;
+      out.no.textContent = String(number);
+      if (number === 13) say("A baker's dozen. The thirteenth one is on the house.");
+      printOut();
+    }
+
+    function printOut() {
+      if (!motion) return;
+      wrap.classList.remove("is-printing");
+      void wrap.offsetWidth; /* restart the print */
+      wrap.classList.add("is-printing");
+    }
+
+    form.addEventListener("submit", function (e) { e.preventDefault(); });
+    form.addEventListener("change", function (e) { render(e.target !== nameInput); });
+    nameInput.addEventListener("input", function () { render(false); });
+    render(false);
+
+    /* The first ticket prints when the counter comes into view. */
+    if (motion && "IntersectionObserver" in window) {
+      var seen = new IntersectionObserver(function (entries) {
+        if (entries.some(function (en) { return en.isIntersecting; })) {
+          seen.disconnect();
+          printOut();
+        }
+      }, { threshold: 0.35 });
+      seen.observe(wrap);
+    }
+  }
 })();

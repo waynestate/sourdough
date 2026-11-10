@@ -26,7 +26,7 @@ Every loaf gets proofed before it ships.
 
 Documentation: the [docs site](site/docs/index.html) is built from [`docs/`](docs/) by Squire's docs builder; `composer docs:build` rebuilds it and `composer docs:check` fails when it is stale. The docs pages wear the front page's header, menu, palette and fonts: edit [`docs/_header.html`](docs/_header.html) and [`docs/theme/sourdough.css`](docs/theme/sourdough.css) (named by the `theme` key in `docs/docs.json`), never the kit's `docs.css`.
 
-Front page: [`site/index.html`](site/index.html), a static page you can open in a browser or serve from `site/`.
+Front page: [`site/index.html`](site/index.html), a static page you can open in a browser or serve from `site/`. Its order counter writes the `sourdough new` command for a loaf, an oven and a name, with the bake and the next steps, all read from [`site/assets/order-menu.json`](site/assets/order-menu.json). `composer site:order-menu` writes that file from the same plan code `sourdough new --dry-run --json` runs, `composer ci` fails when it is stale, and `tests/OrderMenuTest.php` runs every order the ticket can write through the real command.
 
 On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 

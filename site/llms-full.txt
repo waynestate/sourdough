@@ -24,7 +24,7 @@ Every loaf gets proofed before it ships.
 
 Documentation: the [docs site](https://github.com/waynestate/sourdough/blob/HEAD/site/docs/index.html) is built from [`docs/`](https://github.com/waynestate/sourdough/blob/HEAD/docs/) by Squire's docs builder; `composer docs:build` rebuilds it and `composer docs:check` fails when it is stale. The docs pages wear the front page's header, menu, palette and fonts: edit [`docs/_header.html`](https://github.com/waynestate/sourdough/blob/HEAD/docs/_header.html) and [`docs/theme/sourdough.css`](https://github.com/waynestate/sourdough/blob/HEAD/docs/theme/sourdough.css) (named by the `theme` key in `docs/docs.json`), never the kit's `docs.css`.
 
-Front page: [`site/index.html`](https://github.com/waynestate/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`.
+Front page: [`site/index.html`](https://github.com/waynestate/sourdough/blob/HEAD/site/index.html), a static page you can open in a browser or serve from `site/`. Its order counter writes the `sourdough new` command for a loaf, an oven and a name, with the bake and the next steps, all read from [`site/assets/order-menu.json`](https://github.com/waynestate/sourdough/blob/HEAD/site/assets/order-menu.json). `composer site:order-menu` writes that file from the same plan code `sourdough new --dry-run --json` runs, `composer ci` fails when it is stale, and `tests/OrderMenuTest.php` runs every order the ticket can write through the real command.
 
 On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/sourdough/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
@@ -415,7 +415,40 @@ The crumb
 
 Laravel with Inertia and Vue as one app: Inertia pages rendered by Vue, Ziggy routes, the stack packages, Squire's Laravel deploy files and the manifest. [WELD](https://weld.apps.wayne.edu/) is this shape already built, with the stack's product docs and site on top; you can also bake it yourself with `--inertia`.
 
-Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags.
+Not sure yet? [Place an order at the counter](https://sourdough.apps.wayne.edu/#order) and the ticket writes the command for you, or add `--dry-run` to any of these: it prints the plan and writes nothing.
+
+At the counter
+
+### Place your order
+
+Pick a loaf, an oven and a name. The ticket writes the command, the bake and what to run after it, from the same code `sourdough new --dry-run --json` runs, so what you copy is what you get.
+
+Sourdough bakery
+
+#### Order ticket
+
+No. 1
+
+For **my-app**, Raw PHP
+
+`sourdough new my-app --raw`
+
+##### The bake
+
+1. Copy the raw template into my-app
+2. Replace {{app_name}} and {{app_slug}} in file names and contents
+3. Wire ADVISOR into the app
+
+##### Then run
+
+```
+cd my-app
+composer install
+php vendor/bin/advisor install --client=claude --write
+composer serve
+```
+
+The same plan `--dry-run --json` prints. Add `--dry-run` to see it on your own machine first.
 
 Recipe card No. 1
 
@@ -787,6 +820,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Site: the front page has an order counter (`#order`), the command half of the "new app" page (BEST_PRACTICES 1.8). Pick a loaf, an oven and a name and its ticket writes the `sourdough new` command, the bake and the next steps to copy, read from `site/assets/order-menu.json`, which `composer site:order-menu` builds from the same plan code as `sourdough new --dry-run --json`. `composer ci` fails when the menu is stale, and `tests/OrderMenuTest.php` runs every order the ticket can write through the real command. It checks names with the generator's rule and offers only the ovens a shape takes.
 - Added: `sourdough new --dry-run --json` carries `next_steps`, the lines a real bake prints under "Next steps:" for that shape and oven (Sail, Docker or the bench, with or without ADVISOR). The plan now owns them (`Plan::$nextSteps`), so the printed list and the JSON can never disagree; the printed output is unchanged.
 - Docs: the maintaining guide, the troubleshooting page and the README name Preflight 0.6.0, the release CI and the templates pin (they still said 0.1.4 or 0.5.0).
 - Added: the Laravel shapes include Preflight's `mysql56-migrate` component, so every pipeline runs the migrations against MySQL 5.6.51 (D-078); every Preflight pin moves to 0.6.0.
@@ -2174,6 +2208,7 @@ From a machine where `sourdough` is installed (see [Install](https://sourdough.a
    sourdough new my-app
    ```
    Expected: exit code `0` (done). The `my-app` directory appears with a Wayne State app in it: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already wired in. Sourdough prints Next steps for the new app.
+   Not sure which flags you want? The order counter on the [front page](https://sourdough.apps.wayne.edu/#order) writes the command for a shape, an oven and a name, with the same plan and Next steps this command prints.
 2. Run the app's own checks.
    From inside `my-app/`:
    ```
@@ -2715,7 +2750,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 
 The `stack-composer-cache` volume keeps Composer's downloads between runs; Docker creates it the first time.
 
-`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
+`composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the order menu check, the docs site check and `composer audit`.
 
 ### CI [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
@@ -2818,9 +2853,11 @@ If every app should have something, it goes in Sourdough's templates. If only th
 
 `site/` is the static front page, for `https://sourdough.apps.wayne.edu/` on Citadel, served through a small raw-PHP `deploy/` layer generated with Squire.
 
+The order counter (`#order`) is the command half of the "new app" page (BEST_PRACTICES 1.8). Its ticket keeps no recipe of its own: `site/assets/sourdough.js` reads `site/assets/order-menu.json`, which `composer site:order-menu` (`bin/order-menu.php`, through `src/OrderMenu.php`) writes from `Plan::forPermutation()`, the code behind `sourdough new --dry-run --json`. Whenever a shape, an oven, a step, a next step or the name rule changes, run `composer site:order-menu` and commit the JSON; `composer ci` runs `site:order-menu-check` and fails while it is stale. The HTML holds the default order (raw PHP, the bench, ADVISOR on, `my-app`), so the ticket reads right without the script; `tests/OrderMenuTest.php` checks that default, the page's loaves and ovens, and runs every order the ticket can write through `NewCommand`.
+
 ### Things that trip people up [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
 
-- In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
+- All five shapes generate (raw PHP since 0.1.0, the three Laravel shapes since 0.1.5, raw + Vue since 0.1.6). `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` (and `.sourdough/base/`) in generated apps; `feed` needs them.
 
 ### Who maintains it [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)

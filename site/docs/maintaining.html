@@ -106,7 +106,7 @@ that loaf, so it records what <code>new</code> would bake today.</li>
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
 <p>The <code>stack-composer-cache</code> volume keeps Composer's downloads between runs; Docker creates it the first time.</p>
-<p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>.</p>
+<p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the order menu check, the docs site check and <code>composer audit</code>.</p>
 <h2 id="ci"><span class="docs-heading-tail"><span>CI</span><a class="docs-heading-link" aria-label="Link to this section" href="#ci">#</a></span></h2>
 <ul>
 <li><strong>GitLab:</strong> Preflight's <code>php-test</code> (PHP 8.3, 8.4, 8.5) and <code>composer-audit</code> components, plus a <code>composer-ci</code> job.</li>
@@ -187,9 +187,17 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 <h2 id="the-front-page">The front <span class="docs-heading-tail"><span>page</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-front-page">#</a></span></h2>
 <p><code>site/</code> is the static front page, for <code>https://sourdough.apps.wayne.edu/</code> on Citadel, served through a small raw-PHP
 <code>deploy/</code> layer generated with Squire.</p>
+<p>The order counter (<code>#order</code>) is the command half of the &quot;new app&quot; page (BEST_PRACTICES 1.8). Its ticket keeps no
+recipe of its own: <code>site/assets/sourdough.js</code> reads <code>site/assets/order-menu.json</code>, which <code>composer site:order-menu</code>
+(<code>bin/order-menu.php</code>, through <code>src/OrderMenu.php</code>) writes from <code>Plan::forPermutation()</code>, the code behind
+<code>sourdough new --dry-run --json</code>. Whenever a shape, an oven, a step, a next step or the name rule changes, run
+<code>composer site:order-menu</code> and commit the JSON; <code>composer ci</code> runs <code>site:order-menu-check</code> and fails while it is
+stale. The HTML holds the default order (raw PHP, the bench, ADVISOR on, <code>my-app</code>), so the ticket reads right
+without the script; <code>tests/OrderMenuTest.php</code> checks that default, the page's loaves and ovens, and runs every order
+the ticket can write through <code>NewCommand</code>.</p>
 <h2 id="things-that-trip-people-up">Things that trip people <span class="docs-heading-tail"><span>up</span><a class="docs-heading-link" aria-label="Link to this section" href="#things-that-trip-people-up">#</a></span></h2>
 <ul>
-<li>In 0.1 all five shapes generate. <code>--raw --vue</code> apps need <code>npm run build</code> (or <code>npm run dev</code>) before <code>/</code> renders: <code>src/Vite.php</code> refuses with a plain message when there is neither a build nor a dev server.</li>
+<li>All five shapes generate (raw PHP since 0.1.0, the three Laravel shapes since 0.1.5, raw + Vue since 0.1.6). <code>--raw --vue</code> apps need <code>npm run build</code> (or <code>npm run dev</code>) before <code>/</code> renders: <code>src/Vite.php</code> refuses with a plain message when there is neither a build nor a dev server.</li>
 <li>Commit <code>.sourdough/manifest.json</code> (and <code>.sourdough/base/</code>) in generated apps; <code>feed</code> needs them.</li>
 </ul>
 <h2 id="who-maintains-it">Who maintains <span class="docs-heading-tail"><span>it</span><a class="docs-heading-link" aria-label="Link to this section" href="#who-maintains-it">#</a></span></h2>

@@ -128,7 +128,40 @@ The crumb
 
 Laravel with Inertia and Vue as one app: Inertia pages rendered by Vue, Ziggy routes, the stack packages, Squire's Laravel deploy files and the manifest. [WELD](https://weld.apps.wayne.edu/) is this shape already built, with the stack's product docs and site on top; you can also bake it yourself with `--inertia`.
 
-Not sure yet? `sourdough new my-app --dry-run` prints the plan and writes nothing. It works with every shape's flags.
+Not sure yet? [Place an order at the counter](https://sourdough.apps.wayne.edu/#order) and the ticket writes the command for you, or add `--dry-run` to any of these: it prints the plan and writes nothing.
+
+At the counter
+
+## Place your order
+
+Pick a loaf, an oven and a name. The ticket writes the command, the bake and what to run after it, from the same code `sourdough new --dry-run --json` runs, so what you copy is what you get.
+
+Sourdough bakery
+
+### Order ticket
+
+No. 1
+
+For **my-app**, Raw PHP
+
+`sourdough new my-app --raw`
+
+#### The bake
+
+1. Copy the raw template into my-app
+2. Replace {{app_name}} and {{app_slug}} in file names and contents
+3. Wire ADVISOR into the app
+
+#### Then run
+
+```
+cd my-app
+composer install
+php vendor/bin/advisor install --client=claude --write
+composer serve
+```
+
+The same plan `--dry-run --json` prints. Add `--dry-run` to see it on your own machine first.
 
 Recipe card No. 1
 
