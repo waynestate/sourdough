@@ -50,7 +50,7 @@ The step-by-step version is the [Quick start](guides/quick-start.md).
 
 ## Status
 
-Version 0.4.2 (2026-11-09), MIT license: Pinstripe 0.3 and ADVISOR 0.2 in every shape, Pint's findings in the merge request widget on the Laravel shapes, Preflight 0.5.0 pins, Squire 0.10.3's kit, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. Pinstripe 0.3 fails an app that joins SQL from strings until it binds values instead: [Upgrading](upgrading.md#0-4-0-2026-11-09) has the fix. The [changelog](changelog.md) lists it all, and [Upgrading](upgrading.md) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.4.2 (2026-11-09), MIT license: Pinstripe 0.3 and ADVISOR 0.3 in every shape, Pint's findings in the merge request widget on the Laravel shapes, Preflight 0.5.0 pins, Squire 0.10.5's kit, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. Pinstripe 0.3 fails an app that joins SQL from strings until it binds values instead: [Upgrading](upgrading.md#0-4-0-2026-11-09) has the fix. The [changelog](changelog.md) lists it all, and [Upgrading](upgrading.md) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 <details>
 <summary>On the bench: the five loaves and the feeding schedule</summary>
