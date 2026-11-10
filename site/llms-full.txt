@@ -429,7 +429,7 @@ Baker's percentages, roughly. The parts are Composer packages, so `composer upda
 | --- | --- | --- |
 | 100% Flour | [WayneUI](https://wayneui.apps.wayne.edu/) | The interface: WayneUI's standalone PHP file, fetched once into `public/`. |
 | 75% Water | [SESAME](https://sesame.apps.wayne.edu/) | Sign-in. The fake driver in development; the cas driver in production, with `SESAME_CAS_URL` and `SESAME_SERVICE_URL`. |
-| 2% Salt | [HELMET](https://helmet.apps.wayne.edu/) | The runtime baseline: security headers, session cookie flags, trusted proxies from `HELMET_PROXIES`, and `/up` answering `200 ok`. The Laravel shapes add `/ready`, which answers 503 while the database, the cache or the scheduler is down. |
+| 2% Salt | [HELMET](https://helmet.apps.wayne.edu/) | The runtime baseline: security headers, session cookie flags, trusted proxies from `HELMET_PROXIES`, and `/up` answering `200 ok`. Every shape answers `/ready` too: in the Laravel shapes it answers 503 while the database, the cache or the scheduler is down, and the raw shapes add their own checks as the app grows. |
 | 20% Levain | [PROCTOR](https://proctor.apps.wayne.edu/) | The standards check. CI runs `vendor/bin/proctor check` on every push. The release script asks `proctor gate` for a go or no-go too, as a report unless you set `SQUIRE_PROCTOR=enforce`. |
 | 1 Oven | [Preflight](https://preflight.apps.wayne.edu/) | CI from `.gitlab-ci.yml`, pinned to Preflight 0.5.0: PROCTOR, tests on PHP 8.3, 8.4 and 8.5, a Composer audit, an accessibility check of your own pages at WCAG 2.2 AA that blocks, a bill of materials and a Gitleaks secret scan. |
 | 1 Recipe | [CREED](https://creed.apps.wayne.edu/) | The rules the loaf is judged by. Every bake reads its PHP floor from CREED's policy, and PROCTOR grades the app against the same file. |
@@ -731,7 +731,7 @@ Sourdough is one part of the Wayne State app stack, and it starts every shape. [
 #### Also in the kitchen
 
 - [![Squire logo: a satchel with a gold buckle](https://sourdough.apps.wayne.edu/assets/marks/squire.png) **Squire** carries releases](https://squire.apps.wayne.edu/)
-- [![Parity logo: a spirit level with its gold bubble in the middle](https://sourdough.apps.wayne.edu/assets/marks/parity.png) **Parity** Citadel at home](https://git.wayne.edu/enterprise-apps/parity)
+- [![Parity logo: a spirit level with its gold bubble in the middle](https://sourdough.apps.wayne.edu/assets/marks/parity.png) **Parity** Citadel at home](https://parity.apps.wayne.edu/)
 - [![Rollcall logo: an open register with gold ticks](https://sourdough.apps.wayne.edu/assets/marks/rollcall.png) **Rollcall** every app, present](https://rollcall.apps.wayne.edu/)
 - [![ADVISOR logo: a speech bubble holding a gold compass needle](https://sourdough.apps.wayne.edu/assets/marks/advisor.png) **ADVISOR** the MCP server](https://advisor.apps.wayne.edu/)
 - [![Drawbridge logo: a castle tower lowering its bridge on a gold chain](https://sourdough.apps.wayne.edu/assets/marks/drawbridge.png) **Drawbridge** sign-in gateway](https://drawbridge.apps.wayne.edu/)
@@ -787,6 +787,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Site: the front page's stale facts are current (every shape answers `/ready`, not only the Laravel ones, and the "Also in the kitchen" shelf links Parity's site instead of its repository, without the "coming soon" tag).
 - Added: generated Laravel apps turn on HELMET's fixed 4xx page (`helmet.error_pages`, env `HELMET_ERROR_PAGES`, default true in the app's `config/helmet.php`), so an `abort()` message never reaches a visitor; the raw shapes already had HELMET's neutral error page.
 - Added: every app shape's `composer.json` sets Composer's release cooldown (`config.policy.cooldown.period`: `"3 days"`), CREED's 2026-11-03 decision; Composer 2.11 waits that long before it installs a newly published version.
 - Changed: every app shape's root `.gitattributes` pins `*.ps1`, `*.bat` and `*.cmd` to CRLF and `*.sh` to LF (CREED every-OS rule); the Laravel shapes append the pins to the skeleton's file.

@@ -45,6 +45,7 @@
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased"><span class="docs-heading-tail"><span>Unreleased</span><a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></span></h2>
 <ul>
+<li>Site: the front page's stale facts are current (every shape answers <code>/ready</code>, not only the Laravel ones, and the &quot;Also in the kitchen&quot; shelf links Parity's site instead of its repository, without the &quot;coming soon&quot; tag).</li>
 <li>Added: generated Laravel apps turn on HELMET's fixed 4xx page (<code>helmet.error_pages</code>, env <code>HELMET_ERROR_PAGES</code>, default true in the app's <code>config/helmet.php</code>), so an <code>abort()</code> message never reaches a visitor; the raw shapes already had HELMET's neutral error page.</li>
 <li>Added: every app shape's <code>composer.json</code> sets Composer's release cooldown (<code>config.policy.cooldown.period</code>: <code>&quot;3 days&quot;</code>), CREED's 2026-11-03 decision; Composer 2.11 waits that long before it installs a newly published version.</li>
 <li>Changed: every app shape's root <code>.gitattributes</code> pins <code>*.ps1</code>, <code>*.bat</code> and <code>*.cmd</code> to CRLF and <code>*.sh</code> to LF (CREED every-OS rule); the Laravel shapes append the pins to the skeleton's file.</li>

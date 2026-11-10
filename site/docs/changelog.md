@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Site: the front page's stale facts are current (every shape answers `/ready`, not only the Laravel ones, and the "Also in the kitchen" shelf links Parity's site instead of its repository, without the "coming soon" tag).
 - Added: generated Laravel apps turn on HELMET's fixed 4xx page (`helmet.error_pages`, env `HELMET_ERROR_PAGES`, default true in the app's `config/helmet.php`), so an `abort()` message never reaches a visitor; the raw shapes already had HELMET's neutral error page.
 - Added: every app shape's `composer.json` sets Composer's release cooldown (`config.policy.cooldown.period`: `"3 days"`), CREED's 2026-11-03 decision; Composer 2.11 waits that long before it installs a newly published version.
 - Changed: every app shape's root `.gitattributes` pins `*.ps1`, `*.bat` and `*.cmd` to CRLF and `*.sh` to LF (CREED every-OS rule); the Laravel shapes append the pins to the skeleton's file.
