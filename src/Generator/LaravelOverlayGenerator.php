@@ -42,7 +42,10 @@ use Waynestate\Sourdough\PlaybookMode;
  * skeleton's, scripts-descriptions added, config deep-merged with the app
  * keeping its own keys), env-additions.txt appends to the app's
  * .env.example, and gitignore-additions.txt appends the lines the app's
- * .gitignore does not have yet.
+ * .gitignore does not have yet. A fourth one, gitattributes-additions.txt,
+ * appends the line-ending pins the app's .gitattributes does not carry yet,
+ * creating the file with `* text=auto eol=lf` first when the skeleton
+ * ships none.
  *
  * The generator refuses an existing non-empty target dir and writes nothing
  * outside the target dir. A good starter rises on its own.
@@ -80,6 +83,7 @@ abstract class LaravelOverlayGenerator
         'composer.overlay.json',
         'env-additions.txt',
         'gitignore-additions.txt',
+        'gitattributes-additions.txt',
     ];
 
     private readonly GeneratorSupport $support;
@@ -208,6 +212,7 @@ abstract class LaravelOverlayGenerator
             $this->mergeComposerOverlay($targetDir, $overlayDir);
             $this->appendEnvAdditions($targetDir, $overlayDir);
             $this->appendGitignoreAdditions($targetDir, $overlayDir);
+            $this->appendGitattributesAdditions($targetDir, $overlayDir);
         }
 
         // The PHP floor and test matrix come from CREED's policy, bounded by
@@ -478,6 +483,66 @@ abstract class LaravelOverlayGenerator
 
         if (false === file_put_contents($gitignorePath, $existing . "\n" . implode("\n", $block) . "\n")) {
             throw new \RuntimeException(sprintf('Could not write "%s".', $gitignorePath));
+        }
+    }
+
+    /**
+     * Append one overlay's gitattributes-additions.txt to the app's
+     * .gitattributes: the comment lines always travel with the block, and a
+     * pin line is written only when the skeleton's .gitattributes does not
+     * carry it yet, so a skeleton that already pins the same line never
+     * doubles it. An overlay that ships no control file is skipped. A
+     * skeleton without a .gitattributes gets one created, starting with the
+     * CREED every-OS rule `* text=auto eol=lf` followed by the block.
+     *
+     * @throws \RuntimeException when a file cannot be read or written
+     */
+    private function appendGitattributesAdditions(string $targetDir, string $overlayDir): void
+    {
+        $additionsPath = $overlayDir . '/gitattributes-additions.txt';
+        if (!is_file($additionsPath)) {
+            return;
+        }
+
+        $additions = file_get_contents($additionsPath);
+        if (false === $additions) {
+            throw new \RuntimeException(sprintf('Could not read "%s".', $additionsPath));
+        }
+
+        $gitattributesPath = $targetDir . '/.gitattributes';
+        if (is_file($gitattributesPath)) {
+            $existing = file_get_contents($gitattributesPath);
+            if (false === $existing) {
+                throw new \RuntimeException(sprintf('Could not read "%s".', $gitattributesPath));
+            }
+        } else {
+            // No .gitattributes in the skeleton: start from the CREED
+            // every-OS rule, then append the block below.
+            $existing = "* text=auto eol=lf\n";
+        }
+
+        $present = array_map('trim', preg_split('/\R/', $existing) ?: []);
+        $block = [];
+        foreach (preg_split('/\R/', $additions) ?: [] as $line) {
+            $trimmed = trim($line);
+            if ('' === $trimmed) {
+                continue;
+            }
+            if (!str_starts_with($trimmed, '#') && in_array($trimmed, $present, true)) {
+                continue;
+            }
+            $block[] = $trimmed;
+        }
+        if ([] === $block) {
+            return;
+        }
+
+        if ('' !== $existing && !str_ends_with($existing, "\n")) {
+            $existing .= "\n";
+        }
+
+        if (false === file_put_contents($gitattributesPath, $existing . "\n" . implode("\n", $block) . "\n")) {
+            throw new \RuntimeException(sprintf('Could not write "%s".', $gitattributesPath));
         }
     }
 
