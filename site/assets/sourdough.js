@@ -296,7 +296,9 @@
       status: slip.querySelector("[data-order-status]"),
       steps: slip.querySelector("[data-order-steps]"),
       next: slip.querySelector("[data-order-next]"),
-      nextCopy: slip.querySelector("[data-order-next-copy]")
+      nextCopy: slip.querySelector("[data-order-next-copy]"),
+      shareRow: slip.querySelector("[data-order-share-row]"),
+      share: slip.querySelector("[data-order-share]")
     };
     var namePattern = new RegExp(menu.name.pattern);
     var ovenWords = { bench: "", sail: ", on Sail", docker: ", in Docker" };
@@ -394,6 +396,15 @@
       });
       out.nextCopy.setAttribute("data-copy", next.join("\n"));
 
+      /* The same order as a link: #order?loaf=..&oven=..[&name=..][&advisor=no].
+         Opening it puts this ticket back on the counter. */
+      if (out.share) {
+        var query = "loaf=" + encodeURIComponent(loaf) + "&oven=" + encodeURIComponent(oven);
+        if (typed !== "") query += "&name=" + encodeURIComponent(typed);
+        if (!advisor) query += "&advisor=no";
+        out.share.setAttribute("data-copy", location.origin + location.pathname + "#order?" + query);
+      }
+
       if (print) reprint();
     }
 
@@ -414,7 +425,28 @@
     form.addEventListener("submit", function (e) { e.preventDefault(); });
     form.addEventListener("change", function (e) { render(e.target !== nameInput); });
     nameInput.addEventListener("input", function () { render(false); });
+
+    /* A shared order (#order?loaf=inertia&oven=docker&name=...) fills the
+       form. Anything not on the menu is ignored, so a mangled link still
+       lands on a good default ticket. */
+    var shared = location.hash.indexOf("#order?") === 0;
+    if (shared) {
+      var q = new URLSearchParams(location.hash.slice(7));
+      var choose = function (group, value, known) {
+        if (!value || !Object.prototype.hasOwnProperty.call(known, value)) return;
+        var el = form.querySelector('input[name="' + group + '"][value="' + value + '"]');
+        if (el) el.checked = true;
+      };
+      choose("order-loaf", q.get("loaf"), menu.shapes);
+      choose("order-oven", q.get("oven"), menu.ovens);
+      var sharedName = q.get("name");
+      if (sharedName !== null) nameInput.value = sharedName.slice(0, 64);
+      if (q.get("advisor") === "no") advisorBox.checked = false;
+    }
+    if (out.shareRow) out.shareRow.hidden = false;
     render(false);
+    /* #order?... matches no id, so the browser did not scroll: do it here. */
+    if (shared) section.scrollIntoView({ block: "start", behavior: motion ? "smooth" : "auto" });
 
     /* The first ticket prints when the counter comes into view. */
     if (motion && "IntersectionObserver" in window) {

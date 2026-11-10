@@ -17,7 +17,7 @@ From a machine where `sourdough` is installed (see [Install](https://sourdough.a
    sourdough new my-app
    ```
    Expected: exit code `0` (done). The `my-app` directory appears with a Wayne State app in it: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components already wired in. Sourdough prints Next steps for the new app.
-   Not sure which flags you want? The order counter on the [front page](https://sourdough.apps.wayne.edu/#order) writes the command for a shape, an oven and a name, with the same plan and Next steps this command prints.
+   Not sure which flags you want? The order counter on the [front page](https://sourdough.apps.wayne.edu/#order) writes the command for a shape, an oven and a name, with the same plan and Next steps this command prints. Its "Copy a link to this order" button gives you a link to send a coworker, and the link opens the counter on the same order.
 2. Run the app's own checks.
    From inside `my-app/`:
    ```

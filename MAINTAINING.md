@@ -166,6 +166,12 @@ stale. The HTML holds the default order (raw PHP, the bench, ADVISOR on, `my-app
 without the script; `tests/OrderMenuTest.php` checks that default, the page's loaves and ovens, and runs every order
 the ticket can write through `NewCommand`.
 
+An order can travel as a link: `#order?loaf=<shape>&oven=<oven>&name=<name>&advisor=no`, where `loaf` and `oven` are
+keys of the menu, `name` is left out for `my-app` and `advisor=no` appears only when ADVISOR is unchecked. The ticket's
+"Copy a link to this order" button writes it, and the script fills the form from it on load, ignoring any loaf or oven
+that is not a menu key. Renaming a shape or oven key breaks links people have already sent, so keep the old key
+working or say so in the CHANGELOG.
+
 ## Things that trip people up
 
 - All five shapes generate (raw PHP since 0.1.0, the three Laravel shapes since 0.1.5, raw + Vue since 0.1.6). `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.

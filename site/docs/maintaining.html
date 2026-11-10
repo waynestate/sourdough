@@ -195,6 +195,11 @@ recipe of its own: <code>site/assets/sourdough.js</code> reads <code>site/assets
 stale. The HTML holds the default order (raw PHP, the bench, ADVISOR on, <code>my-app</code>), so the ticket reads right
 without the script; <code>tests/OrderMenuTest.php</code> checks that default, the page's loaves and ovens, and runs every order
 the ticket can write through <code>NewCommand</code>.</p>
+<p>An order can travel as a link: <code>#order?loaf=&lt;shape&gt;&amp;oven=&lt;oven&gt;&amp;name=&lt;name&gt;&amp;advisor=no</code>, where <code>loaf</code> and <code>oven</code> are
+keys of the menu, <code>name</code> is left out for <code>my-app</code> and <code>advisor=no</code> appears only when ADVISOR is unchecked. The ticket's
+&quot;Copy a link to this order&quot; button writes it, and the script fills the form from it on load, ignoring any loaf or oven
+that is not a menu key. Renaming a shape or oven key breaks links people have already sent, so keep the old key
+working or say so in the CHANGELOG.</p>
 <h2 id="things-that-trip-people-up">Things that trip people <span class="docs-heading-tail"><span>up</span><a class="docs-heading-link" aria-label="Link to this section" href="#things-that-trip-people-up">#</a></span></h2>
 <ul>
 <li>All five shapes generate (raw PHP since 0.1.0, the three Laravel shapes since 0.1.5, raw + Vue since 0.1.6). <code>--raw --vue</code> apps need <code>npm run build</code> (or <code>npm run dev</code>) before <code>/</code> renders: <code>src/Vite.php</code> refuses with a plain message when there is neither a build nor a dev server.</li>

@@ -164,6 +164,35 @@ final class OrderMenuTest extends TestCase
         self::assertSame('app-v2-beta', RawGenerator::slugify('App.v2_beta'));
     }
 
+    public function testTheOrderLinkWaitsForTheScriptAndOnlyTakesWhatIsOnTheMenu(): void
+    {
+        $page = (string) file_get_contents(self::PAGE);
+        $script = (string) file_get_contents(self::SCRIPT);
+
+        // Without the script the button could only copy the default order,
+        // so the row stays hidden until the counter opens.
+        self::assertSame(1, preg_match('#<p class="slip__share" hidden data-order-share-row>(.*?)</p>#s', $page, $row));
+        self::assertStringContainsString('data-copy="https://sourdough.apps.wayne.edu/#order?loaf=raw&amp;oven=bench"', $row[1] ?? '');
+        self::assertStringContainsString('data-order-share', $row[1] ?? '');
+        self::assertStringContainsString('out.shareRow.hidden = false', $script);
+
+        // The link reads back from #order?..., and a loaf or oven counts only
+        // when it is a key of the menu the command built.
+        self::assertStringContainsString('location.hash.indexOf("#order?") === 0', $script);
+        self::assertStringContainsString('Object.prototype.hasOwnProperty.call(known, value)', $script);
+        self::assertStringContainsString('choose("order-loaf", q.get("loaf"), menu.shapes)', $script);
+        self::assertStringContainsString('choose("order-oven", q.get("oven"), menu.ovens)', $script);
+        foreach (['"loaf="', '"&oven="', '"&name="', '"&advisor=no"'] as $part) {
+            self::assertStringContainsString($part, $script);
+        }
+
+        // Every loaf and oven key travels in a link as it is.
+        $menu = OrderMenu::build();
+        foreach ([...array_keys($menu['shapes']), ...array_keys($menu['ovens'])] as $key) {
+            self::assertSame((string) $key, rawurlencode((string) $key));
+        }
+    }
+
     /**
      * @param array<string, string|bool> $input
      *
