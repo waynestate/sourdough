@@ -820,7 +820,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
-- Docs: BEST_PRACTICES says what the code does today: 1.6 (each shape baked into a temp directory, the Laravel ones offline from the fixture skeleton) is `Checked`, 5.1 (`.gitattributes` pins in every shape, `GitattributesPinsTest`) is `Enforced`, 5.3 (Squire's `parity.sh` and `parity.ps1` in every shape) is `Checked`, and each line of the gap list says whether it is done (and where) or what is still open. The every-OS guide's missing "a script is blocked" advice is listed as the gap in 5.3.
+- Docs: the every-OS guide says what to do when Windows will not run a script ("running scripts is disabled on this system"): on a Windows client with no execution policy set, PowerShell runs no script files at all, so it shows how to check the policy, set `RemoteSigned` for your own account, unblock a downloaded copy, or run one script with its own policy. It no longer says the generator's scripts are never affected. BEST_PRACTICES 5.3 says the same.
+- Docs: BEST_PRACTICES says what the code does today: 1.6 (each shape baked into a temp directory, the Laravel ones offline from the fixture skeleton) is `Checked`, 5.1 (`.gitattributes` pins in every shape, `GitattributesPinsTest`) is `Enforced`, 5.3 (Squire's `parity.sh` and `parity.ps1` in every shape) is `Checked`, and each line of the gap list says whether it is done (and where) or what is still open.
 - Site: the front page has an order counter (`#order`), the command half of the "new app" page (BEST_PRACTICES 1.8). Pick a loaf, an oven and a name and its ticket writes the `sourdough new` command, the bake and the next steps to copy, read from `site/assets/order-menu.json`, which `composer site:order-menu` builds from the same plan code as `sourdough new --dry-run --json`. `composer ci` fails when the menu is stale, and `tests/OrderMenuTest.php` runs every order the ticket can write through the real command. It checks names with the generator's rule and offers only the ovens a shape takes.
 - Added: `sourdough new --dry-run --json` carries `next_steps`, the lines a real bake prints under "Next steps:" for that shape and oven (Sail, Docker or the bench, with or without ADVISOR). The plan now owns them (`Plan::$nextSteps`), so the printed list and the JSON can never disagree; the printed output is unchanged.
 - Docs: the maintaining guide, the troubleshooting page and the README name Preflight 0.6.0, the release CI and the templates pin (they still said 0.1.4 or 0.5.0).
@@ -1670,7 +1671,35 @@ Every generated app ships a `.gitattributes` with `* text=auto eol=lf`, and sets
 
 ### Native paths for each OS [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#native-paths-for-each-os)
 
-Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS get bash (`.sh`), written for macOS's stock bash 3.2 and BSD tools. Be aware that PowerShell's default policy on Windows clients can block scripts that were downloaded from the internet (Microsoft calls the policy defense in depth, not a security boundary). Scripts the generator writes locally are not affected, but the docs should say what to do if a script is blocked. Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex`; that is a pattern WSU docs should not copy.
+Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS get bash (`.sh`), written for macOS's stock bash 3.2 and BSD tools. Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex`; that is a pattern WSU docs should not copy.
+
+#### When Windows will not run a script [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#when-windows-will-not-run-a-script)
+
+PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is `Restricted`: PowerShell runs commands you type but no script files at all, so `scripts\parity.ps1` in your own app fails with "running scripts is disabled on this system". See what is set, scope by scope:
+
+```
+Get-ExecutionPolicy -List
+```
+
+If every scope says `Undefined`, set `RemoteSigned` for your own account. It needs no administrator and changes nothing for anyone else:
+
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+`RemoteSigned` runs scripts written on your computer and asks for a signature only on files marked as downloaded from the internet. If you got the app as a zip from a browser, its scripts carry that mark; read them, then clear it:
+
+```
+Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
+```
+
+To run one script without changing any setting, start it in a PowerShell of its own, for that run only:
+
+```
+powershell -ExecutionPolicy RemoteSigned -File scripts\parity.ps1
+```
+
+If `MachinePolicy` or `UserPolicy` shows a value, Group Policy set it and it beats every command above: ask whoever manages the computer. Never answer a blocked script with `Bypass` for a script you have not read.
 
 ### Subprocesses as argument arrays [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#subprocesses-as-argument-arrays)
 

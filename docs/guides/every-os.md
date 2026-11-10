@@ -17,7 +17,35 @@ Every generated app ships a `.gitattributes` with `* text=auto eol=lf`, and sets
 
 ## Native paths for each OS
 
-Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS get bash (`.sh`), written for macOS's stock bash 3.2 and BSD tools. Be aware that PowerShell's default policy on Windows clients can block scripts that were downloaded from the internet (Microsoft calls the policy defense in depth, not a security boundary). Scripts the generator writes locally are not affected, but the docs should say what to do if a script is blocked. Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex`; that is a pattern WSU docs should not copy.
+Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS get bash (`.sh`), written for macOS's stock bash 3.2 and BSD tools. Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex`; that is a pattern WSU docs should not copy.
+
+### When Windows will not run a script
+
+PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is `Restricted`: PowerShell runs commands you type but no script files at all, so `scripts\parity.ps1` in your own app fails with "running scripts is disabled on this system". See what is set, scope by scope:
+
+```
+Get-ExecutionPolicy -List
+```
+
+If every scope says `Undefined`, set `RemoteSigned` for your own account. It needs no administrator and changes nothing for anyone else:
+
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+`RemoteSigned` runs scripts written on your computer and asks for a signature only on files marked as downloaded from the internet. If you got the app as a zip from a browser, its scripts carry that mark; read them, then clear it:
+
+```
+Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
+```
+
+To run one script without changing any setting, start it in a PowerShell of its own, for that run only:
+
+```
+powershell -ExecutionPolicy RemoteSigned -File scripts\parity.ps1
+```
+
+If `MachinePolicy` or `UserPolicy` shows a value, Group Policy set it and it beats every command above: ask whoever manages the computer. Never answer a blocked script with `Bypass` for a script you have not read.
 
 ## Subprocesses as argument arrays
 
