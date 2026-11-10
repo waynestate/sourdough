@@ -87,7 +87,7 @@ Here is a small, older raw PHP app, `parking-permits`, with a hand-built `public
 
 ```
 $ sourdough adopt --shape raw
-Adopting "parking-permits" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.0.
+Adopting "parking-permits" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.1.
 Compared your app with a fresh raw bake: 41 template files.
 
   yours    composer.json              differs from the template: yours, never overwritten
@@ -116,7 +116,7 @@ Compared your app with a fresh raw bake: 41 template files.
 
 Adopted: 0 match, 3 yours, 1 seeded, 37 missing. Wrote .sourdough/manifest.json.
 Files the template does not ship are not recorded: Sourdough never reads or touches them.
-Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.0"
+Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
       then sourdough feed --dry-run lists the 37 files the first feed adds.
 ```
 
@@ -139,7 +139,7 @@ A vendored Squire kit gets a note too. When `.squire.json` says an older kit tha
 
 ```
 git add .sourdough
-git commit -m "Adopt with Sourdough 0.4.0"
+git commit -m "Adopt with Sourdough 0.4.1"
 ```
 
 The adoption is its own commit, so `git revert` takes it back cleanly. Commit the manifest and do not hand-edit it: it is the starter's memory.
@@ -154,7 +154,7 @@ The first feed adds every `missing` file. A raw app that had lost its `.gitlab-c
 
 ```
 $ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.1 to 0.4.1 (dry run: nothing written)
   add       .gitlab-ci.yml (new in the template)
   add       phpstan.neon (new in the template)
 Plan: 2 add.
@@ -189,7 +189,7 @@ A `yours` file is never written, merged or reported, until the day your copy equ
 
 ```
 $ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.1 to 0.4.1 (dry run: nothing written)
   record    composer.json (your file now matches the template's: Sourdough manages it from here)
 Plan: 1 record.
 Run sourdough feed without --dry-run to apply it.

@@ -3,7 +3,7 @@
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic
 Versioning once 1.0 is out.
 
-## Unreleased
+## 0.4.1 (2026-11-09)
 
 ### Added
 

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Upgrading | Sourdough docs</title>
 <meta name="description" content="How to upgrade Sourdough itself and bring the apps it baked up to date with the manifest and sourdough feed.">
-<meta name="docs-version" content="0.4.0">
+<meta name="docs-version" content="0.4.1">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.4.0</span>
+    <span class="ticket" title="Sourdough version">No. 0.4.1</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -50,9 +50,21 @@
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre tabindex="0"><code>Sourdough 0.4.0
+<pre tabindex="0"><code>Sourdough 0.4.1
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
+<h2 id="0-4-1-2026-11-09">0.4.1 (2026-11-09)<a class="docs-heading-link" aria-label="Link to this section" href="#0-4-1-2026-11-09">#</a></h2>
+<p>A patch on 0.4.0: the Laravel shapes pick up the Pinstripe extras WELD carries, and Sourdough's own tests pass on a tag build. The raw shapes are unchanged.</p>
+<p><strong>What <code>sourdough feed</code> brings a Laravel app baked with 0.4.0</strong> (Blade, Blade + Vue islands, Inertia; it merges each file with your edits):</p>
+<ul>
+<li><code>composer.json</code>: a <code>composer lint:gitlab</code> script that writes Pint's findings as a GitLab Code Quality report, <code>pint-codequality.json</code> (<code>[]</code> when clean).</li>
+<li><code>.gitignore</code>: <code>/pint-codequality.json</code>, a CI artifact only.</li>
+<li><code>.gitlab-ci.yml</code>: the <code>composer-ci</code> job runs <code>composer lint:gitlab</code> in <code>after_script</code>, so it still reports when <code>composer ci</code> fails, and keeps the report as a <code>codequality</code> artifact for seven days. Pint's findings then show in the merge request widget.</li>
+<li><code>tests/Unit/PinstripeWiringTest.php</code>: the app's own test that Pinstripe is a dev dependency, that <code>phpstan.neon</code> includes its Laravel preset and leaves the level and the bans to it, and that <code>pint.json</code> is Pinstripe's <code>laravel.json</code> plus the three recorded skips for Squire's files (<code>deploy</code>, <code>health.php</code>, <code>oracle-check.php</code>).</li>
+</ul>
+<p><strong>Breaking:</strong> none for an app on the template's wiring. An app whose <code>pint.json</code> skips more paths than those three fails the new test until each extra skip is written into the test with its reason. <strong>Deprecated:</strong> none.</p>
+<p><strong>Steps:</strong> in each Laravel app, on a clean git tree, <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, then <code>composer ci</code>.</p>
+<p><strong>How to verify:</strong> <code>composer ci</code> passes, and the next merge request's pipeline lists a <code>codequality</code> report from <code>composer-ci</code>.</p>
 <h2 id="0-4-0-2026-11-09">0.4.0 (2026-11-09)<a class="docs-heading-link" aria-label="Link to this section" href="#0-4-0-2026-11-09">#</a></h2>
 <p><strong>Breaking: Pinstripe 0.3 may fail apps that join SQL from strings.</strong> Feed moves every shape to Pinstripe <code>^0.3</code>, and PHPStan now fails code that builds SQL by gluing a variable into the query text. The fix is to bind the value, with the details below. Everything else in this release is pins, pipeline and kit moves.</p>
 <pre tabindex="0"><code class="language-php">// Fails on Pinstripe 0.3: the value is joined into the SQL.
@@ -184,10 +196,10 @@ php artisan view:clear
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-4-1-2026-11-09">0.4.1 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.4.0</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.4.1</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="upgrading.md">Markdown</a></span>
 </footer>
 </body>

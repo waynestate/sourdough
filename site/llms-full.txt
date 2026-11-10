@@ -18,7 +18,7 @@ A starter you feed: `sourdough new` makes a Wayne State app with the stack alrea
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
-Status: 0.4.0 (2026-11-09), MIT license: Pinstripe 0.3 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](https://github.com/waynestate/sourdough/blob/HEAD/CHANGELOG.md); what a feed brings is in [Upgrading](https://github.com/waynestate/sourdough/blob/HEAD/docs/upgrading.md).
+Status: 0.4.1 (2026-11-09), MIT license: Pinstripe 0.3 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](https://github.com/waynestate/sourdough/blob/HEAD/CHANGELOG.md); what a feed brings is in [Upgrading](https://github.com/waynestate/sourdough/blob/HEAD/docs/upgrading.md).
 
 Every loaf gets proofed before it ships.
 
@@ -212,7 +212,7 @@ The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` c
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.4.0"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
 sourdough feed --dry-run
 ```
 
@@ -456,7 +456,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    Adoption papers an old course finder, taken in
    ```
    $ sourdough adopt --shape raw
-   Adopting "course-finder" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.0.
+   Adopting "course-finder" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.1.
    Compared your app with a fresh raw bake: 41 template files.
    
      yours    composer.json     differs from the template: yours, never overwritten
@@ -468,7 +468,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    
    Adopted: 35 match, 2 yours, 2 seeded, 2 missing. Wrote .sourdough/manifest.json.
    Files the template does not ship are not recorded: Sourdough never reads or touches them.
-   Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.0"
+   Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
          then sourdough feed --dry-run lists the 2 files the first feed adds.
    ```
 3. Any day
@@ -784,7 +784,7 @@ Source: https://sourdough.apps.wayne.edu/docs/changelog.html
 
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic Versioning once 1.0 is out.
 
-### Unreleased[#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
+### 0.4.1 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-4-1-2026-11-09)
 
 #### Added[#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)
 
@@ -1191,7 +1191,7 @@ Here is a small, older raw PHP app, `parking-permits`, with a hand-built `public
 
 ```
 $ sourdough adopt --shape raw
-Adopting "parking-permits" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.0.
+Adopting "parking-permits" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.1.
 Compared your app with a fresh raw bake: 41 template files.
 
   yours    composer.json              differs from the template: yours, never overwritten
@@ -1220,7 +1220,7 @@ Compared your app with a fresh raw bake: 41 template files.
 
 Adopted: 0 match, 3 yours, 1 seeded, 37 missing. Wrote .sourdough/manifest.json.
 Files the template does not ship are not recorded: Sourdough never reads or touches them.
-Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.0"
+Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
       then sourdough feed --dry-run lists the 37 files the first feed adds.
 ```
 
@@ -1243,7 +1243,7 @@ A vendored Squire kit gets a note too. When `.squire.json` says an older kit tha
 
 ```
 git add .sourdough
-git commit -m "Adopt with Sourdough 0.4.0"
+git commit -m "Adopt with Sourdough 0.4.1"
 ```
 
 The adoption is its own commit, so `git revert` takes it back cleanly. Commit the manifest and do not hand-edit it: it is the starter's memory.
@@ -1258,7 +1258,7 @@ The first feed adds every `missing` file. A raw app that had lost its `.gitlab-c
 
 ```
 $ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.1 to 0.4.1 (dry run: nothing written)
   add       .gitlab-ci.yml (new in the template)
   add       phpstan.neon (new in the template)
 Plan: 2 add.
@@ -1293,7 +1293,7 @@ A `yours` file is never written, merged or reported, until the day your copy equ
 
 ```
 $ sourdough feed --dry-run
-Would feed the raw app: Sourdough 0.4.0 to 0.4.0 (dry run: nothing written)
+Would feed the raw app: Sourdough 0.4.1 to 0.4.1 (dry run: nothing written)
   record    composer.json (your file now matches the template's: Sourdough manages it from here)
 Plan: 1 record.
 Run sourdough feed without --dry-run to apply it.
@@ -1791,7 +1791,7 @@ Feed needs a manifest. An app without one gets exit `2`, with the way in: `sourd
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.4.0"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.4.1"
 sourdough feed --dry-run
 ```
 
@@ -2540,7 +2540,7 @@ The step-by-step version is the [Quick start](https://sourdough.apps.wayne.edu/d
 
 ### Status[#](https://sourdough.apps.wayne.edu/docs/#status)
 
-Version 0.4.0 (2026-11-09), MIT license: Pinstripe 0.3 and ADVISOR 0.2 in every shape, Preflight 0.5.0 pins, Squire 0.10.3's kit, and `sourdough adopt` for apps Sourdough did not make. Pinstripe 0.3 fails an app that joins SQL from strings until it binds values instead: [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-4-0-2026-11-09) has the fix. The [changelog](https://sourdough.apps.wayne.edu/docs/changelog.html) lists it all, and [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
+Version 0.4.1 (2026-11-09), MIT license: Pinstripe 0.3 and ADVISOR 0.2 in every shape, Pint's findings in the merge request widget on the Laravel shapes, Preflight 0.5.0 pins, Squire 0.10.3's kit, and `sourdough adopt` for apps Sourdough did not make. Pinstripe 0.3 fails an app that joins SQL from strings until it binds values instead: [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-4-0-2026-11-09) has the fix. The [changelog](https://sourdough.apps.wayne.edu/docs/changelog.html) lists it all, and [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html) says what a feed brings. Agents: this site ships [llms.txt](https://sourdough.apps.wayne.edu/llms.txt) for LLM readers.
 
 **On the bench: the five loaves and the feeding schedule**
 
@@ -2601,10 +2601,10 @@ sourdough --version
 Expected:
 
 ```
-Sourdough 0.4.0
+Sourdough 0.4.1
 ```
 
-The CLI is a Symfony Console application named Sourdough, version 0.4.0 (`bin/sourdough`), so `--version` prints the name and the version.
+The CLI is a Symfony Console application named Sourdough, version 0.4.1 (`bin/sourdough`), so `--version` prints the name and the version.
 
 ### Next steps[#](https://sourdough.apps.wayne.edu/docs/install.html#next-steps)
 
@@ -3012,7 +3012,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
     "name": "course-finder",
     "notes": [],
     "shape": "raw",
-    "sourdough_version": "0.4.0",
+    "sourdough_version": "0.4.1",
     "summary": {
         "match": 38,
         "missing": 1,
@@ -4073,10 +4073,27 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.4.0
+Sourdough 0.4.1
 ```
 
 Then read the section for the version you are moving to.
+
+### 0.4.1 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-4-1-2026-11-09)
+
+A patch on 0.4.0: the Laravel shapes pick up the Pinstripe extras WELD carries, and Sourdough's own tests pass on a tag build. The raw shapes are unchanged.
+
+**What `sourdough feed` brings a Laravel app baked with 0.4.0** (Blade, Blade + Vue islands, Inertia; it merges each file with your edits):
+
+- `composer.json`: a `composer lint:gitlab` script that writes Pint's findings as a GitLab Code Quality report, `pint-codequality.json` (`[]` when clean).
+- `.gitignore`: `/pint-codequality.json`, a CI artifact only.
+- `.gitlab-ci.yml`: the `composer-ci` job runs `composer lint:gitlab` in `after_script`, so it still reports when `composer ci` fails, and keeps the report as a `codequality` artifact for seven days. Pint's findings then show in the merge request widget.
+- `tests/Unit/PinstripeWiringTest.php`: the app's own test that Pinstripe is a dev dependency, that `phpstan.neon` includes its Laravel preset and leaves the level and the bans to it, and that `pint.json` is Pinstripe's `laravel.json` plus the three recorded skips for Squire's files (`deploy`, `health.php`, `oracle-check.php`).
+
+**Breaking:** none for an app on the template's wiring. An app whose `pint.json` skips more paths than those three fails the new test until each extra skip is written into the test with its reason. **Deprecated:** none.
+
+**Steps:** in each Laravel app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer ci`.
+
+**How to verify:** `composer ci` passes, and the next merge request's pipeline lists a `codequality` report from `composer-ci`.
 
 ### 0.4.0 (2026-11-09)[#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-4-0-2026-11-09)
 

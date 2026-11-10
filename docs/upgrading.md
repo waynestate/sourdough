@@ -26,10 +26,27 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.4.0
+Sourdough 0.4.1
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.4.1 (2026-11-09)
+
+A patch on 0.4.0: the Laravel shapes pick up the Pinstripe extras WELD carries, and Sourdough's own tests pass on a tag build. The raw shapes are unchanged.
+
+**What `sourdough feed` brings a Laravel app baked with 0.4.0** (Blade, Blade + Vue islands, Inertia; it merges each file with your edits):
+
+- `composer.json`: a `composer lint:gitlab` script that writes Pint's findings as a GitLab Code Quality report, `pint-codequality.json` (`[]` when clean).
+- `.gitignore`: `/pint-codequality.json`, a CI artifact only.
+- `.gitlab-ci.yml`: the `composer-ci` job runs `composer lint:gitlab` in `after_script`, so it still reports when `composer ci` fails, and keeps the report as a `codequality` artifact for seven days. Pint's findings then show in the merge request widget.
+- `tests/Unit/PinstripeWiringTest.php`: the app's own test that Pinstripe is a dev dependency, that `phpstan.neon` includes its Laravel preset and leaves the level and the bans to it, and that `pint.json` is Pinstripe's `laravel.json` plus the three recorded skips for Squire's files (`deploy`, `health.php`, `oracle-check.php`).
+
+**Breaking:** none for an app on the template's wiring. An app whose `pint.json` skips more paths than those three fails the new test until each extra skip is written into the test with its reason. **Deprecated:** none.
+
+**Steps:** in each Laravel app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer ci`.
+
+**How to verify:** `composer ci` passes, and the next merge request's pipeline lists a `codequality` report from `composer-ci`.
 
 ## 0.4.0 (2026-11-09)
 

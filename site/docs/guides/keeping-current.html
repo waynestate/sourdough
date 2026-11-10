@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Keeping apps current | Sourdough docs</title>
 <meta name="description" content="How sourdough feed reads the manifest and brings template updates into your app without clobbering what you have changed.">
-<meta name="docs-version" content="0.4.0">
+<meta name="docs-version" content="0.4.1">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
 <link rel="stylesheet" href="../../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../../index.html#start-title">Quick start</a>
       <a href="../../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.4.0</span>
+    <span class="ticket" title="Sourdough version">No. 0.4.1</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -251,7 +251,7 @@ the template's version
 <p>Feed needs a manifest. An app without one gets exit <code>2</code>, with the way in: <code>sourdough adopt &lt;dir&gt; --shape &lt;shape&gt;</code> (ADR-0014). Adopt bakes the shape fresh, compares the app with it file by file, and writes the manifest the app would have had: files that match become <code>managed</code>, files that differ stay <code>yours</code> and are never touched, and files the app lacks arrive with the first feed. <a href="./adopt.html">Adopt an existing app</a> walks through it, from picking the shape to the first feed.</p>
 <pre tabindex="0"><code>sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.4.0&quot;
+git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.4.1&quot;
 sourdough feed --dry-run
 </code></pre>
 <p>A <code>yours</code> file gets no step in any feed, so the <code>sourdough-feed</code> job stays green on every release; the day your copy equals the template's, feed records it (<code>record</code>) and manages it from then on.</p>
@@ -283,7 +283,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
   <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#record-where-the-app-came-from">Record where the app came from</a></li><li class="docs-toc__item"><a href="#check-for-drift">Check for drift</a></li><li class="docs-toc__item"><a href="#feed-the-app-a-merge-not-an-overwrite">Feed the app: a merge, not an overwrite</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#what-feed-does">What feed does</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#where-the-base-comes-from">Where the base comes from</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#conflicts">Conflicts</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#rules-feed-keeps">Rules feed keeps</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#feed-in-ci">Feed in CI</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#apps-sourdough-did-not-make-and-weld">Apps Sourdough did not make, and WELD</a></li><li class="docs-toc__item"><a href="#versioned-template-releases">Versioned template releases</a></li><li class="docs-toc__item"><a href="#compatibility-ci">Compatibility CI</a></li><li class="docs-toc__item"><a href="#keep-templates-thin">Keep templates thin</a></li><li class="docs-toc__item"><a href="#owners-windows-and-sunsets">Owners, windows and sunsets</a></li><li class="docs-toc__item"><a href="#refreshing-the-squire-templates">Refreshing the Squire templates</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.4.0</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.4.1</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="keeping-current.md">Markdown</a></span>
 </footer>
 </body>
