@@ -27,6 +27,11 @@
         },
         "platform": {
             "php": "8.3.0"
+        },
+        "policy": {
+            "cooldown": {
+                "period": "3 days"
+            }
         }
     },
     "scripts": {
