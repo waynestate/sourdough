@@ -437,7 +437,7 @@ Task:
 1. Check that PHP 8.3 or newer, Composer and git are on the PATH, and say which versions you found. If the sourdough command is missing, install it with `composer global require waynestate/sourdough`.
 2. Run `git status --short` at the app's root. If the folder is not a git repository, or the tree has changes, stop and tell me. Do not commit for me.
 3. Propose the shape, one of raw, raw-vue, laravel-blade, laravel-blade-vue or laravel-inertia, with the evidence (artisan, inertiajs/inertia-laravel in composer.json, vue in package.json). Propose the name the app goes by, from composer.json. Ask me to confirm both.
-4. Run `sourdough adopt --shape  --name  --dry-run` and summarize it: how many files match, are yours, seeded and missing, and any note (a name that looks wrong, an older Squire kit).
+4. Run `sourdough adopt --shape <shape> --name <name> --dry-run` and summarize it: how many files match, are yours, seeded and missing, and any note (a name that looks wrong, an older Squire kit).
 5. Only when I say so, run the same command without --dry-run, then `sourdough feed --dry-run`, and list the files the first feed would add.
 
 Constraints:

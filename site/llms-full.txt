@@ -724,7 +724,7 @@ Task:
 1. Check that PHP 8.3 or newer, Composer and git are on the PATH, and say which versions you found. If the sourdough command is missing, install it with `composer global require waynestate/sourdough`.
 2. Run `git status --short` at the app's root. If the folder is not a git repository, or the tree has changes, stop and tell me. Do not commit for me.
 3. Propose the shape, one of raw, raw-vue, laravel-blade, laravel-blade-vue or laravel-inertia, with the evidence (artisan, inertiajs/inertia-laravel in composer.json, vue in package.json). Propose the name the app goes by, from composer.json. Ask me to confirm both.
-4. Run `sourdough adopt --shape  --name  --dry-run` and summarize it: how many files match, are yours, seeded and missing, and any note (a name that looks wrong, an older Squire kit).
+4. Run `sourdough adopt --shape <shape> --name <name> --dry-run` and summarize it: how many files match, are yours, seeded and missing, and any note (a name that looks wrong, an older Squire kit).
 5. Only when I say so, run the same command without --dry-run, then `sourdough feed --dry-run`, and list the files the first feed would add.
 
 Constraints:
@@ -820,6 +820,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Fixed: the front page's "Adopt an existing app" prompt asked the agent to run `sourdough adopt` with the values of `--shape` and `--name` missing: the `<shape>` and `<name>` placeholders sat in the HTML unescaped, so browsers read them as unknown elements and the copied prompt, `index.md` and `llms-full.txt` lost them. They are escaped now, as is a raw `<name>` in an old changelog entry, and `tests/SitePlaceholdersTest.php` fails on any element the page does not really use and on any flag left without its value.
 - Site: the order ticket has "Copy a link to this order", a link such as `https://sourdough.apps.wayne.edu/#order?loaf=laravel-inertia&oven=docker&name=Parking%20Permits&advisor=no` that opens the counter with the same loaf, oven, name and ADVISOR choice, so a lead can send a new developer the exact order. A loaf or oven that is not on the menu is ignored and the name goes through the usual rule, so a mangled link still lands on a good ticket. The button appears only once the script has opened the counter.
 - Docs: the every-OS guide says what to do when Windows will not run a script ("running scripts is disabled on this system"): on a Windows client with no execution policy set, PowerShell runs no script files at all, so it shows how to check the policy, set `RemoteSigned` for your own account, unblock a downloaded copy, or run one script with its own policy. It no longer says the generator's scripts are never affected. BEST_PRACTICES 5.3 says the same.
 - Docs: BEST_PRACTICES says what the code does today: 1.6 (each shape baked into a temp directory, the Laravel ones offline from the fixture skeleton) is `Checked`, 5.1 (`.gitattributes` pins in every shape, `GitattributesPinsTest`) is `Enforced`, 5.3 (Squire's `parity.sh` and `parity.ps1` in every shape) is `Checked`, and each line of the gap list says whether it is done (and where) or what is still open.
@@ -1103,7 +1104,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed-7)
 
-- Changed: `--name` on the Laravel bakes reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package) with the description reading ", a Wayne State app baked from Sourdough.", `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
+- Changed: `--name` on the Laravel bakes reaches every place WELD applies it by hand: `composer.json`'s `name` becomes `app/<slug>` (an application is not a published package) with the description reading `"<name>, a Wayne State app baked from Sourdough."`, `.env.example`'s `APP_NAME` carries the app name (quoted when it holds a space), and the `config/app.php` default follows it.
 - Changed: the raw template pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
 - Changed: the raw template's `.gitlab-ci.yml` pins the Preflight components to released Preflight tags; the "not cut yet" note is gone.
 - Changed: the Squire copy comes from Squire 0.4.0 (adds oracle-check.php to every target; the dev dependency is now ^0.4).
