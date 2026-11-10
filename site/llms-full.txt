@@ -270,7 +270,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 
 The proof harness runs that gate on every shape and every Laravel shape in each oven, one after another in Docker: it bakes each with this checkout, checks the manifest, feeds a bake of the last release forward, installs the app, runs its own suite, PROCTOR and `composer ci`, then boots it and fetches its front page. `sh scripts/proof.sh` on Linux and macOS, `.\scripts\proof.ps1` on Windows. What each run proves, and the Last run table, are on the [Proof](https://github.com/waynestate/sourdough/blob/HEAD/docs/reference/proof.md) page.
 
-The site accessibility gate runs Preflight's own a11y checker (vendored in `tools/a11y/check.mjs` from the 0.5.0 tag CI pins, held there by `tests/A11yCheckerPinTest.php`) over every page under `site/` in Docker, in light and dark at 320 px and 1280 px with the WCAG 1.4.10 reflow check: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows. It uses the same image and inputs as the a11y job in CI, so a page that passes here passes the pipeline.
+The site accessibility gate runs Preflight's own a11y checker (vendored in `tools/a11y/check.mjs` from the 0.6.0 tag CI pins, held there by `tests/A11yCheckerPinTest.php`) over every page under `site/` in Docker, in light and dark at 320 px and 1280 px with the WCAG 1.4.10 reflow check: `sh scripts/a11y.sh` from Git Bash, Linux or macOS, `scripts\a11y.ps1` on Windows. It uses the same image and inputs as the a11y job in CI, so a page that passes here passes the pipeline.
 
 #### Tests in the apps it bakes
 
@@ -787,6 +787,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Docs: the maintaining guide, the troubleshooting page and the README name Preflight 0.6.0, the release CI and the templates pin (they still said 0.1.4 or 0.5.0).
 - Added: the Laravel shapes include Preflight's `mysql56-migrate` component, so every pipeline runs the migrations against MySQL 5.6.51 (D-078); every Preflight pin moves to 0.6.0.
 - Changed: new bakes require PROCTOR `^0.15` (was `^0.12`) in the raw `composer.json` and both Laravel overlays, and the front page's deploy layer requires `^0.15` (locked 0.15.0). PROCTOR 0.13 checks the release cooldown against the CREED policy and 0.14 adds `script-pair`; 0.15 adds `mysql56-ci`; all of these only warn, nothing breaks.
 - Docs: the shapes guide's quick start says each `sourdough new` line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).
@@ -2718,7 +2719,7 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 ### CI [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
 - **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
-- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.6.0's release commit, the same release GitLab runs.
 - Green means `composer ci` passed on all three PHP versions on both.
 
 ### Smoke gate [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
@@ -3869,7 +3870,7 @@ Exits 0 when the committed copy matches.
 
 #### PROCTOR's `preflight-pinned` check warns on a bare tag [#](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#proctor-s-preflight-pinned-check-warns-on-a-bare-tag)
 
-Cause: PROCTOR 0.4 to 0.7's `preflight-pinned` check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as `@0.3.0`, and still warns on a branch, `~latest` or a partial version such as `0.3`). New apps pin the Preflight CI components to the 0.5.0 release SHA (`60314791565a264e97cb210813ef4f3e76512402`, with the tag in a trailing comment), which every PROCTOR accepts.
+Cause: PROCTOR 0.4 to 0.7's `preflight-pinned` check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as `@0.3.0`, and still warns on a branch, `~latest` or a partial version such as `0.3`). New apps pin the Preflight CI components to the 0.6.0 release SHA (`30dd7094089931015ec8754fb321e17659749f05`, with the tag in a trailing comment), which every PROCTOR accepts.
 
 Fix: pin the Preflight component includes to the release SHA, with the tag in a trailing comment. Moving a pin is a deliberate commit.
 

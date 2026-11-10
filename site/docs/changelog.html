@@ -45,6 +45,7 @@
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased"><span class="docs-heading-tail"><span>Unreleased</span><a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></span></h2>
 <ul>
+<li>Docs: the maintaining guide, the troubleshooting page and the README name Preflight 0.6.0, the release CI and the templates pin (they still said 0.1.4 or 0.5.0).</li>
 <li>Added: the Laravel shapes include Preflight's <code>mysql56-migrate</code> component, so every pipeline runs the migrations against MySQL 5.6.51 (D-078); every Preflight pin moves to 0.6.0.</li>
 <li>Changed: new bakes require PROCTOR <code>^0.15</code> (was <code>^0.12</code>) in the raw <code>composer.json</code> and both Laravel overlays, and the front page's deploy layer requires <code>^0.15</code> (locked 0.15.0). PROCTOR 0.13 checks the release cooldown against the CREED policy and 0.14 adds <code>script-pair</code>; 0.15 adds <code>mysql56-ci</code>; all of these only warn, nothing breaks.</li>
 <li>Docs: the shapes guide's quick start says each <code>sourdough new</code> line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).</li>
