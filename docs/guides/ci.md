@@ -66,7 +66,7 @@ The rest are project settings, so each generated README lists them under "Pipeli
 Every shape also ships a `sourdough-feed` job. It installs the newest Sourdough release (`composer create-project waynestate/sourdough`) on the shape's own `composer` image, through `${IMAGE_PREFIX}` and on the `.composer-cache`, and runs two checks against the app's manifest:
 
 - `sourdough manifest --check` lists the managed files edited since the last bake or feed. Drift is normal (feed merges it), so the list is a report and never fails the job.
-- `sourdough feed --dry-run` exits `1` when a newer release has template changes the app has not fed. The job exits `1` too, and `allow_failure: exit_codes: [1]` turns that into a warning: a pending feed never blocks a deploy.
+- `sourdough feed --dry-run` exits `1` when a newer release has template changes the app has not fed. The job exits `1` too, and `allow_failure: exit_codes: [1]` turns that into a warning: a pending feed never blocks a deploy. Its log opens with the `Support:` line, so every pipeline shows the framework's end-of-security date.
 
 Exit `2` from either (no manifest, a manifest from a newer Sourdough, conflict markers left over from the last feed, a bake that failed) fails the job, because the app's record needs fixing before any feed can run. The full table and the job itself are in [Keeping apps current](./keeping-current.md#feed-in-ci).
 

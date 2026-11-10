@@ -34,7 +34,7 @@ Upgrade the Sourdough CLI first ([Upgrading](../upgrading.md)), then, in the app
 sourdough feed --dry-run
 ```
 
-The plan lists one line per file that would change, with the reason, and writes nothing:
+The report opens with the same `Support:` line `sourdough new` prints (the shape's owner, its status and the framework's end-of-security date from CREED's policy; `--json` carries it as `support`), so every feed, and every `sourdough-feed` CI run, reminds the app when its framework stops getting security fixes. The plan then lists one line per file that would change, with the reason, and writes nothing:
 
 ```
 Would feed the laravel-inertia app: Sourdough 0.1.5 to 0.1.6 (dry run: nothing written)
