@@ -35,6 +35,7 @@
             "phpstan analyse --memory-limit=1G",
             "@composer audit"
         ],
+        "lint:gitlab": "pint --test --format=gitlab > pint-codequality.json",
         "post-update-cmd": [
             "@boost-update"
         ],
@@ -43,6 +44,7 @@
         "ziggy": "php artisan ziggy:generate --types"
     },
     "scripts-descriptions": {
-        "boost-update": "Refresh Laravel Boost's guidelines and skills (php artisan boost:update). Skipped when Boost is not set up here: no boost.json naming an agent yet, or a composer --no-dev install."
+        "boost-update": "Refresh Laravel Boost's guidelines and skills (php artisan boost:update). Skipped when Boost is not set up here: no boost.json naming an agent yet, or a composer --no-dev install.",
+        "lint:gitlab": "Write Pint's findings as GitLab Code Quality JSON to pint-codequality.json ([] when clean), for the merge request widget."
     }
 }

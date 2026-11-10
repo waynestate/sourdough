@@ -11,3 +11,5 @@
 /.junie/
 # Vite keeps local secrets in .env.*.local files; they never get committed.
 *.local
+# Pint's Code Quality report (composer lint:gitlab), an artifact in CI only.
+/pint-codequality.json

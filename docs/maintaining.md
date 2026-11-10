@@ -102,7 +102,7 @@ Environment variables:
 - `SMOKE_PREV_CACHE`: where that release is installed, so several runs share one copy.
 - `SMOKE_PORT`: the live server's port (default `8099`).
 
-On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix keeps `continue-on-error: true` until it has been seen green too. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
+On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
 
 ## The local runtime output (Sail and Docker)
 

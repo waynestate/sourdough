@@ -85,6 +85,18 @@ composer-ci:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
+  # Pinstripe's Pint findings in the merge request widget (Pinstripe README,
+  # "Show Pint findings in the merge request"). after_script runs when
+  # composer ci fails too, which is when the report matters; it writes []
+  # when the code is clean, and skips quietly when the install never
+  # finished. The flour on the counter shows up in the merge request.
+  after_script:
+    - test -x vendor/bin/pint && composer lint:gitlab || true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    reports:
+      codequality: pint-codequality.json
 
 # PROCTOR measures {{app_name}} against the CREED version policy. Warnings are
 # allowed; failures block the pipeline.

@@ -54,6 +54,7 @@ final class LaravelInertiaGeneratorTest extends TestCase
             'routes/web.php',
             'tests/Feature/QueueWorkerScheduleTest.php',
             'tests/Feature/SchedulerHeartbeatTest.php',
+            'tests/Unit/PinstripeWiringTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }
@@ -89,6 +90,8 @@ final class LaravelInertiaGeneratorTest extends TestCase
         // gitignore additions keep *.local out of git.
         $gitignore = (string) file_get_contents($target . '/.gitignore');
         self::assertContains('*.local', array_map('trim', explode("\n", $gitignore)));
+        // Pint's Code Quality report (composer lint:gitlab) is a CI artifact only.
+        self::assertContains('/pint-codequality.json', array_map('trim', explode("\n", $gitignore)));
     }
 
     public function testMergesTheComposerOverlay(): void

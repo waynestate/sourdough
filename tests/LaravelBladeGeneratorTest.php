@@ -50,6 +50,7 @@ final class LaravelBladeGeneratorTest extends TestCase
             'routes/web.php',
             'tests/Feature/QueueWorkerScheduleTest.php',
             'tests/Feature/SchedulerHeartbeatTest.php',
+            'tests/Unit/PinstripeWiringTest.php',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
         }

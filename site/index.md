@@ -98,7 +98,7 @@ Out of the oven since 0.1.5
 
 The crumb
 
-A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config, `/up` for liveness and `/ready` that asks the database, the cache and the scheduler, Pest 4, Laravel Boost for dev, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Oracle's `oci8` driver is required and waits, dormant, for its settings. Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
+A fresh Laravel skeleton from Composer with the stack wired in: SESAME through the Laravel adapter, HELMET's config, `/up` for liveness and `/ready` that asks the database, the cache and the scheduler, Pest 4, Laravel Boost for dev, Pinstripe's Laravel preset with Pint's findings in the merge request, PROCTOR and Preflight in CI, Squire's Laravel deploy files and the manifest. Oracle's `oci8` driver is required and waits, dormant, for its settings. Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
 
 Seeded loaf
 

@@ -12,7 +12,7 @@ Sourdough's pipelines run one gate, `composer ci`, on both forges: the same comm
 
 ## On GitLab
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.5.0 release commit (`60314791565a264e97cb210813ef4f3e76512402`), with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). On the Laravel shapes, `composer-ci` also runs `composer lint:gitlab` in `after_script`, pass or fail, and keeps Pint's findings as a Code Quality report (`pint-codequality.json`, seven days), so a merge request shows them in its widget. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.5.0 release commit (`60314791565a264e97cb210813ef4f3e76512402`), with the tag in a trailing comment.
 
 ## The accessibility gate
 
@@ -111,7 +111,7 @@ Green means `composer ci` passed on all three PHP versions on both.
 
 ## The smoke jobs on CI
 
-On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix keeps `continue-on-error: true` until it has been seen green too. The full recipe is in [Testing](./testing.md).
+On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The full recipe is in [Testing](./testing.md).
 
 The `proof` job runs the whole [proof harness](../reference/proof.md) on GitLab: every shape and every oven, with the last release fed forward, and keeps the Last run table and every step log as an artifact. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets `SOURDOUGH_PROOF` to `1`.
 

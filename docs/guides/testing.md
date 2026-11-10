@@ -91,7 +91,7 @@ Environment variables:
 `sh scripts/proof.sh` (Linux, macOS) and `.\scripts\proof.ps1` (Windows) run the gate on all eleven runs (five shapes, six ovens), feed the last release forward in each, and write the Last run table. What each run proves and the latest results are on the [Proof](../reference/proof.md) page.
 
 > [!NOTE]
-> On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix keeps `continue-on-error: true` until it has been seen green too. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
+> On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
 
 ## Related
 

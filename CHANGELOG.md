@@ -5,6 +5,14 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Added
+
+- Added: the Laravel shapes (Blade, Blade + Vue islands, Inertia) carry the Pinstripe extras WELD carries. A `composer lint:gitlab` script writes Pint's findings as a GitLab Code Quality report (`pint-codequality.json`, `[]` when clean, ignored by git); the `composer-ci` job runs it in `after_script`, so it still reports when `composer ci` fails, and keeps it as a `codequality` artifact for seven days, which puts Pint's findings in the merge request widget. Each bake also gets `tests/Unit/PinstripeWiringTest.php`, the app's own test that Pinstripe is a dev dependency, that `phpstan.neon` includes its Laravel preset and leaves the level and the bans to it, and that `pint.json` is Pinstripe's `laravel.json` plus the three recorded skips for Squire's files (`deploy`, `health.php`, `oracle-check.php`). A fed app whose `pint.json` skips more paths fails that test until each extra skip is written into the test with its reason. The raw shapes are unchanged: they use Pinstripe's per preset and have no Laravel wiring to guard. New `tests/PinstripeLaravelTest.php` holds every Laravel overlay and pipeline to the same extras.
+
+### Changed
+
+- Changed: the GitHub `smoke` matrix blocks: `continue-on-error: true` is gone, because every shape baked green there (as on GitLab, whose smoke jobs block since 0.4.0). A red shape now fails the GitHub workflow too.
+
 ## 0.4.0 (2026-11-09)
 
 ### Upgrading
