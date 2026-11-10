@@ -61,20 +61,35 @@ final class Manifest
     /**
      * The Sourdough package version, or 'dev' when it cannot be determined
      * (running from a git checkout without a release tag).
+     *
+     * From a checkout, Composer guesses the root package's version from git,
+     * so a checkout sitting on a release tag (a tag build in CI) honestly
+     * reports that tag. Tests must not assume 'dev' here.
      */
     public static function packageVersion(): string
     {
-        if (class_exists(\Composer\InstalledVersions::class)) {
-            $version = \Composer\InstalledVersions::getPrettyVersion('waynestate/sourdough');
-            if (null !== $version && '' !== $version
-                && !str_starts_with($version, 'dev-')
-                && !str_contains($version, 'no-version-set')
-            ) {
-                return $version;
-            }
+        $pretty = class_exists(\Composer\InstalledVersions::class)
+            ? \Composer\InstalledVersions::getPrettyVersion('waynestate/sourdough')
+            : null;
+
+        return self::versionFrom($pretty);
+    }
+
+    /**
+     * Turn Composer's pretty version into the version a manifest records:
+     * a release ("0.4.1") stays as it is; nothing, a branch ("dev-main") or
+     * Composer's "1.0.0+no-version-set" placeholder becomes 'dev'.
+     */
+    public static function versionFrom(?string $pretty): string
+    {
+        if (null === $pretty || '' === $pretty
+            || str_starts_with($pretty, 'dev-')
+            || str_contains($pretty, 'no-version-set')
+        ) {
+            return 'dev';
         }
 
-        return 'dev';
+        return $pretty;
     }
 
     /**

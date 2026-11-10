@@ -13,6 +13,10 @@ Versioning once 1.0 is out.
 
 - Changed: the GitHub `smoke` matrix blocks: `continue-on-error: true` is gone, because every shape baked green there (as on GitLab, whose smoke jobs block since 0.4.0). A red shape now fails the GitHub workflow too.
 
+### Fixed
+
+- Fixed: Sourdough's own tests pass on a tag build. Two `ManifestTest` tests expected the manifest's `sourdough_version` to be `dev`, but from a checkout sitting on a release tag Composer reports that tag, so `Manifest::packageVersion()` rightly says `0.4.0`; the GitHub run for the 0.4.0 tag failed on it. GitLab and local Docker runs never saw it, because there git refuses the job's checkout as owned by another user and Composer falls back to its `no-version-set` placeholder. The tests now accept `dev` or a release, and the new `Manifest::versionFrom()` (which `packageVersion()` now calls) is tested on its own: a release stays as it is, and nothing, a branch or the placeholder becomes `dev`. No change to what a bake writes.
+
 ## 0.4.0 (2026-11-09)
 
 ### Upgrading

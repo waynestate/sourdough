@@ -28,7 +28,8 @@ final class ManifestTest extends TestCase
 
         self::assertSame(1, $manifest['schema']);
         self::assertSame('raw', $manifest['template']);
-        self::assertSame('dev', $manifest['sourdough_version']);
+        // 'dev' from a branch, the tag's version on a tag build: both are true.
+        self::assertSame(Manifest::packageVersion(), $manifest['sourdough_version']);
         self::assertSame(['name' => 'My Cool App'], $manifest['answers']);
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/', $manifest['generated_at']);
         self::assertIsArray($manifest['files']);
@@ -161,10 +162,37 @@ final class ManifestTest extends TestCase
         Manifest::check($target);
     }
 
-    public function testPackageVersionFallsBackToDev(): void
+    public function testPackageVersionIsDevOrARelease(): void
     {
-        // From a git checkout without a release tag the version is unknown.
-        self::assertSame('dev', Manifest::packageVersion());
+        // A branch checkout says 'dev'; a tag build says the tag. This test
+        // used to insist on 'dev' and so only ever failed on release day,
+        // which is the worst day for a test to discover it has opinions.
+        self::assertMatchesRegularExpression('/^(dev|v?\d+\.\d+\.\d+([-+.][0-9A-Za-z.-]+)?)$/', Manifest::packageVersion());
+
+        $pretty = class_exists(\Composer\InstalledVersions::class)
+            ? \Composer\InstalledVersions::getPrettyVersion('waynestate/sourdough')
+            : null;
+        self::assertSame(Manifest::versionFrom($pretty), Manifest::packageVersion());
+    }
+
+    /**
+     * @return iterable<string, array{?string, string}>
+     */
+    public static function prettyVersions(): iterable
+    {
+        yield 'no version' => [null, 'dev'];
+        yield 'empty' => ['', 'dev'];
+        yield 'branch' => ['dev-main', 'dev'];
+        yield 'feature branch' => ['dev-esc/sourdough-tag-manifest-1109', 'dev'];
+        yield 'no git at all' => ['1.0.0+no-version-set', 'dev'];
+        yield 'release tag' => ['0.4.1', '0.4.1'];
+        yield 'prerelease tag' => ['0.5.0-rc.1', '0.5.0-rc.1'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('prettyVersions')]
+    public function testVersionFromFallsBackToDevForAnythingButARelease(?string $pretty, string $expected): void
+    {
+        self::assertSame($expected, Manifest::versionFrom($pretty));
     }
 
     private function generateApp(): string
