@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Added: every app shape's `composer.json` sets Composer's release cooldown (`config.policy.cooldown.period`: `"3 days"`), CREED's 2026-11-03 decision; Composer 2.11 waits that long before it installs a newly published version.
 - Changed: every app shape's root `.gitattributes` pins `*.ps1`, `*.bat` and `*.cmd` to CRLF and `*.sh` to LF (CREED every-OS rule); the Laravel shapes append the pins to the skeleton's file.
 - Added: raw and raw + Vue apps answer GET /ready through HELMET's readiness option, and in production an uncaught exception gets HELMET's neutral error page (the full detail goes to the log). Locally, PHP still shows the error.
 - Docs: the templates reference's rules table, the Squire kit version (0.10.6) in the README and the templates reference, and BEST_PRACTICES 2.1 and backlog item 6 say what the generator does today.
