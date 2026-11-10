@@ -787,6 +787,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Docs: the shapes guide's quick start says each `sourdough new` line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).
 - Docs: MAINTAINING no longer says "in 0.1" for the shapes; three BEST_PRACTICES backlog lines carry a status, and the one that named a `sourdough check` command says it is not built yet.
 - Changed: the GitHub workflow calls Preflight 0.5.0's reusable workflow (pinned to its release commit), the same release as the GitLab pipeline; it was on 0.1.4 because GitHub's copy of Preflight had no later tag.
 - Fixed: the manifest line-ending test normalises the kit's `parity.ps1` before it starts, so it passes on a Windows checkout, where `.gitattributes` writes `.ps1` files with CRLF.
@@ -2216,7 +2217,7 @@ A starter in a jar is only potential until you give it a shape: pick the permuta
 
 All five permutations bake: raw PHP since 0.1.0, the three Laravel shapes since 0.1.5 and raw PHP + Vue since 0.1.6. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
-Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
+Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in. The CLI is one PHP command, so each line below runs the same in Windows PowerShell as in sh; Windows needs no bash or WSL:
 
 raw
 

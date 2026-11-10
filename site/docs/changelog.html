@@ -45,6 +45,7 @@
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased"><span class="docs-heading-tail"><span>Unreleased</span><a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></span></h2>
 <ul>
+<li>Docs: the shapes guide's quick start says each <code>sourdough new</code> line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).</li>
 <li>Docs: MAINTAINING no longer says &quot;in 0.1&quot; for the shapes; three BEST_PRACTICES backlog lines carry a status, and the one that named a <code>sourdough check</code> command says it is not built yet.</li>
 <li>Changed: the GitHub workflow calls Preflight 0.5.0's reusable workflow (pinned to its release commit), the same release as the GitLab pipeline; it was on 0.1.4 because GitHub's copy of Preflight had no later tag.</li>
 <li>Fixed: the manifest line-ending test normalises the kit's <code>parity.ps1</code> before it starts, so it passes on a Windows checkout, where <code>.gitattributes</code> writes <code>.ps1</code> files with CRLF.</li>
