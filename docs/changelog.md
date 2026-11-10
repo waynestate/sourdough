@@ -12,6 +12,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: raw and raw + Vue apps answer GET /ready through HELMET's readiness option, and in production an uncaught exception gets HELMET's neutral error page (the full detail goes to the log). Locally, PHP still shows the error.
 - Docs: the templates reference's rules table, the Squire kit version (0.10.6) in the README and the templates reference, and BEST_PRACTICES 2.1 and backlog item 6 say what the generator does today.
 - Changed: the docs, agent-ready and deploy kits are Squire 0.10.6 (was 0.10.5): the docs builder and agent-ready generator see every file on Docker Desktop mounts. The `templates/squire/` copy and the lock move to 0.10.6 with them.
 - Site: `assets/stack-env.js` knows Parity, so a pre-production page links Parity's pre-production site and a dev page links its local `site/` folder. Until now Parity, of all parts, was the one link that ignored its environment.
