@@ -59,6 +59,10 @@ final class ComposerCooldownTest extends TestCase
 
         // The cooldown is set, at exactly three days...
         self::assertSame('3 days', $composer['config']['policy']['cooldown']['period'] ?? null, $shape);
+        // The stack's own packages are exempt from the wait: the templates
+        // require the newest stack releases, which the stack's CI tested
+        // before tagging.
+        self::assertSame(['waynestate/*'], $composer['config']['policy']['cooldown']['ignore'] ?? null, $shape);
         // ...and the old config keys survived the bake and the merge, the
         // PHP floor among them.
         self::assertArrayHasKey('php', $composer['config']['platform'] ?? [], $shape);

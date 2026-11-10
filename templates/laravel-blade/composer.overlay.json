@@ -15,7 +15,8 @@
         },
         "policy": {
             "cooldown": {
-                "period": "3 days"
+                "period": "3 days",
+                "ignore": ["waynestate/*"]
             }
         }
     },
