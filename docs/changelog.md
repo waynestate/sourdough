@@ -12,6 +12,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: generated Laravel apps turn on HELMET's fixed 4xx page (`helmet.error_pages`, env `HELMET_ERROR_PAGES`, default true in the app's `config/helmet.php`), so an `abort()` message never reaches a visitor; the raw shapes already had HELMET's neutral error page.
 - Added: every app shape's `composer.json` sets Composer's release cooldown (`config.policy.cooldown.period`: `"3 days"`), CREED's 2026-11-03 decision; Composer 2.11 waits that long before it installs a newly published version.
 - Changed: every app shape's root `.gitattributes` pins `*.ps1`, `*.bat` and `*.cmd` to CRLF and `*.sh` to LF (CREED every-OS rule); the Laravel shapes append the pins to the skeleton's file.
 - Added: raw and raw + Vue apps answer GET /ready through HELMET's readiness option, and in production an uncaught exception gets HELMET's neutral error page (the full detail goes to the log). Locally, PHP still shows the error.
