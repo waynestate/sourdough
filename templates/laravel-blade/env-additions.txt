@@ -39,6 +39,7 @@ SESAME_DRIVER=fake
 # HELMET_CSRF_ALLOW_SAME_SITE=
 # HELMET_CSRF_TRUSTED_ORIGINS=
 # HELMET_CSRF_EXCEPT=
+# HELMET_ERROR_PAGES=
 #
 # Oracle: leave these empty if your app does not use Oracle; nothing
 # connects until they are set. On Citadel, set them in the app's

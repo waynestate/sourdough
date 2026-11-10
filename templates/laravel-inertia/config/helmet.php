@@ -26,6 +26,11 @@ declare(strict_types=1);
 |               points at the copy Composer installs, unless
 |               HELMET_POLICY_PATH names another file.
 |
+| "error_pages" A new app answers every 4xx with HELMET's fixed page, so an
+|               abort() message never reaches the visitor; the package leaves
+|               it off for old apps, and HELMET_ERROR_PAGES=false turns it
+|               off here too.
+|
 */
 
 $policyPath = env('HELMET_POLICY_PATH');
@@ -36,4 +41,10 @@ if (! is_string($policyPath) || $policyPath === '') {
 
 return [
     'policy_path' => $policyPath,
+
+    // New apps answer every 4xx with HELMET's fixed page, so an abort()
+    // message never reaches the visitor. HELMET_ERROR_PAGES=false turns
+    // it off; JSON clients, validation, auth redirects and 5xx stay
+    // with Laravel either way.
+    'error_pages' => filter_var(env('HELMET_ERROR_PAGES', true), FILTER_VALIDATE_BOOL),
 ];
