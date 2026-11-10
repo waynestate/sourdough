@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Docs: the README and templates reference name the Squire 0.10.7 kit and PROCTOR `^0.12` (was 0.10.6 and `^0.11`).
 - Changed: new bakes require PROCTOR `^0.12` (was `^0.11`) in the raw `composer.json` and both Laravel overlays, and the front page's deploy layer requires `^0.12` (locked 0.12.0). PROCTOR 0.12 adds two warning-only checks (`composer-cooldown`, `lock-tracked`); nothing breaks.
 - Added: sourdough feed prints the Support: line (owner, status and the framework's end-of-security date from CREED's policy) on every run, so the app's sourdough-feed CI job keeps showing when its framework stops getting security fixes; --json carries it as support.
 - Site: the front page's stale facts are current (every shape answers `/ready`, not only the Laravel ones, and the "Also in the kitchen" shelf links Parity's site instead of its repository, without the "coming soon" tag).
