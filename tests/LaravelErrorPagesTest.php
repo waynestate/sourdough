@@ -58,15 +58,15 @@ final class LaravelErrorPagesTest extends TestCase
             $shape,
         );
         // ...and the existing override survives the new key.
-        self::assertStringContainsString("'policy_path' => $policyPath", $helmet, $shape);
+        self::assertStringContainsString('\'policy_path\' => $policyPath', $helmet, $shape);
 
         // The env key ships commented out, so the config's default holds
         // instead of an empty value overriding it.
         $env = (string) file_get_contents($target . '/.env.example');
         self::assertStringContainsString('# HELMET_ERROR_PAGES=', $env, $shape);
 
-        // The file still parses: tokenizing it does not throw.
-        self::assertIsArray(token_get_all($helmet), $shape);
+        // The file still parses: TOKEN_PARSE makes token_get_all() throw a ParseError on bad syntax.
+        self::assertNotSame([], token_get_all($helmet, TOKEN_PARSE), $shape);
     }
 
     private function bake(string $shape, string $target): void
