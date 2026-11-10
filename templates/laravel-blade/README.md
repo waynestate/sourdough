@@ -23,6 +23,43 @@ php artisan serve
 Open http://localhost:8000. Locally the app signs in with SESAME's fake
 driver (`SESAME_DRIVER=fake`).
 
+### Run it like Citadel
+
+`php artisan serve` stays the everyday bench. When "it works here" has to
+mean "it works on Citadel", run the same folder with
+[Parity](https://git.wayne.edu/enterprise-apps/parity): Citadel's PHP
+image with its `php.ini` and `vhost.conf`, Citadel's proxy in front, MySQL
+5.6.51, `build.sh`, the deployments and Laravel's scheduler as Citadel's
+cron entry. Parity is a separate install for Windows, macOS and Linux;
+nothing in this app needs it. With `.env` and its `APP_KEY` in place
+(above), write `package-lock.json` once with `npm install`, because the
+release script refuses a front end without a lock file:
+
+```bash
+npm install
+parity check
+parity init --from-squire
+parity up
+parity shell --user citadel php artisan migrate
+parity shell --user citadel php artisan optimize
+parity test
+```
+
+`parity init --from-squire` reads this app's Squire kit
+(`docker-compose.squire.yml` and `.env.squire.example`), never a password,
+and writes `parity.json`, the app's Citadel settings; commit it. The first
+`parity up` runs `scripts/release.sh` inside Citadel's image, as Citadel's
+first deployment does: Composer, the front-end build, the migrations and
+`optimize`. That takes a few minutes; if Parity stops waiting for the
+health check, run `parity up` again. The deployment reads only `.env`, so
+it migrates and caches SQLite. Apache, the cron entry and `parity shell`
+also get Parity's MySQL in Laravel's `DB_*` names, which beat `.env`, so
+the two `parity shell` lines migrate MySQL 5.6.51 and cache it, as the
+`citadel` user, the way Citadel runs a release. `.env` keeps SQLite for
+the bench. No Citadel image here yet? `parity image get` fetches it, or
+`parity up --fallback` runs a labeled stand-in. Same dough, Citadel's
+oven.
+
 ## Tests
 
 `composer test` runs Pest. Write new tests in Pest. `tests/Pest.php` binds

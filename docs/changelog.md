@@ -12,6 +12,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Added
+
+- Added: every shape's README gains "Run it like Citadel" at the end of "Run it locally": the [Parity](https://git.wayne.edu/enterprise-apps/parity) commands that run the app on Citadel's PHP image, Apache, `php.ini`, proxy and MySQL 5.6.51, beside the everyday bench (`composer serve` or `php artisan serve`), which stays. Parity is a separate install, so Sourdough bakes no `parity.json`: `parity init --from-squire` writes it from the Squire kit every shape already ships, and that was proofed on a raw and a Blade bake (init, check, up and test). The raw shapes add `--no-cron`, because Parity would otherwise offer Laravel's scheduler to an app with no `artisan`, and say plainly that Citadel sets no `APP_ENV`, so a page boots as production and asks for CAS settings Parity 0.1.0 cannot set yet. The Laravel shapes add `npm install` for the Blade lock file and two `parity shell --user citadel` lines that migrate MySQL 5.6.51 and cache it, because the first deployment reads only `.env`. README is a seeded file, so apps you already baked keep theirs; copy the section from a fresh bake if you want it. New `tests/ParityReadmeTest.php` holds all five shapes to it.
+
 ### Changed
 
 - Docs: Parity joins the party. The README cast, the docs overview, Same kitchen, many ovens and the front page's "Also in the kitchen" shelf carry Parity next to Squire, with its spirit-level mark: the stack's new tool that runs Citadel on your computer (its PHP image, its proxy and MySQL 5.6.51). It has no site yet, so it links to its repository on git.wayne.edu and hangs on the shelf with the dashed "coming soon" tag. Squire packs the loaf for the trip; Parity checks it rises the same in the home oven.
