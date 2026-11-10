@@ -13,7 +13,7 @@ Versioning once 1.0 is out.
 ## Unreleased
 
 - Added: the Laravel shapes include Preflight's `mysql56-migrate` component, so every pipeline runs the migrations against MySQL 5.6.51 (D-078); every Preflight pin moves to 0.6.0.
-- Changed: new bakes require PROCTOR `^0.15` (was `^0.12`) in the raw `composer.json` and both Laravel overlays, and the front page's deploy layer requires `^0.15` (locked 0.15.0). PROCTOR 0.13 checks the release cooldown against the CREED policy and 0.14 adds `script-pair`; both only warn, nothing breaks.
+- Changed: new bakes require PROCTOR `^0.15` (was `^0.12`) in the raw `composer.json` and both Laravel overlays, and the front page's deploy layer requires `^0.15` (locked 0.15.0). PROCTOR 0.13 checks the release cooldown against the CREED policy and 0.14 adds `script-pair`; 0.15 adds `mysql56-ci`; all of these only warn, nothing breaks.
 - Docs: the shapes guide's quick start says each `sourdough new` line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).
 - Docs: MAINTAINING no longer says "in 0.1" for the shapes; three BEST_PRACTICES backlog lines carry a status, and the one that named a `sourdough check` command says it is not built yet.
 - Changed: the GitHub workflow calls Preflight 0.5.0's reusable workflow (pinned to its release commit), the same release as the GitLab pipeline; it was on 0.1.4 because GitHub's copy of Preflight had no later tag.
