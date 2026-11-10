@@ -1,6 +1,6 @@
 ---
 title: Same kitchen, many ovens
-description: Where Sourdough sits among WayneUI, CREED, PROCTOR, SESAME, HELMET, Squire, Preflight, Pinstripe, Booster, Rollcall, Drawbridge, ADVISOR and WELD.
+description: Where Sourdough sits among WayneUI, CREED, PROCTOR, SESAME, HELMET, Squire, Parity, Preflight, Pinstripe, Booster, Rollcall, Drawbridge, ADVISOR and WELD.
 ---
 
 # Same kitchen, many ovens
@@ -16,6 +16,7 @@ Sourdough is one of the parts. Feed it, and it grows; just do not leave it on th
 - [![HELMET](../readme/cast/helmet.png)](https://github.com/waynestate/helmet)
 - [![Sourdough](../readme/cast/sourdough.png)](https://github.com/waynestate/sourdough)
 - [![Squire](../readme/cast/squire.png)](https://github.com/waynestate/squire)
+- [![Parity](../readme/cast/parity.png)](https://git.wayne.edu/enterprise-apps/parity)
 - [![Preflight](../readme/cast/preflight.png)](https://github.com/waynestate/preflight)
 - [![Pinstripe](../readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe)
 - [![Booster](../readme/cast/booster.png)](https://github.com/waynestate/booster)

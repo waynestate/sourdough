@@ -3,6 +3,12 @@
 All notable changes to Sourdough are recorded here. The format follows Keep a Changelog; the project follows Semantic
 Versioning once 1.0 is out.
 
+## Unreleased
+
+### Changed
+
+- Docs: Parity joins the party. The README cast, the docs overview, Same kitchen, many ovens and the front page's "Also in the kitchen" shelf carry Parity next to Squire, with its spirit-level mark: the stack's new tool that runs Citadel on your computer (its PHP image, its proxy and MySQL 5.6.51). It has no site yet, so it links to its repository on git.wayne.edu and hangs on the shelf with the dashed "coming soon" tag. Squire packs the loaf for the trip; Parity checks it rises the same in the home oven.
+
 ## 0.4.1 (2026-11-09)
 
 ### Added

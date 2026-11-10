@@ -326,6 +326,7 @@ README lists the GitLab settings a file cannot hold. See [CI](docs/guides/ci.md#
 <a href="https://github.com/waynestate/helmet"><img src="docs/readme/cast/helmet.png" width="44" alt="HELMET"></a>
 <a href="https://github.com/waynestate/sourdough"><img src="docs/readme/cast/sourdough.png" width="44" alt="Sourdough"></a>
 <a href="https://github.com/waynestate/squire"><img src="docs/readme/cast/squire.png" width="44" alt="Squire"></a>
+<a href="https://git.wayne.edu/enterprise-apps/parity"><img src="docs/readme/cast/parity.png" width="44" alt="Parity"></a>
 <a href="https://github.com/waynestate/preflight"><img src="docs/readme/cast/preflight.png" width="44" alt="Preflight"></a>
 <a href="https://github.com/waynestate/pinstripe"><img src="docs/readme/cast/pinstripe.png" width="44" alt="Pinstripe"></a>
 <a href="https://github.com/waynestate/booster"><img src="docs/readme/cast/booster.png" width="44" alt="Booster"></a>

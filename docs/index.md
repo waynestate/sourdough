@@ -71,6 +71,7 @@ Version 0.4.1 (2026-11-09), MIT license: Pinstripe 0.3 and ADVISOR 0.2 in every 
 <a href="https://github.com/waynestate/helmet"><img src="readme/cast/helmet.png" width="44" alt="HELMET"></a>
 <a href="https://github.com/waynestate/sourdough"><img src="readme/cast/sourdough.png" width="44" alt="Sourdough"></a>
 <a href="https://github.com/waynestate/squire"><img src="readme/cast/squire.png" width="44" alt="Squire"></a>
+<a href="https://git.wayne.edu/enterprise-apps/parity"><img src="readme/cast/parity.png" width="44" alt="Parity"></a>
 <a href="https://github.com/waynestate/preflight"><img src="readme/cast/preflight.png" width="44" alt="Preflight"></a>
 <a href="https://github.com/waynestate/pinstripe"><img src="readme/cast/pinstripe.png" width="44" alt="Pinstripe"></a>
 <a href="https://github.com/waynestate/booster"><img src="readme/cast/booster.png" width="44" alt="Booster"></a>

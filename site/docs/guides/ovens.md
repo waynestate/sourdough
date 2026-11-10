@@ -1,6 +1,6 @@
 ---
 title: "Same kitchen, many ovens | Sourdough docs"
-description: "Where Sourdough sits among WayneUI, CREED, PROCTOR, SESAME, HELMET, Squire, Preflight, Pinstripe, Booster, Rollcall, Drawbridge, ADVISOR and WELD."
+description: "Where Sourdough sits among WayneUI, CREED, PROCTOR, SESAME, HELMET, Squire, Parity, Preflight, Pinstripe, Booster, Rollcall, Drawbridge, ADVISOR and WELD."
 url: https://sourdough.apps.wayne.edu/docs/guides/ovens.html
 llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
@@ -19,6 +19,7 @@ Sourdough is one of the parts. Feed it, and it grows; just do not leave it on th
 - [![HELMET](https://sourdough.apps.wayne.edu/docs/readme/cast/helmet.png)](https://github.com/waynestate/helmet)
 - [![Sourdough](https://sourdough.apps.wayne.edu/docs/readme/cast/sourdough.png)](https://github.com/waynestate/sourdough)
 - [![Squire](https://sourdough.apps.wayne.edu/docs/readme/cast/squire.png)](https://github.com/waynestate/squire)
+- [![Parity](https://sourdough.apps.wayne.edu/docs/readme/cast/parity.png)](https://git.wayne.edu/enterprise-apps/parity)
 - [![Preflight](https://sourdough.apps.wayne.edu/docs/readme/cast/preflight.png)](https://github.com/waynestate/preflight)
 - [![Pinstripe](https://sourdough.apps.wayne.edu/docs/readme/cast/pinstripe.png)](https://github.com/waynestate/pinstripe)
 - [![Booster](https://sourdough.apps.wayne.edu/docs/readme/cast/booster.png)](https://github.com/waynestate/booster)

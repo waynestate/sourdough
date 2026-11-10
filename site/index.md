@@ -444,6 +444,7 @@ Sourdough is one part of the Wayne State app stack, and it starts every shape. [
 ### Also in the kitchen
 
 - [![Squire logo: a satchel with a gold buckle](https://sourdough.apps.wayne.edu/assets/marks/squire.png) **Squire** carries releases](https://squire.apps.wayne.edu/)
+- [![Parity logo: a spirit level with its gold bubble in the middle](https://sourdough.apps.wayne.edu/assets/marks/parity.png) **Parity** Citadel at home](https://git.wayne.edu/enterprise-apps/parity)
 - [![Rollcall logo: an open register with gold ticks](https://sourdough.apps.wayne.edu/assets/marks/rollcall.png) **Rollcall** every app, present](https://rollcall.apps.wayne.edu/)
 - [![ADVISOR logo: a speech bubble holding a gold compass needle](https://sourdough.apps.wayne.edu/assets/marks/advisor.png) **ADVISOR** the MCP server](https://advisor.apps.wayne.edu/)
 - [![Drawbridge logo: a castle tower lowering its bridge on a gold chain](https://sourdough.apps.wayne.edu/assets/marks/drawbridge.png) **Drawbridge** sign-in gateway](https://drawbridge.apps.wayne.edu/)
