@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: the Laravel shapes include Preflight's `mysql56-migrate` component, so every pipeline runs the migrations against MySQL 5.6.51 (D-078); every Preflight pin moves to 0.6.0.
 - Docs: the shapes guide's quick start says each `sourdough new` line runs the same in Windows PowerShell as in sh (one PHP command, no bash or WSL needed).
 - Docs: MAINTAINING no longer says "in 0.1" for the shapes; three BEST_PRACTICES backlog lines carry a status, and the one that named a `sourdough check` command says it is not built yet.
 - Changed: the GitHub workflow calls Preflight 0.5.0's reusable workflow (pinned to its release commit), the same release as the GitLab pipeline; it was on 0.1.4 because GitHub's copy of Preflight had no later tag.

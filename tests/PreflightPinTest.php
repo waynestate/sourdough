@@ -20,14 +20,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class PreflightPinTest extends TestCase
 {
-    private const TAG = '0.5.0';
+    private const TAG = '0.6.0';
 
-    private const SHA = '60314791565a264e97cb210813ef4f3e76512402';
+    private const SHA = '30dd7094089931015ec8754fb321e17659749f05';
 
     /** Preflight 0.3.0's components that pull from Docker Hub and take image_prefix. */
     private const DOCKER_HUB_COMPONENTS = [
         'proctor', 'php-test', 'composer-audit', 'sbom', 'pint', 'phpstan', 'eslint',
-        'secret-detection', 'package-publish', 'renovate', 'squire-kit',
+        'secret-detection', 'package-publish', 'renovate', 'squire-kit', 'mysql56-migrate',
     ];
 
     /** @return iterable<string, array{string}> */

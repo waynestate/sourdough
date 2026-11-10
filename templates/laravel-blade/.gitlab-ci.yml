@@ -1,5 +1,5 @@
 # {{app_name}}'s pipeline, built from the Preflight components on this GitLab.
-# Pinned to Preflight 0.5.0. Never use ~latest.
+# Pinned to Preflight 0.6.0. Never use ~latest.
 # {{app_name}} requires PHP ^8.3, so the test matrix starts at 8.3.
 # composer ci is the contract: every check runs from the "ci" script in composer.json.
 # From Preflight 0.3.0 each component pulls image_prefix/image, with its own
@@ -8,27 +8,36 @@
 # further down. To override an image, give the plain name (php:8.4-cli-trixie@sha256:...):
 # put the prefix in it too and the loaf gets proofed twice, and the pull fails.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       # The example tests are Pest files, and PHPUnit refuses to load them
       # ("Please run ./vendor/bin/pest instead"). Pest runs PHPUnit classes too.
       test_command: vendor/bin/pest
       image_prefix: "${IMAGE_PREFIX}"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
   # The bill of materials (BEST_PRACTICES 4.15): a CycloneDX SBOM of the
   # Composer packages composer.lock installs, dev packages left out, kept as
   # sbom.cdx.json for 30 days. When the next advisory lands, finding the
   # apps it hits is one search per app instead of one guess per app.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/sbom@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/sbom@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
   # Gitleaks reads the checkout and fails on anything shaped like a
   # credential, with the finding redacted in the log and in gitleaks.json.
   # A secret belongs in Settings > CI/CD > Variables, never in a file.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+    inputs:
+      image_prefix: "${IMAGE_PREFIX}"
+  # Migrations meet the MySQL 5.6.51 that Citadel shares (CREED databases.md,
+  # a MUST). The tests run on SQLite, which takes a JSON column or a long
+  # utf8mb4 index that 5.6 rejects at deploy. This job runs php artisan
+  # migrate against a real 5.6.51 service instead. The official 5.6 images
+  # are amd64 only, so the job carries the amd64 runner tag. Proof the dough
+  # in the oven you will bake it in.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/mysql56-migrate@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
   # The accessibility gate (BEST_PRACTICES 6.4): axe-core in a real browser
@@ -38,7 +47,7 @@ include:
   # pages list is the a11y-pages job's A11Y_PATHS: change the two together.
   # The Playwright image comes from mcr.microsoft.com, which the Dependency
   # Proxy does not front, so this component takes no image_prefix.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@60314791565a264e97cb210813ef4f3e76512402 # 0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
     inputs:
       site_dir: a11y-site
       pages: ["/", "/dashboard"]

@@ -8,10 +8,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Every shape's pipeline carries three gates (BEST_PRACTICES 4.15, 6.4 and
- * 6.5): a bill of materials, an accessibility gate over the app's own
- * rendered pages, and the guards around deploy credentials. They come from
- * Preflight's sbom, a11y and secret-detection components, so this test
+ * Every shape's pipeline carries its gates (BEST_PRACTICES 4.15, 6.4, 6.5
+ * and 2.6): a bill of materials, an accessibility gate over the app's own
+ * rendered pages, the guards around deploy credentials, and, on the Laravel
+ * shapes, the migrations run against a real MySQL 5.6.51. They come from
+ * Preflight's sbom, a11y, secret-detection and mysql56-migrate components,
+ * so this test
  * holds the wiring around them, not the jobs themselves. The per-shape
  * generator tests call assertBakedPipelineGates() on a baked app, so a
  * shape that loses a gate fails twice: once here, once where it is baked.
@@ -110,6 +112,15 @@ final class TemplateCiGatesTest extends TestCase
         // 6.5: gitleaks over the checkout, blocking.
         self::assertArrayHasKey('secret-detection', $includes, "$shape: includes Preflight's secret-detection component");
         self::assertStringNotContainsString('allow_failure', $includes['secret-detection'], "$shape: secret detection blocks");
+
+        // 2.6: the Laravel shapes run their migrations on MySQL 5.6.51 (CREED databases.md).
+        if (str_starts_with($shape, 'laravel-')) {
+            self::assertArrayHasKey('mysql56-migrate', $includes, "$shape: includes Preflight's mysql56-migrate component");
+            self::assertStringContainsString('image_prefix: "${IMAGE_PREFIX}"', $includes['mysql56-migrate'], "$shape: mysql56-migrate follows IMAGE_PREFIX");
+            self::assertStringNotContainsString('allow_failure', $includes['mysql56-migrate'], "$shape: the migrations gate blocks");
+        } else {
+            self::assertArrayNotHasKey('mysql56-migrate', $includes, "$shape: the raw shapes have no migrations to run");
+        }
 
         // 6.4: the a11y component over the pages the a11y-pages job saves, at WCAG 2.2 AA, blocking.
         self::assertArrayHasKey('a11y', $includes, "$shape: includes Preflight's a11y component");
