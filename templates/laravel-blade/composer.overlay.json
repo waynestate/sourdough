@@ -28,7 +28,7 @@
         "waynestate/advisor": "^0.3",
         "waynestate/creed": "^0.1.8",
         "waynestate/pinstripe": "^0.3",
-        "waynestate/proctor": "^0.12"
+        "waynestate/proctor": "^0.15"
     },
     "scripts": {
         "boost-update": "@php -r \"exit(is_dir('vendor/laravel/boost') && is_file('boost.json') && ! empty(json_decode(file_get_contents('boost.json'), true)['agents']) ? pclose(popen(escapeshellarg(PHP_BINARY) . ' artisan boost:update --ansi', 'w')) : 0);\"",

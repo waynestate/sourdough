@@ -43,7 +43,7 @@ final class StackPinsTest extends TestCase
         // asks for; an older PROCTOR falls back to `check`. 0.8 adds
         // crlf-deploy-script, 0.9 case-clash, 0.10 vite-secrets and
         // 0.11 `--record`, the JSON Rollcall reads.
-        self::assertSame('^0.12', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+        self::assertSame('^0.15', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
     }
 
     #[DataProvider('proctorComposerFiles')]
