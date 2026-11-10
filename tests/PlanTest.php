@@ -96,6 +96,89 @@ final class PlanTest extends TestCase
         ], $plan->steps);
     }
 
+    public function testRawNextStepsServeWithComposer(): void
+    {
+        $plan = Plan::forPermutation(Permutation::Raw, 'demo', false, false);
+
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'php vendor/bin/advisor install --client=claude --write',
+            'composer serve',
+        ], $plan->nextSteps);
+    }
+
+    public function testRawVueNextStepsBuildBeforeServing(): void
+    {
+        $plan = Plan::forPermutation(Permutation::RawVue, 'demo', false, false, false);
+
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'npm install',
+            'npm run build',
+            'composer serve',
+            '(npm run dev in a second terminal for hot reload)',
+        ], $plan->nextSteps);
+    }
+
+    public function testLaravelBenchNextStepsMigrateAndServe(): void
+    {
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'php vendor/bin/advisor install --client=claude --write',
+            'cp .env.example .env',
+            'php artisan key:generate',
+            'php artisan migrate',
+            'php artisan serve',
+        ], Plan::forPermutation(Permutation::LaravelBlade, 'demo', false, false)->nextSteps);
+
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'cp .env.example .env',
+            'php artisan key:generate',
+            'php artisan migrate',
+            'npm install',
+            'npm run build',
+            'php artisan serve',
+        ], Plan::forPermutation(Permutation::LaravelInertia, 'demo', false, false, false)->nextSteps);
+    }
+
+    public function testSailNextStepsRunThroughSailAndNameWsl(): void
+    {
+        $blade = Plan::forPermutation(Permutation::LaravelBlade, 'demo', true, false, false)->nextSteps;
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'cp .env.example .env',
+            './vendor/bin/sail up -d',
+            './vendor/bin/sail artisan key:generate',
+            './vendor/bin/sail artisan migrate',
+            '(Windows: run sail from WSL2, or use --docker)',
+        ], $blade);
+
+        $islands = Plan::forPermutation(Permutation::LaravelBladeVue, 'demo', true, false, false)->nextSteps;
+        self::assertSame(['./vendor/bin/sail npm install', './vendor/bin/sail npm run dev', '(Windows: run sail from WSL2, or use --docker)'], array_slice($islands, -3));
+    }
+
+    public function testDockerNextStepsUseComposeAndNameViteForFrontEnds(): void
+    {
+        $blade = Plan::forPermutation(Permutation::LaravelBlade, 'demo', false, true, false)->nextSteps;
+        self::assertSame([
+            'cd demo',
+            'composer install',
+            'cp .env.example .env',
+            'composer dev-up',
+            'docker compose exec app php artisan key:generate',
+            'docker compose exec app php artisan migrate',
+        ], $blade);
+
+        $inertia = Plan::forPermutation(Permutation::LaravelInertia, 'demo', false, true, false)->nextSteps;
+        self::assertSame('(Vite runs as its own service on port 5173)', end($inertia));
+    }
+
     public function testRawWithSailThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);

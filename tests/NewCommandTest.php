@@ -146,6 +146,37 @@ final class NewCommandTest extends TestCase
         self::assertSame('Laravel + Inertia/Vue', $data['label']);
     }
 
+    public function testDryRunJsonCarriesTheNextStepsTheRealRunPrints(): void
+    {
+        $parent = $this->makeTempDir();
+        $target = $parent . '/demo';
+
+        $dry = new CommandTester($this->createCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
+        self::assertSame(0, $dry->execute(['dir' => $target, '--laravel' => true, '--docker' => true, '--dry-run' => true, '--json' => true]));
+        $data = json_decode($dry->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame([
+            'cd ' . $target,
+            'composer install',
+            'php vendor/bin/advisor install --client=claude --write',
+            'cp .env.example .env',
+            'composer dev-up',
+            'docker compose exec app php artisan key:generate',
+            'docker compose exec app php artisan migrate',
+        ], $data['next_steps']);
+
+        // The bake prints the very same lines under "Next steps:", in order.
+        $real = new CommandTester($this->createCommand(null, new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton')));
+        self::assertSame(0, $real->execute(['dir' => $target, '--laravel' => true, '--docker' => true]));
+        $printed = explode("\n", str_replace("\r\n", "\n", $real->getDisplay()));
+        $at = array_search('Next steps:', $printed, true);
+        self::assertIsInt($at);
+        self::assertSame(
+            array_map(static fn(string $line): string => '  ' . $line, $data['next_steps']),
+            array_slice($printed, $at + 1, count($data['next_steps'])),
+        );
+    }
+
     public function testJsonWithoutDryRunExitsTwoAndWritesNothing(): void
     {
         $parent = $this->makeTempDir();

@@ -257,6 +257,7 @@ final class NewCommand extends Command
                         'via' => $access['via'],
                     ],
                     'steps' => $plan->steps,
+                    'next_steps' => $plan->nextSteps,
                     'php' => $floor->toArray(),
                     'support' => $support->toArray($permutation, $floor),
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -336,60 +337,8 @@ final class NewCommand extends Command
 
         $output->writeln('');
         $output->writeln('Next steps:');
-        $output->writeln(sprintf('  cd %s', $dir));
-        $output->writeln('  composer install');
-        if ($advisor) {
-            $output->writeln('  php vendor/bin/advisor install --client=claude --write');
-        }
-        if ($docker) {
-            $output->writeln('  cp .env.example .env');
-            $output->writeln('  composer dev-up');
-            $output->writeln('  docker compose exec app php artisan key:generate');
-            $output->writeln('  docker compose exec app php artisan migrate');
-            if (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
-                $output->writeln('  (Vite runs as its own service on port 5173)');
-            }
-        } elseif (Permutation::LaravelBlade === $permutation) {
-            if ($sail) {
-                $output->writeln('  cp .env.example .env');
-                $output->writeln('  ./vendor/bin/sail up -d');
-                $output->writeln('  ./vendor/bin/sail artisan key:generate');
-                $output->writeln('  ./vendor/bin/sail artisan migrate');
-                $output->writeln('  (Windows: run sail from WSL2, or use --docker)');
-            } else {
-                $output->writeln('  cp .env.example .env');
-                $output->writeln('  php artisan key:generate');
-                $output->writeln('  php artisan migrate');
-                $output->writeln('  php artisan serve');
-            }
-        } elseif (Permutation::LaravelBladeVue === $permutation || Permutation::LaravelInertia === $permutation) {
-            if ($sail) {
-                $output->writeln('  cp .env.example .env');
-                $output->writeln('  ./vendor/bin/sail up -d');
-                $output->writeln('  ./vendor/bin/sail artisan key:generate');
-                $output->writeln('  ./vendor/bin/sail artisan migrate');
-                $output->writeln('  ./vendor/bin/sail npm install');
-                $output->writeln('  ./vendor/bin/sail npm run dev');
-                $output->writeln('  (Windows: run sail from WSL2, or use --docker)');
-            } else {
-                $output->writeln('  cp .env.example .env');
-                $output->writeln('  php artisan key:generate');
-                $output->writeln('  php artisan migrate');
-                $output->writeln('  npm install');
-                $output->writeln('  npm run build');
-                $output->writeln('  php artisan serve');
-            }
-        } elseif (Permutation::RawVue === $permutation) {
-            // The same composer serve as raw, after Vite has built the Vue
-            // app once; npm run dev in a second terminal adds hot reload.
-            $output->writeln('  npm install');
-            $output->writeln('  npm run build');
-            $output->writeln('  composer serve');
-            $output->writeln('  (npm run dev in a second terminal for hot reload)');
-        } else {
-            // composer serve sets APP_ENV=local for the raw app, which has no
-            // .env loader; a plain php -S would boot as production.
-            $output->writeln('  composer serve');
+        foreach ($plan->nextSteps as $line) {
+            $output->writeln('  ' . $line);
         }
 
         if (PlaybookMode::Suggest === $playbook) {

@@ -33,7 +33,7 @@ sourdough new [dir] [options]
 | `--dry-run` | print the plan and write nothing |
 | `--name` | app name (default: the basename of `<dir>`) |
 | `--no-input` | never prompt (Sourdough has no prompts) |
-| `--json` | with `--dry-run`, print the plan as JSON |
+| `--json` | with `--dry-run`, print the plan as JSON: `permutation`, `label`, `dir`, `playbook`, `steps`, `next_steps` (the lines a real run prints under "Next steps:"), `php` and `support` |
 | `--describe "<sentence>"` | describe what the app does; a model plans it (needs the `SOURDOUGH_LLM_*` env vars) |
 | `--plan-only` | with `--describe`, print the plan as JSON and write nothing |
 | `--plan <file>` | a ready-made plan file (JSON, or YAML ending in `.yaml` or `.yml`, matching `resources/plan.schema.json`), such as the `.sourdough/plan.yaml` every bake saves |
