@@ -54,7 +54,7 @@
 <p>Upgrade the Sourdough CLI first (<a href="../upgrading.html">Upgrading</a>), then, in the app, on a clean git tree, look before you leap:</p>
 <pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
 </code></pre>
-<p>The plan lists one line per file that would change, with the reason, and writes nothing:</p>
+<p>The report opens with the same <code>Support:</code> line <code>sourdough new</code> prints (the shape's owner, its status and the framework's end-of-security date from CREED's policy; <code>--json</code> carries it as <code>support</code>), so every feed, and every <code>sourdough-feed</code> CI run, reminds the app when its framework stops getting security fixes. The plan then lists one line per file that would change, with the reason, and writes nothing:</p>
 <pre tabindex="0"><code>Would feed the laravel-inertia app: Sourdough 0.1.5 to 0.1.6 (dry run: nothing written)
   update    config/helmet.php (you had not changed it)
   merge     routes/web.php (your edits kept, the template's merged in)
