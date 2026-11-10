@@ -55,7 +55,7 @@ Stack: `Checked`. Errors go to stderr (`tests/NewCommandTest.php`, `testHostileN
 ### 1.6 Test the generator on every permutation, in temp directories
 Unit-test argument handling and the plan. Then generate each permutation into a temp directory and compare the result with a stored snapshot. Test commands through a tester class rather than a real terminal. Why: templates rot silently, and a snapshot diff is the cheapest way to see exactly what a change did.
 Sources: [S8].
-Stack: `Documented`. Step 1 plans tests for every table row and for raw generation into a temp directory. Laravel paths need the network, so their tests run in a pipeline job instead of the unit suite.
+Stack: `Checked`. Each shape has a generator test that bakes it into a fresh temp directory (`tests/RawGeneratorTest.php`, `tests/RawVueGeneratorTest.php`, `tests/LaravelBladeGeneratorTest.php`, `tests/LaravelBladeVueGeneratorTest.php`, `tests/LaravelInertiaGeneratorTest.php`); the Laravel shapes bake from the checked-in skeleton in `tests/fixtures/laravel-skeleton/`, so the unit suite needs no network, and the real `composer create-project` bake of every shape runs in the smoke jobs (3.5). Commands are tested through Symfony's `CommandTester`, and `tests/OrderMenuTest.php` runs every shape, oven and ADVISOR choice the command takes through `NewCommand --dry-run --json`. Gap: there is no stored snapshot of a whole baked tree; the tests assert the files and contents that matter, and the manifest (3.1) records a hash for every file.
 
 ### 1.7 Treat names, paths and templates as untrusted input (second pass)
 Check `<dir>` and any app or vendor name against an allow-list (lower-case letters, digits, hyphens, and Composer's package-name pattern) before the value reaches a file name, a `composer.json` or a command line. Refuse any write whose resolved path falls outside the target directory. Keep templates as data: placeholder substitution only, with no code in a template running during generation. Why: scaffolders have turned template content into code execution before. Backstage's scaffolder let anyone who could edit a registered template run code on the host (CVE-2023-35926, fixed in 1.15.0). Copier refuses templates that use tasks, migrations or Jinja extensions unless the caller passes `--trust`. Composer's own 2026 fixes (package-name validation and bin-path traversal protection in 2.10.2, another path traversal in 2.10.3) show the same class of bug in a PHP tool.
@@ -242,7 +242,7 @@ Stack: `Enforced` in every shape's pipeline. Each `templates/*/.gitlab-ci.yml` i
 ### 5.1 Ship `.gitattributes` in every generated app
 Use `* text=auto eol=lf`, and set `.ps1`, `.bat` and `.cmd` to CRLF. Prefer `.gitattributes` to the per-user `core.autocrlf` setting, because the file travels with the repo and gives every contributor the same rules. Why: Git on Windows converts line endings, and anything that runs on Citadel must be LF.
 Sources: [S7].
-Stack: `Documented`. The developer-OS rule says generated apps carry it from day one. The repos already use it.
+Stack: `Enforced`. The raw shapes carry the rule in the template's own `.gitattributes` (`* text=auto eol=lf`, `*.sh` LF, `*.ps1`, `*.bat` and `*.cmd` CRLF, `templates/raw/.gitattributes`); the Laravel shapes append the same pins from `gitattributes-additions.txt` to the skeleton's file, or create it when the skeleton ships none (`LaravelOverlayGenerator`). `tests/GitattributesPinsTest.php` bakes the shapes and fails one that loses a pin.
 
 ### 5.2 Check server-run files for CRLF and for file-name case clashes
 Fail when `build.sh`, release scripts or `deployments/*` contain CRLF, and when two paths differ only by case. Why: macOS and Windows ignore case and Citadel does not, so an app can work on every laptop and break on deploy.
@@ -253,7 +253,7 @@ Stack: `Enforced` for CRLF. PROCTOR 0.8's `crlf-deploy-script` fails a `build.sh
 A script that developers run ships as a `.ps1` and a `.sh` that do the same thing, or is one PHP command. Windows never needs bash. Scripts for macOS are written for its stock bash and BSD tools. Prefer the single PHP command when the logic is more than a few lines. Be aware that PowerShell's default policy on Windows clients can block scripts that were downloaded from the internet (Microsoft calls the policy defense in depth, not a security boundary). Scripts the generator writes locally are not affected, but the docs should say what to do if a script is blocked.
 Second pass: Laravel's own install page gives Windows users `Set-ExecutionPolicy Bypass -Scope Process -Force` followed by downloading a script and passing it to `iex` [S49]. WSU's docs should not copy that pattern. The same page also shows `composer global require laravel/installer`, which is the better route.
 Sources: [S15], [S49].
-Stack: `Documented`. The developer-OS rule sets it. No generated scripts exist yet to test it on.
+Stack: `Checked`. Every shape ships Squire's `scripts/parity.sh` and `scripts/parity.ps1`, one per OS for the same steps, and `tests/GeneratorSupportTest.php` checks they land with the right modes; the CLI itself is one PHP command on every OS. Gap: the every-OS guide (`docs/guides/every-os.md`) still does not say what to do when PowerShell's execution policy blocks a script.
 
 ### 5.4 Start subprocesses with argument arrays
 Whenever Sourdough runs Composer, npm, git or Docker, pass the command as an array of arguments, never as a shell string. Accept paths with spaces and Windows drive letters. Set timeouts. Why: fewer quoting differences between PowerShell and bash, and no shell parsing of a directory name on Linux and macOS.
@@ -322,34 +322,34 @@ Stack: `Enforced` for what a pipeline file can hold. Citadel deploys by Quick Up
 ## Gaps for the backlog
 
 1. Decide how Laravel paths are built (`laravel new --using` or `composer create-project`) and write it in one place. (Done: the Laravel shapes bake on `composer create-project laravel/laravel` with `--no-scripts`, in `src/Generator/LaravelOverlayGenerator.php`.)
-2. Design the update story: `.sourdough.json`, `sourdough check`, a merging `sourdough update`, tagged template releases.
-3. Define exit codes, `--json`, `NO_COLOR` and `--no-input` once for the whole stack, and match PROCTOR.
-4. Generate the PHP floor from CREED's `policy.json` instead of a template constant.
-5. List which Laravel kit features Sourdough removes (registration, password reset, two-factor) and test that they are gone.
+2. Design the update story: `.sourdough.json`, `sourdough check`, a merging `sourdough update`, tagged template releases. (Mostly done: the manifest is `.sourdough/manifest.json` (3.1), the merging update is `sourdough feed` (3.3), `sourdough feed --dry-run` is the check (3.2) and releases are tagged (3.4). Open: a command named `sourdough check`, see 14.)
+3. Define exit codes, `--json`, `NO_COLOR` and `--no-input` once for the whole stack, and match PROCTOR. (Done for Sourdough, see 1.4 and 1.5: 0, 1 and 2 as in PROCTOR.)
+4. Generate the PHP floor from CREED's `policy.json` instead of a template constant. (Done, see 4.2.)
+5. List which Laravel kit features Sourdough removes (registration, password reset, two-factor) and test that they are gone. (Done, see 2.2: no kit is installed, so they never arrive.)
 6. Add PROCTOR checks for CRLF in server-run files, name-case clashes, secret-looking `VITE_` variables and `env()` outside config. (Done 2026-11-09 in PROCTOR, see 4.4, 4.6 and 5.2: `env-outside-config` since 0.7, `crlf-deploy-script` since 0.8, `case-clash` since 0.9.0, and `vite-secrets` on main after 0.9.0. The shapes require `^0.15`, so baked apps run all four.)
-7. Ship a tested Vite manifest reader for the raw PHP plus Vue path.
-8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before Squire's image or `--docker` is built.
-9. Add a compatibility pipeline that generates, installs and tests all five permutations.
-10. Get Windows and macOS runners, or write the smoke-test checklist.
+7. Ship a tested Vite manifest reader for the raw PHP plus Vue path. (Done, see 4.7.)
+8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before Squire's image or `--docker` is built. (Done, see 5.7.)
+9. Add a compatibility pipeline that generates, installs and tests all five permutations. (Done, see 3.5: the `smoke-*` jobs and the scheduled proof.)
+10. Get Windows and macOS runners, or write the smoke-test checklist. (Open, see 5.8: the smoke gate is written per OS, but the CI runners are Linux.)
 11. Say how Boost's generated files are refreshed and whether they are committed. (Answered 2026-11-08, see 2.3: `composer boost-update` refreshes them after `composer update`, what Boost regenerates is ignored, and `.ai/` is committed.)
-12. Decide between pinning Preflight components by tag or by commit. (GitLab prefers a commit SHA.)
+12. Decide between pinning Preflight components by tag or by commit. (GitLab prefers a commit SHA.) (Done, see 4.3: by commit SHA, with the tag in a comment.)
 
 Added in the second pass:
 
-13. Settle the database story for the Laravel paths. The shared MySQL 5.6 is below Laravel 13's MySQL 5.7+ minimum, and Laravel's default 255-character indexed strings exceed the 767-byte key limit. Set the 191 default, avoid JSON columns, and run CI migrations against 5.6 (2.6, the MySQL timeline question).
+13. Settle the database story for the Laravel paths. The shared MySQL 5.6 is below Laravel 13's MySQL 5.7+ minimum, and Laravel's default 255-character indexed strings exceed the 767-byte key limit. Set the 191 default, avoid JSON columns, and run CI migrations against 5.6 (2.6, the MySQL timeline question). (Done: the 191 default (2.6), and Preflight's `mysql56-migrate` component runs the migrations on MySQL 5.6.51 in every Laravel shape's pipeline.)
 14. Generate the newest Laravel major, name it in tests, and print each template's end-of-security date in the README (2.4, 3.7). (Open: `sourdough check` is not built yet; `sourdough feed --dry-run` is the nearest command and exits 1 when feeding would change files.)
-15. Validate names and paths and keep templates free of code in the generator; add hostile-input tests (1.7).
+15. Validate names and paths and keep templates free of code in the generator; add hostile-input tests (1.7). (Done, see 1.7.)
 16. Make the "new app" page call the same engine as the CLI and show the equivalent command (1.8). (Command half done: the front page's order counter reads a menu built from the CLI's plan code and tested through the real command. Open: the page returns no archive and creates no repository.)
 17. Require a current Composer (2.11.1 or later at the time of writing) in CI and the build, and set Composer's `policy` block explicitly. Re-test PROCTOR's `composer-audit` check against 2.10 output (4.1, 4.8).
 18. Set a release cooldown for Composer and npm, install JavaScript from the lock file with `ignore-scripts`, add a `package-lock.json` check to PROCTOR, and pin a supported Node LTS (4.9, 4.10, 4.11). (Mostly done: the raw template sets a Composer `cooldown` and PROCTOR checks it, the front-end shapes ship the npm one-day cooldown and a locked `npm ci --ignore-scripts` install on a pinned Node 22 image, and PROCTOR checks Node end of life. Open: a PROCTOR `package-lock.json` check.)
-19. Keep the Vite dev server on localhost, raise the Vite floor, and publish container ports on loopback only (4.12).
-20. Run CI on PHP 8.4 and 8.5 with deprecations as failures, and nightly (3.5, 4.13).
+19. Keep the Vite dev server on localhost, raise the Vite floor, and publish container ports on loopback only (4.12). (Done, see 4.12.)
+20. Run CI on PHP 8.4 and 8.5 with deprecations as failures, and nightly (3.5, 4.13). (Done for the generated apps, see 4.13. Open: Sourdough's own smoke gate and proof bake on PHP 8.5 only, see 3.5.)
 21. Keep `APP_KEY` out of git, generate it per environment, and have the release script check it and `APP_DEBUG` (4.14). (Done 2026-11-09, see 4.14: Squire's kit 0.9.0 release script stops a Laravel release with no `APP_KEY` or with `APP_DEBUG` on in production.)
-22. Add an accessibility check to the generated apps' CI and to the "new app" page, and ask the accessibility office how the Title II rule applies (6.4).
-23. Generate a `.gitlab-ci.yml` that protects deploy credentials (protected variables, job-token allowlist, no secrets in `inputs`) (6.5).
-24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into the developer-OS decision or the Sourdough docs (5.4).
-25. Name an owner and a support window per permutation (3.6, 3.7).
-26. Produce an SBOM in CI (4.15), low priority.
+22. Add an accessibility check to the generated apps' CI and to the "new app" page, and ask the accessibility office how the Title II rule applies (6.4). (Done for the starters and the front page's order counter, see 6.4. Open: the question to the accessibility office.)
+23. Generate a `.gitlab-ci.yml` that protects deploy credentials (protected variables, job-token allowlist, no secrets in `inputs`) (6.5). (Done, see 6.5.)
+24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into the developer-OS decision or the Sourdough docs (5.4). (Open, see 5.4.)
+25. Name an owner and a support window per permutation (3.6, 3.7). (Done, see 3.7: `resources/shapes.json` and `docs/guides/support.md`.)
+26. Produce an SBOM in CI (4.15), low priority. (Done, see 4.15.)
 
 ---
 
