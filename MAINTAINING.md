@@ -159,7 +159,7 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 
 ## Things that trip people up
 
-- In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
+- All five shapes generate (raw PHP since 0.1.0, the three Laravel shapes since 0.1.5, raw + Vue since 0.1.6). `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` (and `.sourdough/base/`) in generated apps; `feed` needs them.
 
 ## Who maintains it

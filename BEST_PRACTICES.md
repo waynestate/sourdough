@@ -321,7 +321,7 @@ Stack: `Enforced` for what a pipeline file can hold. Citadel deploys by Quick Up
 
 ## Gaps for the backlog
 
-1. Decide how Laravel paths are built (`laravel new --using` or `composer create-project`) and write it in one place.
+1. Decide how Laravel paths are built (`laravel new --using` or `composer create-project`) and write it in one place. (Done: the Laravel shapes bake on `composer create-project laravel/laravel` with `--no-scripts`, in `src/Generator/LaravelOverlayGenerator.php`.)
 2. Design the update story: `.sourdough.json`, `sourdough check`, a merging `sourdough update`, tagged template releases.
 3. Define exit codes, `--json`, `NO_COLOR` and `--no-input` once for the whole stack, and match PROCTOR.
 4. Generate the PHP floor from CREED's `policy.json` instead of a template constant.
@@ -337,11 +337,11 @@ Stack: `Enforced` for what a pipeline file can hold. Citadel deploys by Quick Up
 Added in the second pass:
 
 13. Settle the database story for the Laravel paths. The shared MySQL 5.6 is below Laravel 13's MySQL 5.7+ minimum, and Laravel's default 255-character indexed strings exceed the 767-byte key limit. Set the 191 default, avoid JSON columns, and run CI migrations against 5.6 (2.6, the MySQL timeline question).
-14. Generate the newest Laravel major, name it in tests, and print each template's end-of-security date in the README and in `sourdough check` (2.4, 3.7).
+14. Generate the newest Laravel major, name it in tests, and print each template's end-of-security date in the README (2.4, 3.7). (Open: `sourdough check` is not built yet; `sourdough feed --dry-run` is the nearest command and exits 1 when feeding would change files.)
 15. Validate names and paths and keep templates free of code in the generator; add hostile-input tests (1.7).
 16. Make the "new app" page call the same engine as the CLI and show the equivalent command (1.8).
 17. Require a current Composer (2.11.1 or later at the time of writing) in CI and the build, and set Composer's `policy` block explicitly. Re-test PROCTOR's `composer-audit` check against 2.10 output (4.1, 4.8).
-18. Set a release cooldown for Composer and npm, install JavaScript from the lock file with `ignore-scripts`, add a `package-lock.json` check to PROCTOR, and pin a supported Node LTS (4.9, 4.10, 4.11).
+18. Set a release cooldown for Composer and npm, install JavaScript from the lock file with `ignore-scripts`, add a `package-lock.json` check to PROCTOR, and pin a supported Node LTS (4.9, 4.10, 4.11). (Mostly done: the raw template sets a Composer `cooldown` and PROCTOR checks it, the front-end shapes ship the npm one-day cooldown and a locked `npm ci --ignore-scripts` install on a pinned Node 22 image, and PROCTOR checks Node end of life. Open: a PROCTOR `package-lock.json` check.)
 19. Keep the Vite dev server on localhost, raise the Vite floor, and publish container ports on loopback only (4.12).
 20. Run CI on PHP 8.4 and 8.5 with deprecations as failures, and nightly (3.5, 4.13).
 21. Keep `APP_KEY` out of git, generate it per environment, and have the release script check it and `APP_DEBUG` (4.14). (Done 2026-11-09, see 4.14: Squire's kit 0.9.0 release script stops a Laravel release with no `APP_KEY` or with `APP_DEBUG` on in production.)
