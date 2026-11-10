@@ -61,7 +61,13 @@ final class PreflightPinTest extends TestCase
         foreach ($includes as $include) {
             self::assertSame(self::TAG, $include['ref'], "{$include['name']} is pinned to the release tag");
         }
-        // Not .github/workflows/ci.yml: GitHub's Preflight copy stops at 0.1.4, so it stays there until that mirror catches up.
+    }
+
+    public function testGithubWorkflowPinsTheSameReleaseCommit(): void
+    {
+        $workflow = self::read(dirname(__DIR__) . '/.github/workflows/ci.yml');
+        self::assertStringContainsString('php-package.yml@' . self::SHA . ' # ' . self::TAG, $workflow);
+        self::assertStringNotContainsString('79029cc', $workflow);
     }
 
     /**
