@@ -384,6 +384,43 @@ final class FeedCommandTest extends TestCase
         self::assertSame(1, $data['exit']);
     }
 
+    public function testTheDryRunPrintsTheSupportLine(): void
+    {
+        $app = $this->bake(Permutation::Raw);
+        $this->commitAll($app, 'baked');
+
+        $dry = $this->feed($app, ['--dry-run' => true]);
+        self::assertSame(0, $dry->getStatusCode(), $dry->getDisplay());
+
+        $support = null;
+        foreach (explode("\n", $dry->getDisplay()) as $line) {
+            if (str_starts_with($line, 'Support:     ')) {
+                $support = $line;
+            }
+        }
+        self::assertNotNull($support, 'the report opens with the Support line: ' . $dry->getDisplay());
+        // The end-of-security date comes from CREED's policy when it can be
+        // read; when it cannot, the line says so instead of failing the feed.
+        self::assertMatchesRegularExpression('/security fixes until \d{4}-\d{2}-\d{2}|CREED\'s policy/', $support);
+    }
+
+    public function testTheJsonPlanCarriesTheSupportBlock(): void
+    {
+        $app = $this->bake(Permutation::Raw);
+        $this->commitAll($app, 'baked');
+
+        $tester = $this->feed($app, ['--dry-run' => true, '--json' => true]);
+        self::assertSame(0, $tester->getStatusCode(), $tester->getDisplay());
+
+        $data = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($data['support'] ?? null, 'the plan carries the support block');
+        self::assertSame('raw', $data['support']['shape']);
+        self::assertIsString($data['support']['owner']);
+        self::assertNotSame('', $data['support']['owner']);
+        self::assertIsString($data['support']['status']);
+        self::assertIsArray($data['support']['runs_on'] ?? null);
+    }
+
     public function testADirtyTreeIsRefused(): void
     {
         $app = $this->bake(Permutation::Raw);

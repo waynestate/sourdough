@@ -16,6 +16,9 @@ use Waynestate\Sourdough\Feed\FeedException;
 use Waynestate\Sourdough\Feed\FeedPlan;
 use Waynestate\Sourdough\Feed\Git;
 use Waynestate\Sourdough\Generator\SkeletonSource;
+use Waynestate\Sourdough\Permutation;
+use Waynestate\Sourdough\PhpFloor;
+use Waynestate\Sourdough\ShapeSupport;
 
 /**
  * The `sourdough feed` command: bring template updates into an app made
@@ -77,10 +80,21 @@ final class FeedCommand extends Command
             return 2;
         }
 
+        // The shape's owner and support status come from resources/shapes.json
+        // and its end-of-security date from CREED's policy, exactly as
+        // `sourdough new` works them out. When any part cannot be worked out
+        // (an unknown template name, an unreadable policy or catalog), the
+        // feed goes on without the Support line: it must never fail because
+        // of it.
+        [$permutation, $floor, $support] = $this->support($plan);
+
         $exit = $this->exitCode($plan, $dryRun);
 
         if ($json) {
             $data = $plan->toArray($dryRun) + ['exit' => $exit];
+            if (null !== $permutation && null !== $floor && null !== $support) {
+                $data['support'] = $support->toArray($permutation, $floor);
+            }
             $encoded = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             if (false === $encoded) {
                 $this->errorOutput($output)->writeln('Could not encode the plan as JSON.');
@@ -92,9 +106,31 @@ final class FeedCommand extends Command
             return $exit;
         }
 
-        $this->report($output, $plan, $dryRun);
+        $this->report($output, $plan, $dryRun, $permutation, $floor, $support);
 
         return $exit;
+    }
+
+    /**
+     * The support facts behind the report's Support line and the JSON
+     * plan's support key: the permutation from the manifest's template,
+     * the PHP floor from CREED's policy and the shape catalog. Anything
+     * that cannot be worked out comes back null.
+     *
+     * @return array{0: Permutation|null, 1: PhpFloor|null, 2: ShapeSupport|null}
+     */
+    private function support(FeedPlan $plan): array
+    {
+        $permutation = Permutation::tryFrom($plan->template);
+        if (null === $permutation) {
+            return [null, null, null];
+        }
+
+        try {
+            return [$permutation, PhpFloor::forPermutation($permutation), ShapeSupport::load()];
+        } catch (\Throwable) {
+            return [null, null, null];
+        }
     }
 
     private function exitCode(FeedPlan $plan, bool $dryRun): int
@@ -106,8 +142,18 @@ final class FeedCommand extends Command
         return $plan->conflicts() > 0 ? 1 : 0;
     }
 
-    private function report(OutputInterface $output, FeedPlan $plan, bool $dryRun): void
-    {
+    private function report(
+        OutputInterface $output,
+        FeedPlan $plan,
+        bool $dryRun,
+        ?Permutation $permutation,
+        ?PhpFloor $floor,
+        ?ShapeSupport $support,
+    ): void {
+        if (null !== $permutation && null !== $floor && null !== $support) {
+            $output->writeln(sprintf('Support:     %s', $support->line($permutation, $floor)));
+        }
+
         foreach ($plan->notes as $note) {
             $output->writeln('note: ' . $note);
         }
