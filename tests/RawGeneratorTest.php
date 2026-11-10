@@ -597,7 +597,7 @@ final class RawGeneratorTest extends TestCase
         $target = $this->generateFromRealTemplate();
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame('^0.2', $composer['require-dev']['waynestate/advisor']);
+        self::assertSame('^0.3', $composer['require-dev']['waynestate/advisor']);
 
         $gitignore = (string) file_get_contents($target . '/.gitignore');
         self::assertStringContainsString('.mcp.json', $gitignore);
