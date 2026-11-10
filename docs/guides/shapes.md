@@ -21,25 +21,45 @@ A starter in a jar is only potential until you give it a shape: pick the permuta
 
 All five permutations bake: raw PHP since 0.1.0, the three Laravel shapes since 0.1.5 and raw PHP + Vue since 0.1.6. `--raw --vue` is the raw PHP bake with a Vue 3 front end over it: PHP answers JSON under `/api/`, Vite builds the Vue app, and `src/Vite.php` loads it from the build or the dev server.
 
-Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in:
+Run `sourdough new` with the flags for the row you want. `dir` is the directory to create the app in. The CLI is one PHP command, so the PowerShell line is the same as the sh line; Windows needs no bash or WSL:
 
-```bash tab="raw"
+```bash tab="raw (sh)"
 sourdough new my-app --raw
 ```
 
-```bash tab="raw + vue"
+```powershell tab="raw (PowerShell)"
+sourdough new my-app --raw
+```
+
+```bash tab="raw + vue (sh)"
 sourdough new my-app --raw --vue
 ```
 
-```bash tab="laravel"
+```powershell tab="raw + vue (PowerShell)"
+sourdough new my-app --raw --vue
+```
+
+```bash tab="laravel (sh)"
 sourdough new my-app --laravel
 ```
 
-```bash tab="laravel + vue"
+```powershell tab="laravel (PowerShell)"
+sourdough new my-app --laravel
+```
+
+```bash tab="laravel + vue (sh)"
 sourdough new my-app --laravel --vue
 ```
 
-```bash tab="inertia"
+```powershell tab="laravel + vue (PowerShell)"
+sourdough new my-app --laravel --vue
+```
+
+```bash tab="inertia (sh)"
+sourdough new my-app --inertia
+```
+
+```powershell tab="inertia (PowerShell)"
 sourdough new my-app --inertia
 ```
 
