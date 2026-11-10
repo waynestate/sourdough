@@ -70,8 +70,12 @@ final class ManifestCommandTest extends TestCase
     {
         $target = $this->generateApp();
         $file = $target . '/scripts/parity.ps1';
-        $lf = (string) file_get_contents($file);
+        $lf = str_replace("\r\n", "\n", (string) file_get_contents($file));
         self::assertStringNotContainsString("\r\n", $lf);
+        // Start from LF in both environments: on a Windows checkout the
+        // template's parity.ps1 arrives in CRLF, and the check forgives the
+        // difference, as feed does.
+        file_put_contents($file, $lf);
         file_put_contents($file, str_replace("\n", "\r\n", $lf));
 
         $tester = $this->tester();
