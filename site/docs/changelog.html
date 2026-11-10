@@ -45,6 +45,7 @@
 Versioning once 1.0 is out.</p>
 <h2 id="unreleased"><span class="docs-heading-tail"><span>Unreleased</span><a class="docs-heading-link" aria-label="Link to this section" href="#unreleased">#</a></span></h2>
 <ul>
+<li>Changed: the GitHub workflow calls Preflight 0.5.0's reusable workflow (pinned to its release commit), the same release as the GitLab pipeline; it was on 0.1.4 because GitHub's copy of Preflight had no later tag.</li>
 <li>Fixed: the manifest line-ending test normalises the kit's <code>parity.ps1</code> before it starts, so it passes on a Windows checkout, where <code>.gitattributes</code> writes <code>.ps1</code> files with CRLF.</li>
 <li>Docs: the README and templates reference name the Squire 0.10.7 kit and PROCTOR <code>^0.12</code> (was 0.10.6 and <code>^0.11</code>).</li>
 <li>Changed: new bakes require PROCTOR <code>^0.12</code> (was <code>^0.11</code>) in the raw <code>composer.json</code> and both Laravel overlays, and the front page's deploy layer requires <code>^0.12</code> (locked 0.12.0). PROCTOR 0.12 adds two warning-only checks (<code>composer-cooldown</code>, <code>lock-tracked</code>); nothing breaks.</li>
