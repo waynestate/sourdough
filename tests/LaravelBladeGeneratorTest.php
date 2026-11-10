@@ -76,7 +76,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         self::assertSame('^0.3', $composer['require-dev']['waynestate/advisor']);
         self::assertSame('^0.1.8', $composer['require-dev']['waynestate/creed']);
         self::assertSame('^0.3', $composer['require-dev']['waynestate/pinstripe']);
-        self::assertSame('^0.11', $composer['require-dev']['waynestate/proctor']);
+        self::assertSame('^0.12', $composer['require-dev']['waynestate/proctor']);
         // ...and Pest is the test runner for new tests...
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest']);
         self::assertSame('^4.0', $composer['require-dev']['pestphp/pest-plugin-laravel']);
