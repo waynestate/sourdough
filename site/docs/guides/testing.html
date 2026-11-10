@@ -39,10 +39,10 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html" aria-current="page">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="testing">Testing<a class="docs-heading-link" aria-label="Link to this section" href="#testing">#</a></h1>
+      <article class="docs-article"><h1 id="testing"><span class="docs-heading-tail"><span>Testing</span><a class="docs-heading-link" aria-label="Link to this section" href="#testing">#</a></span></h1>
 <p>This page is the proofing bench: how to run Sourdough's own checks day to day, and how to fire the smoke gate that bakes a shape for real before it may be claimed. Like any starter, Sourdough needs regular feeding, or it goes flat. For the wider runbook, continue to <a href="../maintaining.html">Maintaining</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>Maintainers: how to build, test and release this project, and where its data comes from, is in <a href="../maintaining.html">MAINTAINING.md</a>.</p></aside>
-<h2 id="day-to-day-commands">Day-to-day commands<a class="docs-heading-link" aria-label="Link to this section" href="#day-to-day-commands">#</a></h2>
+<h2 id="day-to-day-commands">Day-to-day <span class="docs-heading-tail"><span>commands</span><a class="docs-heading-link" aria-label="Link to this section" href="#day-to-day-commands">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -82,20 +82,20 @@
 </tbody>
 </table></div>
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>. The tests fail on any PHP or PHPUnit deprecation (<code>failOnDeprecation</code> and <code>failOnPhpunitDeprecation</code> in <code>phpunit.xml.dist</code>), and the report names the test that raised it, the same gate every baked app gets.</p>
-<h2 id="with-only-docker">With only Docker<a class="docs-heading-link" aria-label="Link to this section" href="#with-only-docker">#</a></h2>
+<h2 id="with-only-docker">With only <span class="docs-heading-tail"><span>Docker</span><a class="docs-heading-link" aria-label="Link to this section" href="#with-only-docker">#</a></span></h2>
 <p>The same lines work in PowerShell and sh:</p>
 <pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpunit
 </code></pre>
 <p>The <code>stack-composer-cache</code> volume keeps Composer's downloads between runs; Docker creates it the first time.</p>
-<h2 id="from-the-repo-root">From the repo root<a class="docs-heading-link" aria-label="Link to this section" href="#from-the-repo-root">#</a></h2>
+<h2 id="from-the-repo-root">From the repo <span class="docs-heading-tail"><span>root</span><a class="docs-heading-link" aria-label="Link to this section" href="#from-the-repo-root">#</a></span></h2>
 <pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 composer install --no-interaction
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.3-cli vendor/bin/phpunit
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli vendor/bin/phpunit
 docker run --rm -v &quot;${PWD}:/app&quot; -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 composer validate --strict
 docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 </code></pre>
-<h2 id="the-smoke-gate">The smoke gate<a class="docs-heading-link" aria-label="Link to this section" href="#the-smoke-gate">#</a></h2>
+<h2 id="the-smoke-gate">The smoke <span class="docs-heading-tail"><span>gate</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-smoke-gate">#</a></span></h2>
 <p>The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own <code>bin/sourdough new &lt;dir&gt; --no-advisor --no-playbook --no-input</code> (the CLI under test is the one being shipped). Every bake passes <code>--no-playbook</code>, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.</p>
 <p>Right after the bake, every shape proves its manifest and its bake: <code>sourdough manifest --check</code> must be clean, and with the fresh app committed to a scratch git repository <code>sourdough feed --dry-run</code> must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:</p>
 <ul>
@@ -124,10 +124,10 @@ docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdo
 <li><code>SMOKE_PREV_CACHE</code>: where that release is installed, so several runs share one copy.</li>
 <li><code>SMOKE_PORT</code>: the live server's port (default <code>8099</code>).</li>
 </ul>
-<h2 id="proof-the-lot">Proof the lot<a class="docs-heading-link" aria-label="Link to this section" href="#proof-the-lot">#</a></h2>
+<h2 id="proof-the-lot">Proof the <span class="docs-heading-tail"><span>lot</span><a class="docs-heading-link" aria-label="Link to this section" href="#proof-the-lot">#</a></span></h2>
 <p><code>sh scripts/proof.sh</code> (Linux, macOS) and <code>.\scripts\proof.ps1</code> (Windows) run the gate on all eleven runs (five shapes, six ovens), feed the last release forward in each, and write the Last run table. What each run proves and the latest results are on the <a href="../reference/proof.html">Proof</a> page.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>On CI the gate runs as one job per shape: <code>smoke</code> (matrix) on GitHub, <code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code> and <code>smoke-inertia</code> on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab <code>proof</code> job, by hand or on a schedule that sets <code>SOURDOUGH_PROOF</code> to <code>1</code>, never on a push.</p></aside>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="./ci.html">CI</a></li>
 <li><a href="./shapes.html">Pick a shape</a></li>

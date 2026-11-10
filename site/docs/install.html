@@ -39,30 +39,30 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../docs/index.html">Overview</a></li><li><a href="../docs/install.html" aria-current="page">Install</a></li><li><a href="../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../docs/guides/manifest.html">The manifest</a></li><li><a href="../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../docs/guides/testing.html">Testing</a></li><li><a href="../docs/guides/ci.html">CI</a></li><li><a href="../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../docs/guides/support.html">Support and sunset</a></li><li><a href="../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/plan-format.html">Plan format</a></li><li><a href="../docs/reference/templates.html">Templates</a></li><li><a href="../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../docs/upgrading.html">Upgrading</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="install">Install<a class="docs-heading-link" aria-label="Link to this section" href="#install">#</a></h1>
+      <article class="docs-article"><h1 id="install"><span class="docs-heading-tail"><span>Install</span><a class="docs-heading-link" aria-label="Link to this section" href="#install">#</a></span></h1>
 <p>Sourdough is one PHP command, so it works on Windows, macOS, and Linux.</p>
-<h2 id="requirements">Requirements<a class="docs-heading-link" aria-label="Link to this section" href="#requirements">#</a></h2>
+<h2 id="requirements"><span class="docs-heading-tail"><span>Requirements</span><a class="docs-heading-link" aria-label="Link to this section" href="#requirements">#</a></span></h2>
 <ul>
 <li>PHP 8.3 or newer (<code>^8.3</code> in <code>composer.json</code>).</li>
 <li>Composer, for the install lines below.</li>
 <li>No PHP extensions are declared in <code>composer.json</code>.</li>
 </ul>
 <p>Where the code lives: the canonical repository is <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/sourdough">enterprise-apps/sourdough</a> on git.wayne.edu. Open issues and merge requests there; tags are made there, by the maintainer, with an approver. GitHub (<a rel="noopener" href="https://github.com/waynestate/sourdough">waynestate/sourdough</a>) is a read-only push mirror of it: nobody pushes to it, and Packagist reads from it. git.wayne.edu is the starter culture now; GitHub is the slice Packagist eats.</p>
-<h2 id="install-1">Install<a class="docs-heading-link" aria-label="Link to this section" href="#install-1">#</a></h2>
+<h2 id="install-1"><span class="docs-heading-tail"><span>Install</span><a class="docs-heading-link" aria-label="Link to this section" href="#install-1">#</a></span></h2>
 <p>Two ways in: install the <code>sourdough</code> command on your machine, or scaffold without installing.</p>
 <div class="docs-tabs" data-tabs="composer global require|composer create-project"><div class="docs-tabs__panel" data-tab-label="composer global require"><p class="docs-tabs__label">composer global require</p><pre tabindex="0"><code class="language-bash">composer global require waynestate/sourdough
 </code></pre></div>
 <div class="docs-tabs__panel" data-tab-label="composer create-project"><p class="docs-tabs__label">composer create-project</p><pre tabindex="0"><code class="language-bash">composer create-project waynestate/sourdough
 </code></pre></div></div>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>After <code>composer global require</code>, the <code>sourdough</code> command lives in <code>composer global config bin-dir --absolute</code>; put that directory on your PATH.</p></aside>
-<h2 id="verify">Verify<a class="docs-heading-link" aria-label="Link to this section" href="#verify">#</a></h2>
+<h2 id="verify"><span class="docs-heading-tail"><span>Verify</span><a class="docs-heading-link" aria-label="Link to this section" href="#verify">#</a></span></h2>
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected:</p>
 <pre tabindex="0"><code>Sourdough 0.4.2
 </code></pre>
 <p>The CLI is a Symfony Console application named Sourdough, version 0.4.2 (<code>bin/sourdough</code>), so <code>--version</code> prints the name and the version.</p>
-<h2 id="next-steps">Next steps<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></h2>
+<h2 id="next-steps">Next <span class="docs-heading-tail"><span>steps</span><a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></span></h2>
 <ul>
 <li><a href="guides/quick-start.html">Quick start</a>: bake your first app and run its checks.</li>
 <li><a href="guides/shapes.html">Pick a shape</a>: choose the permutation your app needs.</li>

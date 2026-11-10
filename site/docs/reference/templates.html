@@ -39,11 +39,11 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html" aria-current="page">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="templates">Templates<a class="docs-heading-link" aria-label="Link to this section" href="#templates">#</a></h1>
+      <article class="docs-article"><h1 id="templates"><span class="docs-heading-tail"><span>Templates</span><a class="docs-heading-link" aria-label="Link to this section" href="#templates">#</a></span></h1>
 <p>Reference for the template directories under <code>templates/</code>: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in <a href="../guides/shapes.html">Pick a shape</a>, then come back here for the exact values.</p>
 <p>Five jars on the shelf, all five full.</p>
 <p><img src="../readme/proof.svg" alt="The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule" /></p>
-<h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
+<h2 id="the-template-directories">The template <span class="docs-heading-tail"><span>directories</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -128,8 +128,8 @@
 </code></pre></div>
 <div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --inertia
 </code></pre></div></div>
-<h2 id="what-each-template-carries">What each template carries<a class="docs-heading-link" aria-label="Link to this section" href="#what-each-template-carries">#</a></h2>
-<h3 id="raw">raw/<a class="docs-heading-link" aria-label="Link to this section" href="#raw">#</a></h3>
+<h2 id="what-each-template-carries">What each template <span class="docs-heading-tail"><span>carries</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-each-template-carries">#</a></span></h2>
+<h3 id="raw"><span class="docs-heading-tail"><span>raw/</span><a class="docs-heading-link" aria-label="Link to this section" href="#raw">#</a></span></h3>
 <ul>
 <li>Pins WayneUI 2.0.8 (<code>https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php</code>) instead of fetching the floating <code>main</code> branch copy.</li>
 <li>Ships Pinstripe's coding standard: <code>pint.json</code> (the per preset, with the fetched <code>public/wayne-ui.php</code> kept out and <code>vendor</code> excluded) and <code>phpstan.neon</code> (Pinstripe's raw preset, level 8 over <code>src/</code> and <code>public/</code>), with <code>waynestate/pinstripe</code> in require-dev and the extension-installer plugin allowed.</li>
@@ -141,7 +141,7 @@
 <li>Installs Squire's deploy files from <code>templates/squire/</code>: <code>build.sh</code>, <code>deployments/001-first-release.sh</code>, <code>scripts/release.sh</code>, <code>scripts/parity.sh</code>, <code>scripts/parity.ps1</code>, <code>health.php</code>, <code>public/up.php</code>, <code>docker-compose.squire.yml</code>, <code>.env.squire.example</code>, and the <code>.squire/</code> build context.</li>
 <li>Oracle: raw PHP apps run queries through the <code>App\Oracle</code> helper, which takes values only as binds and answers mistakes with plain sentences.</li>
 </ul>
-<h3 id="raw-vue">raw-vue/<a class="docs-heading-link" aria-label="Link to this section" href="#raw-vue">#</a></h3>
+<h3 id="raw-vue"><span class="docs-heading-tail"><span>raw-vue/</span><a class="docs-heading-link" aria-label="Link to this section" href="#raw-vue">#</a></span></h3>
 <p><code>sourdough new --raw --vue</code> copies <code>raw/</code> first, then <code>raw-vue/</code> over it, so the two raw shapes share the same Squire files, Pinstripe checks, Oracle helper, Playbook and ADVISOR wiring. The manifest records the template as <code>raw-vue</code>.</p>
 <ul>
 <li><code>public/index.php</code> boots HELMET, the session and SESAME exactly as <code>raw/</code> does. Paths under <code>/api/</code> answer JSON: <code>/api/me</code> returns the signed-in user (<code>username</code> and <code>name</code>), an unknown endpoint is a JSON <code>404</code>, and a request without a session is a JSON <code>401</code> instead of a redirect to CAS. <code>/</code> sends the page that loads the Vue app; any other path sends the same page with a <code>404</code>, and Vue says the page does not exist.</li>
@@ -151,7 +151,7 @@
 <li>Drops <code>stubs/wayne-ui.php</code> and <code>phpstan.neon</code>'s <code>scanFiles</code>: Vue draws the chrome, so there is no fetched <code>public/wayne-ui.php</code>.</li>
 <li>Its <code>.gitlab-ci.yml</code> adds a <code>frontend</code> job (<code>npm ci --ignore-scripts</code> from the shipped <code>package-lock.json</code>, <code>npm audit --audit-level=high --omit=dev</code> (runtime dependencies; a second run lists dev-only findings without failing), <code>npm run build</code>, and <code>sbom-npm.cdx.json</code> from CycloneDX's npm tool) to the raw pipeline, and its <code>a11y-pages</code> job waits for that build and also saves <code>/api/me</code>, so the accessibility gate sees the Vue app signed in.</li>
 </ul>
-<h3 id="laravel-blade">laravel-blade/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade">#</a></h3>
+<h3 id="laravel-blade"><span class="docs-heading-tail"><span>laravel-blade/</span><a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade">#</a></span></h3>
 <ul>
 <li>A fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.</li>
 <li>Ships <code>app/Providers/AppServiceProvider.php</code> with <code>Schema::defaultStringLength(191)</code>, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR <code>mysql56-string-default</code>).</li>
@@ -161,14 +161,14 @@
 <li>Pinstripe is installed, not copied: <code>phpstan.neon</code> includes Pinstripe's Laravel preset (level 8, the ignore hygiene and the banned calls come from the package) and <code>pint.json</code> is Pinstripe's <code>laravel.json</code> plus three recorded skips for Squire's files (<code>deploy</code>, <code>health.php</code>, <code>oracle-check.php</code>). The app's own <code>tests/Unit/PinstripeWiringTest.php</code> holds both files to that, so a new skip needs its reason written down. <code>composer lint:gitlab</code> writes Pint's findings as a GitLab Code Quality report (<code>pint-codequality.json</code>, ignored by git), and the <code>composer-ci</code> job runs it in <code>after_script</code>, so the merge request widget shows Pint's findings even when <code>composer ci</code> fails. The other Laravel shapes ship the same, as WELD does.</li>
 <li>Next steps: <code>composer install</code>, <code>cp .env.example .env</code>, <code>php artisan key:generate</code>, <code>php artisan migrate</code>, <code>php artisan serve</code>.</li>
 </ul>
-<h3 id="laravel-blade-vue">laravel-blade-vue/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade-vue">#</a></h3>
+<h3 id="laravel-blade-vue"><span class="docs-heading-tail"><span>laravel-blade-vue/</span><a class="docs-heading-link" aria-label="Link to this section" href="#laravel-blade-vue">#</a></span></h3>
 <ul>
 <li>The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a <code>resources/js/app.js</code> registry that mounts a Vue 3 app on every <code>[data-vue-island]</code> element, and a Counter island live on the dashboard view.</li>
 <li>Ships <code>tests/Feature/ExampleTest.php</code> with <code>$this-&gt;withoutVite()</code>, so <code>composer ci</code> in a freshly baked islands app does not fail on the missing Vite manifest before <code>npm run build</code> has run.</li>
 <li>Its own <code>.gitlab-ci.yml</code>: the Laravel + Blade pipeline plus a <code>frontend</code> job (<code>npm ci --ignore-scripts</code>, <code>npm audit --audit-level=high --omit=dev</code>, <code>npm run build</code>, the npm SBOM), whose <code>public/build/</code> the <code>a11y-pages</code> job serves, because Blade's <code>@vite</code> reads the build's manifest.</li>
 <li>Next steps: the Laravel + Blade steps plus <code>npm install</code> and <code>npm run build</code>.</li>
 </ul>
-<h3 id="laravel-inertia">laravel-inertia/<a class="docs-heading-link" aria-label="Link to this section" href="#laravel-inertia">#</a></h3>
+<h3 id="laravel-inertia"><span class="docs-heading-tail"><span>laravel-inertia/</span><a class="docs-heading-link" aria-label="Link to this section" href="#laravel-inertia">#</a></span></h3>
 <ul>
 <li>The same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.</li>
 <li>Inertia 3 on both sides: <code>inertiajs/inertia-laravel</code> <code>^3.0</code> and <code>@inertiajs/vue3</code> <code>^3.0</code>. The root view marks its <code>&lt;title&gt;</code> with <code>data-inertia</code>, Inertia hands the first page to Vue in a <code>&lt;script type=&quot;application/json&quot;&gt;</code> element (data, not code, so HELMET's CSP has nothing to admit), and no Axios: the pages talk through Inertia's own client. Add <code>axios</code> to <code>package.json</code> only when your own code imports it. <code>resources/js/app.ts</code> hands HELMET's per-request nonce (read from the pre-paint script) to Inertia's <code>nonce</code> option, so the progress bar's injected styles pass the CSP.</li>
@@ -177,7 +177,7 @@
 <li>The overlay allows <code>phpstan/extension-installer</code>; the appended SESAME and HELMET env keys ship commented out (except <code>SESAME_DRIVER=fake</code>) so package defaults hold instead of being overridden by empty values. <code>config/sesame.php</code> defaults <code>SESAME_FAKE_USERNAME</code> to <code>jane.doe</code>, so the fake driver has a non-empty username.</li>
 <li>Next steps: the Laravel + Blade steps plus <code>npm install</code> and <code>npm run build</code>.</li>
 </ul>
-<h2 id="shared-wiring-in-every-app">Shared wiring in every app<a class="docs-heading-link" aria-label="Link to this section" href="#shared-wiring-in-every-app">#</a></h2>
+<h2 id="shared-wiring-in-every-app">Shared wiring in every <span class="docs-heading-tail"><span>app</span><a class="docs-heading-link" aria-label="Link to this section" href="#shared-wiring-in-every-app">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -226,7 +226,7 @@
 </table></div>
 <p>Seeded files are <code>.env.example</code> and <code>README.md</code>: Sourdough wrote them once and you own them now. Managed files belong to Sourdough; the manifest is the record <code>sourdough feed</code> refreshes, merging in any edits you made. See <a href="../guides/manifest.html">The manifest</a>.</p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. <code>--no-advisor</code> skips the ADVISOR wiring.</p></aside>
-<h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></h2>
+<h2 id="the-squire-owned-copy-templates-squire">The Squire-owned copy (<code>templates/squire/</code><span class="docs-heading-tail"><span>)</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-squire-owned-copy-templates-squire">#</a></span></h2>
 <p>The deploy files in your app come from Squire's exported copy, checked into this repository at <code>templates/squire/</code>: <code>raw/</code>, <code>laravel/</code>, <code>static/</code>, <code>vue/</code>, <code>catalog.json</code>, <code>manifest.json</code>. The copy is Squire 0.10.5's kit: a Laravel release first refuses to run with no <code>APP_KEY</code> or with <code>APP_DEBUG</code> on in production (and warns when <code>APP_ENV</code> is not production); then its <code>scripts/release.sh</code> runs PROCTOR's deploy gate (<code>proctor gate</code>) right after <code>composer audit</code>, before the frontend build and the migrations, writes the verdict to <code>storage/squire/proctor-gate.json</code> (<code>SQUIRE_PROCTOR_RECORD_DIR</code>), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (<code>php artisan reload</code>, or <code>queue:restart</code> and <code>schedule:interrupt</code> on an older Laravel; report only, <code>SQUIRE_ARTISAN_RESTART=0</code> turns it off). The image hardens too: the web's PHP loses its shell functions (<code>SQUIRE_PHP_DISABLE_FUNCTIONS</code> sets the list), opcache runs with production settings (<code>SQUIRE_OPCACHE_VALIDATE</code>), Apache answers <code>ServerTokens Prod</code>, and secrets can be read from <code>/run/secrets</code>. Session cookies are <code>SameSite=Lax</code> (<code>.squire/php.ini</code>), every image the kit builds from is named in full (<code>docker.io/library/...</code>) so Buildah and Podman take it, and the portable image ships the built assets without <code>node_modules/</code>. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -251,7 +251,7 @@
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
 <p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line.</p>
-<h2 id="rules-the-generator-applies">Rules the generator applies<a class="docs-heading-link" aria-label="Link to this section" href="#rules-the-generator-applies">#</a></h2>
+<h2 id="rules-the-generator-applies">Rules the generator <span class="docs-heading-tail"><span>applies</span><a class="docs-heading-link" aria-label="Link to this section" href="#rules-the-generator-applies">#</a></span></h2>
 <p>From the best-practices notes, section 1 (Generating a project):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -305,7 +305,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 </tbody>
 </table></div>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>The untrusted-input rule exists because scaffolders have turned template content into code execution before: Backstage's scaffolder let anyone who could edit a registered template run code on the host (CVE-2023-35926, fixed in 1.15.0), and Copier refuses templates that use tasks, migrations or Jinja extensions unless the caller passes <code>--trust</code>.</p></aside>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="../guides/shapes.html">Pick a shape</a></li>
 <li><a href="./commands.html">Commands</a></li>

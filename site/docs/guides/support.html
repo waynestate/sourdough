@@ -39,10 +39,10 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html" aria-current="page">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="support-and-sunset">Support and sunset<a class="docs-heading-link" aria-label="Link to this section" href="#support-and-sunset">#</a></h1>
+      <article class="docs-article"><h1 id="support-and-sunset">Support and <span class="docs-heading-tail"><span>sunset</span><a class="docs-heading-link" aria-label="Link to this section" href="#support-and-sunset">#</a></span></h1>
 <p>Starters die quietly when nobody owns them. This page is the policy for Sourdough's five shapes: who owns each one, how long it is supported, and how one is retired without surprising the apps baked from it. Even the best loaf goes stale; the point is to say so before it does.</p>
 <p>The facts behind the policy are data, not prose: <code>resources/shapes.json</code> holds each shape's owner, status and sunset fields, and <code>sourdough new --dry-run --json</code> reports them with the dates the app inherits from CREED.</p>
-<h2 id="owners">Owners<a class="docs-heading-link" aria-label="Link to this section" href="#owners">#</a></h2>
+<h2 id="owners"><span class="docs-heading-tail"><span>Owners</span><a class="docs-heading-link" aria-label="Link to this section" href="#owners">#</a></span></h2>
 <p>Every shape names an owner role, never a person. Today all five belong to the same role:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -81,7 +81,7 @@
 </tbody>
 </table></div>
 <p>The Sourdough maintainers are the role that releases Sourdough (Enterprise Applications). The owner keeps the shape green in the smoke and proof jobs, answers its issues, and decides when it is deprecated. A change to the Inertia shape also lands in WELD, which is generated from it, in the same round of work.</p>
-<h2 id="how-long-a-shape-is-supported">How long a shape is supported<a class="docs-heading-link" aria-label="Link to this section" href="#how-long-a-shape-is-supported">#</a></h2>
+<h2 id="how-long-a-shape-is-supported">How long a shape is <span class="docs-heading-tail"><span>supported</span><a class="docs-heading-link" aria-label="Link to this section" href="#how-long-a-shape-is-supported">#</a></span></h2>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>The windows below are a proposal and are not confirmed yet. The rules for marking and announcing a deprecation are in force now.</p></aside>
 <ul>
 <li>A shape is supported while <code>resources/shapes.json</code> lists it as <code>supported</code>. Only the newest Sourdough release gets fixes; an app stays supported by feeding (<code>sourdough feed</code>), which its own <code>sourdough-feed</code> CI job reminds it to do.</li>
@@ -89,7 +89,7 @@
 <li>The raw shapes follow PHP alone: their floor comes from CREED (see <a href="#the-php-floor">The PHP floor</a>), and <code>sourdough new</code> prints that line's end of security support.</li>
 <li>Proposal: a shape is supported for as long as its framework line has a supported successor that the shape can move to. When it has none, or no one in the owner role can keep it green, it is deprecated as below.</li>
 </ul>
-<h2 id="how-a-shape-is-retired">How a shape is retired<a class="docs-heading-link" aria-label="Link to this section" href="#how-a-shape-is-retired">#</a></h2>
+<h2 id="how-a-shape-is-retired">How a shape is <span class="docs-heading-tail"><span>retired</span><a class="docs-heading-link" aria-label="Link to this section" href="#how-a-shape-is-retired">#</a></span></h2>
 <p>A retirement is announced one release ahead, the same way Preflight retires a component (see <a rel="noopener" href="https://preflight.apps.wayne.edu/docs/guides/deprecation.html">Preflight: deprecating a component</a>):</p>
 <ol>
 <li><strong>Deprecate.</strong> In a release, the shape's entry in <code>resources/shapes.json</code> changes to <code>&quot;status&quot;: &quot;deprecated&quot;</code> with <code>deprecated_in</code> (this release), <code>removed_in</code> (a later release) and <code>replacement</code> (the shape to move to). The CHANGELOG gets a <code>Deprecated:</code> bullet naming the shape and its replacement, and the upgrading page says what to do.</li>
@@ -98,7 +98,7 @@
 <li><strong>Remove.</strong> In the <code>removed_in</code> release the generator goes, and the entry changes to <code>&quot;status&quot;: &quot;removed&quot;</code>. Feeding an app of that shape stops with the same notice, naming the replacement. Published tags are never moved, so an older Sourdough release still bakes the old shape for anyone who needs it.</li>
 </ol>
 <p><code>tests/ShapeSupportTest.php</code> holds the catalog to these rules: every shape Sourdough bakes is listed with an owner; a supported shape carries no sunset fields; a deprecated or removed shape names the release that deprecated it, a later release that removes it, and a replacement Sourdough still bakes; and a removed shape is one Sourdough no longer bakes.</p>
-<h2 id="the-fields">The fields<a class="docs-heading-link" aria-label="Link to this section" href="#the-fields">#</a></h2>
+<h2 id="the-fields">The <span class="docs-heading-tail"><span>fields</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-fields">#</a></span></h2>
 <p><code>resources/shapes.json</code>, one entry per shape:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -135,7 +135,7 @@
 <li><code>support</code>: the shape's entry plus <code>policy</code> (this page) and <code>runs_on</code>, the line the app inherits its clock from (<code>{&quot;component&quot;: &quot;laravel&quot;, &quot;version&quot;: &quot;13&quot;, &quot;security_until&quot;: &quot;2028-03-17&quot;}</code> for a Laravel shape, the PHP floor line for a raw one).</li>
 <li><code>php</code>: the floor the bake writes (<code>constraint</code>, <code>platform</code>, <code>versions</code>), the floor line's <code>floor_security_until</code>, and where it came from (<code>source</code>, <code>origin</code>, <code>refreshed_on</code>, <code>horizon_days</code>, and <code>reason</code> when the fallback was used).</li>
 </ul>
-<h2 id="the-php-floor">The PHP floor<a class="docs-heading-link" aria-label="Link to this section" href="#the-php-floor">#</a></h2>
+<h2 id="the-php-floor">The PHP <span class="docs-heading-tail"><span>floor</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-php-floor">#</a></span></h2>
 <p>A new app's PHP floor is not a number in a template: Sourdough reads it from CREED's <code>policy.json</code> when it bakes, the same file PROCTOR's <code>php-floor</code> check reads in the app.</p>
 <ul>
 <li><strong>Source.</strong> The policy installed with <code>waynestate/creed</code> (a Sourdough dependency), or the file the <code>SOURDOUGH_POLICY</code> environment variable names.</li>
@@ -145,7 +145,7 @@
 <li><strong>Moving an app.</strong> When CREED moves the floor, the next Sourdough release bakes the new one, and <code>sourdough feed</code> brings it into apps already baked, merged like any template change.</li>
 </ul>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p>The 365-day horizon is a proposal. CREED is the natural owner of it; until CREED's policy carries one, the number lives in <code>src/PhpFloor.php</code>.</p></aside>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="keeping-current.html">Keeping apps current</a></li>
 <li><a href="../upgrading.html">Upgrading</a></li>

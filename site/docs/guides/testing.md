@@ -6,7 +6,7 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Testing[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#testing)
+# Testing [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#testing)
 
 This page is the proofing bench: how to run Sourdough's own checks day to day, and how to fire the smoke gate that bakes a shape for real before it may be claimed. Like any starter, Sourdough needs regular feeding, or it goes flat. For the wider runbook, continue to [Maintaining](https://sourdough.apps.wayne.edu/docs/maintaining.html).
 
@@ -14,7 +14,7 @@ Note
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://sourdough.apps.wayne.edu/docs/maintaining.html).
 
-## Day-to-day commands[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#day-to-day-commands)
+## Day-to-day commands [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#day-to-day-commands)
 
 | Task | Command |
 | --- | --- |
@@ -28,7 +28,7 @@ Maintainers: how to build, test and release this project, and where its data com
 
 `composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`. The tests fail on any PHP or PHPUnit deprecation (`failOnDeprecation` and `failOnPhpunitDeprecation` in `phpunit.xml.dist`), and the report names the test that raised it, the same gate every baked app gets.
 
-## With only Docker[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#with-only-docker)
+## With only Docker [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#with-only-docker)
 
 The same lines work in PowerShell and sh:
 
@@ -39,7 +39,7 @@ docker run --rm -v "${PWD}:/app" -w /app php:8.5-cli vendor/bin/phpunit
 
 The `stack-composer-cache` volume keeps Composer's downloads between runs; Docker creates it the first time.
 
-## From the repo root[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#from-the-repo-root)
+## From the repo root [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#from-the-repo-root)
 
 ```
 docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 composer install --no-interaction
@@ -49,7 +49,7 @@ docker run --rm -v "${PWD}:/app" -v stack-composer-cache:/tmp/cache -w /app comp
 docker run --rm -v "${PWD}:/app" -w /app php:8.4-cli php bin/sourdough new /tmp/demo --dry-run
 ```
 
-## The smoke gate[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#the-smoke-gate)
+## The smoke gate [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#the-smoke-gate)
 
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-playbook --no-input` (the CLI under test is the one being shipped). Every bake passes `--no-playbook`, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.
 
@@ -94,7 +94,7 @@ Environment variables:
 - `SMOKE_PREV_CACHE`: where that release is installed, so several runs share one copy.
 - `SMOKE_PORT`: the live server's port (default `8099`).
 
-## Proof the lot[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#proof-the-lot)
+## Proof the lot [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#proof-the-lot)
 
 `sh scripts/proof.sh` (Linux, macOS) and `.\scripts\proof.ps1` (Windows) run the gate on all eleven runs (five shapes, six ovens), feed the last release forward in each, and write the Last run table. What each run proves and the latest results are on the [Proof](https://sourdough.apps.wayne.edu/docs/reference/proof.html) page.
 
@@ -102,7 +102,7 @@ Note
 
 On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/testing.html#related)
 
 - [CI](https://sourdough.apps.wayne.edu/docs/guides/ci.html)
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)

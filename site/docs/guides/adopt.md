@@ -6,13 +6,13 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Adopt an existing app[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#adopt-an-existing-app)
+# Adopt an existing app [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#adopt-an-existing-app)
 
 `sourdough feed` only reaches an app that carries `.sourdough/manifest.json`, and `sourdough new` writes one only into the apps it bakes. Most Wayne State apps were mixed somewhere else, years ago. `sourdough adopt` is the way in for them: it writes the manifest the app would have had if Sourdough had baked it, and from then on `feed` looks after it like any other loaf. Not every loaf came from our starter, but every loaf can be fed.
 
 Adopt writes one file, `.sourdough/manifest.json`. It never changes your code, never writes `.sourdough/base/`, and never reads a file the template does not ship.
 
-## When to adopt[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#when-to-adopt)
+## When to adopt [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#when-to-adopt)
 
 - **The app is close to one of the five shapes.** Adopt compares the app with a fresh bake of the shape you name, file by file. The closer the app is to that shape, the more files Sourdough can keep current.
 - **Older Laravel apps: upgrade with [Booster](https://booster.apps.wayne.edu/) first.** Adopt compares with today's `laravel/laravel` skeleton, so an app on Laravel 8 is mostly `yours`. That is correct, not a failure, but every hop Booster takes brings more files level with the template, and each one that matches gets updates from then on.
@@ -20,7 +20,7 @@ Adopt writes one file, `.sourdough/manifest.json`. It never changes your code, n
 
 WELD is not adopted yet: it was built by hand and checks its drift against a fresh Inertia bake with its own regen check. See [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#apps-sourdough-did-not-make-and-weld).
 
-## Before you start[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#before-you-start)
+## Before you start [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#before-you-start)
 
 Adopt only runs inside a git repository, on a clean tree, so the adoption is one commit you can review and `git revert` can take back. An app that is not in git yet:
 
@@ -32,7 +32,7 @@ git commit -m "Before Sourdough"
 
 Adopt needs git on PATH (or `SOURDOUGH_GIT` pointing at it), on Windows, macOS and Linux alike. The Laravel shapes bake a fresh `laravel/laravel` skeleton to compare with, so adopting one needs Composer and the network (or a warm Composer cache), the same as `sourdough new`.
 
-## Pick the shape and the name[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#pick-the-shape-and-the-name)
+## Pick the shape and the name [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#pick-the-shape-and-the-name)
 
 ```
 sourdough adopt [<dir>] --shape <shape> [--name <name>] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]
@@ -68,7 +68,7 @@ note: 2 files differ where the template writes the app name; if the app goes by 
 
 **Playbook and ADVISOR.** `--no-playbook` and `--no-advisor` change what the template bakes (`composer.json`, `.env.example`, the README, `.gitignore`), and they are recorded in the manifest's answers, so every later feed bakes the same way. Leave them off unless the app should never have that wiring; WSU apps need Playbook.
 
-## Look first[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#look-first)
+## Look first [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#look-first)
 
 ```
 sourdough adopt --shape raw --dry-run
@@ -81,7 +81,7 @@ A dry run prints the same report and writes nothing. It opens with `Would adopt`
 - `The folder is not writable: a real adopt would fail.`
 - `git is not available: a real adopt would fail.`
 
-## Read the report[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#read-the-report)
+## Read the report [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#read-the-report)
 
 Here is a small, older raw PHP app, `parking-permits`, with a hand-built `public/index.php`, a `composer.json` that requires PHP 7.4, its own `public/.htaccess` and a README:
 
@@ -135,7 +135,7 @@ Every recorded hash is the template's, never the app's. A Windows checkout with 
 
 A vendored Squire kit gets a note too. When `.squire.json` says an older kit than the one this Sourdough bakes, the note says to run `vendor/bin/squire update` and commit; the next feed takes over each kit file that then matches.
 
-## Commit the adoption[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#commit-the-adoption)
+## Commit the adoption [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#commit-the-adoption)
 
 ```
 git add .sourdough
@@ -144,7 +144,7 @@ git commit -m "Adopt with Sourdough 0.4.2"
 
 The adoption is its own commit, so `git revert` takes it back cleanly. Commit the manifest and do not hand-edit it: it is the starter's memory.
 
-## The first feed[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#the-first-feed)
+## The first feed [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#the-first-feed)
 
 ```
 sourdough feed --dry-run
@@ -173,7 +173,7 @@ This is how the stack's wiring (Squire's kit, the pipeline with PROCTOR and the 
 
 **Delete what you do not want.** Delete the file, commit, and feed remembers: it never adds the file again, and when the template changes it the plan only shows `keep`. `sourdough manifest --check` lists it as `missing <file>`, a report the CI job never fails on. To undo a whole feed instead: `git restore . && git clean -fd`.
 
-## Your own .gitlab-ci.yml[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#your-own-gitlab-ci-yml)
+## Your own .gitlab-ci.yml [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#your-own-gitlab-ci-yml)
 
 When `.gitlab-ci.yml` is `yours`, the app's pipeline has no `sourdough-feed` job, so nothing warns when the app falls behind. Copy the job by hand from a fresh bake of the same shape:
 
@@ -183,7 +183,7 @@ sourdough new ../fresh-bake --raw
 
 Copy the `sourdough-feed:` job from `../fresh-bake/.gitlab-ci.yml` into yours, with what it leans on: the `.composer-cache` template it extends and the `IMAGE_PREFIX` variable its image uses. Then delete the fresh bake. [Feed in CI](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci) explains what the job reports.
 
-## Take a yours file over[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#take-a-yours-file-over)
+## Take a yours file over [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#take-a-yours-file-over)
 
 A `yours` file is never written, merged or reported, until the day your copy equals the template's. To hand one to Sourdough, make it match the template (copy it from a fresh bake of the same shape and name, or bring your copy level), commit, and feed:
 
@@ -197,7 +197,7 @@ Run sourdough feed without --dry-run to apply it.
 
 A `record` line changes no file, only the manifest: the file is `managed` from then on and gets every template update. The `sourdough-feed` job warns until that feed is committed. Squire's kit files come back the same way after `vendor/bin/squire update`.
 
-## Start over[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#start-over)
+## Start over [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#start-over)
 
 Wrong shape, wrong name? Delete `.sourdough/`, commit, and adopt again. Adopt never writes over a manifest, because that would lose the record feed stands on:
 
@@ -208,7 +208,7 @@ $ sourdough adopt /srv/apps/parking-permits --shape raw
 
 A `.sourdough/base/` folder with no manifest beside it is left from a record that is gone, and adopt refuses that too, until you delete `.sourdough/` and commit.
 
-## Exit codes[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#exit-codes)
+## Exit codes [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#exit-codes)
 
 | Exit | Meaning | When |
 | --- | --- | --- |
@@ -218,7 +218,7 @@ A `.sourdough/base/` folder with no manifest beside it is left from a record tha
 
 The whole command (options, refusals, JSON and environment) is in [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-adopt). Failing lines and their fixes are in [Troubleshooting](https://sourdough.apps.wayne.edu/docs/troubleshooting.html#adopting-sourdough-adopt).
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#related)
 
 - [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
 - [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)

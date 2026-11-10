@@ -39,9 +39,9 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html" aria-current="page">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="proof">Proof<a class="docs-heading-link" aria-label="Link to this section" href="#proof">#</a></h1>
+      <article class="docs-article"><h1 id="proof"><span class="docs-heading-tail"><span>Proof</span><a class="docs-heading-link" aria-label="Link to this section" href="#proof">#</a></span></h1>
 <p>This page says what each check of Sourdough proves and how to run it. Sourdough's promise is that every shape it bakes works on the day it comes out of the oven, so the proof is not a unit test of the generator: it bakes every shape for real, with this checkout, and makes the loaf prove itself.</p>
-<h2 id="last-run">Last run<a class="docs-heading-link" aria-label="Link to this section" href="#last-run">#</a></h2>
+<h2 id="last-run">Last <span class="docs-heading-tail"><span>run</span><a class="docs-heading-link" aria-label="Link to this section" href="#last-run">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -140,7 +140,7 @@
 </tbody>
 </table></div>
 <p>The <code>composer ci</code> row ran in <code>composer:2.10.3</code> on PHP 8.5. All eleven proof runs came from one <code>.\scripts\proof.ps1</code> on Windows (Docker Desktop, amd64), 178 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. Templates have changed since 0.1.6 (the platform pin, the resolver refresh, the skeleton tests), so every feed found work: the raw shapes took one update (<code>composer.json</code>), the Laravel shapes one add (<code>tests/Feature/SkeletonTest.php</code>) and two updates (<code>app/Sesame/UserResolver.php</code>, <code>composer.json</code>), and the oven runs recorded the scaffold's own files besides (<code>compose.yaml</code> for Sail, the <code>Dockerfile</code> and its friends for Docker), because a 0.1.6 manifest never named them. The oven feeds also crossed the 0.1.6 gap where the manifest hashed <code>composer.json</code> before the scaffold edited it: feed rebuilt the missing base from the app's file and merged from it (see <a href="#what-it-found">What it found</a>). The Laravel shapes ship nine tests each now: the two starter examples plus seven skeleton tests covering <code>/up</code>, the home page, the sign-in redirect, the signed-in dashboard, a 404 and the user refresh; the count is theirs, not the proof's.</p>
-<h2 id="what-it-found">What it found<a class="docs-heading-link" aria-label="Link to this section" href="#what-it-found">#</a></h2>
+<h2 id="what-it-found">What it <span class="docs-heading-tail"><span>found</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-it-found">#</a></span></h2>
 <p>The first run of the harness, on the same day, failed nine of eleven runs. Six of the failures were Sourdough's:</p>
 <ul>
 <li><strong>An app baked by 0.1.6 with <code>--sail</code> or <code>--docker</code> could never feed cleanly.</strong> 0.1.6 wrote the manifest before the oven's scaffold ran, so it named no oven and hashed <code>composer.json</code> before the scaffold edited it. <code>sourdough feed</code> then baked the plain shape, called the app fresh and wrote nothing, and <code>sourdough manifest --check</code> reported <code>composer.json</code> changed for good. Fixed in the same branch: feed reads the oven from the app's files when a 0.1.6 manifest names none, and a new <code>record</code> action moves the manifest to a file the app already has right (<a href="../guides/keeping-current.html#what-feed-does">Keeping apps current</a>).</li>
@@ -152,7 +152,7 @@
 <li><strong>PROCTOR warns <code>php-floor</code></strong> on every shape: PHP 8.3 is in security-only support until 2027-12-31. Expected, and the stack's floor until then.</li>
 </ul>
 <p>The run above closed the last failure, in all six oven runs: <strong>a 0.1.6 oven bake conflicted on <code>composer.json</code> at its first feed after a template change.</strong> 0.1.6 hashed <code>composer.json</code> before the oven's scaffold edited it, so the manifest named a version no checkout ever held: the app's file carried the scaffold's edits, and the base for a three-way merge was nowhere, not in <code>.sourdough/base/</code> (first feed) and not in the app's git history (the pre-scaffold version was never committed). While the template's <code>composer.json</code> stayed the same as 0.1.6's, the post-scaffold files matched and nothing happened; once the template's file changed (this cycle, the platform pin), feed marked both versions and stopped. Feed now rebuilds that base: it undoes the scaffold's edit to recover the pre-scaffold composer data, verifies the data against the recorded hash, and reapplies the scaffold to get the exact file the app started from. An oven app that never touched <code>composer.json</code> takes the template's as an update, and a real app edit still merges over the rebuilt base, or conflicts as before. All eleven runs pass.</p>
-<h2 id="run-it">Run it<a class="docs-heading-link" aria-label="Link to this section" href="#run-it">#</a></h2>
+<h2 id="run-it">Run <span class="docs-heading-tail"><span>it</span><a class="docs-heading-link" aria-label="Link to this section" href="#run-it">#</a></span></h2>
 <p>The proof harness is a pair: <code>scripts/proof.sh</code> on Linux and macOS, <code>scripts/proof.ps1</code> on Windows. Both build the smoke image (<code>scripts/smoke.Dockerfile</code>: PHP 8.5, Composer 2.11.1, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.</p>
 <div class="docs-tabs" data-tabs="sh|powershell"><div class="docs-tabs__panel" data-tab-label="sh"><p class="docs-tabs__label">sh</p><pre tabindex="0"><code class="language-bash">sh scripts/proof.sh            # every run
 sh scripts/proof.sh raw inertia+docker
@@ -216,7 +216,7 @@ sh scripts/proof.sh raw inertia+docker
 </tr>
 </tbody>
 </table></div>
-<h2 id="what-each-run-proves">What each run proves<a class="docs-heading-link" aria-label="Link to this section" href="#what-each-run-proves">#</a></h2>
+<h2 id="what-each-run-proves">What each run <span class="docs-heading-tail"><span>proves</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-each-run-proves">#</a></span></h2>
 <p>Every run goes through <code>scripts/smoke-shape.sh</code>, the same gate the per-shape smoke jobs run on every pipeline. Each step prints <code>ok</code> or <code>FAIL</code>; the first <code>FAIL</code> stops the run and shows the step's tail.</p>
 <ol>
 <li><strong>It bakes.</strong> <code>sourdough new</code> with this checkout's own CLI, so the starter under test is the one being shipped.</li>
@@ -271,18 +271,18 @@ sh scripts/proof.sh raw inertia+docker
 </tr>
 </tbody>
 </table></div>
-<h3 id="the-ovens">The ovens<a class="docs-heading-link" aria-label="Link to this section" href="#the-ovens">#</a></h3>
+<h3 id="the-ovens">The <span class="docs-heading-tail"><span>ovens</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-ovens">#</a></span></h3>
 <p>A Laravel shape with <code>--sail</code> or <code>--docker</code> is proven up to the oven door. The run bakes it, checks the manifest, the reproducible bake and the feed from the last release as above, checks that the scaffold wrote its files (<code>compose.yaml</code> and <code>laravel/sail</code> for Sail; the <code>Dockerfile</code>, <code>compose.yaml</code>, <code>.dockerignore</code> and the <code>dev-up</code> script for Docker), then installs the app and runs its own suite and PROCTOR. The oven's <code>.env.example</code> points at MySQL, which the gate does not run; the suite keeps to SQLite in memory, as <code>phpunit.xml</code> says.</p>
-<h2 id="composer-ci">composer ci<a class="docs-heading-link" aria-label="Link to this section" href="#composer-ci">#</a></h2>
+<h2 id="composer-ci">composer <span class="docs-heading-tail"><span>ci</span><a class="docs-heading-link" aria-label="Link to this section" href="#composer-ci">#</a></span></h2>
 <p>Sourdough's own gate, the same command on GitLab and GitHub:</p>
 <pre tabindex="0"><code class="language-sh">composer ci   # validate, PHPUnit, Pint, PHPStan, the Squire copy, agent-ready files, the docs site, audit
 </code></pre>
 <p>The PHPUnit suite covers every generator, the manifest, <code>sourdough feed</code> on every shape with local edits, merges, conflicts and refusals (<code>tests/FeedCommandTest.php</code>, offline), and the Sail and Docker scaffolds file by file. <code>tests/ProofHarnessTest.php</code> keeps the two harness scripts, the gate, the CI job and the table on this page listing the same runs.</p>
-<h2 id="on-ci">On CI<a class="docs-heading-link" aria-label="Link to this section" href="#on-ci">#</a></h2>
+<h2 id="on-ci">On <span class="docs-heading-tail"><span>CI</span><a class="docs-heading-link" aria-label="Link to this section" href="#on-ci">#</a></span></h2>
 <p>Each shape's smoke job (<code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code>, <code>smoke-inertia</code>) runs the gate on every pipeline, without the feed from the last release and without the ovens.</p>
 <p>The <code>proof</code> job runs the whole harness. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets <code>SOURDOUGH_PROOF</code> to <code>1</code>. It keeps <code>proof-out/</code> (the table, the summary and every step log) as an artifact for 30 days. Like the smoke jobs it is allowed to fail for now. The runner it lands on is arm64 where the table above ran on amd64, so a green <code>proof</code> job is the arm64 half of the same proof.</p>
 <aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Strongly recommended: a git.wayne.edu instance runner, so the proof and every app's pipeline run where the code lives.</p></aside>
-<h2 id="what-it-does-not-prove-yet">What it does not prove yet<a class="docs-heading-link" aria-label="Link to this section" href="#what-it-does-not-prove-yet">#</a></h2>
+<h2 id="what-it-does-not-prove-yet">What it does not prove <span class="docs-heading-tail"><span>yet</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-it-does-not-prove-yet">#</a></span></h2>
 <ul>
 <li><strong>No oven is lit.</strong> The <code>--sail</code> and <code>--docker</code> runs never start a compose stack: the gate has no Docker daemon. The scaffold tests (<code>tests/SailScaffoldTest.php</code>, <code>tests/DockerScaffoldTest.php</code>) pin their files.</li>
 <li><strong>No Playbook, no ADVISOR.</strong> Every bake passes <code>--no-playbook</code> (its package is private and the proof runs credential-free) and <code>--no-advisor</code>. A Wayne State app needs Playbook; its wiring is covered by the unit suite.</li>
@@ -290,7 +290,7 @@ sh scripts/proof.sh raw inertia+docker
 <li><strong>No browser.</strong> The front page is fetched with curl. Nothing clicks the Vue island, runs axe on a baked app, or checks it on a phone.</li>
 <li><strong>A feed with local edits</strong> is proven by <code>tests/FeedCommandTest.php</code>, not by the harness: the harness feeds an app nobody has touched.</li>
 </ul>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="../guides/testing.html">Testing</a></li>
 <li><a href="../guides/keeping-current.html">Keeping apps current</a></li>

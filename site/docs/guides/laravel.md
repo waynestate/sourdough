@@ -6,13 +6,13 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Building on Laravel[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#building-on-laravel)
+# Building on Laravel [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#building-on-laravel)
 
 This page covers what a Laravel bake adds over the raw base and the practices that keep Laravel shapes sound. Start by picking your shape on [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for what the bake gives you and how to keep it healthy.
 
 A Laravel loaf bakes from a fresh Laravel skeleton, not from the raw base: `sourdough new --laravel` starts from Composer's official installer and layers the stack on top, so the app inherits Laravel's upgrades to the skeleton.
 
-## What a Laravel bake adds[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#what-a-laravel-bake-adds)
+## What a Laravel bake adds [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#what-a-laravel-bake-adds)
 
 - `--laravel` bakes a Laravel + Blade app: a fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
 - `--laravel --vue` bakes a Laravel + Blade + Vue islands app: the Laravel + Blade bake under a front-end layer (Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view).
@@ -22,7 +22,7 @@ All three Laravel shapes also ship Laravel Boost as a dev-only tool, with the st
 
 All five permutations bake; the raw ones (`--raw`, `--raw --vue`) start from the raw base instead of a Laravel skeleton.
 
-## Build on the official installer[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
+## Build on the official installer [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#build-on-the-official-installer)
 
 For Laravel paths, wrap the supported entry points instead of copying Laravel's skeleton by hand. `composer create-project laravel/laravel` picks the newest major, which is right. The installer also accepts a community starter kit published on Packagist:
 
@@ -32,7 +32,7 @@ laravel new my-app --using=vendor/kit
 
 A kit declares its environment variables in `.env.example` and its setup steps in the `post-create-project-cmd` list of its `composer.json`. There is no plain Blade kit, so the `--laravel` (Blade) and Blade-plus-Vue-islands permutations are a bare Laravel install plus Sourdough's own layer, not a vendor kit.
 
-## Local runtime: Sail or Docker[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#local-runtime-sail-or-docker)
+## Local runtime: Sail or Docker [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#local-runtime-sail-or-docker)
 
 The Laravel paths take a flag for the local runtime, and the two are mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.`
 
@@ -49,7 +49,7 @@ docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 
 The `FROM` lines in the generated `Dockerfile` are the app's own images, for everyday work. Citadel's own image is Parity's job (below).
 
-## Run it like Citadel: Parity[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#run-it-like-citadel-parity)
+## Run it like Citadel: Parity [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#run-it-like-citadel-parity)
 
 Neither flag is Citadel. [Parity](https://git.wayne.edu/enterprise-apps/parity) is: it runs the same folder on Citadel's PHP image with its `php.ini` and `vhost.conf`, Citadel's proxy, MySQL 5.6.51, `build.sh`, the deployments, and Laravel's scheduler as Citadel's cron entry, on Windows, macOS and Linux with Podman or Docker. It is a separate install, not a flag, and Sourdough bakes no `parity.json`: `parity init --from-squire` writes it from the Squire kit every shape already ships. Every Laravel README ends "Run it locally" with "Run it like Citadel", which comes down to:
 
@@ -69,7 +69,7 @@ Which to use when:
 - **`php artisan serve`, Sail or `--docker`** while you write code: fast reloads, Vite, your own database.
 - **Parity** before a release, after a PHP or Laravel upgrade, or whenever a bug only shows on Citadel: Citadel's `php.ini`, Apache, proxy headers and MySQL 5.6 are where "works on my machine" usually parts ways with production.
 
-## Sign-in stays SESAME[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
+## Sign-in stays SESAME [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
 
 Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.
 
@@ -77,7 +77,7 @@ Warning
 
 A live `/register` route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.
 
-## Laravel Boost, dev only[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)
+## Laravel Boost, dev only [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only)
 
 Every Laravel bake (Blade, Blade with Vue, Inertia) ships [Laravel Boost](https://laravel.com/docs/boost) in `require-dev`: an MCP server, guidelines and skills that teach a coding agent the app's Laravel. Boost is used as published, through its own commands and file layout. Sourdough adds the stack's guidance and the guard rails around it. [ADVISOR](https://github.com/waynestate/advisor) complements Boost, never replaces it: Boost knows Laravel, ADVISOR knows the Wayne State stack.
 
@@ -113,15 +113,15 @@ Warning
 
 Boost's MCP server can run database queries and code through Tinker, so the development `.env` must point at a local database and never at the shared server.
 
-## Support windows[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#support-windows)
+## Support windows [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#support-windows)
 
 Laravel gives each major 18 months of bug fixes and two years of security fixes. From its release notes: 11 reached the end of security fixes on 2026-03-12; 12 (PHP 8.2 to 8.5) gets security fixes until 2027-02-24; 13 (PHP 8.3 to 8.5) until 2028-03-17. Name the major in the generator's tests, so a new release cannot change output unseen, and print the end-of-security date in the generated README. Laravel 13 needs PHP 8.3, which is also the stack's floor: 8.2 security support ends 2026-12-31.
 
-## Trust the HA-Proxy, not every sender[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#trust-the-ha-proxy-not-every-sender)
+## Trust the HA-Proxy, not every sender [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#trust-the-ha-proxy-not-every-sender)
 
 Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that ends TLS, Laravel's `url` helper can produce `http` links until `trustProxies` is set in `bootstrap/app.php`. The generated app should list the proxy addresses (from env) and also set `trustHosts`. Raw PHP gets the same behavior from HELMET.
 
-## /up for liveness, /ready for traffic[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#up-for-liveness-ready-for-traffic)
+## /up for liveness, /ready for traffic [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#up-for-liveness-ready-for-traffic)
 
 `/up` is Laravel's health route and the liveness answer: 200 whenever the app boots, and it never looks at the database or the cache, so a database blip cannot restart every container at once. `/ready` asks the other question, "should this instance get traffic right now?". Every Laravel shape registers HELMET's readiness route there, in `bootstrap/app.php` (the `then:` callback, outside the web group, so a probe writes no session row and sets no cookie), with three app checks next to HELMET's own:
 
@@ -133,19 +133,19 @@ Citadel ends TLS at HA-Proxy, so the app sees plain HTTP. Behind a balancer that
 
 Any failure answers 503 with the check names and statuses only; the reason goes to the log as `helmet.readiness_check_failed`. Point a readiness probe or a balancer at `/ready` and anything that restarts the app at `/up`. A hung database holds the probe for as long as the connection's own connect timeout, so on MySQL set `PDO::ATTR_TIMEOUT` in the connection's `options`. `tests/Feature/ReadyChecksTest.php` breaks the database and the cache in turn and expects 503.
 
-## A stopped scheduler shows up[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#a-stopped-scheduler-shows-up)
+## A stopped scheduler shows up [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#a-stopped-scheduler-shows-up)
 
 Citadel has no queue worker, so a generated app runs its queue from the scheduler (`QUEUE_WORKER_MODE=scheduler` starts a short `queue:work` each minute). A scheduler that stops does not error: it simply stops running, and jobs pile up in silence. Every Laravel shape therefore stamps a heartbeat into the cache each minute (`routes/console.php`, under the name `scheduler-heartbeat`), and `/ready` carries a `scheduler` check. While the stamp is missing or older than `WORKER_HEARTBEAT_MAX_AGE` seconds (default 180, `config/worker.php`), `/ready` answers 503, so a balancer or health probe skips the instance instead of feeding it work nobody will run. `/up` stays the liveness answer: it never looks at the cache, so a stalled scheduler does not take the app out of rotation for requests that do not need the queue.
 
-## Every queued job has limits[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#every-queued-job-has-limits)
+## Every queued job has limits [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#every-queued-job-has-limits)
 
 A queued job with no limits retries as often as the worker allows and can hold a worker until the platform kills it. Every class under `app/Jobs` that implements `ShouldQueue` declares Laravel's `#[Tries]` and `#[Timeout]` attributes (on the class, a parent or a trait; the older `$tries` and `$timeout` properties count too), and the timeout stays below the queue connection's `retry_after` (Laravel's default is 90 seconds), or a second worker picks the job up while the first is still running it. `tests/Feature/JobLimitsTest.php` fails the suite on a job that breaks either rule, and passes while there are no jobs. The app ships `stubs/job.queued.stub` and `stubs/job.batched.queued.stub`, so `php artisan make:job` writes `#[Tries(3)]` and `#[Timeout(45)]` from the first job on.
 
-## Work on the shared MySQL 5.6[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
+## Work on the shared MySQL 5.6 [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#work-on-the-shared-mysql-5-6)
 
 Laravel's database docs list MySQL 5.7+ and MariaDB 10.3+ as supported; the shared server is MySQL 5.6, which left extended support on 2021-02-28. The practical limit is the index key prefix: 767 bytes for REDUNDANT and COMPACT tables, which is 191 characters in utf8mb4. Laravel's default string column is 255 characters, so a unique index on it can fail with error 1071. The Laravel templates set the 191 default with `Schema::defaultStringLength(191)` in `app/Providers/AppServiceProvider.php` and avoid JSON columns, so string columns stay inside the limit (PROCTOR `mysql56-string-default`). Sail's MySQL is current, so a developer's migrations can pass locally and fail on deploy.
 
-## Next steps[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#next-steps)
+## Next steps [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#next-steps)
 
 Each Laravel bake prints Next steps suited to the shape. For `--laravel`:
 
@@ -166,7 +166,7 @@ npm run build
 
 The bake runs `php artisan migrate` after `php artisan key:generate`, so a freshly baked app has its database before the first request instead of answering 500 until someone migrates by hand.
 
-## The Oracle check[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#the-oracle-check)
+## The Oracle check [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#the-oracle-check)
 
 Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with:
 
@@ -176,7 +176,7 @@ php artisan oracle:check
 
 The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#related)
 
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
 - [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)

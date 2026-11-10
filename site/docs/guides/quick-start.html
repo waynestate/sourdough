@@ -39,9 +39,9 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html" aria-current="page">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="quick-start">Quick start<a class="docs-heading-link" aria-label="Link to this section" href="#quick-start">#</a></h1>
+      <article class="docs-article"><h1 id="quick-start">Quick <span class="docs-heading-tail"><span>start</span><a class="docs-heading-link" aria-label="Link to this section" href="#quick-start">#</a></span></h1>
 <p>From a machine where <code>sourdough</code> is installed (see <a href="../install.html">Install</a>), bake an app and prove it.</p>
-<h2 id="steps">Steps<a class="docs-heading-link" aria-label="Link to this section" href="#steps">#</a></h2>
+<h2 id="steps"><span class="docs-heading-tail"><span>Steps</span><a class="docs-heading-link" aria-label="Link to this section" href="#steps">#</a></span></h2>
 <ol>
 <li>
 <p>Scaffold the app.</p>
@@ -57,7 +57,7 @@
 <p>Expected: exit code <code>0</code>. A freshly baked app passes its own <code>composer ci</code> on the first run.</p>
 </li>
 </ol>
-<h2 id="what-you-built">What you built<a class="docs-heading-link" aria-label="Link to this section" href="#what-you-built">#</a></h2>
+<h2 id="what-you-built">What you <span class="docs-heading-tail"><span>built</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-you-built">#</a></span></h2>
 <ul>
 <li>A Wayne State app with the stack already wired in: SESAME (auth), HELMET (baseline runtime), PROCTOR (checks), and the Preflight CI components.</li>
 <li>Playbook wiring by default: the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends your token to git.wayne.edu, the seven setting names in <code>.env.example</code>, a <code>composer playbook</code> script that shows whether Playbook is installed, and a &quot;WSU values (PLAYBOOK)&quot; README section.</li>
@@ -66,7 +66,7 @@
 <li><code>.sourdough/manifest.json</code>, the starter's memory: the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked <code>managed</code> (Sourdough owns it and will update it) or <code>seeded</code> (Sourdough wrote it once and you own it now: <code>.env.example</code>, <code>README.md</code>, and <code>package-lock.json</code> on the shapes with a front end).</li>
 <li><code>.sourdough/plan.yaml</code>, the plan the app was baked from: the shape, the name and the stack parts (plus the models and pages, when you baked from a plan file). It bakes the same loaf again with <code>--plan</code>; see <a href="../reference/plan-format.html#the-saved-plan">The saved plan</a>.</li>
 </ul>
-<h2 id="next-steps">Next steps<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></h2>
+<h2 id="next-steps">Next <span class="docs-heading-tail"><span>steps</span><a class="docs-heading-link" aria-label="Link to this section" href="#next-steps">#</a></span></h2>
 <ul>
 <li>Follow the app's printed Next steps: they point at <code>composer playbook</code> once dependencies are in, and at <code>php vendor/bin/advisor install --client=claude --write</code> for ADVISOR.</li>
 <li><a href="shapes.html">Pick a shape</a>: the permutations, from raw PHP to Laravel plus Inertia/Vue.</li>

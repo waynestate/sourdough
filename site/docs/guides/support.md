@@ -6,13 +6,13 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Support and sunset[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#support-and-sunset)
+# Support and sunset [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#support-and-sunset)
 
 Starters die quietly when nobody owns them. This page is the policy for Sourdough's five shapes: who owns each one, how long it is supported, and how one is retired without surprising the apps baked from it. Even the best loaf goes stale; the point is to say so before it does.
 
 The facts behind the policy are data, not prose: `resources/shapes.json` holds each shape's owner, status and sunset fields, and `sourdough new --dry-run --json` reports them with the dates the app inherits from CREED.
 
-## Owners[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#owners)
+## Owners [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#owners)
 
 Every shape names an owner role, never a person. Today all five belong to the same role:
 
@@ -26,7 +26,7 @@ Every shape names an owner role, never a person. Today all five belong to the sa
 
 The Sourdough maintainers are the role that releases Sourdough (Enterprise Applications). The owner keeps the shape green in the smoke and proof jobs, answers its issues, and decides when it is deprecated. A change to the Inertia shape also lands in WELD, which is generated from it, in the same round of work.
 
-## How long a shape is supported[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-long-a-shape-is-supported)
+## How long a shape is supported [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-long-a-shape-is-supported)
 
 Note
 
@@ -37,7 +37,7 @@ The windows below are a proposal and are not confirmed yet. The rules for markin
 - The raw shapes follow PHP alone: their floor comes from CREED (see [The PHP floor](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor)), and `sourdough new` prints that line's end of security support.
 - Proposal: a shape is supported for as long as its framework line has a supported successor that the shape can move to. When it has none, or no one in the owner role can keep it green, it is deprecated as below.
 
-## How a shape is retired[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-a-shape-is-retired)
+## How a shape is retired [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#how-a-shape-is-retired)
 
 A retirement is announced one release ahead, the same way Preflight retires a component (see [Preflight: deprecating a component](https://preflight.apps.wayne.edu/docs/guides/deprecation.html)):
 
@@ -48,7 +48,7 @@ A retirement is announced one release ahead, the same way Preflight retires a co
 
 `tests/ShapeSupportTest.php` holds the catalog to these rules: every shape Sourdough bakes is listed with an owner; a supported shape carries no sunset fields; a deprecated or removed shape names the release that deprecated it, a later release that removes it, and a replacement Sourdough still bakes; and a removed shape is one Sourdough no longer bakes.
 
-## The fields[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-fields)
+## The fields [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-fields)
 
 `resources/shapes.json`, one entry per shape:
 
@@ -65,7 +65,7 @@ A retirement is announced one release ahead, the same way Preflight retires a co
 - `support`: the shape's entry plus `policy` (this page) and `runs_on`, the line the app inherits its clock from (`{"component": "laravel", "version": "13", "security_until": "2028-03-17"}` for a Laravel shape, the PHP floor line for a raw one).
 - `php`: the floor the bake writes (`constraint`, `platform`, `versions`), the floor line's `floor_security_until`, and where it came from (`source`, `origin`, `refreshed_on`, `horizon_days`, and `reason` when the fallback was used).
 
-## The PHP floor[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor)
+## The PHP floor [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#the-php-floor)
 
 A new app's PHP floor is not a number in a template: Sourdough reads it from CREED's `policy.json` when it bakes, the same file PROCTOR's `php-floor` check reads in the app.
 
@@ -79,7 +79,7 @@ Note
 
 The 365-day horizon is a proposal. CREED is the natural owner of it; until CREED's policy carries one, the number lives in `src/PhpFloor.php`.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/support.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/support.html#related)
 
 - [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
 - [Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html)

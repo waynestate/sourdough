@@ -39,10 +39,10 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../docs/index.html">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li><a href="../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../docs/guides/manifest.html">The manifest</a></li><li><a href="../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../docs/guides/testing.html">Testing</a></li><li><a href="../docs/guides/ci.html">CI</a></li><li><a href="../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../docs/guides/support.html">Support and sunset</a></li><li><a href="../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/plan-format.html">Plan format</a></li><li><a href="../docs/reference/templates.html">Templates</a></li><li><a href="../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../docs/maintaining.html">Maintaining</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/troubleshooting.html" aria-current="page">Troubleshooting</a></li><li><a href="../docs/upgrading.html">Upgrading</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="troubleshooting">Troubleshooting<a class="docs-heading-link" aria-label="Link to this section" href="#troubleshooting">#</a></h1>
+      <article class="docs-article"><h1 id="troubleshooting"><span class="docs-heading-tail"><span>Troubleshooting</span><a class="docs-heading-link" aria-label="Link to this section" href="#troubleshooting">#</a></span></h1>
 <p>What to do when a bake is refused or a check fails. Each symptom below names the cause, the fix, and a command that checks the result. Start with the exit code: <code>0</code> done, <code>1</code> refused, <code>2</code> tool error. A starter that refuses loudly is easier to feed than one that fails quietly.</p>
-<h2 id="exit-code-1-the-bake-was-refused">Exit code 1: the bake was refused<a class="docs-heading-link" aria-label="Link to this section" href="#exit-code-1-the-bake-was-refused">#</a></h2>
-<h3 id="a-raw-vue-app-shows-no-vite-build-and-no-dev-server">A <code>--raw --vue</code> app shows &quot;No Vite build and no dev server&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#a-raw-vue-app-shows-no-vite-build-and-no-dev-server">#</a></h3>
+<h2 id="exit-code-1-the-bake-was-refused">Exit code 1: the bake was <span class="docs-heading-tail"><span>refused</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-code-1-the-bake-was-refused">#</a></span></h2>
+<h3 id="a-raw-vue-app-shows-no-vite-build-and-no-dev-server">A <code>--raw --vue</code> app shows &quot;No Vite build and no dev <span class="docs-heading-tail"><span>server&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#a-raw-vue-app-shows-no-vite-build-and-no-dev-server">#</a></span></h3>
 <p>Cause: the raw PHP + Vue app loads its page from Vite: from <code>public/build/manifest.json</code> after <code>npm run build</code>, or from the dev server while <code>npm run dev</code> runs. A fresh bake has neither, so <code>src/Vite.php</code> refuses with that sentence instead of printing tags that point nowhere.</p>
 <p>Fix: build the front end once, or run the dev server next to <code>composer serve</code>.</p>
 <p>Check:</p>
@@ -51,7 +51,7 @@ npm run build
 composer serve
 </code></pre>
 <p><a rel="noopener" href="http://localhost:8000">http://localhost:8000</a> shows the app, and <a rel="noopener" href="http://localhost:8000/api/me">http://localhost:8000/api/me</a> answers JSON.</p>
-<h3 id="sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook"><code>sourdough new</code> refuses before writing anything: no read access to Playbook<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook">#</a></h3>
+<h3 id="sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook"><code>sourdough new</code> refuses before writing anything: no read access to <span class="docs-heading-tail"><span>Playbook</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-new-refuses-before-writing-anything-no-read-access-to-playbook">#</a></span></h3>
 <p>Cause: by default the generated app requires <code>waynestate/playbook</code>, WSU's private shared-values package on git.wayne.edu. Before writing anything, <code>sourdough new</code> checks that this machine can read the package (a Composer credential, then a direct git probe); without read access it refuses with exit <code>1</code> and prints the how-to.</p>
 <p>Fix: follow the printed how-to to get read access, then rerun the same command.</p>
 <p>Check:</p>
@@ -59,58 +59,58 @@ composer serve
 </code></pre>
 <p><code>--dry-run</code> runs the check but never refuses, and its JSON plan carries a <code>playbook</code> key with the mode, the access status and the probe that answered. Once the app exists, <code>composer playbook</code> (the script <code>@composer show waynestate/playbook --no-interaction</code>) shows whether Playbook is installed.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p><code>--no-playbook</code> skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook.</p></aside>
-<h3 id="git-wayne-edu-is-unreachable-during-the-access-check">git.wayne.edu is unreachable during the access check<a class="docs-heading-link" aria-label="Link to this section" href="#git-wayne-edu-is-unreachable-during-the-access-check">#</a></h3>
+<h3 id="git-wayne-edu-is-unreachable-during-the-access-check">git.wayne.edu is unreachable during the access <span class="docs-heading-tail"><span>check</span><a class="docs-heading-link" aria-label="Link to this section" href="#git-wayne-edu-is-unreachable-during-the-access-check">#</a></span></h3>
 <p>Cause: the Playbook access check cannot reach git.wayne.edu. Sourdough still generates the app, but warns that <code>composer install</code> will need the connection.</p>
 <p>Fix: restore the connection to git.wayne.edu, then install the app's dependencies.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">composer install
 </code></pre>
 <p>Run it in the generated app; it completes without the Playbook fetch failing.</p>
-<h3 id="playbook-and-no-playbook-together"><code>--playbook</code> and <code>--no-playbook</code> together<a class="docs-heading-link" aria-label="Link to this section" href="#playbook-and-no-playbook-together">#</a></h3>
+<h3 id="playbook-and-no-playbook-together"><code>--playbook</code> and <code>--no-playbook</code> <span class="docs-heading-tail"><span>together</span><a class="docs-heading-link" aria-label="Link to this section" href="#playbook-and-no-playbook-together">#</a></span></h3>
 <p>Cause: the two flags are mutually exclusive and are refused with exit <code>1</code>. <code>--playbook</code> is kept for compatibility and changes nothing, because Playbook is now the default.</p>
 <p>Fix: drop one of the flags.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run
 </code></pre>
 <p>Exits 0 and prints the plan.</p>
-<h3 id="an-invalid-flag-a-non-empty-target-or-a-bad-app-name">An invalid flag, a non-empty target, or a bad app name<a class="docs-heading-link" aria-label="Link to this section" href="#an-invalid-flag-a-non-empty-target-or-a-bad-app-name">#</a></h3>
+<h3 id="an-invalid-flag-a-non-empty-target-or-a-bad-app-name">An invalid flag, a non-empty target, or a bad app <span class="docs-heading-tail"><span>name</span><a class="docs-heading-link" aria-label="Link to this section" href="#an-invalid-flag-a-non-empty-target-or-a-bad-app-name">#</a></span></h3>
 <p>Cause: exit <code>1</code> also covers invalid flags, a non-empty target (Sourdough refuses to generate into a directory that already has files), and an app name that fails validation. The name (from <code>--name</code>, from the plan, or from the basename of <code>&lt;dir&gt;</code>) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.</p>
 <p>Fix: correct the flags, point <code>dir</code> at an empty directory, and rename the app to something the allow-list accepts.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run
 </code></pre>
 <p>Prints the plan and writes nothing.</p>
-<h3 id="the-model-gave-up-describe">The model gave up (<code>--describe</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-model-gave-up-describe">#</a></h3>
+<h3 id="the-model-gave-up-describe">The model gave up (<code>--describe</code><span class="docs-heading-tail"><span>)</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-model-gave-up-describe">#</a></span></h3>
 <p>Cause: if the answer from the model is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>).</p>
 <p>Fix: write the plan yourself and pass it in:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name.</p>
 <p>Check: the same command exits 0 when the plan is valid.</p>
-<h2 id="exit-code-2-a-tool-error">Exit code 2: a tool error<a class="docs-heading-link" aria-label="Link to this section" href="#exit-code-2-a-tool-error">#</a></h2>
-<h3 id="sourdough-manifest-without-check"><code>sourdough manifest</code> without <code>--check</code><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest-without-check">#</a></h3>
+<h2 id="exit-code-2-a-tool-error">Exit code 2: a tool <span class="docs-heading-tail"><span>error</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-code-2-a-tool-error">#</a></span></h2>
+<h3 id="sourdough-manifest-without-check"><code>sourdough manifest</code> without <span class="docs-heading-tail"><code>--check</code><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest-without-check">#</a></span></h3>
 <p>Cause: without <code>--check</code> the command answers &quot;Use <code>sourdough manifest --check</code> to check the app against its manifest.&quot; and exits <code>2</code>. A missing manifest in the directory is also a tool error (exit <code>2</code>).</p>
 <p>Fix: run the command with <code>--check</code>, inside the generated app (or pass the app directory as an argument).</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Exits 0 and prints <code>Clean: every managed file matches the manifest.</code></p>
-<h3 id="json-without-dry-run"><code>--json</code> without <code>--dry-run</code><a class="docs-heading-link" aria-label="Link to this section" href="#json-without-dry-run">#</a></h3>
+<h3 id="json-without-dry-run"><code>--json</code> without <span class="docs-heading-tail"><code>--dry-run</code><a class="docs-heading-link" aria-label="Link to this section" href="#json-without-dry-run">#</a></span></h3>
 <p>Cause: <code>--json</code> is only available with <code>--dry-run</code>; without it the command exits <code>2</code>.</p>
 <p>Fix: add <code>--dry-run</code>.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --dry-run --json
 </code></pre>
 <p>Prints the plan as JSON.</p>
-<h3 id="the-model-could-not-be-reached-describe">The model could not be reached (<code>--describe</code>)<a class="docs-heading-link" aria-label="Link to this section" href="#the-model-could-not-be-reached-describe">#</a></h3>
+<h3 id="the-model-could-not-be-reached-describe">The model could not be reached (<code>--describe</code><span class="docs-heading-tail"><span>)</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-model-could-not-be-reached-describe">#</a></span></h3>
 <p>Cause: <code>--describe</code> needs the <code>SOURDOUGH_LLM_BASE_URL</code>, <code>SOURDOUGH_LLM_API_KEY</code> and <code>SOURDOUGH_LLM_MODEL</code> environment variables (no defaults, no key in code) and a reachable OpenAI-compatible endpoint. When the endpoint cannot be reached, the command prints <code>The model could not be reached:</code> plus the underlying error and exits <code>2</code>.</p>
 <p>Fix: set the three variables and point them at a working endpoint (a hosted API, a local server, or WarriorGPT), then rerun. Any OpenAI-compatible endpoint works; Sourdough only needs the base URL, key, and model.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
 <p>Prints the plan as JSON without writing anything.</p>
-<h2 id="drift-the-manifest-and-the-squire-copy">Drift: the manifest and the Squire copy<a class="docs-heading-link" aria-label="Link to this section" href="#drift-the-manifest-and-the-squire-copy">#</a></h2>
-<h3 id="sourdough-manifest-check-exits-1-in-a-generated-app"><code>sourdough manifest --check</code> exits 1 in a generated app<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest-check-exits-1-in-a-generated-app">#</a></h3>
+<h2 id="drift-the-manifest-and-the-squire-copy">Drift: the manifest and the Squire <span class="docs-heading-tail"><span>copy</span><a class="docs-heading-link" aria-label="Link to this section" href="#drift-the-manifest-and-the-squire-copy">#</a></span></h2>
+<h3 id="sourdough-manifest-check-exits-1-in-a-generated-app"><code>sourdough manifest --check</code> exits 1 in a generated <span class="docs-heading-tail"><span>app</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest-check-exits-1-in-a-generated-app">#</a></span></h3>
 <p>Cause: a managed file changed or is missing. The output lists one line per file, <code>changed  &lt;file&gt;</code> or <code>missing  &lt;file&gt;</code>. Seeded files (<code>.env.example</code> and <code>README.md</code>) are never reported: they're yours.</p>
 <p>Fix: nothing, if the change is deliberate. <code>sourdough feed</code> three-way merges your edits with the template's, so a drifted managed file is fine; the check just names the files a feed will merge rather than replace. If the change was a mistake, restore the file from your version control.</p>
 <p>Check:</p>
@@ -118,7 +118,7 @@ composer serve
 </code></pre>
 <p>Exits 0 when every managed file matches the manifest.</p>
 <aside class="docs-callout docs-callout--tip" role="note"><p class="docs-callout__label">Tip</p><p>Commit <code>.sourdough/manifest.json</code> (and <code>.sourdough/base/</code>, once a feed has written it) in generated apps. It's the record that keeps <code>feed</code> honest.</p></aside>
-<h3 id="composer-squire-copy-check-exits-1-maintainers-of-sourdough"><code>composer squire-copy:check</code> exits 1 (maintainers of Sourdough)<a class="docs-heading-link" aria-label="Link to this section" href="#composer-squire-copy-check-exits-1-maintainers-of-sourdough">#</a></h3>
+<h3 id="composer-squire-copy-check-exits-1-maintainers-of-sourdough"><code>composer squire-copy:check</code> exits 1 (maintainers of <span class="docs-heading-tail"><span>Sourdough)</span><a class="docs-heading-link" aria-label="Link to this section" href="#composer-squire-copy-check-exits-1-maintainers-of-sourdough">#</a></span></h3>
 <p>Cause: the committed copy at <code>templates/squire/</code> has drifted from a fresh export from the installed <code>waynestate/squire</code> package. The check is part of <code>composer ci</code>.</p>
 <p>Fix: rewrite the copy from the installed package, then commit <code>templates/squire/</code>:</p>
 <pre tabindex="0"><code class="language-bash">composer squire-copy:sync
@@ -127,79 +127,79 @@ composer serve
 <pre tabindex="0"><code class="language-bash">composer squire-copy:check
 </code></pre>
 <p>Exits 0 when the committed copy matches.</p>
-<h3 id="proctor-s-preflight-pinned-check-warns-on-a-bare-tag">PROCTOR's <code>preflight-pinned</code> check warns on a bare tag<a class="docs-heading-link" aria-label="Link to this section" href="#proctor-s-preflight-pinned-check-warns-on-a-bare-tag">#</a></h3>
+<h3 id="proctor-s-preflight-pinned-check-warns-on-a-bare-tag">PROCTOR's <code>preflight-pinned</code> check warns on a bare <span class="docs-heading-tail"><span>tag</span><a class="docs-heading-link" aria-label="Link to this section" href="#proctor-s-preflight-pinned-check-warns-on-a-bare-tag">#</a></span></h3>
 <p>Cause: PROCTOR 0.4 to 0.7's <code>preflight-pinned</code> check wants a 40-hex SHA and warns on a bare tag (0.8 also accepts a full release tag such as <code>@0.3.0</code>, and still warns on a branch, <code>~latest</code> or a partial version such as <code>0.3</code>). New apps pin the Preflight CI components to the 0.5.0 release SHA (<code>60314791565a264e97cb210813ef4f3e76512402</code>, with the tag in a trailing comment), which every PROCTOR accepts.</p>
 <p>Fix: pin the Preflight component includes to the release SHA, with the tag in a trailing comment. Moving a pin is a deliberate commit.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">composer ci
 </code></pre>
 <p>Run it in the generated app; the PROCTOR check passes.</p>
-<h2 id="feeding-sourdough-feed">Feeding: sourdough feed<a class="docs-heading-link" aria-label="Link to this section" href="#feeding-sourdough-feed">#</a></h2>
-<h3 id="sourdough-feed-exits-2-commit-or-stash-your-changes-first"><code>sourdough feed</code> exits 2: &quot;Commit or stash your changes first&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-commit-or-stash-your-changes-first">#</a></h3>
+<h2 id="feeding-sourdough-feed">Feeding: sourdough <span class="docs-heading-tail"><span>feed</span><a class="docs-heading-link" aria-label="Link to this section" href="#feeding-sourdough-feed">#</a></span></h2>
+<h3 id="sourdough-feed-exits-2-commit-or-stash-your-changes-first"><code>sourdough feed</code> exits 2: &quot;Commit or stash your changes <span class="docs-heading-tail"><span>first&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-commit-or-stash-your-changes-first">#</a></span></h3>
 <p>Cause: the app's git tree is not clean (a modified, staged or untracked file under the app folder). Feed only runs on a clean tree, so <code>git diff</code> shows exactly what it did and <code>git restore</code> undoes it.</p>
 <p>Fix: commit or stash your work, then feed. <code>--dry-run</code> still plans on a dirty tree, with a note.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">git status --porcelain
 </code></pre>
 <p>Prints nothing when the tree is clean.</p>
-<h3 id="sourdough-feed-exits-1-a-conflict"><code>sourdough feed</code> exits 1: a conflict<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-1-a-conflict">#</a></h3>
+<h3 id="sourdough-feed-exits-1-a-conflict"><code>sourdough feed</code> exits 1: a <span class="docs-heading-tail"><span>conflict</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-1-a-conflict">#</a></span></h3>
 <p>Cause: you and the template changed the same lines of a file, or feed had no base to merge from (you edited the file before your first commit), so it marked both versions instead of guessing. The plan line says which.</p>
 <p>Fix: open each <code>conflict</code> file, keep what it should be, delete the <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; app</code>, <code>=======</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; sourdough &lt;version&gt;</code> lines, run your checks and commit. For a binary file, compare it with <code>&lt;file&gt;.sourdough-new</code>, keep one, and delete the copy.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">git diff --check
 </code></pre>
 <p>Prints nothing when no conflict markers are left.</p>
-<h3 id="sourdough-feed-exits-2-finish-the-last-feed-first"><code>sourdough feed</code> exits 2: &quot;Finish the last feed first&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-finish-the-last-feed-first">#</a></h3>
+<h3 id="sourdough-feed-exits-2-finish-the-last-feed-first"><code>sourdough feed</code> exits 2: &quot;Finish the last feed <span class="docs-heading-tail"><span>first&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-finish-the-last-feed-first">#</a></span></h3>
 <p>Cause: a managed file still holds a marker from an earlier feed (<code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; sourdough &lt;version&gt;</code>), or a <code>.sourdough-new</code> copy is still lying around. Feeding on top of an unresolved conflict would bury it.</p>
 <p>Fix: resolve the listed files as for a conflict above, delete any <code>.sourdough-new</code> copies, commit, then feed again.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
 </code></pre>
 <p>Exits 0 or 1 (a plan) instead of 2.</p>
-<h3 id="sourdough-feed-exits-2-only-runs-inside-a-git-repository-or-no-sourdough-manifest"><code>sourdough feed</code> exits 2: &quot;only runs inside a git repository&quot; or &quot;No Sourdough manifest&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-only-runs-inside-a-git-repository-or-no-sourdough-manifest">#</a></h3>
+<h3 id="sourdough-feed-exits-2-only-runs-inside-a-git-repository-or-no-sourdough-manifest"><code>sourdough feed</code> exits 2: &quot;only runs inside a git repository&quot; or &quot;No Sourdough <span class="docs-heading-tail"><span>manifest&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed-exits-2-only-runs-inside-a-git-repository-or-no-sourdough-manifest">#</a></span></h3>
 <p>Cause: feed stands on git and on a manifest. An app outside git cannot be fed, and neither can one Sourdough did not make (WELD included) until it has a manifest.</p>
 <p>Fix: <code>git init</code> and commit the app first. For an app with no manifest, adopt it: <code>sourdough adopt --shape &lt;shape&gt;</code>, commit <code>.sourdough/</code>, then feed. See <a href="guides/adopt.html">Adopt an existing app</a>.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough manifest --check
 </code></pre>
 <p>Exits 0 or 1 when the app has a manifest, 2 when it has none.</p>
-<h2 id="adopting-sourdough-adopt">Adopting: sourdough adopt<a class="docs-heading-link" aria-label="Link to this section" href="#adopting-sourdough-adopt">#</a></h2>
-<h3 id="sourdough-adopt-exits-1-shape-is-required-or-unknown-shape"><code>sourdough adopt</code> exits 1: &quot;--shape is required&quot; or &quot;Unknown shape&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-shape-is-required-or-unknown-shape">#</a></h3>
+<h2 id="adopting-sourdough-adopt">Adopting: sourdough <span class="docs-heading-tail"><span>adopt</span><a class="docs-heading-link" aria-label="Link to this section" href="#adopting-sourdough-adopt">#</a></span></h2>
+<h3 id="sourdough-adopt-exits-1-shape-is-required-or-unknown-shape"><code>sourdough adopt</code> exits 1: &quot;--shape is required&quot; or &quot;Unknown <span class="docs-heading-tail"><span>shape&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-shape-is-required-or-unknown-shape">#</a></span></h3>
 <p>Cause: adopt never picks a shape; you name what the app already is. Without <code>--shape</code> it says what the app's files point at (<code>This app looks like laravel-inertia (it has artisan and inertiajs/inertia-laravel).</code>). A shape that is not one of the five is refused with the list, and a retired one with its replacement.</p>
 <p>Fix: pass one of <code>raw</code>, <code>raw-vue</code>, <code>laravel-blade</code>, <code>laravel-blade-vue</code>, <code>laravel-inertia</code>. These are the manifest's <code>template</code> values, not <code>sourdough new</code>'s flags.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape raw --dry-run
 </code></pre>
 <p>Exits 0 with the report.</p>
-<h3 id="sourdough-adopt-exits-1-an-oven-or-a-name-it-cannot-bake"><code>sourdough adopt</code> exits 1: an oven or a name it cannot bake<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-an-oven-or-a-name-it-cannot-bake">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-an-oven-or-a-name-it-cannot-bake"><code>sourdough adopt</code> exits 1: an oven or a name it cannot <span class="docs-heading-tail"><span>bake</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-an-oven-or-a-name-it-cannot-bake">#</a></span></h3>
 <p>Cause: <code>--sail</code> or <code>--docker</code> on a raw shape (<code>--sail and --docker are for the Laravel paths: the raw paths run on plain PHP.</code>), both ovens (<code>Choose one of --sail or --docker, not both.</code>), or a name <code>sourdough new</code> would refuse, followed by <code>Pass --name &quot;&lt;a valid name&gt;&quot;.</code> The name defaults to the folder's basename, so a folder called <code>my app (old)</code> is refused.</p>
 <p>Fix: drop the oven (an app with its own Docker setup needs neither), or pass <code>--name</code> with letters, numbers, spaces, dots, dashes and underscores, at most 63 characters, starting with a letter or number.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape laravel-blade --name parking-permits --dry-run
 </code></pre>
 <p>Exits 0 with the report.</p>
-<h3 id="sourdough-adopt-exits-1-does-not-exist-or-is-a-file-not-a-directory"><code>sourdough adopt</code> exits 1: &quot;does not exist&quot; or &quot;is a file, not a directory&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-does-not-exist-or-is-a-file-not-a-directory">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-does-not-exist-or-is-a-file-not-a-directory"><code>sourdough adopt</code> exits 1: &quot;does not exist&quot; or &quot;is a file, not a <span class="docs-heading-tail"><span>directory&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-does-not-exist-or-is-a-file-not-a-directory">#</a></span></h3>
 <p>Cause: <code>&lt;dir&gt;</code> is not there, or it names a file. Adopt takes the app's root folder.</p>
 <p>Fix: pass the app's root folder, or run adopt inside it with no <code>&lt;dir&gt;</code>.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape raw --dry-run
 </code></pre>
 <p>Exits 0 with the report.</p>
-<h3 id="sourdough-adopt-exits-1-already-has-a-sourdough-manifest"><code>sourdough adopt</code> exits 1: &quot;already has a Sourdough manifest&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-already-has-a-sourdough-manifest">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-already-has-a-sourdough-manifest"><code>sourdough adopt</code> exits 1: &quot;already has a Sourdough <span class="docs-heading-tail"><span>manifest&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-already-has-a-sourdough-manifest">#</a></span></h3>
 <p>Cause: Sourdough made or adopted this app already. Adopting over a manifest would lose the record feed stands on, so adopt has no <code>--force</code>.</p>
 <p>Fix: bring it up to date with <code>sourdough feed</code>. To adopt it again with another <code>--shape</code> or <code>--name</code>, delete <code>.sourdough/</code>, commit, and run adopt again.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough feed --dry-run
 </code></pre>
 <p>Exits 0 (fresh) or 1 (a plan): the app already has its record.</p>
-<h3 id="sourdough-adopt-exits-1-is-left-from-a-manifest-that-is-gone"><code>sourdough adopt</code> exits 1: &quot;is left from a manifest that is gone&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-is-left-from-a-manifest-that-is-gone">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-is-left-from-a-manifest-that-is-gone"><code>sourdough adopt</code> exits 1: &quot;is left from a manifest that is <span class="docs-heading-tail"><span>gone&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-is-left-from-a-manifest-that-is-gone">#</a></span></h3>
 <p>Cause: <code>.sourdough/base/</code> is there but <code>.sourdough/manifest.json</code> is not. Those base copies belong to a record that is gone, and a later feed would merge against them as if they were still true.</p>
 <p>Fix: delete <code>.sourdough/</code>, commit, and run adopt again.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape raw --dry-run
 </code></pre>
 <p>Exits 0 with the report.</p>
-<h3 id="sourdough-adopt-exits-1-only-runs-inside-a-git-repository"><code>sourdough adopt</code> exits 1: &quot;only runs inside a git repository&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-only-runs-inside-a-git-repository">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-only-runs-inside-a-git-repository"><code>sourdough adopt</code> exits 1: &quot;only runs inside a git <span class="docs-heading-tail"><span>repository&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-only-runs-inside-a-git-repository">#</a></span></h3>
 <p>Cause: the app is not in git. Adopt wants the adoption to be one commit you can review, and every later feed to be undoable.</p>
 <p>Fix:</p>
 <pre tabindex="0"><code class="language-bash">git init
@@ -210,14 +210,14 @@ git commit -m &quot;Before Sourdough&quot;
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape raw --dry-run
 </code></pre>
 <p>Exits 0, with no <code>note: Not inside a git repository</code> line.</p>
-<h3 id="sourdough-adopt-exits-1-commit-or-stash-your-changes-first"><code>sourdough adopt</code> exits 1: &quot;Commit or stash your changes first&quot;<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-commit-or-stash-your-changes-first">#</a></h3>
+<h3 id="sourdough-adopt-exits-1-commit-or-stash-your-changes-first"><code>sourdough adopt</code> exits 1: &quot;Commit or stash your changes <span class="docs-heading-tail"><span>first&quot;</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-1-commit-or-stash-your-changes-first">#</a></span></h3>
 <p>Cause: the tree has uncommitted or untracked changes, listed under the message (up to ten, then <code>... and N more</code>). The hashes describe the files on disk, so uncommitted edits would be adopted as if they were committed, and the adoption should be a commit of its own.</p>
 <p>Fix: commit or stash, then adopt.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">git status --short
 </code></pre>
 <p>Prints nothing.</p>
-<h3 id="sourdough-adopt-exits-2-git-the-folder-or-the-bake"><code>sourdough adopt</code> exits 2: git, the folder or the bake<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-2-git-the-folder-or-the-bake">#</a></h3>
+<h3 id="sourdough-adopt-exits-2-git-the-folder-or-the-bake"><code>sourdough adopt</code> exits 2: git, the folder or the <span class="docs-heading-tail"><span>bake</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt-exits-2-git-the-folder-or-the-bake">#</a></span></h3>
 <p>Cause: one of these:</p>
 <ul>
 <li><code>sourdough adopt needs git on PATH (or SOURDOUGH_GIT set to it)</code>: adopt checks the tree, and feed, which comes next, merges with git.</li>
@@ -231,21 +231,21 @@ git commit -m &quot;Before Sourdough&quot;
 composer --version
 </code></pre>
 <p>Both print a version.</p>
-<h3 id="many-files-are-yours-and-a-note-says-the-name-may-be-wrong">Many files are <code>yours</code>, and a note says the name may be wrong<a class="docs-heading-link" aria-label="Link to this section" href="#many-files-are-yours-and-a-note-says-the-name-may-be-wrong">#</a></h3>
+<h3 id="many-files-are-yours-and-a-note-says-the-name-may-be-wrong">Many files are <code>yours</code>, and a note says the name may be <span class="docs-heading-tail"><span>wrong</span><a class="docs-heading-link" aria-label="Link to this section" href="#many-files-are-yours-and-a-note-says-the-name-may-be-wrong">#</a></span></h3>
 <p>Cause: the template writes the app's name into files (<code>composer.json</code>, <code>public/index.php</code>, the README), and <code>--name</code> defaulted to the folder's basename. If the app goes by another name, every file that carries it differs. Adopt flags each one (<code>differs; the template writes the app name here as &quot;&lt;name&gt;&quot;, and your file does not have it</code>), and two or more add <code>note: &lt;n&gt; files differ where the template writes the app name</code>.</p>
 <p>Fix: delete <code>.sourdough/</code>, commit, and adopt again with <code>--name</code> set to the name in <code>composer.json</code>. A <code>yours</code> file is never lost or overwritten either way; the right name only lets more files match.</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape raw --name parking-permits --dry-run
 </code></pre>
 <p>The name note is gone and more files are <code>match</code> (add <code>-v</code> to list them).</p>
-<h3 id="almost-everything-is-yours-on-an-older-laravel-app">Almost everything is <code>yours</code> on an older Laravel app<a class="docs-heading-link" aria-label="Link to this section" href="#almost-everything-is-yours-on-an-older-laravel-app">#</a></h3>
+<h3 id="almost-everything-is-yours-on-an-older-laravel-app">Almost everything is <code>yours</code> on an older Laravel <span class="docs-heading-tail"><span>app</span><a class="docs-heading-link" aria-label="Link to this section" href="#almost-everything-is-yours-on-an-older-laravel-app">#</a></span></h3>
 <p>Cause: adopt compares with today's <code>laravel/laravel</code> skeleton and today's PHP floor from CREED's policy. An app several majors behind differs almost everywhere. That is correct: <code>yours</code> files are safe, and feed never touches them.</p>
 <p>Fix: upgrade first with <a rel="noopener" href="https://booster.apps.wayne.edu/">Booster</a>, one hop at a time, then adopt (or, if already adopted, feed: each file that now matches is recorded and managed from then on).</p>
 <p>Check:</p>
 <pre tabindex="0"><code class="language-bash">sourdough adopt --shape laravel-blade --dry-run
 </code></pre>
 <p>The summary line shows more <code>match</code> than before the upgrade.</p>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="reference/commands.html">Commands</a></li>
 <li><a href="reference/templates.html">Templates</a></li>

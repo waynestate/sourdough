@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Commands[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#commands)
+# Commands [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#commands)
 
 Reference for the `sourdough` CLI: every command, argument, option and exit code, exactly as the sources define them. For the JSON plan behind `--describe` and `--plan`, see [Plan format](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html).
 
-## sourdough new[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-new)
+## sourdough new [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-new)
 
 Make a new Wayne State app with the stack already wired in.
 
@@ -20,7 +20,7 @@ sourdough new [dir] [options]
 
 `dir` is the directory to create the app in. It is required unless you use `--describe`.
 
-### Options[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#options)
+### Options [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#options)
 
 | Option | Meaning |
 | --- | --- |
@@ -45,7 +45,7 @@ Note
 
 `--sail` and `--docker` are both real for the Laravel shapes (`--laravel`, `--laravel --vue` and `--inertia`) and mutually exclusive: together they are refused with `Choose one of --sail or --docker, not both.` (exit `1`). With `--sail` the app runs on Laravel Sail: `laravel/sail` in require-dev, a `compose.yaml`, the database settings in `.env.example` and a README section; the database is MySQL 8.4 LTS. On Windows, Sail needs WSL2, and `--docker` is the route that works natively. With `--docker` Sourdough writes the app's own Docker setup after the shape is baked: a two-target `Dockerfile` (dev and prod) whose base images are pinned by manifest-list digest, a `compose.yaml` with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a `.dockerignore`, the PHP ini files the image copies in, the `composer dev-up`, `dev-down` and `dev-shell` scripts, the database settings in `.env.example`, and a "Run it locally with Docker" README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64. Playbook credentials reach a production build only as a BuildKit secret, never a build arg. The raw paths keep their own refusal at the plan step: "`--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP." Neither oven is Citadel: to run any shape on Citadel's own PHP image, proxy and MySQL 5.6.51, use [Parity](https://git.wayne.edu/enterprise-apps/parity), a separate install that no flag adds; every baked README's "Run it like Citadel" gives its commands.
 
-### Exit codes[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes)
+### Exit codes [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes)
 
 Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not available, model gave up), `2` tool error.
 
@@ -63,7 +63,7 @@ Exit codes: `0` done, `1` refused (invalid flags, non-empty target, not availabl
 
 Other refusals, all exit `1`: invalid flags, a non-empty target, a model that gives up (the message points to `--plan=<file>`), and an app name that fails validation.
 
-### Playbook access check[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#playbook-access-check)
+### Playbook access check [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#playbook-access-check)
 
 By default the generated app requires `waynestate/playbook` (WSU's private shared-values package on git.wayne.edu): the VCS repository, the package in `require`, `config.gitlab-domains` so Composer sends your token to git.wayne.edu, the seven setting names in `.env.example`, a `composer playbook` script that shows whether Playbook is installed, and a "WSU values (PLAYBOOK)" README section that explains how to get read access.
 
@@ -78,7 +78,7 @@ Before writing anything, `sourdough new` checks that this machine can read the p
 
 After generation the Next steps point at `composer playbook`. `--playbook` is kept for compatibility and changes nothing; `--no-playbook` skips all of it. The two flags together are refused with exit `1`.
 
-### ADVISOR wiring[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#advisor-wiring)
+### ADVISOR wiring [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#advisor-wiring)
 
 Generated apps ship with ADVISOR wired in by default: `waynestate/advisor` lands in `require-dev`, `.mcp.json` is git-ignored (a client config starts a program for whoever opens the project), and the README gains an "ADVISOR" section. The Next steps print the install line once dependencies are in:
 
@@ -90,11 +90,11 @@ php vendor/bin/advisor install --client=claude --write
 
 The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: `laravel/boost` in `require-dev`, a guarded `composer boost-update` after `composer update`, a `.gitignore` block for what `php artisan boost:install` writes (`/.mcp.json`, `/boost.json`, `/CLAUDE.md`, `/AGENTS.md`, `/.claude/skills/`, `/.junie/`), the stack's guidelines and two starter rules in `.ai/`, and `tests/Feature/BoostDevOnlyTest.php`. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See [Laravel Boost, dev only](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#laravel-boost-dev-only).
 
-### App name validation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#app-name-validation)
+### App name validation [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#app-name-validation)
 
 The app name (from `--name`, from the plan, or from the basename of `<dir>`) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.
 
-### PHP floor and support lines[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#php-floor-and-support-lines)
+### PHP floor and support lines [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#php-floor-and-support-lines)
 
 Every plan, dry run or real, prints two lines under `Target:`:
 
@@ -105,13 +105,13 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 
 The floor comes from CREED's policy at bake time; when the policy cannot be read, the first line ends `(pinned fallback: <reason>)` and the bake uses the pinned values. A shape that is deprecated also prints `Deprecated: The <shape> shape is deprecated since Sourdough <x> and is removed in <y>; move to <shape>. See <page>` to stderr; it never changes the exit code. With `--dry-run --json` the plan gains a `php` object and a `support` object with the same facts. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
 
-### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
+### Environment [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment)
 
 - `SOURDOUGH_POLICY`: a CREED-format `policy.json` to take the PHP floor from (default: the copy installed with `waynestate/creed`). A file that cannot be read means the pinned fallback, named in the `PHP:` line.
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH).
 - `SOURDOUGH_LLM_BASE_URL`, `SOURDOUGH_LLM_API_KEY`, `SOURDOUGH_LLM_MODEL`: the model `--describe` asks.
 
-### Next steps printed after generation[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#next-steps-printed-after-generation)
+### Next steps printed after generation [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#next-steps-printed-after-generation)
 
 | Shape | Steps |
 | --- | --- |
@@ -124,7 +124,7 @@ The floor comes from CREED's policy at bake time; when the policy cannot be read
 
 With ADVISOR wired in, `php vendor/bin/advisor install --client=claude --write` is printed after `composer install`. With Playbook required, the output ends with: `WSU values: Playbook installs with composer install. Check it any time with: composer playbook`.
 
-## sourdough manifest[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-manifest)
+## sourdough manifest [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-manifest)
 
 Check a generated app against its Sourdough manifest.
 
@@ -149,7 +149,7 @@ Exit codes: `0` clean, `1` changed or missing, `2` tool error.
 
 Seeded and yours files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not `changed`.
 
-## sourdough adopt[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-adopt)
+## sourdough adopt [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-adopt)
 
 Write the Sourdough manifest for an app Sourdough did not make, so `sourdough feed` can keep it current. The walk-through is [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html).
 
@@ -170,7 +170,7 @@ sourdough adopt [<dir>] --shape <shape> [--name <name>] [--sail | --docker] [--n
 
 Adopt bakes the shape into a scratch folder through the same `Baker` as `new` and `feed`, looks at each template path in the app (and only those), and writes `.sourdough/manifest.json`. It writes no other file: no `.sourdough/base/`, no `.sourdough/plan.yaml`. The answers gain `adopted: true`. There is no `--php` (the PHP floor comes from CREED's policy at bake time, so feed could never reproduce one) and no `--force` (every refusal has a plain fix).
 
-### Report lines[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#report-lines)
+### Report lines [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#report-lines)
 
 One line per template path that needs a look, ` <status> <path> <detail>`: `yours`, then `seeded`, then `missing`, each sorted by path; `match` lines only with `-v`. Without `-v`, a top-level folder whose every template file is missing folds into one line, `missing src/ (2 files) the next sourdough feed adds them`.
 
@@ -193,7 +193,7 @@ After the lines: any `note:` lines (a deprecated shape, a vendored Squire kit ol
 | `The folder is not writable: a real adopt would fail.` | check the folder's permissions |
 | `git is not available: a real adopt would fail.` | put git on PATH, or set `SOURDOUGH_GIT` |
 
-### Exit codes[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes-1)
+### Exit codes [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes-1)
 
 | Exit | Meaning | When |
 | --- | --- | --- |
@@ -220,7 +220,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
 | the bake failed | `sourdough adopt failed: could not bake a fresh <shape> app to compare with:` (the Laravel shapes add that they need Composer and the network, or a warm Composer cache) | `2` |
 | the manifest could not be written | `sourdough adopt failed:` | `2` |
 
-### JSON[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json)
+### JSON [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json)
 
 `--json` prints one object with sorted keys: `dir`, `dry_run`, `exit`, `files`, `name`, `notes`, `shape`, `sourdough_version` and `summary`. `files` lists every template path, `match` included, sorted and never folded, as `{path, status, detail}`; `summary` counts each status.
 
@@ -261,13 +261,13 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
 
 (`files` is cut to three of its 41 entries here: a raw app that lacks `phpstan.neon`, on a dry run.) A refusal with `--json` prints its message to stderr and no JSON, as `feed` does.
 
-### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-1)
+### Environment [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-1)
 
 - `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
 - `SOURDOUGH_POLICY`: the CREED policy the fresh bake takes its PHP floor from, as for `sourdough new`. Adopt with the policy the app's later feeds will use, or the floor shows up as a template change.
 
-## sourdough feed[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-feed)
+## sourdough feed [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#sourdough-feed)
 
 Bring Sourdough template updates into an app without clobbering what it has changed.
 
@@ -283,7 +283,7 @@ sourdough feed [dir] [--dry-run] [--json]
 
 Feed bakes the app's shape again with the answers in its manifest, compares the base (what the manifest recorded), the app and the new loaf file by file, and writes the result. How it decides, and where the base comes from, is in [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#what-feed-does).
 
-### Plan lines[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#plan-lines)
+### Plan lines [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#plan-lines)
 
 One line per file that changes, ` <action> <file> (<why>)`; files feed leaves alone are not listed.
 
@@ -309,7 +309,7 @@ After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a o
 | `note: Not inside a git repository: ...` | dry runs only: a real feed would refuse |
 | `note: Uncommitted changes: ...` | dry runs only: a real feed would refuse until the tree is clean |
 
-### Exit codes[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes-2)
+### Exit codes [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#exit-codes-2)
 
 | Run | `0` | `1` | `2` |
 | --- | --- | --- | --- |
@@ -328,17 +328,17 @@ After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a o
 | the manifest lists a path outside the app | `The manifest lists an unsafe path` | `2` |
 | the bake failed (for example, Composer could not fetch the Laravel skeleton) | `sourdough feed failed:` | `2` |
 
-### JSON[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json-1)
+### JSON [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#json-1)
 
 `--json` prints one object: `dir`, `template`, `from` and `to` (the Sourdough versions), `dry_run`, `fresh`, `files` (one `{path, action, detail}` per plan line), `summary` (a count per action), `base_copies` (the files kept in `.sourdough/base/`), `notes`, and `exit`. A deprecated shape's notice is one of the `notes` on every run; feeding an app whose shape was removed stops with exit `2` and names the replacement. See [Support and sunset](https://sourdough.apps.wayne.edu/docs/guides/support.html).
 
-### Environment[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-2)
+### Environment [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#environment-2)
 
 - `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
 - `SOURDOUGH_POLICY`: the CREED policy the new loaf takes its PHP floor from, as for `sourdough new`. Feed with the same policy the app was baked with, or the floor shows up as a template change.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/reference/commands.html#related)
 
 - [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)
 - [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html)

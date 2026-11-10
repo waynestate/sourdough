@@ -39,14 +39,14 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="commands">Commands<a class="docs-heading-link" aria-label="Link to this section" href="#commands">#</a></h1>
+      <article class="docs-article"><h1 id="commands"><span class="docs-heading-tail"><span>Commands</span><a class="docs-heading-link" aria-label="Link to this section" href="#commands">#</a></span></h1>
 <p>Reference for the <code>sourdough</code> CLI: every command, argument, option and exit code, exactly as the sources define them. For the JSON plan behind <code>--describe</code> and <code>--plan</code>, see <a href="plan-format.html">Plan format</a>.</p>
-<h2 id="sourdough-new">sourdough new<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-new">#</a></h2>
+<h2 id="sourdough-new">sourdough <span class="docs-heading-tail"><span>new</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-new">#</a></span></h2>
 <p>Make a new Wayne State app with the stack already wired in.</p>
 <pre tabindex="0"><code>sourdough new [dir] [options]
 </code></pre>
 <p><code>dir</code> is the directory to create the app in. It is required unless you use <code>--describe</code>.</p>
-<h3 id="options">Options<a class="docs-heading-link" aria-label="Link to this section" href="#options">#</a></h3>
+<h3 id="options"><span class="docs-heading-tail"><span>Options</span><a class="docs-heading-link" aria-label="Link to this section" href="#options">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -122,7 +122,7 @@
 </tbody>
 </table></div>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--sail</code> and <code>--docker</code> are both real for the Laravel shapes (<code>--laravel</code>, <code>--laravel --vue</code> and <code>--inertia</code>) and mutually exclusive: together they are refused with <code>Choose one of --sail or --docker, not both.</code> (exit <code>1</code>). With <code>--sail</code> the app runs on Laravel Sail: <code>laravel/sail</code> in require-dev, a <code>compose.yaml</code>, the database settings in <code>.env.example</code> and a README section; the database is MySQL 8.4 LTS. On Windows, Sail needs WSL2, and <code>--docker</code> is the route that works natively. With <code>--docker</code> Sourdough writes the app's own Docker setup after the shape is baked: a two-target <code>Dockerfile</code> (dev and prod) whose base images are pinned by manifest-list digest, a <code>compose.yaml</code> with a MySQL 8.4 service (and a vite service for the Vue and Inertia shapes), a <code>.dockerignore</code>, the PHP ini files the image copies in, the <code>composer dev-up</code>, <code>dev-down</code> and <code>dev-shell</code> scripts, the database settings in <code>.env.example</code>, and a &quot;Run it locally with Docker&quot; README section. It works natively on Windows, macOS and Linux (no WSL2 needed) and is checked on amd64 and arm64. Playbook credentials reach a production build only as a BuildKit secret, never a build arg. The raw paths keep their own refusal at the plan step: &quot;<code>--sail</code> and <code>--docker</code> are for the Laravel paths: the raw paths run on plain PHP.&quot; Neither oven is Citadel: to run any shape on Citadel's own PHP image, proxy and MySQL 5.6.51, use <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/parity">Parity</a>, a separate install that no flag adds; every baked README's &quot;Run it like Citadel&quot; gives its commands.</p></aside>
-<h3 id="exit-codes">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes">#</a></h3>
+<h3 id="exit-codes">Exit <span class="docs-heading-tail"><span>codes</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes">#</a></span></h3>
 <p>Exit codes: <code>0</code> done, <code>1</code> refused (invalid flags, non-empty target, not available, model gave up), <code>2</code> tool error.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -181,7 +181,7 @@
 </tbody>
 </table></div>
 <p>Other refusals, all exit <code>1</code>: invalid flags, a non-empty target, a model that gives up (the message points to <code>--plan=&lt;file&gt;</code>), and an app name that fails validation.</p>
-<h3 id="playbook-access-check">Playbook access check<a class="docs-heading-link" aria-label="Link to this section" href="#playbook-access-check">#</a></h3>
+<h3 id="playbook-access-check">Playbook access <span class="docs-heading-tail"><span>check</span><a class="docs-heading-link" aria-label="Link to this section" href="#playbook-access-check">#</a></span></h3>
 <p>By default the generated app requires <code>waynestate/playbook</code> (WSU's private shared-values package on git.wayne.edu): the VCS repository, the package in <code>require</code>, <code>config.gitlab-domains</code> so Composer sends your token to git.wayne.edu, the seven setting names in <code>.env.example</code>, a <code>composer playbook</code> script that shows whether Playbook is installed, and a &quot;WSU values (PLAYBOOK)&quot; README section that explains how to get read access.</p>
 <p>Before writing anything, <code>sourdough new</code> checks that this machine can read the package (a Composer credential, then a direct git probe):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -211,27 +211,27 @@
 </tbody>
 </table></div>
 <p>After generation the Next steps point at <code>composer playbook</code>. <code>--playbook</code> is kept for compatibility and changes nothing; <code>--no-playbook</code> skips all of it. The two flags together are refused with exit <code>1</code>.</p>
-<h3 id="advisor-wiring">ADVISOR wiring<a class="docs-heading-link" aria-label="Link to this section" href="#advisor-wiring">#</a></h3>
+<h3 id="advisor-wiring">ADVISOR <span class="docs-heading-tail"><span>wiring</span><a class="docs-heading-link" aria-label="Link to this section" href="#advisor-wiring">#</a></span></h3>
 <p>Generated apps ship with ADVISOR wired in by default: <code>waynestate/advisor</code> lands in <code>require-dev</code>, <code>.mcp.json</code> is git-ignored (a client config starts a program for whoever opens the project), and the README gains an &quot;ADVISOR&quot; section. The Next steps print the install line once dependencies are in:</p>
 <pre tabindex="0"><code>php vendor/bin/advisor install --client=claude --write
 </code></pre>
 <p><code>--no-advisor</code> skips all of it.</p>
 <p>The three Laravel shapes also ship Laravel Boost as a dev-only tool, whatever the ADVISOR answer: <code>laravel/boost</code> in <code>require-dev</code>, a guarded <code>composer boost-update</code> after <code>composer update</code>, a <code>.gitignore</code> block for what <code>php artisan boost:install</code> writes (<code>/.mcp.json</code>, <code>/boost.json</code>, <code>/CLAUDE.md</code>, <code>/AGENTS.md</code>, <code>/.claude/skills/</code>, <code>/.junie/</code>), the stack's guidelines and two starter rules in <code>.ai/</code>, and <code>tests/Feature/BoostDevOnlyTest.php</code>. ADVISOR complements Boost: Boost knows Laravel, ADVISOR knows the stack. See <a href="../guides/laravel.html#laravel-boost-dev-only">Laravel Boost, dev only</a>.</p>
-<h3 id="app-name-validation">App name validation<a class="docs-heading-link" aria-label="Link to this section" href="#app-name-validation">#</a></h3>
+<h3 id="app-name-validation">App name <span class="docs-heading-tail"><span>validation</span><a class="docs-heading-link" aria-label="Link to this section" href="#app-name-validation">#</a></span></h3>
 <p>The app name (from <code>--name</code>, from the plan, or from the basename of <code>&lt;dir&gt;</code>) must start with a letter or number and use only letters, numbers, spaces, dots, dashes and underscores, at most 63 characters; anything else is refused before anything is written.</p>
-<h3 id="php-floor-and-support-lines">PHP floor and support lines<a class="docs-heading-link" aria-label="Link to this section" href="#php-floor-and-support-lines">#</a></h3>
+<h3 id="php-floor-and-support-lines">PHP floor and support <span class="docs-heading-tail"><span>lines</span><a class="docs-heading-link" aria-label="Link to this section" href="#php-floor-and-support-lines">#</a></span></h3>
 <p>Every plan, dry run or real, prints two lines under <code>Target:</code>:</p>
 <pre tabindex="0"><code>PHP:         PHP ^8.3, tested on 8.3, 8.4 and 8.5 (from waynestate/creed, refreshed 2026-10-29)
 Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security fixes until 2028-03-17
 </code></pre>
 <p>The floor comes from CREED's policy at bake time; when the policy cannot be read, the first line ends <code>(pinned fallback: &lt;reason&gt;)</code> and the bake uses the pinned values. A shape that is deprecated also prints <code>Deprecated: The &lt;shape&gt; shape is deprecated since Sourdough &lt;x&gt; and is removed in &lt;y&gt;; move to &lt;shape&gt;. See &lt;page&gt;</code> to stderr; it never changes the exit code. With <code>--dry-run --json</code> the plan gains a <code>php</code> object and a <code>support</code> object with the same facts. See <a href="../guides/support.html">Support and sunset</a>.</p>
-<h3 id="environment">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment">#</a></h3>
+<h3 id="environment"><span class="docs-heading-tail"><span>Environment</span><a class="docs-heading-link" aria-label="Link to this section" href="#environment">#</a></span></h3>
 <ul>
 <li><code>SOURDOUGH_POLICY</code>: a CREED-format <code>policy.json</code> to take the PHP floor from (default: the copy installed with <code>waynestate/creed</code>). A file that cannot be read means the pinned fallback, named in the <code>PHP:</code> line.</li>
 <li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH).</li>
 <li><code>SOURDOUGH_LLM_BASE_URL</code>, <code>SOURDOUGH_LLM_API_KEY</code>, <code>SOURDOUGH_LLM_MODEL</code>: the model <code>--describe</code> asks.</li>
 </ul>
-<h3 id="next-steps-printed-after-generation">Next steps printed after generation<a class="docs-heading-link" aria-label="Link to this section" href="#next-steps-printed-after-generation">#</a></h3>
+<h3 id="next-steps-printed-after-generation">Next steps printed after <span class="docs-heading-tail"><span>generation</span><a class="docs-heading-link" aria-label="Link to this section" href="#next-steps-printed-after-generation">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -267,7 +267,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tbody>
 </table></div>
 <p>With ADVISOR wired in, <code>php vendor/bin/advisor install --client=claude --write</code> is printed after <code>composer install</code>. With Playbook required, the output ends with: <code>WSU values: Playbook installs with composer install. Check it any time with: composer playbook</code>.</p>
-<h2 id="sourdough-manifest">sourdough manifest<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest">#</a></h2>
+<h2 id="sourdough-manifest">sourdough <span class="docs-heading-tail"><span>manifest</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-manifest">#</a></span></h2>
 <p>Check a generated app against its Sourdough manifest.</p>
 <pre tabindex="0"><code>sourdough manifest [dir] [--check]
 </code></pre>
@@ -314,7 +314,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tbody>
 </table></div>
 <p>Seeded and yours files are never reported: the app owns them. Line endings are forgiven: a CRLF checkout of a file Sourdough wrote with LF is not <code>changed</code>.</p>
-<h2 id="sourdough-adopt">sourdough adopt<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt">#</a></h2>
+<h2 id="sourdough-adopt">sourdough <span class="docs-heading-tail"><span>adopt</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-adopt">#</a></span></h2>
 <p>Write the Sourdough manifest for an app Sourdough did not make, so <code>sourdough feed</code> can keep it current. The walk-through is <a href="../guides/adopt.html">Adopt an existing app</a>.</p>
 <pre tabindex="0"><code>sourdough adopt [&lt;dir&gt;] --shape &lt;shape&gt; [--name &lt;name&gt;] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]
 </code></pre>
@@ -361,7 +361,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tbody>
 </table></div>
 <p>Adopt bakes the shape into a scratch folder through the same <code>Baker</code> as <code>new</code> and <code>feed</code>, looks at each template path in the app (and only those), and writes <code>.sourdough/manifest.json</code>. It writes no other file: no <code>.sourdough/base/</code>, no <code>.sourdough/plan.yaml</code>. The answers gain <code>adopted: true</code>. There is no <code>--php</code> (the PHP floor comes from CREED's policy at bake time, so feed could never reproduce one) and no <code>--force</code> (every refusal has a plain fix).</p>
-<h3 id="report-lines">Report lines<a class="docs-heading-link" aria-label="Link to this section" href="#report-lines">#</a></h3>
+<h3 id="report-lines">Report <span class="docs-heading-tail"><span>lines</span><a class="docs-heading-link" aria-label="Link to this section" href="#report-lines">#</a></span></h3>
 <p>One line per template path that needs a look, <code>  &lt;status&gt;  &lt;path&gt;  &lt;detail&gt;</code>: <code>yours</code>, then <code>seeded</code>, then <code>missing</code>, each sorted by path; <code>match</code> lines only with <code>-v</code>. Without <code>-v</code>, a top-level folder whose every template file is missing folds into one line, <code>missing  src/ (2 files)  the next sourdough feed adds them</code>.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -436,7 +436,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="exit-codes-1">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-1">#</a></h3>
+<h3 id="exit-codes-1">Exit <span class="docs-heading-tail"><span>codes</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-1">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -545,7 +545,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="json">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json">#</a></h3>
+<h3 id="json"><span class="docs-heading-tail"><span>JSON</span><a class="docs-heading-link" aria-label="Link to this section" href="#json">#</a></span></h3>
 <p><code>--json</code> prints one object with sorted keys: <code>dir</code>, <code>dry_run</code>, <code>exit</code>, <code>files</code>, <code>name</code>, <code>notes</code>, <code>shape</code>, <code>sourdough_version</code> and <code>summary</code>. <code>files</code> lists every template path, <code>match</code> included, sorted and never folded, as <code>{path, status, detail}</code>; <code>summary</code> counts each status.</p>
 <pre tabindex="0"><code class="language-json">{
     &quot;dir&quot;: &quot;/srv/apps/course-finder&quot;,
@@ -581,13 +581,13 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 }
 </code></pre>
 <p>(<code>files</code> is cut to three of its 41 entries here: a raw app that lacks <code>phpstan.neon</code>, on a dry run.) A refusal with <code>--json</code> prints its message to stderr and no JSON, as <code>feed</code> does.</p>
-<h3 id="environment-1">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment-1">#</a></h3>
+<h3 id="environment-1"><span class="docs-heading-tail"><span>Environment</span><a class="docs-heading-link" aria-label="Link to this section" href="#environment-1">#</a></span></h3>
 <ul>
 <li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>
 <li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
 <li><code>SOURDOUGH_POLICY</code>: the CREED policy the fresh bake takes its PHP floor from, as for <code>sourdough new</code>. Adopt with the policy the app's later feeds will use, or the floor shows up as a template change.</li>
 </ul>
-<h2 id="sourdough-feed">sourdough feed<a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed">#</a></h2>
+<h2 id="sourdough-feed">sourdough <span class="docs-heading-tail"><span>feed</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-feed">#</a></span></h2>
 <p>Bring Sourdough template updates into an app without clobbering what it has changed.</p>
 <pre tabindex="0"><code>sourdough feed [dir] [--dry-run] [--json]
 </code></pre>
@@ -614,7 +614,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tbody>
 </table></div>
 <p>Feed bakes the app's shape again with the answers in its manifest, compares the base (what the manifest recorded), the app and the new loaf file by file, and writes the result. How it decides, and where the base comes from, is in <a href="../guides/keeping-current.html#what-feed-does">Keeping apps current</a>.</p>
-<h3 id="plan-lines">Plan lines<a class="docs-heading-link" aria-label="Link to this section" href="#plan-lines">#</a></h3>
+<h3 id="plan-lines">Plan <span class="docs-heading-tail"><span>lines</span><a class="docs-heading-link" aria-label="Link to this section" href="#plan-lines">#</a></span></h3>
 <p>One line per file that changes, <code>  &lt;action&gt;  &lt;file&gt; (&lt;why&gt;)</code>; files feed leaves alone are not listed.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -679,7 +679,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="exit-codes-2">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-2">#</a></h3>
+<h3 id="exit-codes-2">Exit <span class="docs-heading-tail"><span>codes</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-2">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -760,15 +760,15 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 </tr>
 </tbody>
 </table></div>
-<h3 id="json-1">JSON<a class="docs-heading-link" aria-label="Link to this section" href="#json-1">#</a></h3>
+<h3 id="json-1"><span class="docs-heading-tail"><span>JSON</span><a class="docs-heading-link" aria-label="Link to this section" href="#json-1">#</a></span></h3>
 <p><code>--json</code> prints one object: <code>dir</code>, <code>template</code>, <code>from</code> and <code>to</code> (the Sourdough versions), <code>dry_run</code>, <code>fresh</code>, <code>files</code> (one <code>{path, action, detail}</code> per plan line), <code>summary</code> (a count per action), <code>base_copies</code> (the files kept in <code>.sourdough/base/</code>), <code>notes</code>, and <code>exit</code>. A deprecated shape's notice is one of the <code>notes</code> on every run; feeding an app whose shape was removed stops with exit <code>2</code> and names the replacement. See <a href="../guides/support.html">Support and sunset</a>.</p>
-<h3 id="environment-2">Environment<a class="docs-heading-link" aria-label="Link to this section" href="#environment-2">#</a></h3>
+<h3 id="environment-2"><span class="docs-heading-tail"><span>Environment</span><a class="docs-heading-link" aria-label="Link to this section" href="#environment-2">#</a></span></h3>
 <ul>
 <li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>
 <li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
 <li><code>SOURDOUGH_POLICY</code>: the CREED policy the new loaf takes its PHP floor from, as for <code>sourdough new</code>. Feed with the same policy the app was baked with, or the floor shows up as a template change.</li>
 </ul>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="../guides/keeping-current.html">Keeping apps current</a></li>
 <li><a href="../guides/adopt.html">Adopt an existing app</a></li>

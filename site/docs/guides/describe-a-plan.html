@@ -39,29 +39,29 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html" aria-current="page">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="describe-a-plan">Describe a plan<a class="docs-heading-link" aria-label="Link to this section" href="#describe-a-plan">#</a></h1>
+      <article class="docs-article"><h1 id="describe-a-plan">Describe a <span class="docs-heading-tail"><span>plan</span><a class="docs-heading-link" aria-label="Link to this section" href="#describe-a-plan">#</a></span></h1>
 <p>Instead of choosing flags, describe what the app does in a sentence and let an OpenAI-compatible model plan it. This page covers the command, the model configuration, the plan format, and the steps a plan becomes; when you have a plan you trust, save it to a file and generate with <code>--plan</code>.</p>
-<h2 id="describe-it-in-a-sentence">Describe it in a sentence<a class="docs-heading-link" aria-label="Link to this section" href="#describe-it-in-a-sentence">#</a></h2>
+<h2 id="describe-it-in-a-sentence">Describe it in a <span class="docs-heading-tail"><span>sentence</span><a class="docs-heading-link" aria-label="Link to this section" href="#describe-it-in-a-sentence">#</a></span></h2>
 <pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot;
 </code></pre>
 <p>Sourdough asks an OpenAI-compatible model for a plan, validates it against <code>resources/plan.schema.json</code>, and prints it. The model kneads the dough, but you decide when the loaf is ready to bake: if the answer is not valid JSON, does not match the schema, or the model gives up after one retry, Sourdough refuses with a message pointing you to <code>--plan=&lt;file&gt;</code> (exit <code>1</code>). You write the plan yourself and pass it in.</p>
 <p>The model does the work but never gates. When an answer fails, Sourdough retries once, telling the model why the previous answer was not valid. If the second answer fails too, the command stops with:</p>
 <pre tabindex="0"><code class="language-text">The model could not produce a valid plan. Write the plan yourself and pass it with --plan=&lt;file&gt;.
 </code></pre>
-<h2 id="see-the-plan-without-writing-anything">See the plan without writing anything<a class="docs-heading-link" aria-label="Link to this section" href="#see-the-plan-without-writing-anything">#</a></h2>
+<h2 id="see-the-plan-without-writing-anything">See the plan without writing <span class="docs-heading-tail"><span>anything</span><a class="docs-heading-link" aria-label="Link to this section" href="#see-the-plan-without-writing-anything">#</a></span></h2>
 <pre tabindex="0"><code class="language-bash">sourdough new --describe &quot;A blog with posts and comments&quot; --plan-only
 </code></pre>
-<h2 id="pass-a-ready-made-plan">Pass a ready-made plan<a class="docs-heading-link" aria-label="Link to this section" href="#pass-a-ready-made-plan">#</a></h2>
+<h2 id="pass-a-ready-made-plan">Pass a ready-made <span class="docs-heading-tail"><span>plan</span><a class="docs-heading-link" aria-label="Link to this section" href="#pass-a-ready-made-plan">#</a></span></h2>
 <p><code>--describe</code> stops at the plan: baking straight from a description is not built yet. Save the plan to a file and pass it with <code>--plan</code>, which bakes it:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app --plan plan.json
 </code></pre>
 <p><code>--plan</code> reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in <code>.yaml</code> or <code>.yml</code> is read as YAML, anything else as JSON. A missing file, or a file that does not parse or does not match the schema, is refused with the reason printed.</p>
-<h2 id="the-plan-stays-with-the-app">The plan stays with the app<a class="docs-heading-link" aria-label="Link to this section" href="#the-plan-stays-with-the-app">#</a></h2>
+<h2 id="the-plan-stays-with-the-app">The plan stays with the <span class="docs-heading-tail"><span>app</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-plan-stays-with-the-app">#</a></span></h2>
 <p>The bake saves the plan in the app as <code>.sourdough/plan.yaml</code>, next to the manifest, so the app keeps a record of what it was asked to be. It is a valid plan file, so the same loaf bakes again from it:</p>
 <pre tabindex="0"><code class="language-bash">sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
 </code></pre>
 <p>Sourdough never rewrites it after the bake: <code>sourdough feed</code> and <code>sourdough manifest --check</code> leave it alone, and you may edit it as the app grows. Commit it with the manifest. See <a href="../reference/plan-format.html#the-saved-plan">The saved plan</a>.</p>
-<h2 id="model-configuration">Model configuration<a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></h2>
+<h2 id="model-configuration">Model <span class="docs-heading-tail"><span>configuration</span><a class="docs-heading-link" aria-label="Link to this section" href="#model-configuration">#</a></span></h2>
 <p><code>--describe</code> needs three environment variables (no defaults, no key in code):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -90,7 +90,7 @@
 <p>If a variable is missing, the command names it and points you at the alternative:</p>
 <pre tabindex="0"><code class="language-text">The SOURDOUGH_LLM_MODEL environment variable is not set. Set it, or pass a ready-made plan with --plan=&lt;file&gt;.
 </code></pre>
-<h2 id="what-a-plan-looks-like">What a plan looks like<a class="docs-heading-link" aria-label="Link to this section" href="#what-a-plan-looks-like">#</a></h2>
+<h2 id="what-a-plan-looks-like">What a plan looks <span class="docs-heading-tail"><span>like</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-a-plan-looks-like">#</a></span></h2>
 <p>A plan is a small JSON object:</p>
 <pre tabindex="0"><code class="language-json">{
     &quot;permutation&quot;: &quot;raw&quot;,
@@ -109,7 +109,7 @@
 }
 </code></pre>
 <p><code>permutation</code>, <code>parts</code>, and <code>name</code> are required; <code>models</code> and <code>pages</code> are optional. <code>parts</code> is a subset of <code>sesame</code>, <code>helmet</code>, <code>proctor</code>, and <code>preflight</code>.</p>
-<h2 id="the-steps-a-plan-produces">The steps a plan produces<a class="docs-heading-link" aria-label="Link to this section" href="#the-steps-a-plan-produces">#</a></h2>
+<h2 id="the-steps-a-plan-produces">The steps a plan <span class="docs-heading-tail"><span>produces</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-steps-a-plan-produces">#</a></span></h2>
 <p>The plan becomes a list of plain steps, built from the permutation, the target dir, the local runtime flags (<code>--sail</code> and <code>--docker</code>) and whether ADVISOR is wired in (<code>--no-advisor</code> opts out). For the raw shape the steps are:</p>
 <ul>
 <li><code>Copy the raw template into &lt;dir&gt;</code></li>
@@ -118,7 +118,7 @@
 <p>The raw + Vue shape starts with <code>Copy the raw template, then the raw-vue template over it, into &lt;dir&gt;</code> and the same replace step. The Laravel shapes get one step to create the app in the target dir. Permutations that keep ADVISOR get <code>Wire ADVISOR into the app</code>; <code>--sail</code> adds <code>Use Sail for the local runtime (compose.yaml, laravel/sail in require-dev)</code> and <code>--docker</code> adds <code>Use Docker for the local runtime (Dockerfile, compose.yaml, MySQL 8.4)</code>. The two flags are mutually exclusive: together they are refused with <code>Choose one of --sail or --docker, not both.</code></p>
 <aside class="docs-callout docs-callout--note" role="note"><p class="docs-callout__label">Note</p><p><code>--sail</code> and <code>--docker</code> are for the Laravel paths: the raw paths run on plain PHP. Combining them with a raw permutation is refused.</p></aside>
 <p>In 0.1 all five permutations are generated.</p>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="./shapes.html">Pick a shape</a></li>
 <li><a href="./manifest.html">The manifest</a></li>

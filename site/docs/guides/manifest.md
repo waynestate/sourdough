@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# The manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-manifest)
+# The manifest [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-manifest)
 
 Every app Sourdough generates (or adopts) carries a `.sourdough/manifest.json`, the starter's memory of what went into the loaf. This page explains what it records and how to check your app against it; commit the manifest so `sourdough feed` can bring template updates in without clobbering what you have changed.
 
-## What it records[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#what-it-records)
+## What it records [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#what-it-records)
 
 The manifest records the Sourdough version, the template, the answers you chose, and a sha256 hash of every file. Its keys, sorted alphabetically in the JSON:
 
@@ -25,7 +25,7 @@ The manifest records the Sourdough version, the template, the answers you chose,
 
 The JSON is pretty-printed with sorted keys and a trailing newline, and paths use forward slashes on every OS, so two runs with the same answers differ only in `generated_at`.
 
-## Managed, seeded and yours[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#managed-seeded-and-yours)
+## Managed, seeded and yours [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#managed-seeded-and-yours)
 
 | Class | Who owns it |
 | --- | --- |
@@ -37,11 +37,11 @@ Only `sourdough adopt` writes `yours`. Its hash is the template's version of the
 
 The manifest remembers what went into the loaf, so `feed` knows what to refresh and what to leave to rise on its own. `sourdough feed` reads it to bring template updates into your app without clobbering what you've changed: see [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html).
 
-## After a feed[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#after-a-feed)
+## After a feed [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#after-a-feed)
 
 `sourdough feed` moves the manifest to the new base: the hashes of the loaf the installed Sourdough bakes today, and its version. Next to the manifest it keeps `.sourdough/base/`, one `<file>.base` per managed file you have changed, holding the template's version of that file. That is the base the next feed merges from, even when git history no longer has it. The `.base` suffix keeps a kept `.gitignore` from ignoring anything and keeps linters out. Commit the folder with the manifest, and do not edit it either.
 
-## Check an app against its manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#check-an-app-against-its-manifest)
+## Check an app against its manifest [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#check-an-app-against-its-manifest)
 
 `sourdough manifest --check` lists the managed files that have drifted from the manifest, the files a feed will merge rather than replace:
 
@@ -61,15 +61,15 @@ Tip
 
 Commit `.sourdough/manifest.json` in your app. It's the record that keeps `feed` honest.
 
-## The saved plan is not in the manifest[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-saved-plan-is-not-in-the-manifest)
+## The saved plan is not in the manifest [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-saved-plan-is-not-in-the-manifest)
 
 `.sourdough/plan.yaml`, the plan the app was baked from, sits next to the manifest but is not listed in it, so it is neither managed nor seeded. The manifest lists what the template wrote; the plan is what you asked for. `sourdough manifest --check` never reports it and `sourdough feed` never touches it, so edit it as the app grows and commit it with the manifest. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
-## The Squire deploy files[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-squire-deploy-files)
+## The Squire deploy files [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#the-squire-deploy-files)
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into this repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. To refresh them, run `composer squire-copy:sync`, which rewrites the copy from the installed `waynestate/squire` package, then verify it with `composer squire-copy:check` (part of `composer ci`).
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/manifest.html#related)
 
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
 - [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html)

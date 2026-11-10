@@ -39,10 +39,10 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html" aria-current="page">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="pick-a-shape">Pick a shape<a class="docs-heading-link" aria-label="Link to this section" href="#pick-a-shape">#</a></h1>
+      <article class="docs-article"><h1 id="pick-a-shape">Pick a <span class="docs-heading-tail"><span>shape</span><a class="docs-heading-link" aria-label="Link to this section" href="#pick-a-shape">#</a></span></h1>
 <p>A starter in a jar is only potential until you give it a shape: pick the permutation below, then run <code>sourdough new</code> with the matching flags. If you would rather describe the app in a sentence and let a model plan it, continue to <a href="./describe-a-plan.html">Describe a plan</a>.</p>
 <p><img src="../readme/gallery.jpg" alt="Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard" /></p>
-<h2 id="the-five-permutations">The five permutations<a class="docs-heading-link" aria-label="Link to this section" href="#the-five-permutations">#</a></h2>
+<h2 id="the-five-permutations">The five <span class="docs-heading-tail"><span>permutations</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-five-permutations">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -85,7 +85,7 @@
 </code></pre></div>
 <div class="docs-tabs__panel" data-tab-label="inertia"><p class="docs-tabs__label">inertia</p><pre tabindex="0"><code class="language-bash">sourdough new my-app --inertia
 </code></pre></div></div>
-<h2 id="the-template-directories">The template directories<a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></h2>
+<h2 id="the-template-directories">The template <span class="docs-heading-tail"><span>directories</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-template-directories">#</a></span></h2>
 <p>Each shape bakes from a directory in <code>templates/</code>:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
@@ -125,7 +125,7 @@
 <li><code>stubs/wayne-ui.php</code>, a static-analysis stub for the run-time WayneUI functions (<code>wsu_shell_start</code>, <code>wsu_shell_end</code>) that <code>phpstan.neon</code> scans through <code>scanFiles</code>.</li>
 <li>A front controller that answers <code>404</code> for any path but <code>/</code> (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; <code>/up</code> stays HELMET's and answers first.</li>
 </ul>
-<h2 id="raw-php-vue">Raw PHP + Vue<a class="docs-heading-link" aria-label="Link to this section" href="#raw-php-vue">#</a></h2>
+<h2 id="raw-php-vue">Raw PHP + <span class="docs-heading-tail"><span>Vue</span><a class="docs-heading-link" aria-label="Link to this section" href="#raw-php-vue">#</a></span></h2>
 <p><code>--raw --vue</code> keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under <code>/api/</code> (<code>/api/me</code> is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no <code>public/wayne-ui.php</code> to fetch. Run it with:</p>
 <pre tabindex="0"><code class="language-bash">composer install
 npm install
@@ -133,9 +133,9 @@ npm run build
 composer serve
 </code></pre>
 <p>Run <code>npm run dev</code> in a second terminal for hot reload: <code>src/Vite.php</code> loads the app from the dev server while it runs, and from <code>public/build</code> otherwise. See <a href="../reference/templates.html#raw-vue">Templates</a> for every file it adds.</p>
-<h2 id="oracle-in-every-shape">Oracle in every shape<a class="docs-heading-link" aria-label="Link to this section" href="#oracle-in-every-shape">#</a></h2>
+<h2 id="oracle-in-every-shape">Oracle in every <span class="docs-heading-tail"><span>shape</span><a class="docs-heading-link" aria-label="Link to this section" href="#oracle-in-every-shape">#</a></span></h2>
 <p>Oracle is wired but dormant in every generated app. The settings <code>ORACLE_USERNAME</code>, <code>ORACLE_PASSWORD</code>, and either <code>ORACLE_TNS</code> or <code>ORACLE_HOST</code>, <code>ORACLE_PORT</code>, <code>ORACLE_SERVICE_NAME</code> ship commented out in <code>.env.example</code>; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with <code>php artisan oracle:check</code>, and raw PHP apps run queries through the <code>App\Oracle</code> helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: <code>oracle-check.php</code> at the app root, where Squire's Laravel layout ships it, first, then <code>deploy/oracle-check.php</code>.</p>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="./describe-a-plan.html">Describe a plan</a></li>
 <li><a href="./manifest.html">The manifest</a></li>

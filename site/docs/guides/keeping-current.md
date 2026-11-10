@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Keeping apps current[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keeping-apps-current)
+# Keeping apps current [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keeping-apps-current)
 
 A project that was fresh on the day it was generated is stale a month later, so this page is about keeping generated apps fed: what the manifest records, how `sourdough feed` merges template updates in without clobbering your changes, and how CI tells you when an app falls behind. Like any starter, it needs regular feeding, or it goes flat. Commit the manifest in your app, keep the `sourdough-feed` job every shape's pipeline ships with, then read on.
 
-## Record where the app came from[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#record-where-the-app-came-from)
+## Record where the app came from [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#record-where-the-app-came-from)
 
 Every app carries a `.sourdough/manifest.json` recording the Sourdough version, the template, the answers you chose, and a sha256 hash of every file, each marked `managed` or `seeded` (or `yours`, in an app Sourdough adopted). Other tools do the same: Copier writes `.copier-answers.yml`, and cruft writes `.cruft.json`. Without this record there is nothing to compare against, so no update is possible.
 
@@ -20,7 +20,7 @@ Do not hand-edit the manifest. It is the starter's memory: it remembers what wen
 
 [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html) has the full key list and the managed, seeded and yours split.
 
-## Check for drift[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#check-for-drift)
+## Check for drift [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#check-for-drift)
 
 `sourdough manifest --check` lists the managed files that have drifted from the manifest, the ones you (or someone) edited since Sourdough wrote them:
 
@@ -30,7 +30,7 @@ sourdough manifest --check
 
 Exit codes: `0` clean, `1` a managed file changed or is missing, `2` tool error (no manifest, or no `--check`). Seeded and yours files are never reported. They're yours. Line endings are forgiven, as `feed` forgives them: a checkout that turned a file to CRLF (the raw shapes' `.gitattributes` does it for `*.ps1`) has not drifted. Drift is not wrong: `feed` merges your edits with the template's. The check tells you which files a feed will have to merge rather than simply replace, which is why the [CI job](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci) reports drift and never fails on it.
 
-## Feed the app: a merge, not an overwrite[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-the-app-a-merge-not-an-overwrite)
+## Feed the app: a merge, not an overwrite [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-the-app-a-merge-not-an-overwrite)
 
 Upgrade the Sourdough CLI first ([Upgrading](https://sourdough.apps.wayne.edu/docs/upgrading.html)), then, in the app, on a clean git tree, look before you leap:
 
@@ -57,7 +57,7 @@ git status
 git diff
 ```
 
-### What feed does[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#what-feed-does)
+### What feed does [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#what-feed-does)
 
 Feed is the update model of Copier and cruft (ADR-0014), built on plain git instead of a Python runtime:
 
@@ -85,13 +85,13 @@ Seeded files (`README.md`, `.env.example`, `package-lock.json`) are never touche
 
 4. It moves the manifest to the new base (the new loaf's hashes and the new Sourdough version) and keeps the template's version of every managed file you have changed in `.sourdough/base/<file>.base`. Commit both.
 
-### Where the base comes from[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#where-the-base-comes-from)
+### Where the base comes from [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#where-the-base-comes-from)
 
 A three-way merge needs the version Sourdough wrote last time. The manifest records only its hash, so feed finds the content by that hash: first in `.sourdough/base/` (kept by the previous feed), then in any commit of your app's git history (the commit right after `sourdough new` holds every file as baked). A candidate is used only when its sha256 matches the manifest, so a wrong base can never sneak in.
 
 When neither has it (you edited a file before your first commit), feed cannot tell your edits from the template's, so it does not guess: every place the two versions differ is marked as a conflict, and the lines they share stand once. Commit right after `sourdough new` and this never happens.
 
-### Conflicts[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#conflicts)
+### Conflicts [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#conflicts)
 
 A conflict is never a silent overwrite. Feed exits `1`, and the file holds git's markers:
 
@@ -105,7 +105,7 @@ the template's version
 
 Edit the file to what it should be, delete the markers, and run your checks. `git diff --check` lists any markers left behind, so put it in a pre-commit hook or CI. Until the markers (and any `.sourdough-new` copies) are gone, the next feed refuses with exit `2` and lists them: finish one feeding before the next.
 
-### Rules feed keeps[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#rules-feed-keeps)
+### Rules feed keeps [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#rules-feed-keeps)
 
 - **A clean git tree first.** Copier recommends a clean `git status` but does not enforce it; feed enforces it (exit `2`), untracked files included, so `git status` and `git diff` show exactly what it did. To undo a whole feed: `git restore . && git clean -fd`.
 - **Git, and only git.** Feed needs git on PATH (or `SOURDOUGH_GIT` pointing at it), on Windows, macOS and Linux alike. The Laravel shapes also bake on a fresh `laravel/laravel` skeleton through Composer, the same as `sourdough new`, so feeding one needs Composer and the network; Laravel's own skeleton updates arrive as template updates, merged the same way.
@@ -113,7 +113,7 @@ Edit the file to what it should be, delete the markers, and run your checks. `gi
 - **The answers stay.** Feed bakes with the answers in the manifest (the shape, `--sail` or `--docker`, Playbook and ADVISOR). It does not change them.
 - **The plan is yours.** `.sourdough/plan.yaml`, the plan the app was baked from, is not in the manifest: feed never reads, rewrites or removes it, and never lists it in its plan, so editing it is not drift. An app baked before Sourdough saved its plan gets none written by feed. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
-### Exit codes[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#exit-codes)
+### Exit codes [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#exit-codes)
 
 | Run | `0` | `1` | `2` |
 | --- | --- | --- | --- |
@@ -122,7 +122,7 @@ Edit the file to what it should be, delete the markers, and run your checks. `gi
 
 Add `--json` to either for a machine-readable plan: the template, `from` and `to` versions, one entry per file (`path`, `action`, `detail`), a summary count per action, the base copies, any notes, and the exit code.
 
-### Feed in CI[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci)
+### Feed in CI [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#feed-in-ci)
 
 Every shape's `.gitlab-ci.yml` ships a `sourdough-feed` job, so an app that falls behind its template says so in its own pipeline instead of surfacing as drift months later; that is what makes a starter "fed". The job runs on the shape's `composer` image (multi-arch, through `${IMAGE_PREFIX}`, on the `.composer-cache`), installs the newest Sourdough release with `composer create-project`, and asks it two questions:
 
@@ -156,7 +156,7 @@ To clear the warning, feed the app on your machine (upgrade the CLI, `sourdough 
 
 Copier's `copier check-update` is the same idea: `--quiet` makes it exit 2 when an update exists, and `--output-format json` gives machines the answer.
 
-### Apps Sourdough did not make, and WELD[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#apps-sourdough-did-not-make-and-weld)
+### Apps Sourdough did not make, and WELD [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#apps-sourdough-did-not-make-and-weld)
 
 Feed needs a manifest. An app without one gets exit `2`, with the way in: `sourdough adopt <dir> --shape <shape>` (ADR-0014). Adopt bakes the shape fresh, compares the app with it file by file, and writes the manifest the app would have had: files that match become `managed`, files that differ stay `yours` and are never touched, and files the app lacks arrive with the first feed. [Adopt an existing app](https://sourdough.apps.wayne.edu/docs/guides/adopt.html) walks through it, from picking the shape to the first feed.
 
@@ -171,23 +171,23 @@ A `yours` file gets no step in any feed, so the `sourdough-feed` job stays green
 
 WELD itself is not adopted yet: it was built by hand and checks its drift against a fresh Inertia bake with its own regen check.
 
-## Versioned template releases[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#versioned-template-releases)
+## Versioned template releases [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#versioned-template-releases)
 
 Tag template releases with semantic versions, and put a short "what changed, what to do" entry in the changelog for each. Copier picks the newest tag by default. An update tool is only as good as the history it can read.
 
-## Compatibility CI[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#compatibility-ci)
+## Compatibility CI [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#compatibility-ci)
 
 On every change to Sourdough, and on every release of WayneUI, SESAME, HELMET and PROCTOR, generate each permutation, install it and run its own tests and the PROCTOR check. Run it on a schedule (nightly), not only on changes, covering PHP 8.4 and 8.5 and the current and previous Laravel major. The starter is the place where all the stack libraries meet, so it is where a break shows first. A starter with no commits still rots, because the things it depends on keep moving.
 
-## Keep templates thin[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keep-templates-thin)
+## Keep templates thin [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#keep-templates-thin)
 
 Put shared behavior in libraries, not in the template. Code that lives in SESAME, HELMET and PROCTOR updates with `composer update`, so only the glue lives in the template and the merge stays small. Other universities ship starters the same way: a Composer package plus an install command. A new site installs it with `composer require` and `php artisan starterkit:install`, and an existing site can require the library without publishing the project files. This is the core-plus-adapters rule applied to the starter itself.
 
-## Owners, windows and sunsets[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#owners-windows-and-sunsets)
+## Owners, windows and sunsets [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#owners-windows-and-sunsets)
 
 Starters die quietly. The React team deprecated Create React App on 2025-02-14, saying it had no active maintainers, and installing it now prints a warning that points at current frameworks. Laravel replaced Breeze and Jetstream with new kits when Laravel 12 shipped. Each permutation should name an owner, tie its support window to the framework and PHP end dates, run the scheduled build, and have the check print a deprecation notice with the migration note.
 
-## Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#refreshing-the-squire-templates)
+## Refreshing the Squire templates [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#refreshing-the-squire-templates)
 
 The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` config, and their friends) come from Squire's exported copy, checked into the Sourdough repository at `templates/squire/`. Squire owns them; Sourdough installs them as-is and records them in the manifest, so you never edit them by hand. When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
 
@@ -198,7 +198,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 
 Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. From the installed package the same refresh is `composer squire-copy:sync`, verified by `composer squire-copy:check` (part of `composer ci`). Apps generated earlier pick up the refreshed files with their next `sourdough feed`.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html#related)
 
 - [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
 - [Building on Laravel](https://sourdough.apps.wayne.edu/docs/guides/laravel.html)

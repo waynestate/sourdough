@@ -6,7 +6,7 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Templates[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#templates)
+# Templates [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#templates)
 
 Reference for the template directories under `templates/`: which directory bakes which shape, what each one carries, the Squire-owned deploy copy, and the rules the generator applies before it writes anything. Pick a shape first in [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html), then come back here for the exact values.
 
@@ -14,7 +14,7 @@ Five jars on the shelf, all five full.
 
 ![The proof: dough rises past its gold band as WayneUI, SESAME, HELMET, PROCTOR and Preflight go in one by one, over the feeding schedule](https://sourdough.apps.wayne.edu/docs/readme/proof.svg)
 
-## The template directories[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-template-directories)
+## The template directories [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-template-directories)
 
 | Directory | Shape | Status |
 | --- | --- | --- |
@@ -69,9 +69,9 @@ inertia
 sourdough new my-app --inertia
 ```
 
-## What each template carries[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#what-each-template-carries)
+## What each template carries [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#what-each-template-carries)
 
-### raw/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw)
+### raw/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw)
 
 - Pins WayneUI 2.0.8 (`https://wayneui.apps.wayne.edu/v2/releases/2.0.8/wayne-ui.php`) instead of fetching the floating `main` branch copy.
 - Ships Pinstripe's coding standard: `pint.json` (the per preset, with the fetched `public/wayne-ui.php` kept out and `vendor` excluded) and `phpstan.neon` (Pinstripe's raw preset, level 8 over `src/` and `public/`), with `waynestate/pinstripe` in require-dev and the extension-installer plugin allowed.
@@ -83,7 +83,7 @@ sourdough new my-app --inertia
 - Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
 - Oracle: raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
 
-### raw-vue/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue)
+### raw-vue/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue)
 
 `sourdough new --raw --vue` copies `raw/` first, then `raw-vue/` over it, so the two raw shapes share the same Squire files, Pinstripe checks, Oracle helper, Playbook and ADVISOR wiring. The manifest records the template as `raw-vue`.
 
@@ -94,7 +94,7 @@ sourdough new my-app --inertia
 - Drops `stubs/wayne-ui.php` and `phpstan.neon`'s `scanFiles`: Vue draws the chrome, so there is no fetched `public/wayne-ui.php`.
 - Its `.gitlab-ci.yml` adds a `frontend` job (`npm ci --ignore-scripts` from the shipped `package-lock.json`, `npm audit --audit-level=high --omit=dev` (runtime dependencies; a second run lists dev-only findings without failing), `npm run build`, and `sbom-npm.cdx.json` from CycloneDX's npm tool) to the raw pipeline, and its `a11y-pages` job waits for that build and also saves `/api/me`, so the accessibility gate sees the Vue app signed in.
 
-### laravel-blade/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
+### laravel-blade/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade)
 
 - A fresh Laravel skeleton from Composer, the laravel-blade overlay, the stack packages, Squire's laravel deploy files and the manifest.
 - Ships `app/Providers/AppServiceProvider.php` with `Schema::defaultStringLength(191)`, so string columns stay inside Citadel's MySQL 5.6 index limit (PROCTOR `mysql56-string-default`).
@@ -104,14 +104,14 @@ sourdough new my-app --inertia
 - Pinstripe is installed, not copied: `phpstan.neon` includes Pinstripe's Laravel preset (level 8, the ignore hygiene and the banned calls come from the package) and `pint.json` is Pinstripe's `laravel.json` plus three recorded skips for Squire's files (`deploy`, `health.php`, `oracle-check.php`). The app's own `tests/Unit/PinstripeWiringTest.php` holds both files to that, so a new skip needs its reason written down. `composer lint:gitlab` writes Pint's findings as a GitLab Code Quality report (`pint-codequality.json`, ignored by git), and the `composer-ci` job runs it in `after_script`, so the merge request widget shows Pint's findings even when `composer ci` fails. The other Laravel shapes ship the same, as WELD does.
 - Next steps: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate`, `php artisan serve`.
 
-### laravel-blade-vue/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade-vue)
+### laravel-blade-vue/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-blade-vue)
 
 - The Laravel + Blade bake under a front-end layer: Vite with the Vue plugin, a `resources/js/app.js` registry that mounts a Vue 3 app on every `[data-vue-island]` element, and a Counter island live on the dashboard view.
 - Ships `tests/Feature/ExampleTest.php` with `$this->withoutVite()`, so `composer ci` in a freshly baked islands app does not fail on the missing Vite manifest before `npm run build` has run.
 - Its own `.gitlab-ci.yml`: the Laravel + Blade pipeline plus a `frontend` job (`npm ci --ignore-scripts`, `npm audit --audit-level=high --omit=dev`, `npm run build`, the npm SBOM), whose `public/build/` the `a11y-pages` job serves, because Blade's `@vite` reads the build's manifest.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
-### laravel-inertia/[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
+### laravel-inertia/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#laravel-inertia)
 
 - The same Laravel skeleton, the laravel-inertia overlay (Inertia pages rendered by Vue, Ziggy routes, the stack packages), Squire's laravel deploy files and the manifest.
 - Inertia 3 on both sides: `inertiajs/inertia-laravel` `^3.0` and `@inertiajs/vue3` `^3.0`. The root view marks its `<title>` with `data-inertia`, Inertia hands the first page to Vue in a `<script type="application/json">` element (data, not code, so HELMET's CSP has nothing to admit), and no Axios: the pages talk through Inertia's own client. Add `axios` to `package.json` only when your own code imports it. `resources/js/app.ts` hands HELMET's per-request nonce (read from the pre-paint script) to Inertia's `nonce` option, so the progress bar's injected styles pass the CSP.
@@ -120,7 +120,7 @@ sourdough new my-app --inertia
 - The overlay allows `phpstan/extension-installer`; the appended SESAME and HELMET env keys ship commented out (except `SESAME_DRIVER=fake`) so package defaults hold instead of being overridden by empty values. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe`, so the fake driver has a non-empty username.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
-## Shared wiring in every app[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#shared-wiring-in-every-app)
+## Shared wiring in every app [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#shared-wiring-in-every-app)
 
 | Part | What lands in the app |
 | --- | --- |
@@ -140,7 +140,7 @@ Note
 
 `--playbook` is kept for compatibility and changes nothing; `--no-playbook` skips the Playbook wiring and is for CI and automated tests only. WSU apps need Playbook. `--no-advisor` skips the ADVISOR wiring.
 
-## The Squire-owned copy (`templates/squire/`)[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-squire-owned-copy-templates-squire)
+## The Squire-owned copy (`templates/squire/`) [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#the-squire-owned-copy-templates-squire)
 
 The deploy files in your app come from Squire's exported copy, checked into this repository at `templates/squire/`: `raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`. The copy is Squire 0.10.5's kit: a Laravel release first refuses to run with no `APP_KEY` or with `APP_DEBUG` on in production (and warns when `APP_ENV` is not production); then its `scripts/release.sh` runs PROCTOR's deploy gate (`proctor gate`) right after `composer audit`, before the frontend build and the migrations, writes the verdict to `storage/squire/proctor-gate.json` (`SQUIRE_PROCTOR_RECORD_DIR`), the baseline the next release is ratcheted against, and after the optimize step restarts Laravel's long-lived processes (`php artisan reload`, or `queue:restart` and `schedule:interrupt` on an older Laravel; report only, `SQUIRE_ARTISAN_RESTART=0` turns it off). The image hardens too: the web's PHP loses its shell functions (`SQUIRE_PHP_DISABLE_FUNCTIONS` sets the list), opcache runs with production settings (`SQUIRE_OPCACHE_VALIDATE`), Apache answers `ServerTokens Prod`, and secrets can be read from `/run/secrets`. Session cookies are `SameSite=Lax` (`.squire/php.ini`), every image the kit builds from is named in full (`docker.io/library/...`) so Buildah and Podman take it, and the portable image ships the built assets without `node_modules/`. Squire owns those files; Sourdough never hand-edits them, installs them as-is and records them in the manifest, so you never edit them by hand.
 
@@ -158,7 +158,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 
 Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line.
 
-## Rules the generator applies[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#rules-the-generator-applies)
+## Rules the generator applies [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#rules-the-generator-applies)
 
 From the best-practices notes, section 1 (Generating a project):
 
@@ -177,7 +177,7 @@ Note
 
 The untrusted-input rule exists because scaffolders have turned template content into code execution before: Backstage's scaffolder let anyone who could edit a registered template run code on the host (CVE-2023-35926, fixed in 1.15.0), and Copier refuses templates that use tasks, migrations or Jinja extensions unless the caller passes `--trust`.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#related)
 
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
 - [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)

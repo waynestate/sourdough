@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Same kitchen, many ovens[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#same-kitchen-many-ovens)
+# Same kitchen, many ovens [#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#same-kitchen-many-ovens)
 
 Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend. This page is the cast of the kitchen: every part of the stack, with a link to its public repository.
 
-## The cast[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#the-cast)
+## The cast [#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#the-cast)
 
 - [![WayneUI](https://sourdough.apps.wayne.edu/docs/readme/cast/wayneui.png)](https://github.com/waynestate/wayne-ui)
 - [![CREED](https://sourdough.apps.wayne.edu/docs/readme/cast/creed.png)](https://github.com/waynestate/creed)
@@ -28,7 +28,7 @@ Sourdough is one of the parts. Feed it, and it grows; just do not leave it on th
 - [![ADVISOR](https://sourdough.apps.wayne.edu/docs/readme/cast/advisor.png)](https://github.com/waynestate/advisor)
 - [![WELD](https://sourdough.apps.wayne.edu/docs/readme/cast/weld.png)](https://github.com/waynestate/weld)
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/ovens.html#related)
 
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
 - [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)

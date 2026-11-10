@@ -39,24 +39,24 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li><a href="../../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../../docs/guides/manifest.html">The manifest</a></li><li><a href="../../docs/guides/adopt.html" aria-current="page">Adopt an existing app</a></li><li><a href="../../docs/guides/testing.html">Testing</a></li><li><a href="../../docs/guides/ci.html">CI</a></li><li><a href="../../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../../docs/guides/support.html">Support and sunset</a></li><li><a href="../../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/plan-format.html">Plan format</a></li><li><a href="../../docs/reference/templates.html">Templates</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/maintaining.html">Maintaining</a></li><li><a href="../../docs/agent-ready.html">Agent ready</a></li><li><a href="../../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../../docs/upgrading.html">Upgrading</a></li><li><a href="../../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="adopt-an-existing-app">Adopt an existing app<a class="docs-heading-link" aria-label="Link to this section" href="#adopt-an-existing-app">#</a></h1>
+      <article class="docs-article"><h1 id="adopt-an-existing-app">Adopt an existing <span class="docs-heading-tail"><span>app</span><a class="docs-heading-link" aria-label="Link to this section" href="#adopt-an-existing-app">#</a></span></h1>
 <p><code>sourdough feed</code> only reaches an app that carries <code>.sourdough/manifest.json</code>, and <code>sourdough new</code> writes one only into the apps it bakes. Most Wayne State apps were mixed somewhere else, years ago. <code>sourdough adopt</code> is the way in for them: it writes the manifest the app would have had if Sourdough had baked it, and from then on <code>feed</code> looks after it like any other loaf. Not every loaf came from our starter, but every loaf can be fed.</p>
 <p>Adopt writes one file, <code>.sourdough/manifest.json</code>. It never changes your code, never writes <code>.sourdough/base/</code>, and never reads a file the template does not ship.</p>
-<h2 id="when-to-adopt">When to adopt<a class="docs-heading-link" aria-label="Link to this section" href="#when-to-adopt">#</a></h2>
+<h2 id="when-to-adopt">When to <span class="docs-heading-tail"><span>adopt</span><a class="docs-heading-link" aria-label="Link to this section" href="#when-to-adopt">#</a></span></h2>
 <ul>
 <li><strong>The app is close to one of the five shapes.</strong> Adopt compares the app with a fresh bake of the shape you name, file by file. The closer the app is to that shape, the more files Sourdough can keep current.</li>
 <li><strong>Older Laravel apps: upgrade with <a rel="noopener" href="https://booster.apps.wayne.edu/">Booster</a> first.</strong> Adopt compares with today's <code>laravel/laravel</code> skeleton, so an app on Laravel 8 is mostly <code>yours</code>. That is correct, not a failure, but every hop Booster takes brings more files level with the template, and each one that matches gets updates from then on.</li>
 <li><strong>Older PHP is fine.</strong> The PHP floor comes from CREED's policy at bake time, never from an option, so an app on an older PHP gets <code>composer.json</code> and <code>.gitlab-ci.yml</code> marked <code>yours</code>. Upgrade and they can come back (see <a href="#take-a-yours-file-over">Take a yours file over</a>).</li>
 </ul>
 <p>WELD is not adopted yet: it was built by hand and checks its drift against a fresh Inertia bake with its own regen check. See <a href="./keeping-current.html#apps-sourdough-did-not-make-and-weld">Keeping apps current</a>.</p>
-<h2 id="before-you-start">Before you start<a class="docs-heading-link" aria-label="Link to this section" href="#before-you-start">#</a></h2>
+<h2 id="before-you-start">Before you <span class="docs-heading-tail"><span>start</span><a class="docs-heading-link" aria-label="Link to this section" href="#before-you-start">#</a></span></h2>
 <p>Adopt only runs inside a git repository, on a clean tree, so the adoption is one commit you can review and <code>git revert</code> can take back. An app that is not in git yet:</p>
 <pre tabindex="0"><code>git init
 git add -A
 git commit -m &quot;Before Sourdough&quot;
 </code></pre>
 <p>Adopt needs git on PATH (or <code>SOURDOUGH_GIT</code> pointing at it), on Windows, macOS and Linux alike. The Laravel shapes bake a fresh <code>laravel/laravel</code> skeleton to compare with, so adopting one needs Composer and the network (or a warm Composer cache), the same as <code>sourdough new</code>.</p>
-<h2 id="pick-the-shape-and-the-name">Pick the shape and the name<a class="docs-heading-link" aria-label="Link to this section" href="#pick-the-shape-and-the-name">#</a></h2>
+<h2 id="pick-the-shape-and-the-name">Pick the shape and the <span class="docs-heading-tail"><span>name</span><a class="docs-heading-link" aria-label="Link to this section" href="#pick-the-shape-and-the-name">#</a></span></h2>
 <pre tabindex="0"><code>sourdough adopt [&lt;dir&gt;] --shape &lt;shape&gt; [--name &lt;name&gt;] [--sail | --docker] [--no-playbook] [--no-advisor] [--dry-run] [--json] [-v]
 </code></pre>
 <p><code>&lt;dir&gt;</code> is the app's root folder; the default is the current directory. <code>--shape</code> is required, because you are naming what the app already is, not composing a new one:</p>
@@ -102,7 +102,7 @@ note: 2 files differ where the template writes the app name; if the app goes by 
 </code></pre>
 <p><strong>The oven.</strong> <code>--sail</code> and <code>--docker</code> are for the Laravel shapes, with the same meaning as for <code>sourdough new</code>. Pass one only when the app runs on Sourdough's own oven files. An app with its own Docker setup leaves both off, so its <code>Dockerfile</code> and <code>compose.yaml</code> stay outside the manifest and Sourdough never sees them.</p>
 <p><strong>Playbook and ADVISOR.</strong> <code>--no-playbook</code> and <code>--no-advisor</code> change what the template bakes (<code>composer.json</code>, <code>.env.example</code>, the README, <code>.gitignore</code>), and they are recorded in the manifest's answers, so every later feed bakes the same way. Leave them off unless the app should never have that wiring; WSU apps need Playbook.</p>
-<h2 id="look-first">Look first<a class="docs-heading-link" aria-label="Link to this section" href="#look-first">#</a></h2>
+<h2 id="look-first">Look <span class="docs-heading-tail"><span>first</span><a class="docs-heading-link" aria-label="Link to this section" href="#look-first">#</a></span></h2>
 <pre tabindex="0"><code>sourdough adopt --shape raw --dry-run
 </code></pre>
 <p>A dry run prints the same report and writes nothing. It opens with <code>Would adopt</code> and ends <code>Run sourdough adopt without --dry-run to write the manifest.</code> It still refuses a wrong command (a missing or unknown shape, a bad oven or name, a folder that is missing, already adopted, or left from an old manifest), but git and the folder only earn a note, so you can look at an app before it is in git:</p>
@@ -112,7 +112,7 @@ note: 2 files differ where the template writes the app name; if the app goes by 
 <li><code>The folder is not writable: a real adopt would fail.</code></li>
 <li><code>git is not available: a real adopt would fail.</code></li>
 </ul>
-<h2 id="read-the-report">Read the report<a class="docs-heading-link" aria-label="Link to this section" href="#read-the-report">#</a></h2>
+<h2 id="read-the-report">Read the <span class="docs-heading-tail"><span>report</span><a class="docs-heading-link" aria-label="Link to this section" href="#read-the-report">#</a></span></h2>
 <p>Here is a small, older raw PHP app, <code>parking-permits</code>, with a hand-built <code>public/index.php</code>, a <code>composer.json</code> that requires PHP 7.4, its own <code>public/.htaccess</code> and a README:</p>
 <pre tabindex="0"><code>$ sourdough adopt --shape raw
 Adopting &quot;parking-permits&quot; as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.2.
@@ -187,12 +187,12 @@ Next: git add .sourdough &amp;&amp; git commit -m &quot;Adopt with Sourdough 0.4
 <p>Every recorded hash is the template's, never the app's. A Windows checkout with CRLF endings still matches. Files the template does not ship (your own code, <code>vendor/</code>, <code>node_modules/</code>, uploads) are never read and never recorded.</p>
 <p><code>yours</code> and <code>missing</code> are normal outcomes: adopt exits <code>0</code> with any mix of them. Adopt is not a CI gate; <code>feed --dry-run</code> is.</p>
 <p>A vendored Squire kit gets a note too. When <code>.squire.json</code> says an older kit than the one this Sourdough bakes, the note says to run <code>vendor/bin/squire update</code> and commit; the next feed takes over each kit file that then matches.</p>
-<h2 id="commit-the-adoption">Commit the adoption<a class="docs-heading-link" aria-label="Link to this section" href="#commit-the-adoption">#</a></h2>
+<h2 id="commit-the-adoption">Commit the <span class="docs-heading-tail"><span>adoption</span><a class="docs-heading-link" aria-label="Link to this section" href="#commit-the-adoption">#</a></span></h2>
 <pre tabindex="0"><code>git add .sourdough
 git commit -m &quot;Adopt with Sourdough 0.4.2&quot;
 </code></pre>
 <p>The adoption is its own commit, so <code>git revert</code> takes it back cleanly. Commit the manifest and do not hand-edit it: it is the starter's memory.</p>
-<h2 id="the-first-feed">The first feed<a class="docs-heading-link" aria-label="Link to this section" href="#the-first-feed">#</a></h2>
+<h2 id="the-first-feed">The first <span class="docs-heading-tail"><span>feed</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-first-feed">#</a></span></h2>
 <pre tabindex="0"><code>sourdough feed --dry-run
 </code></pre>
 <p>The first feed adds every <code>missing</code> file. A raw app that had lost its <code>.gitlab-ci.yml</code> and <code>phpstan.neon</code>, with its own <code>composer.json</code> and <code>public/index.php</code>:</p>
@@ -210,12 +210,12 @@ git diff
 </code></pre>
 <p>This is how the stack's wiring (Squire's kit, the pipeline with PROCTOR and the <code>sourdough-feed</code> job, PHPStan, Pint) reaches an older app. Review what arrived, run your checks, and commit. An app that had no <code>.gitlab-ci.yml</code> gets the shape's full pipeline, and some of its gates may fail on an older app until you fix them.</p>
 <p><strong>Delete what you do not want.</strong> Delete the file, commit, and feed remembers: it never adds the file again, and when the template changes it the plan only shows <code>keep</code>. <code>sourdough manifest --check</code> lists it as <code>missing  &lt;file&gt;</code>, a report the CI job never fails on. To undo a whole feed instead: <code>git restore . &amp;&amp; git clean -fd</code>.</p>
-<h2 id="your-own-gitlab-ci-yml">Your own .gitlab-ci.yml<a class="docs-heading-link" aria-label="Link to this section" href="#your-own-gitlab-ci-yml">#</a></h2>
+<h2 id="your-own-gitlab-ci-yml">Your own <span class="docs-heading-tail"><span>.gitlab-ci.yml</span><a class="docs-heading-link" aria-label="Link to this section" href="#your-own-gitlab-ci-yml">#</a></span></h2>
 <p>When <code>.gitlab-ci.yml</code> is <code>yours</code>, the app's pipeline has no <code>sourdough-feed</code> job, so nothing warns when the app falls behind. Copy the job by hand from a fresh bake of the same shape:</p>
 <pre tabindex="0"><code>sourdough new ../fresh-bake --raw
 </code></pre>
 <p>Copy the <code>sourdough-feed:</code> job from <code>../fresh-bake/.gitlab-ci.yml</code> into yours, with what it leans on: the <code>.composer-cache</code> template it extends and the <code>IMAGE_PREFIX</code> variable its image uses. Then delete the fresh bake. <a href="./keeping-current.html#feed-in-ci">Feed in CI</a> explains what the job reports.</p>
-<h2 id="take-a-yours-file-over">Take a yours file over<a class="docs-heading-link" aria-label="Link to this section" href="#take-a-yours-file-over">#</a></h2>
+<h2 id="take-a-yours-file-over">Take a yours file <span class="docs-heading-tail"><span>over</span><a class="docs-heading-link" aria-label="Link to this section" href="#take-a-yours-file-over">#</a></span></h2>
 <p>A <code>yours</code> file is never written, merged or reported, until the day your copy equals the template's. To hand one to Sourdough, make it match the template (copy it from a fresh bake of the same shape and name, or bring your copy level), commit, and feed:</p>
 <pre tabindex="0"><code>$ sourdough feed --dry-run
 Would feed the raw app: Sourdough 0.4.2 to 0.4.2 (dry run: nothing written)
@@ -224,13 +224,13 @@ Plan: 1 record.
 Run sourdough feed without --dry-run to apply it.
 </code></pre>
 <p>A <code>record</code> line changes no file, only the manifest: the file is <code>managed</code> from then on and gets every template update. The <code>sourdough-feed</code> job warns until that feed is committed. Squire's kit files come back the same way after <code>vendor/bin/squire update</code>.</p>
-<h2 id="start-over">Start over<a class="docs-heading-link" aria-label="Link to this section" href="#start-over">#</a></h2>
+<h2 id="start-over">Start <span class="docs-heading-tail"><span>over</span><a class="docs-heading-link" aria-label="Link to this section" href="#start-over">#</a></span></h2>
 <p>Wrong shape, wrong name? Delete <code>.sourdough/</code>, commit, and adopt again. Adopt never writes over a manifest, because that would lose the record feed stands on:</p>
 <pre tabindex="0"><code>$ sourdough adopt /srv/apps/parking-permits --shape raw
 &quot;/srv/apps/parking-permits&quot; already has a Sourdough manifest: Sourdough made or adopted this app. Bring it up to date with sourdough feed. To adopt it again with another --shape or --name, delete .sourdough/, commit, and run adopt again.
 </code></pre>
 <p>A <code>.sourdough/base/</code> folder with no manifest beside it is left from a record that is gone, and adopt refuses that too, until you delete <code>.sourdough/</code> and commit.</p>
-<h2 id="exit-codes">Exit codes<a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes">#</a></h2>
+<h2 id="exit-codes">Exit <span class="docs-heading-tail"><span>codes</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -258,7 +258,7 @@ Run sourdough feed without --dry-run to apply it.
 </tbody>
 </table></div>
 <p>The whole command (options, refusals, JSON and environment) is in <a href="../reference/commands.html#sourdough-adopt">Commands</a>. Failing lines and their fixes are in <a href="../troubleshooting.html#adopting-sourdough-adopt">Troubleshooting</a>.</p>
-<h2 id="related">Related<a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></h2>
+<h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="./manifest.html">The manifest</a></li>
 <li><a href="./keeping-current.html">Keeping apps current</a></li>

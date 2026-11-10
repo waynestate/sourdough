@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Proof[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#proof)
+# Proof [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#proof)
 
 This page says what each check of Sourdough proves and how to run it. Sourdough's promise is that every shape it bakes works on the day it comes out of the oven, so the proof is not a unit test of the generator: it bakes every shape for real, with this checkout, and makes the loaf prove itself.
 
-## Last run[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#last-run)
+## Last run [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#last-run)
 
 | Run | Date | Commit | Result | Duration |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ This page says what each check of Sourdough proves and how to run it. Sourdough'
 
 The `composer ci` row ran in `composer:2.10.3` on PHP 8.5. All eleven proof runs came from one `.\scripts\proof.ps1` on Windows (Docker Desktop, amd64), 178 seconds in all, in the smoke image: PHP 8.5.12, Composer 2.10.3, Node 22.23.4. Templates have changed since 0.1.6 (the platform pin, the resolver refresh, the skeleton tests), so every feed found work: the raw shapes took one update (`composer.json`), the Laravel shapes one add (`tests/Feature/SkeletonTest.php`) and two updates (`app/Sesame/UserResolver.php`, `composer.json`), and the oven runs recorded the scaffold's own files besides (`compose.yaml` for Sail, the `Dockerfile` and its friends for Docker), because a 0.1.6 manifest never named them. The oven feeds also crossed the 0.1.6 gap where the manifest hashed `composer.json` before the scaffold edited it: feed rebuilt the missing base from the app's file and merged from it (see [What it found](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)). The Laravel shapes ship nine tests each now: the two starter examples plus seven skeleton tests covering `/up`, the home page, the sign-in redirect, the signed-in dashboard, a 404 and the user refresh; the count is theirs, not the proof's.
 
-## What it found[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)
+## What it found [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-found)
 
 The first run of the harness, on the same day, failed nine of eleven runs. Six of the failures were Sourdough's:
 
@@ -43,7 +43,7 @@ Still open, from the same runs:
 
 The run above closed the last failure, in all six oven runs: **a 0.1.6 oven bake conflicted on `composer.json` at its first feed after a template change.** 0.1.6 hashed `composer.json` before the oven's scaffold edited it, so the manifest named a version no checkout ever held: the app's file carried the scaffold's edits, and the base for a three-way merge was nowhere, not in `.sourdough/base/` (first feed) and not in the app's git history (the pre-scaffold version was never committed). While the template's `composer.json` stayed the same as 0.1.6's, the post-scaffold files matched and nothing happened; once the template's file changed (this cycle, the platform pin), feed marked both versions and stopped. Feed now rebuilds that base: it undoes the scaffold's edit to recover the pre-scaffold composer data, verifies the data against the recorded hash, and reapplies the scaffold to get the exact file the app started from. An oven app that never touched `composer.json` takes the template's as an update, and a real app edit still merges over the rebuilt base, or conflicts as before. All eleven runs pass.
 
-## Run it[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#run-it)
+## Run it [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#run-it)
 
 The proof harness is a pair: `scripts/proof.sh` on Linux and macOS, `scripts/proof.ps1` on Windows. Both build the smoke image (`scripts/smoke.Dockerfile`: PHP 8.5, Composer 2.11.1, Node 22, pinned) and run every bake inside it, one after another, so the result is the same on every machine.
 
@@ -83,7 +83,7 @@ The exit code is `0` when every run passed, `1` when any failed, `2` when the ha
 | `PROOF_OUT` (`-OutDir`) | where the results go. Default: `proof-out/`. |
 | `--here` | `proof.sh` only: run in this machine instead of Docker. The CI job uses it inside the smoke image. |
 
-## What each run proves[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-each-run-proves)
+## What each run proves [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-each-run-proves)
 
 Every run goes through `scripts/smoke-shape.sh`, the same gate the per-shape smoke jobs run on every pipeline. Each step prints `ok` or `FAIL`; the first `FAIL` stops the run and shows the step's tail.
 
@@ -105,11 +105,11 @@ Every run goes through `scripts/smoke-shape.sh`, the same gate the per-shape smo
 | Laravel + Blade + Vue islands | the same | `baked fresh by Sourdough` and the built assets | `/dashboard` carries the `data-vue-island="counter"` island, `/nope` 404, `/up` 200 |
 | Laravel + Inertia/Vue | the same | the `Home` page component and the built assets | `/dashboard` renders the `Dashboard` page after the fake sign-in, `/nope` 404, `/up` 200 |
 
-### The ovens[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#the-ovens)
+### The ovens [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#the-ovens)
 
 A Laravel shape with `--sail` or `--docker` is proven up to the oven door. The run bakes it, checks the manifest, the reproducible bake and the feed from the last release as above, checks that the scaffold wrote its files (`compose.yaml` and `laravel/sail` for Sail; the `Dockerfile`, `compose.yaml`, `.dockerignore` and the `dev-up` script for Docker), then installs the app and runs its own suite and PROCTOR. The oven's `.env.example` points at MySQL, which the gate does not run; the suite keeps to SQLite in memory, as `phpunit.xml` says.
 
-## composer ci[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#composer-ci)
+## composer ci [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#composer-ci)
 
 Sourdough's own gate, the same command on GitLab and GitHub:
 
@@ -119,7 +119,7 @@ composer ci   # validate, PHPUnit, Pint, PHPStan, the Squire copy, agent-ready f
 
 The PHPUnit suite covers every generator, the manifest, `sourdough feed` on every shape with local edits, merges, conflicts and refusals (`tests/FeedCommandTest.php`, offline), and the Sail and Docker scaffolds file by file. `tests/ProofHarnessTest.php` keeps the two harness scripts, the gate, the CI job and the table on this page listing the same runs.
 
-## On CI[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#on-ci)
+## On CI [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#on-ci)
 
 Each shape's smoke job (`smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue`, `smoke-inertia`) runs the gate on every pipeline, without the feed from the last release and without the ovens.
 
@@ -129,7 +129,7 @@ Tip
 
 Strongly recommended: a git.wayne.edu instance runner, so the proof and every app's pipeline run where the code lives.
 
-## What it does not prove yet[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-does-not-prove-yet)
+## What it does not prove yet [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#what-it-does-not-prove-yet)
 
 - **No oven is lit.** The `--sail` and `--docker` runs never start a compose stack: the gate has no Docker daemon. The scaffold tests (`tests/SailScaffoldTest.php`, `tests/DockerScaffoldTest.php`) pin their files.
 - **No Playbook, no ADVISOR.** Every bake passes `--no-playbook` (its package is private and the proof runs credential-free) and `--no-advisor`. A Wayne State app needs Playbook; its wiring is covered by the unit suite.
@@ -137,7 +137,7 @@ Strongly recommended: a git.wayne.edu instance runner, so the proof and every ap
 - **No browser.** The front page is fetched with curl. Nothing clicks the Vue island, runs axe on a baked app, or checks it on a phone.
 - **A feed with local edits** is proven by `tests/FeedCommandTest.php`, not by the harness: the harness feeds an app nobody has touched.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/reference/proof.html#related)
 
 - [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
 - [Keeping apps current](https://sourdough.apps.wayne.edu/docs/guides/keeping-current.html)

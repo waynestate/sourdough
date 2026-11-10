@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Describe a plan[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-a-plan)
+# Describe a plan [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-a-plan)
 
 Instead of choosing flags, describe what the app does in a sentence and let an OpenAI-compatible model plan it. This page covers the command, the model configuration, the plan format, and the steps a plan becomes; when you have a plan you trust, save it to a file and generate with `--plan`.
 
-## Describe it in a sentence[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-it-in-a-sentence)
+## Describe it in a sentence [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#describe-it-in-a-sentence)
 
 ```bash
 sourdough new --describe "A blog with posts and comments"
@@ -24,13 +24,13 @@ The model does the work but never gates. When an answer fails, Sourdough retries
 The model could not produce a valid plan. Write the plan yourself and pass it with --plan=<file>.
 ```
 
-## See the plan without writing anything[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#see-the-plan-without-writing-anything)
+## See the plan without writing anything [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#see-the-plan-without-writing-anything)
 
 ```bash
 sourdough new --describe "A blog with posts and comments" --plan-only
 ```
 
-## Pass a ready-made plan[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#pass-a-ready-made-plan)
+## Pass a ready-made plan [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#pass-a-ready-made-plan)
 
 `--describe` stops at the plan: baking straight from a description is not built yet. Save the plan to a file and pass it with `--plan`, which bakes it:
 
@@ -40,7 +40,7 @@ sourdough new my-app --plan plan.json
 
 `--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A file ending in `.yaml` or `.yml` is read as YAML, anything else as JSON. A missing file, or a file that does not parse or does not match the schema, is refused with the reason printed.
 
-## The plan stays with the app[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-plan-stays-with-the-app)
+## The plan stays with the app [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-plan-stays-with-the-app)
 
 The bake saves the plan in the app as `.sourdough/plan.yaml`, next to the manifest, so the app keeps a record of what it was asked to be. It is a valid plan file, so the same loaf bakes again from it:
 
@@ -50,7 +50,7 @@ sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
 
 Sourdough never rewrites it after the bake: `sourdough feed` and `sourdough manifest --check` leave it alone, and you may edit it as the app grows. Commit it with the manifest. See [The saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
-## Model configuration[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#model-configuration)
+## Model configuration [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#model-configuration)
 
 `--describe` needs three environment variables (no defaults, no key in code):
 
@@ -72,7 +72,7 @@ If a variable is missing, the command names it and points you at the alternative
 The SOURDOUGH_LLM_MODEL environment variable is not set. Set it, or pass a ready-made plan with --plan=<file>.
 ```
 
-## What a plan looks like[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#what-a-plan-looks-like)
+## What a plan looks like [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#what-a-plan-looks-like)
 
 A plan is a small JSON object:
 
@@ -96,7 +96,7 @@ A plan is a small JSON object:
 
 `permutation`, `parts`, and `name` are required; `models` and `pages` are optional. `parts` is a subset of `sesame`, `helmet`, `proctor`, and `preflight`.
 
-## The steps a plan produces[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-steps-a-plan-produces)
+## The steps a plan produces [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#the-steps-a-plan-produces)
 
 The plan becomes a list of plain steps, built from the permutation, the target dir, the local runtime flags (`--sail` and `--docker`) and whether ADVISOR is wired in (`--no-advisor` opts out). For the raw shape the steps are:
 
@@ -111,7 +111,7 @@ Note
 
 In 0.1 all five permutations are generated.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html#related)
 
 - [Pick a shape](https://sourdough.apps.wayne.edu/docs/guides/shapes.html)
 - [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)

@@ -39,11 +39,11 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li class="docs-nav__group"><span class="docs-nav__label">Getting Started</span><ul><li><a href="../docs/index.html">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li><a href="../docs/guides/quick-start.html">Quick start</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/shapes.html">Pick a shape</a></li><li><a href="../docs/guides/describe-a-plan.html">Describe a plan</a></li><li><a href="../docs/guides/manifest.html">The manifest</a></li><li><a href="../docs/guides/adopt.html">Adopt an existing app</a></li><li><a href="../docs/guides/testing.html">Testing</a></li><li><a href="../docs/guides/ci.html">CI</a></li><li><a href="../docs/guides/ovens.html">Same kitchen, many ovens</a></li><li><a href="../docs/guides/laravel.html">Building on Laravel</a></li><li><a href="../docs/guides/keeping-current.html">Keeping apps current</a></li><li><a href="../docs/guides/support.html">Support and sunset</a></li><li><a href="../docs/guides/every-os.html">Every developer, every operating system</a></li><li><a href="../docs/guides/wiring-the-stack.html">Wiring the stack in</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/plan-format.html">Plan format</a></li><li><a href="../docs/reference/templates.html">Templates</a></li><li><a href="../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../docs/maintaining.html" aria-current="page">Maintaining</a></li><li><a href="../docs/agent-ready.html">Agent ready</a></li><li><a href="../docs/troubleshooting.html">Troubleshooting</a></li><li><a href="../docs/upgrading.html">Upgrading</a></li><li><a href="../docs/changelog.html">Changelog</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="maintaining-feeding-the-starter">MAINTAINING: feeding the starter<a class="docs-heading-link" aria-label="Link to this section" href="#maintaining-feeding-the-starter">#</a></h1>
+      <article class="docs-article"><h1 id="maintaining-feeding-the-starter">MAINTAINING: feeding the <span class="docs-heading-tail"><span>starter</span><a class="docs-heading-link" aria-label="Link to this section" href="#maintaining-feeding-the-starter">#</a></span></h1>
 <p>How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired
 in and is meant to own that wiring for the app's whole life. Built today: <code>new</code> and <code>new --describe</code>, <code>manifest</code>, <code>feed</code>
 and <code>adopt</code>. Like any starter, it needs regular feeding, or it goes flat.</p>
-<h2 id="what-sourdough-is-and-what-it-depends-on">What Sourdough is and what it depends on<a class="docs-heading-link" aria-label="Link to this section" href="#what-sourdough-is-and-what-it-depends-on">#</a></h2>
+<h2 id="what-sourdough-is-and-what-it-depends-on">What Sourdough is and what it depends <span class="docs-heading-tail"><span>on</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-sourdough-is-and-what-it-depends-on">#</a></span></h2>
 <ul>
 <li><code>waynestate/sourdough</code> on Packagist, with the CLI <code>bin/sourdough</code>.</li>
 <li>Runtime dependencies: <code>symfony/console</code>, <code>symfony/http-client</code>, <code>justinrainbow/json-schema</code>, <code>openai-php/client</code>
@@ -60,9 +60,9 @@ app's git history (see <code>docs/guides/keeping-current.md</code>). <code>new</
 change to a generator reaches all three: <code>adopt</code> bakes the shape into a scratch folder and compares the app with
 that loaf, so it records what <code>new</code> would bake today.</li>
 </ul>
-<h2 id="where-it-lives">Where it lives<a class="docs-heading-link" aria-label="Link to this section" href="#where-it-lives">#</a></h2>
+<h2 id="where-it-lives">Where it <span class="docs-heading-tail"><span>lives</span><a class="docs-heading-link" aria-label="Link to this section" href="#where-it-lives">#</a></span></h2>
 <p>Development happens on git.wayne.edu, the canonical repository (<a rel="noopener" href="https://git.wayne.edu/enterprise-apps/sourdough">enterprise-apps/sourdough</a>). GitHub (<a rel="noopener" href="https://github.com/waynestate/sourdough">waynestate/sourdough</a>) is a read-only push mirror: <code>main</code> and tags are copied automatically, nobody pushes to it, and Packagist picks releases up from there. Changes, issues and merge requests go to git.wayne.edu.</p>
-<h2 id="build-and-test">Build and test<a class="docs-heading-link" aria-label="Link to this section" href="#build-and-test">#</a></h2>
+<h2 id="build-and-test">Build and <span class="docs-heading-tail"><span>test</span><a class="docs-heading-link" aria-label="Link to this section" href="#build-and-test">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -107,13 +107,13 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpuni
 </code></pre>
 <p>The <code>stack-composer-cache</code> volume keeps Composer's downloads between runs; Docker creates it the first time.</p>
 <p><code>composer ci</code> runs <code>composer validate --strict</code>, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and <code>composer audit</code>.</p>
-<h2 id="ci">CI<a class="docs-heading-link" aria-label="Link to this section" href="#ci">#</a></h2>
+<h2 id="ci"><span class="docs-heading-tail"><span>CI</span><a class="docs-heading-link" aria-label="Link to this section" href="#ci">#</a></span></h2>
 <ul>
 <li><strong>GitLab:</strong> Preflight's <code>php-test</code> (PHP 8.3, 8.4, 8.5) and <code>composer-audit</code> components, plus a <code>composer-ci</code> job.</li>
 <li><strong>GitHub:</strong> <code>.github/workflows/ci.yml</code> calls Preflight's reusable workflow with <code>composer ci</code>, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.</li>
 <li>Green means <code>composer ci</code> passed on all three PHP versions on both.</li>
 </ul>
-<h2 id="smoke-gate">Smoke gate<a class="docs-heading-link" aria-label="Link to this section" href="#smoke-gate">#</a></h2>
+<h2 id="smoke-gate">Smoke <span class="docs-heading-tail"><span>gate</span><a class="docs-heading-link" aria-label="Link to this section" href="#smoke-gate">#</a></span></h2>
 <p>The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own <code>bin/sourdough new &lt;dir&gt; --no-advisor --no-playbook --no-input</code> (the CLI under test is the one being shipped). Every bake passes <code>--no-playbook</code>, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.</p>
 <p>Right after the bake, every shape proves its manifest and its bake: <code>sourdough manifest --check</code> must be clean, and with the fresh app committed to a scratch git repository <code>sourdough feed --dry-run</code> must find nothing to feed (a bake that is not stable would make every feed of it a conflict). The repository is dropped again before the app's own checks:</p>
 <ul>
@@ -144,7 +144,7 @@ docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdo
 <li><code>SMOKE_PORT</code>: the live server's port (default <code>8099</code>).</li>
 </ul>
 <p>On CI the gate runs as one job per shape: <code>smoke</code> (matrix) on GitHub, <code>smoke-raw</code>, <code>smoke-raw-vue</code>, <code>smoke-blade</code>, <code>smoke-blade-vue</code> and <code>smoke-inertia</code> on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab <code>proof</code> job, by hand or on a schedule that sets <code>SOURDOUGH_PROOF</code> to <code>1</code>, never on a push.</p>
-<h2 id="the-local-runtime-output-sail-and-docker">The local runtime output (Sail and Docker)<a class="docs-heading-link" aria-label="Link to this section" href="#the-local-runtime-output-sail-and-docker">#</a></h2>
+<h2 id="the-local-runtime-output-sail-and-docker">The local runtime output (Sail and <span class="docs-heading-tail"><span>Docker)</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-local-runtime-output-sail-and-docker">#</a></span></h2>
 <p>The <code>--sail</code> and <code>--docker</code> output is checked by tests and by the proof's oven runs: <code>tests/SailScaffoldTest.php</code> and <code>tests/DockerScaffoldTest.php</code> assert on the files each scaffold writes, including real-binary runs through <code>bin/sourdough</code>, and <code>scripts/proof.sh</code> bakes every Laravel shape in each oven, installs it and runs its suite and PROCTOR. No Docker daemon is part of either, so a bake with <code>--docker</code> is not proven to boot here. The plan is to add Docker smoke runs to the smoke gate once it can drive a compose stack (build the app image, start MySQL, run <code>php artisan migrate</code> and expect <code>/up</code> 200); until then the docs claim what the tests prove.</p>
 <p>The base images in <code>templates/docker/Dockerfile</code> are pinned by manifest-list digest, so one pin resolves natively on amd64 and arm64. To bump a pin:</p>
 <ol>
@@ -152,14 +152,14 @@ docker run --rm -v &quot;$PWD:/repo:ro&quot; -v /work -e SMOKE_WORK=/work sourdo
 <li>Replace the digest on the matching <code>FROM</code> line, add a CHANGELOG line, and commit.</li>
 </ol>
 <p>A digest pin never moves on its own, so schedule these bumps (for example when a new patch release lands on the line) to pick up security fixes inside the image.</p>
-<h2 id="refreshing-the-squire-templates">Refreshing the Squire templates<a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-the-squire-templates">#</a></h2>
+<h2 id="refreshing-the-squire-templates">Refreshing the Squire <span class="docs-heading-tail"><span>templates</span><a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-the-squire-templates">#</a></span></h2>
 <p>When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:</p>
 <pre tabindex="0"><code>php ../squire/bin/export-templates.php --to=../sourdough/templates/squire
 php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --check
 </code></pre>
 <p>Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Apps generated earlier
 pick up the refreshed files with their next <code>sourdough feed</code>.</p>
-<h2 id="refreshing-a-template-s-lock-file">Refreshing a template's lock file<a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-a-template-s-lock-file">#</a></h2>
+<h2 id="refreshing-a-template-s-lock-file">Refreshing a template's lock <span class="docs-heading-tail"><span>file</span><a class="docs-heading-link" aria-label="Link to this section" href="#refreshing-a-template-s-lock-file">#</a></span></h2>
 <p>Each template that ships a <code>package.json</code> (<code>raw-vue</code>, <code>laravel-blade-vue</code>, <code>laravel-inertia</code>) ships the
 <code>package-lock.json</code> that goes with it, so a fresh app passes <code>npm ci</code> on its first pipeline.
 <code>tests/TemplateNpmLockTest.php</code> fails when the two drift. After editing a template's <code>package.json</code>, write its lock
@@ -173,10 +173,10 @@ sed 's/&quot;app-slug-placeholder&quot;/&quot;{{app_slug}}&quot;/g' package-lock
 keeps the one-day release cooldown the app's <code>.npmrc</code> sets, which npm 10 ignores. Then run <code>npm ci --ignore-scripts</code>,
 <code>npm audit --audit-level=high --omit=dev</code> and <code>npm run build</code> on a bake of the shape (the smoke jobs run the install and the
 build), and commit the lock with its <code>package.json</code>. Apps already baked keep their own lock: it is seeded.</p>
-<h2 id="what-belongs-here">What belongs here<a class="docs-heading-link" aria-label="Link to this section" href="#what-belongs-here">#</a></h2>
+<h2 id="what-belongs-here">What belongs <span class="docs-heading-tail"><span>here</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-belongs-here">#</a></span></h2>
 <p>If every app should have something, it goes in Sourdough's templates. If only the Laravel + Inertia/Vue shape (WELD)
 should have it, it lives in WELD. Version rules belong to CREED, checks to PROCTOR, Citadel scripts to Squire.</p>
-<h2 id="releasing">Releasing<a class="docs-heading-link" aria-label="Link to this section" href="#releasing">#</a></h2>
+<h2 id="releasing"><span class="docs-heading-tail"><span>Releasing</span><a class="docs-heading-link" aria-label="Link to this section" href="#releasing">#</a></span></h2>
 <ol>
 <li>Move the lines under <code>## Unreleased</code> in <code>CHANGELOG.md</code> to a new <code>## X.Y.Z (YYYY-MM-DD)</code> heading.</li>
 <li><code>composer ci</code> and the Squire copy check green locally, then both pipelines green for that commit.</li>
@@ -184,15 +184,15 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 <li>Tag <code>X.Y.Z</code> (no <code>v</code>) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.</li>
 <li>A release needs a maintainer's approval. Never move or delete a published tag.</li>
 </ol>
-<h2 id="the-front-page">The front page<a class="docs-heading-link" aria-label="Link to this section" href="#the-front-page">#</a></h2>
+<h2 id="the-front-page">The front <span class="docs-heading-tail"><span>page</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-front-page">#</a></span></h2>
 <p><code>site/</code> is the static front page, for <code>https://sourdough.apps.wayne.edu/</code> on Citadel, served through a small raw-PHP
 <code>deploy/</code> layer generated with Squire.</p>
-<h2 id="things-that-trip-people-up">Things that trip people up<a class="docs-heading-link" aria-label="Link to this section" href="#things-that-trip-people-up">#</a></h2>
+<h2 id="things-that-trip-people-up">Things that trip people <span class="docs-heading-tail"><span>up</span><a class="docs-heading-link" aria-label="Link to this section" href="#things-that-trip-people-up">#</a></span></h2>
 <ul>
 <li>In 0.1 all five shapes generate. <code>--raw --vue</code> apps need <code>npm run build</code> (or <code>npm run dev</code>) before <code>/</code> renders: <code>src/Vite.php</code> refuses with a plain message when there is neither a build nor a dev server.</li>
 <li>Commit <code>.sourdough/manifest.json</code> (and <code>.sourdough/base/</code>) in generated apps; <code>feed</code> needs them.</li>
 </ul>
-<h2 id="who-maintains-it">Who maintains it<a class="docs-heading-link" aria-label="Link to this section" href="#who-maintains-it">#</a></h2>
+<h2 id="who-maintains-it">Who maintains <span class="docs-heading-tail"><span>it</span><a class="docs-heading-link" aria-label="Link to this section" href="#who-maintains-it">#</a></span></h2>
 <p>The stack maintainer (a role, not a named person), Wayne State University Enterprise Applications. To reach them,
 open an issue on git.wayne.edu. Internal runbook (accounts, tokens, mirrors, deploy access): ask Enterprise
 Applications.</p>

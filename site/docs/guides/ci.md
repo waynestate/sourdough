@@ -6,7 +6,7 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#ci)
+# CI [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#ci)
 
 Sourdough's pipelines run one gate, `composer ci`, on both forges: the same command on GitLab and GitHub. This page covers what each pipeline runs, what green means, and where the pipelines should run. For what the gate contains, continue to [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
@@ -14,11 +14,11 @@ Tip
 
 Strongly recommended: a git.wayne.edu instance runner.
 
-## On GitLab[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
+## On GitLab [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-gitlab)
 
 Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). On the Laravel shapes, `composer-ci` also runs `composer lint:gitlab` in `after_script`, pass or fail, and keeps Pint's findings as a Code Quality report (`pint-codequality.json`, seven days), so a merge request shows them in its widget. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. Every include is pinned to the Preflight 0.5.0 release commit (`60314791565a264e97cb210813ef4f3e76512402`), with the tag in a trailing comment.
 
-## The accessibility gate[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate)
+## The accessibility gate [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-accessibility-gate)
 
 Every shape's pipeline checks the app's own pages in a real browser (BEST_PRACTICES 6.4). Two jobs share the work, so the checking stays Preflight's:
 
@@ -37,15 +37,15 @@ Note
 
 Automated checks find only part of the problems. axe-core checks a loaded page; it does not follow a client-side navigation, so focus after a route change and announced route changes in the Vue shapes still need a person with a keyboard and a screen reader. The generated README says so.
 
-## The npm install and audit[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-npm-install-and-audit)
+## The npm install and audit [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-npm-install-and-audit)
 
 The shapes with a front end (raw + Vue, Blade + Vue, Inertia) ship a `package-lock.json`, written against the template's `package.json` with npm's one-day release cooldown honored, so a fresh app's first pipeline installs exactly what Sourdough tested (BEST_PRACTICES 4.10). The `frontend` job runs `npm ci --ignore-scripts`, which installs the lock as it is, runs no package's install script, and stops when `package.json` and the lock disagree, then `npm audit --audit-level=high --omit=dev`, which fails the job on a high or critical advisory in a runtime dependency (moderate and low ones are listed, not fatal), then a second `npm audit` that lists every finding, dev tools included, and never fails. The lock is seeded: after the bake it is yours, and npm writes it. Change a dependency with `npm install` and commit `package.json` and `package-lock.json` together. A package that truly needs its install script (a native addon, a binary download) gets an `npm rebuild <name>` line after `npm ci`, by name, so nothing else runs one.
 
-## The bill of materials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-bill-of-materials)
+## The bill of materials [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-bill-of-materials)
 
 Preflight's `sbom` component writes `sbom.cdx.json`, a CycloneDX SBOM of the Composer packages `composer.lock` installs (dev packages left out), and keeps it for 30 days (BEST_PRACTICES 4.15). The shapes with a front end add the npm half in their `frontend` job: `@cyclonedx/cyclonedx-npm`, the CycloneDX project's own tool, pinned to an exact version and run with `--ignore-scripts`, writes `sbom-npm.cdx.json` from what the install put in `node_modules`, dev packages included, because the build tools make the bundle. npm's built-in `npm sbom` refuses a `package.json` without a `version`, which an app's never has. When the next advisory lands, the affected apps are one search per file away. Container image contents are not covered: the shapes build no image in CI.
 
-## Secrets and deploy credentials[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#secrets-and-deploy-credentials)
+## Secrets and deploy credentials [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#secrets-and-deploy-credentials)
 
 Preflight's `secret-detection` component runs Gitleaks over the checkout and fails on anything shaped like a credential, redacted in the log and in `gitleaks.json`. A freshly baked app of every shape scans clean.
 
@@ -66,7 +66,7 @@ A job that extends it never runs for a merge request and runs only on a protecte
 
 The rest are project settings, so each generated README lists them under "Pipeline": protect `main` and the release tags; keep each deploy credential in a protected, masked (or masked and hidden) variable; never put a credential in the file or a component's inputs; keep the job token allowlist on and add other projects by name; read a fork's merge request before running its pipeline in the project; prefer the deploy target's own secret store for anything long-lived. All of it works on GitLab Community Edition. Protected environments, which would add an approval step, are a paid tier feature, so the file does not rely on them.
 
-## Is the app still fed?[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
+## Is the app still fed? [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
 
 Every shape also ships a `sourdough-feed` job. It installs the newest Sourdough release (`composer create-project waynestate/sourdough`) on the shape's own `composer` image, through `${IMAGE_PREFIX}` and on the `.composer-cache`, and runs two checks against the app's manifest:
 
@@ -77,7 +77,7 @@ Exit `2` from either (no manifest, a manifest from a newer Sourdough, conflict m
 
 An app `sourdough adopt` took in has the job only if its `.gitlab-ci.yml` came from the template: when the app had none, the first feed adds the shape's whole file, job included. When the app keeps a `.gitlab-ci.yml` of its own (`yours` in the manifest), copy the `sourdough-feed` job by hand from a fresh bake of the same shape, with the `.composer-cache` template and the `IMAGE_PREFIX` variable it leans on: see [Your own .gitlab-ci.yml](https://sourdough.apps.wayne.edu/docs/guides/adopt.html#your-own-gitlab-ci-yml). The job's answers mean the same on an adopted app, and `yours` files never turn it yellow.
 
-## Dependency caching[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
+## Dependency caching [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#dependency-caching)
 
 A pipeline that downloads every image and package on every run can get the runner's address rate limited by Docker Hub, and a busy afternoon of fifty jobs can look like abuse. Every shape's `.gitlab-ci.yml` keeps those downloads cached, so a fed starter does not go asking the neighbors for flour.
 
@@ -107,29 +107,29 @@ The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, 
 
 `tests/TemplateCiCacheTest.php` fails Sourdough's own suite when a shape's own job gains an image without `${IMAGE_PREFIX}/` or an install without its cache, and `tests/PreflightPinTest.php` fails it when a shape pins another Preflight version than the rest, gives a component a prefixed `image`, or leaves out `image_prefix`.
 
-## On GitHub[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
+## On GitHub [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-github)
 
 `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.
 
-## What green means[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
+## What green means [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#what-green-means)
 
 Green means `composer ci` passed on all three PHP versions on both.
 
-## The smoke jobs on CI[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
+## The smoke jobs on CI [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-smoke-jobs-on-ci)
 
 On CI the smoke gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The full recipe is in [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html).
 
 The `proof` job runs the whole [proof harness](https://sourdough.apps.wayne.edu/docs/reference/proof.html) on GitLab: every shape and every oven, with the last release fed forward, and keeps the Last run table and every step log as an artifact. It never runs on a push: start it by hand from any pipeline, or from a pipeline schedule that sets `SOURDOUGH_PROOF` to `1`.
 
-## On the bench[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
+## On the bench [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#on-the-bench)
 
 ![Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard](https://sourdough.apps.wayne.edu/docs/readme/gallery.jpg)
 
-## The recipe card[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-recipe-card)
+## The recipe card [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#the-recipe-card)
 
 ![Sourdough brand board: the starter jar mark, palette and type](https://sourdough.apps.wayne.edu/docs/readme/board.jpg)
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#related)
 
 - [Testing](https://sourdough.apps.wayne.edu/docs/guides/testing.html)
 - [Same kitchen, many ovens](https://sourdough.apps.wayne.edu/docs/guides/ovens.html)

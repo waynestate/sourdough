@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Plan format[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#plan-format)
+# Plan format [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#plan-format)
 
 Reference for the plan that `sourdough new --describe` asks a model for, `sourdough new --plan <file>` reads back (as JSON, or as YAML), and every bake saves in the app as `.sourdough/plan.yaml`. Every plan is validated against `resources/plan.schema.json`. For the flags that produce a plan, see [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html).
 
-## The plan object[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-plan-object)
+## The plan object [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-plan-object)
 
 A plan is a small JSON object:
 
@@ -44,7 +44,7 @@ A plan is a small JSON object:
 
 When a plan is printed as JSON, empty `models` and `pages` are omitted.
 
-### Permutation values[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#permutation-values)
+### Permutation values [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#permutation-values)
 
 | Value | Flags | Name |
 | --- | --- | --- |
@@ -63,7 +63,7 @@ Flag resolution, from `src/Permutation.php`:
 
 In 0.1 all five permutations generate.
 
-### Parts[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#parts)
+### Parts [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#parts)
 
 From `src/Part.php`, the stack parts a Sourdough app is wired with:
 
@@ -76,15 +76,15 @@ From `src/Part.php`, the stack parts a Sourdough app is wired with:
 
 A plan's `parts` is a subset of these.
 
-### Models[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#models)
+### Models [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#models)
 
 Each model object has a `name` and a `fields` list; each field has a `name` and a `type`, both strings, as in the example above.
 
-### Pages[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#pages)
+### Pages [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#pages)
 
 A list of strings, such as `["/", "/posts"]`.
 
-## The saved plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan)
+## The saved plan [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan)
 
 Every bake saves its plan in the app as `.sourdough/plan.yaml`, next to the manifest (ADR-0014, decision 3): the recipe card taped inside the jar's lid. It is written after the bake succeeds, on both paths that bake:
 
@@ -123,7 +123,7 @@ The keys are the plan object's, in the same order, and the comment lines are YAM
 sourdough new my-app-copy --plan my-app/.sourdough/plan.yaml
 ```
 
-### Neither managed nor seeded[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#neither-managed-nor-seeded)
+### Neither managed nor seeded [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#neither-managed-nor-seeded)
 
 The saved plan is not in the manifest. The manifest lists the files the template wrote, and the plan is not template output: it is what you asked for. Like the manifest itself and `.sourdough/base/`, it is Sourdough's record about the app, not a file of the app, so it carries neither class:
 
@@ -132,7 +132,7 @@ The saved plan is not in the manifest. The manifest lists the files the template
 
 Edit it as the app grows (a new model, a new page), so it stays the record of what the app is for, and commit it with the manifest.
 
-## Getting a plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#getting-a-plan)
+## Getting a plan [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#getting-a-plan)
 
 Instead of choosing flags, describe what the app does and let a model plan it:
 
@@ -156,7 +156,7 @@ sourdough new my-app --plan plan.json
 
 `--plan` reads the file, validates it against the schema, and continues the normal generation flow using the plan's permutation and name. A YAML plan (`.yaml` or `.yml`) works the same way, and the bake saves the plan as [the saved plan](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-saved-plan).
 
-### Model configuration[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#model-configuration)
+### Model configuration [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#model-configuration)
 
 `--describe` needs three environment variables (no defaults, no key in code):
 
@@ -172,7 +172,7 @@ Danger
 
 `SOURDOUGH_LLM_API_KEY` is a secret. It has no default, and there is no key in code: set it in the environment for the run.
 
-## The steps plan[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-steps-plan)
+## The steps plan [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#the-steps-plan)
 
 The app plan is the what: permutation, parts, name, models, pages. The steps plan in `src/Plan.php` is the how, that is, what `sourdough new` will do, and `--dry-run` prints it. It carries the permutation, the target dir, and a list of steps:
 
@@ -189,7 +189,7 @@ The app plan is the what: permutation, parts, name, models, pages. The steps pla
 
 `--sail` and `--docker` are for the Laravel paths: the raw paths run on plain PHP, and combining either flag with a raw permutation is refused.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/reference/plan-format.html#related)
 
 - [Commands](https://sourdough.apps.wayne.edu/docs/reference/commands.html)
 - [Wiring the stack in](https://sourdough.apps.wayne.edu/docs/guides/wiring-the-stack.html)

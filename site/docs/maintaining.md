@@ -6,11 +6,11 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# MAINTAINING: feeding the starter[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#maintaining-feeding-the-starter)
+# MAINTAINING: feeding the starter [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#maintaining-feeding-the-starter)
 
 How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne State app with the stack already wired in and is meant to own that wiring for the app's whole life. Built today: `new` and `new --describe`, `manifest`, `feed` and `adopt`. Like any starter, it needs regular feeding, or it goes flat.
 
-## What Sourdough is and what it depends on[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-sourdough-is-and-what-it-depends-on)
+## What Sourdough is and what it depends on [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-sourdough-is-and-what-it-depends-on)
 
 - `waynestate/sourdough` on Packagist, with the CLI `bin/sourdough`.
 - Runtime dependencies: `symfony/console`, `symfony/http-client`, `justinrainbow/json-schema`, `openai-php/client` (only for `new --describe`, which can ask an OpenAI-compatible model for a plan; optional). No other stack package at runtime.
@@ -18,11 +18,11 @@ How to build, test, release and keep Sourdough alive. Sourdough makes a Wayne St
 - **It carries a copy of Squire's templates** in `templates/squire/` (`raw/`, `laravel/`, `static/`, `vue/`, `catalog.json`, `manifest.json`). Squire owns those files; Sourdough never hand-edits them. `composer squire-copy:sync` rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.10`), and `composer squire-copy:check` (part of `composer ci`) exits 1 when the committed copy has drifted.
 - `feed` needs only git on the developer's machine: it bakes the app's shape again with the manifest's answers and three-way merges each file with `git merge-file`, the base found by its manifest hash in `.sourdough/base/` or the app's git history (see `docs/guides/keeping-current.md`). `new`, `feed` and `adopt` bake through the same `Baker`, so a change to a generator reaches all three: `adopt` bakes the shape into a scratch folder and compares the app with that loaf, so it records what `new` would bake today.
 
-## Where it lives[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#where-it-lives)
+## Where it lives [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#where-it-lives)
 
 Development happens on git.wayne.edu, the canonical repository ([enterprise-apps/sourdough](https://git.wayne.edu/enterprise-apps/sourdough)). GitHub ([waynestate/sourdough](https://github.com/waynestate/sourdough)) is a read-only push mirror: `main` and tags are copied automatically, nobody pushes to it, and Packagist picks releases up from there. Changes, issues and merge requests go to git.wayne.edu.
 
-## Build and test[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#build-and-test)
+## Build and test [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#build-and-test)
 
 | Task | Command |
 | --- | --- |
@@ -45,13 +45,13 @@ The `stack-composer-cache` volume keeps Composer's downloads between runs; Docke
 
 `composer ci` runs `composer validate --strict`, the tests, Pint, PHPStan, the Squire copy check, the agent-ready files check, the docs site check and `composer audit`.
 
-## CI[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
+## CI [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#ci)
 
 - **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
 - **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.1.4: GitHub's copy of Preflight has no later tag yet, so the GitHub side stays there while GitLab runs 0.5.0.
 - Green means `composer ci` passed on all three PHP versions on both.
 
-## Smoke gate[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
+## Smoke gate [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#smoke-gate)
 
 The smoke gate is the proofing bench: it proofs one shape at a time before that shape may be claimed. It bakes the app with this checkout's own `bin/sourdough new <dir> --no-advisor --no-playbook --no-input` (the CLI under test is the one being shipped). Every bake passes `--no-playbook`, because Playbook is the default wiring but its package is private on git.wayne.edu and the gate must run credential-free.
 
@@ -96,7 +96,7 @@ Environment variables:
 
 On CI the gate runs as one job per shape: `smoke` (matrix) on GitHub, `smoke-raw`, `smoke-raw-vue`, `smoke-blade`, `smoke-blade-vue` and `smoke-inertia` on GitLab. The GitLab jobs block (since 0.4.0, after every shape baked green there): a red shape fails the pipeline. The GitHub matrix blocks too, since it baked every shape green there. The whole proof runs in the GitLab `proof` job, by hand or on a schedule that sets `SOURDOUGH_PROOF` to `1`, never on a push.
 
-## The local runtime output (Sail and Docker)[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-local-runtime-output-sail-and-docker)
+## The local runtime output (Sail and Docker) [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-local-runtime-output-sail-and-docker)
 
 The `--sail` and `--docker` output is checked by tests and by the proof's oven runs: `tests/SailScaffoldTest.php` and `tests/DockerScaffoldTest.php` assert on the files each scaffold writes, including real-binary runs through `bin/sourdough`, and `scripts/proof.sh` bakes every Laravel shape in each oven, installs it and runs its suite and PROCTOR. No Docker daemon is part of either, so a bake with `--docker` is not proven to boot here. The plan is to add Docker smoke runs to the smoke gate once it can drive a compose stack (build the app image, start MySQL, run `php artisan migrate` and expect `/up` 200); until then the docs claim what the tests prove.
 
@@ -107,7 +107,7 @@ The base images in `templates/docker/Dockerfile` are pinned by manifest-list dig
 
 A digest pin never moves on its own, so schedule these bumps (for example when a new patch release lands on the line) to pick up security fixes inside the image.
 
-## Refreshing the Squire templates[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-the-squire-templates)
+## Refreshing the Squire templates [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-the-squire-templates)
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
 
@@ -118,7 +118,7 @@ php ../squire/bin/export-templates.php --to=../sourdough/templates/squire --chec
 
 Commit the refreshed copy with the Squire commit in the message, and add a CHANGELOG line. Apps generated earlier pick up the refreshed files with their next `sourdough feed`.
 
-## Refreshing a template's lock file[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-a-template-s-lock-file)
+## Refreshing a template's lock file [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#refreshing-a-template-s-lock-file)
 
 Each template that ships a `package.json` (`raw-vue`, `laravel-blade-vue`, `laravel-inertia`) ships the `package-lock.json` that goes with it, so a fresh app passes `npm ci` on its first pipeline. `tests/TemplateNpmLockTest.php` fails when the two drift. After editing a template's `package.json`, write its lock again in the pinned Node image the pipelines use (`node:22.21.1-alpine3.22`, by digest), in a scratch folder that holds a copy of that `package.json` and of `templates/squire/vue/.npmrc`:
 
@@ -130,11 +130,11 @@ sed 's/"app-slug-placeholder"/"{{app_slug}}"/g' package-lock.json > <repo>/templ
 
 The stand-in name keeps npm away from the `{{app_slug}}` placeholder, which is not a valid package name. `--before` keeps the one-day release cooldown the app's `.npmrc` sets, which npm 10 ignores. Then run `npm ci --ignore-scripts`, `npm audit --audit-level=high --omit=dev` and `npm run build` on a bake of the shape (the smoke jobs run the install and the build), and commit the lock with its `package.json`. Apps already baked keep their own lock: it is seeded.
 
-## What belongs here[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
+## What belongs here [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#what-belongs-here)
 
 If every app should have something, it goes in Sourdough's templates. If only the Laravel + Inertia/Vue shape (WELD) should have it, it lives in WELD. Version rules belong to CREED, checks to PROCTOR, Citadel scripts to Squire.
 
-## Releasing[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#releasing)
+## Releasing [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#releasing)
 
 1. Move the lines under `## Unreleased` in `CHANGELOG.md` to a new `## X.Y.Z (YYYY-MM-DD)` heading.
 2. `composer ci` and the Squire copy check green locally, then both pipelines green for that commit.
@@ -142,15 +142,15 @@ If every app should have something, it goes in Sourdough's templates. If only th
 4. Tag `X.Y.Z` (no `v`) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.
 5. A release needs a maintainer's approval. Never move or delete a published tag.
 
-## The front page[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-front-page)
+## The front page [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#the-front-page)
 
 `site/` is the static front page, for `https://sourdough.apps.wayne.edu/` on Citadel, served through a small raw-PHP `deploy/` layer generated with Squire.
 
-## Things that trip people up[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
+## Things that trip people up [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#things-that-trip-people-up)
 
 - In 0.1 all five shapes generate. `--raw --vue` apps need `npm run build` (or `npm run dev`) before `/` renders: `src/Vite.php` refuses with a plain message when there is neither a build nor a dev server.
 - Commit `.sourdough/manifest.json` (and `.sourdough/base/`) in generated apps; `feed` needs them.
 
-## Who maintains it[#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)
+## Who maintains it [#](https://sourdough.apps.wayne.edu/docs/maintaining.html#who-maintains-it)
 
 The stack maintainer (a role, not a named person), Wayne State University Enterprise Applications. To reach them, open an issue on git.wayne.edu. Internal runbook (accounts, tokens, mirrors, deploy access): ask Enterprise Applications.

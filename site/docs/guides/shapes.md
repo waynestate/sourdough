@@ -6,13 +6,13 @@ llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Pick a shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#pick-a-shape)
+# Pick a shape [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#pick-a-shape)
 
 A starter in a jar is only potential until you give it a shape: pick the permutation below, then run `sourdough new` with the matching flags. If you would rather describe the app in a sentence and let a model plan it, continue to [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html).
 
 ![Five loaves on the proofing bench (raw, raw + vue, blade, blade + islands, inertia) above the feeding schedule chalkboard](https://sourdough.apps.wayne.edu/docs/readme/gallery.jpg)
 
-## The five permutations[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-five-permutations)
+## The five permutations [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-five-permutations)
 
 | Flags | Permutation |
 | --- | --- |
@@ -56,7 +56,7 @@ inertia
 sourdough new my-app --inertia
 ```
 
-## The template directories[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-template-directories)
+## The template directories [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#the-template-directories)
 
 Each shape bakes from a directory in `templates/`:
 
@@ -77,7 +77,7 @@ The raw template also carries its own checks:
 - `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`.
 - A front controller that answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
 
-## Raw PHP + Vue[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#raw-php-vue)
+## Raw PHP + Vue [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#raw-php-vue)
 
 `--raw --vue` keeps everything above and swaps the page for a Vue 3 app. PHP boots HELMET, the session and SESAME the same way, then answers JSON under `/api/` (`/api/me` is the signed-in user) and sends one page that loads the Vue app. WayneUI comes from its Vue package and its layered dist stylesheet, pinned as in the Inertia shape, so there is no `public/wayne-ui.php` to fetch. Run it with:
 
@@ -90,11 +90,11 @@ composer serve
 
 Run `npm run dev` in a second terminal for hot reload: `src/Vite.php` loads the app from the dev server while it runs, and from `public/build` otherwise. See [Templates](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue) for every file it adds.
 
-## Oracle in every shape[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#oracle-in-every-shape)
+## Oracle in every shape [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#oracle-in-every-shape)
 
 Oracle is wired but dormant in every generated app. The settings `ORACLE_USERNAME`, `ORACLE_PASSWORD`, and either `ORACLE_TNS` or `ORACLE_HOST`, `ORACLE_PORT`, `ORACLE_SERVICE_NAME` ship commented out in `.env.example`; while they are empty, nothing connects and nothing errors. Once you fill them in, Laravel apps check the wiring with `php artisan oracle:check`, and raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences. The command finds the check file where it lives: `oracle-check.php` at the app root, where Squire's Laravel layout ships it, first, then `deploy/oracle-check.php`.
 
-## Related[#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#related)
+## Related [#](https://sourdough.apps.wayne.edu/docs/guides/shapes.html#related)
 
 - [Describe a plan](https://sourdough.apps.wayne.edu/docs/guides/describe-a-plan.html)
 - [The manifest](https://sourdough.apps.wayne.edu/docs/guides/manifest.html)
