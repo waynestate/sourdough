@@ -51,6 +51,12 @@ $helmet = helmet_boot([
     'trusted_proxies' => $trustedProxies,
     // HELMET's default policy, plus the Vite dev server while it runs.
     'csp' => $vite->withDevServer(SecurityHeaders::defaultCspPolicy()),
+    // GET /ready answers here, like /up: add checks for the database and other
+    // dependencies under 'checks' (name => callable) as the app grows.
+    'readiness' => ['enabled' => true],
+    // In production an uncaught exception is logged in full and the visitor
+    // gets HELMET's neutral error page. Locally, PHP shows the error.
+    'error_handler' => ['enabled' => $appEnv === 'production'],
 ]);
 
 // The session store comes from the environment so more than one replica can
