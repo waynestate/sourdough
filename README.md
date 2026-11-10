@@ -69,7 +69,7 @@ Options:
 - `--vue` add a Vue front end
 - `--inertia` use Inertia/Vue (implies `--laravel`)
 - `--sail` run the Laravel app on Sail for local work: compose.yaml and laravel/sail in require-dev, MySQL 8.4 LTS; needs WSL2 on Windows, where `--docker` is the route that works natively
-- `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, are the single place to swap in Squire's Citadel-parity image when it exists; MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
+- `--docker` generate a Dockerfile and compose.yaml for local work (native on every OS; amd64 and arm64): the app's own base images, pinned by digest, for everyday work (Citadel's own image and MySQL 5.6.51 are [Parity](https://git.wayne.edu/enterprise-apps/parity)'s job: every baked README's "Run it like Citadel" says how); MySQL 8.4; Playbook credentials reach the build only as a BuildKit secret, never a build arg
 - `--dry-run` print the plan and write nothing
 - `--name` app name (default: the basename of `<dir>`)
 - `--no-input` never prompt (Sourdough has no prompts)

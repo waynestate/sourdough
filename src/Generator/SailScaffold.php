@@ -78,8 +78,11 @@ Sail is Laravel's Docker setup for local work. It is a development tool only; it
     ./vendor/bin/sail npm install
     ./vendor/bin/sail npm run dev
 
-The app is at http://localhost:8000. The database is MySQL 8.4 LTS. Citadel still runs MySQL 5.6, which Laravel 13 cannot run on,
-so local parity with Citadel's database is not possible; PROCTOR's mysql56 check covers the gap.
+The app is at http://localhost:8000. The database is MySQL 8.4 LTS; Citadel still runs MySQL 5.6, which is older than Laravel 13
+supports, and PROCTOR's mysql56 check covers that gap. To run the same folder on Citadel's own image, proxy and MySQL 5.6.51, use
+Parity (the "Run it like Citadel" steps in this README). Its first deployment reads only `.env`, and Sail's `.env` points at
+Sail's own MySQL, so the release stops at the migrate step with `Access denied`: set `DB_CONNECTION=sqlite` in `.env` for Parity
+runs and put `mysql` back for Sail.
 
 Windows: Sail's `sail` script is a shell script, so run it from WSL2. Without WSL2, generate the app with `--docker` instead.
 README;

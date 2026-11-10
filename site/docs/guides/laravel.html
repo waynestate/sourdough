@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building on Laravel | Sourdough docs</title>
-<meta name="description" content="What a Laravel bake adds over the raw base, including a fresh skeleton from Composer, Sail or Docker for the local runtime, artisan Next steps, and the Oracle check command.">
+<meta name="description" content="What a Laravel bake adds over the raw base, including a fresh skeleton from Composer, Sail or Docker for the local runtime, Parity to run it like Citadel, artisan Next steps, and the Oracle check command.">
 <meta name="docs-version" content="0.4.1">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -65,7 +65,22 @@
 <p>With <code>--docker</code>, the production build takes Playbook's credentials as a BuildKit secret, never a build arg:</p>
 <pre tabindex="0"><code class="language-bash">docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 </code></pre>
-<p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the single place to swap in Squire's Citadel-parity image when it exists.</p>
+<p>The <code>FROM</code> lines in the generated <code>Dockerfile</code> are the app's own images, for everyday work. Citadel's own image is Parity's job (below).</p>
+<h2 id="run-it-like-citadel-parity">Run it like Citadel: Parity<a class="docs-heading-link" aria-label="Link to this section" href="#run-it-like-citadel-parity">#</a></h2>
+<p>Neither flag is Citadel. <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/parity">Parity</a> is: it runs the same folder on Citadel's PHP image with its <code>php.ini</code> and <code>vhost.conf</code>, Citadel's proxy, MySQL 5.6.51, <code>build.sh</code>, the deployments, and Laravel's scheduler as Citadel's cron entry, on Windows, macOS and Linux with Podman or Docker. It is a separate install, not a flag, and Sourdough bakes no <code>parity.json</code>: <code>parity init --from-squire</code> writes it from the Squire kit every shape already ships. Every Laravel README ends &quot;Run it locally&quot; with &quot;Run it like Citadel&quot;, which comes down to:</p>
+<pre tabindex="0"><code class="language-bash">parity check
+parity init --from-squire
+parity up
+parity shell --user citadel php artisan migrate
+parity shell --user citadel php artisan optimize
+parity test
+</code></pre>
+<p>The first <code>parity up</code> runs <code>scripts/release.sh</code> inside Citadel's image, as Citadel's first deployment does, and that deployment reads only <code>.env</code>; the two <code>parity shell</code> lines migrate Parity's MySQL 5.6.51 and cache its settings, which reach the app as Laravel's <code>DB_*</code> variables and beat <code>.env</code>. An app baked with <code>--docker</code> or <code>--sail</code> points <code>.env</code> at that oven's MySQL, which Parity cannot reach, so its release stops at the migrate step with <code>Access denied</code>; set <code>DB_CONNECTION=sqlite</code> in <code>.env</code> for Parity runs (the oven's README section says so). Plain Blade apps write <code>package-lock.json</code> once with <code>npm install</code> first, because the release script refuses a front end without a lock file.</p>
+<p>Which to use when:</p>
+<ul>
+<li><strong><code>php artisan serve</code>, Sail or <code>--docker</code></strong> while you write code: fast reloads, Vite, your own database.</li>
+<li><strong>Parity</strong> before a release, after a PHP or Laravel upgrade, or whenever a bug only shows on Citadel: Citadel's <code>php.ini</code>, Apache, proxy headers and MySQL 5.6 are where &quot;works on my machine&quot; usually parts ways with production.</li>
+</ul>
 <h2 id="sign-in-stays-sesame">Sign-in stays SESAME<a class="docs-heading-link" aria-label="Link to this section" href="#sign-in-stays-sesame">#</a></h2>
 <p>Laravel's kits ship registration, password reset, email verification and two-factor login through Fortify. A WSU app signs in through SESAME, so turn off the features you do not use, and remove their routes from the front end too. In the Vue, React and Svelte kits a leftover reference to a disabled route breaks the build, because routes are generated at build time.</p>
 <aside class="docs-callout docs-callout--warning" role="note"><p class="docs-callout__label">Warning</p><p>A live <code>/register</code> route in an app that is supposed to use central sign-in is a security hole and a support burden. The kits also set a login rate limit (5 a minute per email and IP in the docs' example), and the WorkOS variants would add a second hosted identity provider beside SESAME, so leave them out.</p></aside>
@@ -195,7 +210,7 @@ npm run build
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/ovens.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Same kitchen, many ovens</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/keeping-current.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Keeping apps current</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-a-laravel-bake-adds">What a Laravel bake adds</a></li><li class="docs-toc__item"><a href="#build-on-the-official-installer">Build on the official installer</a></li><li class="docs-toc__item"><a href="#local-runtime-sail-or-docker">Local runtime: Sail or Docker</a></li><li class="docs-toc__item"><a href="#sign-in-stays-sesame">Sign-in stays SESAME</a></li><li class="docs-toc__item"><a href="#laravel-boost-dev-only">Laravel Boost, dev only</a></li><li class="docs-toc__item"><a href="#support-windows">Support windows</a></li><li class="docs-toc__item"><a href="#trust-the-ha-proxy-not-every-sender">Trust the HA-Proxy, not every sender</a></li><li class="docs-toc__item"><a href="#up-for-liveness-ready-for-traffic">/up for liveness, /ready for traffic</a></li><li class="docs-toc__item"><a href="#a-stopped-scheduler-shows-up">A stopped scheduler shows up</a></li><li class="docs-toc__item"><a href="#every-queued-job-has-limits">Every queued job has limits</a></li><li class="docs-toc__item"><a href="#work-on-the-shared-mysql-5-6">Work on the shared MySQL 5.6</a></li><li class="docs-toc__item"><a href="#next-steps">Next steps</a></li><li class="docs-toc__item"><a href="#the-oracle-check">The Oracle check</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-a-laravel-bake-adds">What a Laravel bake adds</a></li><li class="docs-toc__item"><a href="#build-on-the-official-installer">Build on the official installer</a></li><li class="docs-toc__item"><a href="#local-runtime-sail-or-docker">Local runtime: Sail or Docker</a></li><li class="docs-toc__item"><a href="#run-it-like-citadel-parity">Run it like Citadel: Parity</a></li><li class="docs-toc__item"><a href="#sign-in-stays-sesame">Sign-in stays SESAME</a></li><li class="docs-toc__item"><a href="#laravel-boost-dev-only">Laravel Boost, dev only</a></li><li class="docs-toc__item"><a href="#support-windows">Support windows</a></li><li class="docs-toc__item"><a href="#trust-the-ha-proxy-not-every-sender">Trust the HA-Proxy, not every sender</a></li><li class="docs-toc__item"><a href="#up-for-liveness-ready-for-traffic">/up for liveness, /ready for traffic</a></li><li class="docs-toc__item"><a href="#a-stopped-scheduler-shows-up">A stopped scheduler shows up</a></li><li class="docs-toc__item"><a href="#every-queued-job-has-limits">Every queued job has limits</a></li><li class="docs-toc__item"><a href="#work-on-the-shared-mysql-5-6">Work on the shared MySQL 5.6</a></li><li class="docs-toc__item"><a href="#next-steps">Next steps</a></li><li class="docs-toc__item"><a href="#the-oracle-check">The Oracle check</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.4.1</span></span>

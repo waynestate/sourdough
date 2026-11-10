@@ -13,9 +13,11 @@ The dev container runs as root on purpose (it is local only, and Docker Desktop 
 
 The app is at http://localhost:8000. `composer dev-down` stops it and `composer dev-shell` opens a shell in the app container.
 
-The base images are pinned by digest in `Dockerfile`; the `FROM` lines are the single place to swap in Squire's Citadel-parity image
-when it exists. The database is MySQL 8.4 LTS. Citadel still runs MySQL 5.6, which Laravel 13 cannot run on, so local parity with
-Citadel's database is not possible; PROCTOR's mysql56 check covers the gap.
+The base images are pinned by digest in `Dockerfile`. The database is MySQL 8.4 LTS; Citadel still runs MySQL 5.6, which is
+older than Laravel 13 supports, and PROCTOR's mysql56 check covers that gap. To run the same folder on Citadel's own image, proxy
+and MySQL 5.6.51, use Parity (the "Run it like Citadel" steps in this README). Its first deployment reads only `.env`, and this
+`.env` points at the `mysql` service here, so the release stops at the migrate step with `Access denied`: set
+`DB_CONNECTION=sqlite` in `.env` for Parity runs and put `mysql` back for `composer dev-up`.
 
 Production image: `docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .` Playbook credentials go in as a
 BuildKit secret (a Composer auth file), never a build argument. The image runs as a non-root user and listens on 8080.

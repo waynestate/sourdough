@@ -1,6 +1,6 @@
 ---
 title: "Building on Laravel | Sourdough docs"
-description: "What a Laravel bake adds over the raw base, including a fresh skeleton from Composer, Sail or Docker for the local runtime, artisan Next steps, and the Oracle check command."
+description: "What a Laravel bake adds over the raw base, including a fresh skeleton from Composer, Sail or Docker for the local runtime, Parity to run it like Citadel, artisan Next steps, and the Oracle check command."
 url: https://sourdough.apps.wayne.edu/docs/guides/laravel.html
 llms: https://sourdough.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
@@ -47,7 +47,27 @@ With `--docker`, the production build takes Playbook's credentials as a BuildKit
 docker build --target prod --secret id=composer_auth,src=auth.json -t myapp .
 ```
 
-The `FROM` lines in the generated `Dockerfile` are the single place to swap in Squire's Citadel-parity image when it exists.
+The `FROM` lines in the generated `Dockerfile` are the app's own images, for everyday work. Citadel's own image is Parity's job (below).
+
+## Run it like Citadel: Parity[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#run-it-like-citadel-parity)
+
+Neither flag is Citadel. [Parity](https://git.wayne.edu/enterprise-apps/parity) is: it runs the same folder on Citadel's PHP image with its `php.ini` and `vhost.conf`, Citadel's proxy, MySQL 5.6.51, `build.sh`, the deployments, and Laravel's scheduler as Citadel's cron entry, on Windows, macOS and Linux with Podman or Docker. It is a separate install, not a flag, and Sourdough bakes no `parity.json`: `parity init --from-squire` writes it from the Squire kit every shape already ships. Every Laravel README ends "Run it locally" with "Run it like Citadel", which comes down to:
+
+```bash
+parity check
+parity init --from-squire
+parity up
+parity shell --user citadel php artisan migrate
+parity shell --user citadel php artisan optimize
+parity test
+```
+
+The first `parity up` runs `scripts/release.sh` inside Citadel's image, as Citadel's first deployment does, and that deployment reads only `.env`; the two `parity shell` lines migrate Parity's MySQL 5.6.51 and cache its settings, which reach the app as Laravel's `DB_*` variables and beat `.env`. An app baked with `--docker` or `--sail` points `.env` at that oven's MySQL, which Parity cannot reach, so its release stops at the migrate step with `Access denied`; set `DB_CONNECTION=sqlite` in `.env` for Parity runs (the oven's README section says so). Plain Blade apps write `package-lock.json` once with `npm install` first, because the release script refuses a front end without a lock file.
+
+Which to use when:
+
+- **`php artisan serve`, Sail or `--docker`** while you write code: fast reloads, Vite, your own database.
+- **Parity** before a release, after a PHP or Laravel upgrade, or whenever a bug only shows on Citadel: Citadel's `php.ini`, Apache, proxy headers and MySQL 5.6 are where "works on my machine" usually parts ways with production.
 
 ## Sign-in stays SESAME[#](https://sourdough.apps.wayne.edu/docs/guides/laravel.html#sign-in-stays-sesame)
 
