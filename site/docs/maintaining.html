@@ -110,7 +110,7 @@ docker run --rm -v &quot;${PWD}:/app&quot; -w /app php:8.5-cli vendor/bin/phpuni
 <h2 id="ci"><span class="docs-heading-tail"><span>CI</span><a class="docs-heading-link" aria-label="Link to this section" href="#ci">#</a></span></h2>
 <ul>
 <li><strong>GitLab:</strong> Preflight's <code>php-test</code> (PHP 8.3, 8.4, 8.5) and <code>composer-audit</code> components, plus a <code>composer-ci</code> job.</li>
-<li><strong>GitHub:</strong> <code>.github/workflows/ci.yml</code> calls Preflight's reusable workflow with <code>composer ci</code>, pinned to Preflight 0.6.0's release commit, the same release GitLab runs.</li>
+<li><strong>GitHub:</strong> <code>.github/workflows/ci.yml</code> calls Preflight's reusable workflow with <code>composer ci</code>, pinned to Preflight 0.8.0's release commit, the same release GitLab runs.</li>
 <li>Green means <code>composer ci</code> passed on all three PHP versions on both.</li>
 </ul>
 <h2 id="smoke-gate">Smoke <span class="docs-heading-tail"><span>gate</span><a class="docs-heading-link" aria-label="Link to this section" href="#smoke-gate">#</a></span></h2>

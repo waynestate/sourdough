@@ -12,6 +12,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- CI pins Preflight 0.8.0.
 - Fixed: the front page's "Adopt an existing app" prompt asked the agent to run `sourdough adopt` with the values of `--shape` and `--name` missing: the `<shape>` and `<name>` placeholders sat in the HTML unescaped, so browsers read them as unknown elements and the copied prompt, `index.md` and `llms-full.txt` lost them. They are escaped now, as is a raw `<name>` in an old changelog entry, and `tests/SitePlaceholdersTest.php` fails on any element the page does not really use and on any flag left without its value.
 - Site: the order ticket has "Copy a link to this order", a link such as `https://sourdough.apps.wayne.edu/#order?loaf=laravel-inertia&oven=docker&name=Parking%20Permits&advisor=no` that opens the counter with the same loaf, oven, name and ADVISOR choice, so a lead can send a new developer the exact order. A loaf or oven that is not on the menu is ignored and the name goes through the usual rule, so a mangled link still lands on a good ticket. The button appears only once the script has opened the counter.
 - Docs: the every-OS guide says what to do when Windows will not run a script ("running scripts is disabled on this system"): on a Windows client with no execution policy set, PowerShell runs no script files at all, so it shows how to check the policy, set `RemoteSigned` for your own account, unblock a downloaded copy, or run one script with its own policy. It no longer says the generator's scripts are never affected. BEST_PRACTICES 5.3 says the same.
