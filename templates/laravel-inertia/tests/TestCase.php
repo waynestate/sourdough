@@ -26,6 +26,19 @@ abstract class TestCase extends BaseTestCase
         $app->bind(LoadEnvironmentVariables::class, SkipEnvFile::class);
         $app->make(Kernel::class)->bootstrap();
 
+        // The skeleton suite must pass on every laptop and in CI, so the
+        // values it leans on are pinned here instead of left to the
+        // developer's .env: an APP_URL, HELMET_PROXIES or
+        // SESAME_DRIVER=cas must not change the verdict. A test that wants
+        // another value sets it itself. helmet.proxies is null, which
+        // trusts no proxy; the HELMET provider copies it into Laravel's
+        // trustProxies at boot.
+        $app['config']->set([
+            'app.url' => 'http://localhost',
+            'sesame.driver' => 'fake',
+            'helmet.proxies' => null,
+        ]);
+
         return $app;
     }
 
