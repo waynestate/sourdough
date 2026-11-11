@@ -13,3 +13,5 @@
 *.local
 # Pint's Code Quality report (composer lint:gitlab), an artifact in CI only.
 /pint-codequality.json
+# Parity's per-app folder holds each developer's local passwords; they never get committed.
+/.parity/

@@ -8,7 +8,9 @@ use Inertia\Inertia;
 | Routes
 |--------------------------------------------------------------------------
 |
-| / and /dashboard live here. SESAME owns the rest of the auth surface:
+| / and the signed-in landing page live here; its path and route name come
+| from config/home.php, so renaming the starter Dashboard is a one-file
+| edit. SESAME owns the rest of the auth surface:
 | with sesame.routes left at its default (true), the adapter registers
 | GET /login (sesame.login) and POST /logout (sesame.logout). A CAS ticket
 | comes back to the app's service URL, which defaults to that same /login
@@ -22,6 +24,8 @@ use Inertia\Inertia;
 
 Route::get('/', fn () => Inertia::render('Home'))->name('home');
 
-Route::get('/dashboard', fn () => Inertia::render('Dashboard'))
+// The signed-in landing page: path and route name from config/home.php, so
+// an app that renames the starter Dashboard edits one file, not three.
+Route::get(config('home.path'), fn () => Inertia::render('Dashboard'))
     ->middleware(['auth.sesame'])
-    ->name('dashboard');
+    ->name(config('home.route'));

@@ -38,6 +38,9 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'name' => config('app.name'),
+            // The signed-in landing page's route name: the Vue layer calls
+            // route(page.props.homeRoute), so it never pins a path of its own.
+            'homeRoute' => config('home.route'),
             'auth' => [
                 // Sign-in is SESAME's, so the shared user comes from its
                 // session, not from a Laravel guard.

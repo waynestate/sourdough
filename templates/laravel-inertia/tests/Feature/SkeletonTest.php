@@ -15,6 +15,16 @@ use Inertia\Testing\AssertableInertia;
 | server uses, and they run on SQLite in memory, as phpunit.xml says.
 */
 
+/**
+ * The signed-in landing page's path from config/home.php, so these tests
+ * follow the page when the app moves it instead of pinning a literal that
+ * goes stale.
+ */
+function sourdoughHomePath(): string
+{
+    return (string) config('home.path');
+}
+
 it('answers /up with 200', function () {
     $this->get('/up')->assertStatus(200);
 });
@@ -25,11 +35,11 @@ it('answers / with 200 for a guest', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page->component('Home', false));
 });
 
-it('sends a guest at /dashboard to the sign-in flow', function () {
-    $this->get('/dashboard')->assertRedirect('/login');
+it('sends a guest at the signed-in landing page to the sign-in flow', function () {
+    $this->get(sourdoughHomePath())->assertRedirect('/login');
 });
 
-it('shows /dashboard to a signed-in user', function () {
+it('shows the signed-in landing page to a signed-in user', function () {
     // The fake driver answers /login with its configured identity and the
     // resolver imports the user, so one request signs the session in.
     $this->get('/login')->assertRedirect('/');
@@ -37,7 +47,7 @@ it('shows /dashboard to a signed-in user', function () {
     // component() takes false for shouldExist because the pages live in
     // resources/js/pages while Inertia's default existence check looks
     // under js/Pages; the assertion pins the name the route renders.
-    $this->get('/dashboard')
+    $this->get(sourdoughHomePath())
         ->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page->component('Dashboard', false));
 });
