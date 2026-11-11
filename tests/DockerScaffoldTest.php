@@ -45,11 +45,17 @@ final class DockerScaffoldTest extends TestCase
         (new DockerScaffold())->apply($target, false);
         $dockerfile = (string) file_get_contents($target . '/Dockerfile');
 
-        foreach ([
-            'sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0',
-            'sha256:9236fd373d3bcda0659cf94838a744bd79791419292958963f8c6b34a0071554',
-            'sha256:4cc63b3d4e05c40da73e7af5d39364ca2678ac07208919497bda3bbab975be95',
-        ] as $digest) {
+        // The pins live in the scaffold source, and Renovate feeds that file
+        // on every digest bump. Read them from there so this test never has
+        // to carry a second copy of the dough.
+        $templatePath = dirname(__DIR__) . '/templates/docker/Dockerfile';
+        self::assertFileExists($templatePath, 'scaffold source Dockerfile is missing');
+        $template = (string) file_get_contents($templatePath);
+        preg_match_all('/^FROM\s+\S+@sha256:([0-9a-f]{64})/m', $template, $matches);
+        $digests = array_map(static fn (string $hex): string => 'sha256:' . $hex, $matches[1] ?? []);
+        self::assertGreaterThanOrEqual(3, count($digests), 'the scaffold Dockerfile pins at least three base images by digest');
+
+        foreach ($digests as $digest) {
             self::assertStringContainsString($digest, $dockerfile);
         }
 
