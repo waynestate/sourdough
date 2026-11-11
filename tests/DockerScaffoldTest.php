@@ -52,7 +52,7 @@ final class DockerScaffoldTest extends TestCase
         self::assertFileExists($templatePath, 'scaffold source Dockerfile is missing');
         $template = (string) file_get_contents($templatePath);
         preg_match_all('/^FROM\s+\S+@sha256:([0-9a-f]{64})/m', $template, $matches);
-        $digests = array_map(static fn(string $hex): string => 'sha256:' . $hex, $matches[1] ?? []);
+        $digests = array_map(static fn(string $hex): string => 'sha256:' . $hex, $matches[1]);
         self::assertGreaterThanOrEqual(3, count($digests), 'the scaffold Dockerfile pins at least three base images by digest');
 
         foreach ($digests as $digest) {
