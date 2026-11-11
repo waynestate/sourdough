@@ -1,20 +1,20 @@
-# PREFLIGHT components, pinned to the Preflight 0.6.0 release commit. Never use
+# PREFLIGHT components, pinned to the Preflight 0.8.0 release commit. Never use
 # ~latest. From 0.3.0 each component pulls image_prefix/image, with its own
 # default image (pinned by digest in that release). image_prefix is this file's
 # ${IMAGE_PREFIX}, so the components take the same proxy rule as the jobs
 # further down. To override an image, give the plain name (php:8.4-cli-trixie@sha256:...):
 # put the prefix in it too and the loaf gets proofed twice, and the pull fails.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       proctor_command: vendor/bin/proctor check --format=codequality
       image_prefix: "${IMAGE_PREFIX}"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       test_command: vendor/bin/phpunit
       image_prefix: "${IMAGE_PREFIX}"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       working_dir: .
       image_prefix: "${IMAGE_PREFIX}"
@@ -22,13 +22,13 @@ include:
   # Composer packages composer.lock installs, dev packages left out, kept as
   # sbom.cdx.json for 30 days. When the next advisory lands, finding the
   # apps it hits is one search per app instead of one guess per app.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/sbom@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/sbom@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
   # Gitleaks reads the checkout and fails on anything shaped like a
   # credential, with the finding redacted in the log and in gitleaks.json.
   # A secret belongs in Settings > CI/CD > Variables, never in a file.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       image_prefix: "${IMAGE_PREFIX}"
   # The accessibility gate (BEST_PRACTICES 6.4): axe-core in a real browser
@@ -38,7 +38,7 @@ include:
   # pages list is the a11y-pages job's A11Y_PATHS: change the two together.
   # The Playwright image comes from mcr.microsoft.com, which the Dependency
   # Proxy does not front, so this component takes no image_prefix.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@30dd7094089931015ec8754fb321e17659749f05 # 0.6.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@28d9c5994d06c633850d431dcf6ca56c48a96055 # 0.8.0
     inputs:
       site_dir: a11y-site
       pages: ["/"]

@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
  */
 final class PreflightPinTest extends TestCase
 {
-    private const TAG = '0.6.0';
+    private const TAG = '0.8.0';
 
-    private const SHA = '30dd7094089931015ec8754fb321e17659749f05';
+    private const SHA = '28d9c5994d06c633850d431dcf6ca56c48a96055';
 
     /** Preflight 0.3.0's components that pull from Docker Hub and take image_prefix. */
     private const DOCKER_HUB_COMPONENTS = [
