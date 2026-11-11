@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Docs: the front page and the README name Preflight 0.8.0, the release every pipeline pins (they still said 0.6.0), and `tests/PreflightPinTest.php` now fails when a sentence that names the pin on the front page, the README, MAINTAINING, BEST_PRACTICES or a docs page (not the changelog or upgrading notes) names another release.
 - CI pins Preflight 0.8.0.
 - Fixed: the front page's "Adopt an existing app" prompt asked the agent to run `sourdough adopt` with the values of `--shape` and `--name` missing: the `<shape>` and `<name>` placeholders sat in the HTML unescaped, so browsers read them as unknown elements and the copied prompt, `index.md` and `llms-full.txt` lost them. They are escaped now, as is a raw `<name>` in an old changelog entry, and `tests/SitePlaceholdersTest.php` fails on any element the page does not really use and on any flag left without its value.
 - Site: the order ticket has "Copy a link to this order", a link such as `https://sourdough.apps.wayne.edu/#order?loaf=laravel-inertia&oven=docker&name=Parking%20Permits&advisor=no` that opens the counter with the same loaf, oven, name and ADVISOR choice, so a lead can send a new developer the exact order. A loaf or oven that is not on the menu is ignored and the name goes through the usual rule, so a mangled link still lands on a good ticket. The button appears only once the script has opened the counter.

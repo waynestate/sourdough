@@ -71,6 +71,52 @@ final class PreflightPinTest extends TestCase
     }
 
     /**
+     * The prose that names the pin says the pin. Every pin moves the YAML in
+     * one commit, and twice a sentence on the front page or in the README
+     * stayed a release behind (the front page said 0.6.0 under a 0.8.0
+     * pipeline). This reads every page a developer sees today: the front
+     * page and the README, MAINTAINING, BEST_PRACTICES and every docs page
+     * except the changelog and upgrading notes, which are history and keep
+     * the release they describe.
+     */
+    public function testProseThatNamesThePinNamesThisRelease(): void
+    {
+        $root = dirname(__DIR__);
+        $files = [$root . '/README.md', $root . '/MAINTAINING.md', $root . '/BEST_PRACTICES.md', $root . '/site/index.html'];
+        $docs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root . '/docs', \FilesystemIterator::SKIP_DOTS));
+        foreach ($docs as $doc) {
+            if ($doc instanceof \SplFileInfo && 'md' === $doc->getExtension()
+                && !in_array($doc->getFilename(), ['changelog.md', 'upgrading.md'], true)) {
+                $files[] = $doc->getPathname();
+            }
+        }
+
+        $patterns = [
+            '/pinned to (?:the )?Preflight (\d+\.\d+\.\d+)/',
+            '/Preflight (\d+\.\d+\.\d+)(?:\'s)? release commit/',
+            '/from the (\d+\.\d+\.\d+) tag CI pins/',
+        ];
+        $seen = 0;
+        foreach ($files as $file) {
+            $text = self::read($file);
+            foreach ($patterns as $pattern) {
+                preg_match_all($pattern, $text, $m);
+                foreach ($m[1] as $version) {
+                    ++$seen;
+                    self::assertSame(
+                        self::TAG,
+                        $version,
+                        substr($file, strlen($root) + 1) . ' says Preflight ' . $version . ' where the pipelines pin '
+                        . self::TAG . '. Move the sentence with the pin.',
+                    );
+                }
+            }
+        }
+
+        self::assertGreaterThanOrEqual(5, $seen, 'the pages still name the pin (or these patterns no longer match them)');
+    }
+
+    /**
      * The shapes pass no image inputs at all: the components' defaults are
      * pinned by digest inside the pinned release, so a copy here would only
      * drift from them. An app owner may add one; it has to be plain.
