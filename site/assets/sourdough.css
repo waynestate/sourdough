@@ -997,6 +997,33 @@ h1, h2, h3 {
   background-repeat: no-repeat;
 }
 
+/* The poke test: sourdough check's report on its own slip, tilted the
+   other way from the adoption papers so the two never look stacked, and a
+   rubber stamp in the corner. The stamp is ink, not a mark: two rules and
+   a word in the hand font, set where the short OK line leaves room. */
+.papers--poke { transform: rotate(0.6deg); padding-bottom: 1.4rem; }
+.papers--poke::before { left: auto; right: 9%; transform: rotate(5deg); }
+.papers--poke::after { right: auto; left: 7%; transform: rotate(-3deg); }
+.papers--poke .papers__st { color: var(--sd-green); }
+.poke__stamp {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.85rem;
+  margin: 0;
+  padding: 0.1rem 0.7rem 0.15rem;
+  font-family: var(--sd-hand);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sd-green-deep);
+  border: 3px double var(--sd-green);
+  border-radius: 6px;
+  background: rgba(255, 204, 51, 0.18);
+  transform: rotate(-7deg);
+  pointer-events: none;
+}
+
 .jars {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1236,6 +1263,10 @@ h1, h2, h3 {
   .papers__detail { grid-column: 2; }
   .papers__sum { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px dashed rgba(138, 79, 31, 0.22); }
   .papers__then { padding-left: 6ch; }
+  /* The poke slip's labels are a little wider than adopt's statuses, and
+     its stamp moves under the OK line instead of over it. */
+  .papers--poke .papers__row { grid-template-columns: 5.4rem minmax(0, 1fr); }
+  .poke__stamp { position: static; display: inline-block; margin-top: 0.7rem; }
 }
 /* A small phone: status and path share the line, the detail takes the
    whole width under them, so no path breaks mid-name. */
@@ -1422,13 +1453,26 @@ h1, h2, h3 {
    Inside no-preference only, so a visitor who turns motion off mid-visit
    never keeps a blank slip. */
 @media (prefers-reduced-motion: no-preference) {
-  .motion .schedule__row--adopt .papers__ln { opacity: 0; }
-  .motion .schedule__row--adopt.is-in .papers__ln {
+  .motion .schedule__row--adopt .papers__ln,
+  .motion .schedule__row--poke .papers__ln { opacity: 0; }
+  .motion .schedule__row--adopt.is-in .papers__ln,
+  .motion .schedule__row--poke.is-in .papers__ln {
     animation: print-line 0.42s var(--sd-ease-out) both;
     animation-delay: calc(0.85s + var(--n) * 0.11s);
   }
-  .motion .schedule__row--adopt .papers__wrote { background-size: 0 100%; }
+  .motion .schedule__row--adopt .papers__wrote,
+  .motion .schedule__row--poke .papers__wrote { background-size: 0 100%; }
   .motion .schedule__row--adopt.is-in .papers__wrote { animation: underline-in 0.7s var(--sd-ease-out) 2.4s both; }
+  .motion .schedule__row--poke.is-in .papers__wrote { animation: underline-in 0.6s var(--sd-ease-out) 1.55s both; }
+  /* The poke: the stamp comes down hard, sinks in and springs back. */
+  .motion .schedule__row--poke .poke__stamp { opacity: 0; }
+  .motion .schedule__row--poke.is-in .poke__stamp { animation: stamp-in 0.75s var(--sd-ease-rise) 2.05s both; }
+}
+@keyframes stamp-in {
+  0% { opacity: 0; transform: rotate(-16deg) scale(1.7); }
+  45% { opacity: 1; transform: rotate(-7deg) scale(0.9); }
+  70% { transform: rotate(-7deg) scale(1.05); }
+  100% { opacity: 1; transform: rotate(-7deg) scale(1); }
 }
 @keyframes print-line {
   from { opacity: 0; transform: translateY(5px); }

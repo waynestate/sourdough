@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commands | Sourdough docs</title>
-<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check, sourdough adopt and sourdough feed, with their exit codes.">
+<meta name="description" content="Every sourdough command and option, from sourdough new&#039;s flags to sourdough manifest --check, sourdough adopt, sourdough feed and sourdough check, with their exit codes.">
 <meta name="docs-version" content="0.4.2">
 <link rel="stylesheet" href="../../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../../assets/docs.css">
@@ -768,6 +768,90 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
 <li><code>SOURDOUGH_COMPOSER</code>: the Composer binary the Laravel shapes bake their skeleton with (default: <code>composer</code> on PATH), as for <code>sourdough new</code>.</li>
 <li><code>SOURDOUGH_POLICY</code>: the CREED policy the new loaf takes its PHP floor from, as for <code>sourdough new</code>. Feed with the same policy the app was baked with, or the floor shows up as a template change.</li>
 </ul>
+<h2 id="sourdough-check">sourdough <span class="docs-heading-tail"><span>check</span><a class="docs-heading-link" aria-label="Link to this section" href="#sourdough-check">#</a></span></h2>
+<p>Check an app in one read-only run: is it fed, and is its shape supported?</p>
+<pre tabindex="0"><code>sourdough check [dir] [--json]
+</code></pre>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Argument or option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dir</code></td>
+<td>the app directory to check (default: the current directory)</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print the result as JSON</td>
+</tr>
+</tbody>
+</table></div>
+<p>The baker's poke test: it puts together <code>sourdough manifest --check</code>, <code>sourdough feed --dry-run</code> and the support facts <code>sourdough new</code> prints, and writes nothing. It needs no clean tree. The app's own edits to managed files are reported and never fail the check, because the app owns them and a feed merges them.</p>
+<pre tabindex="0"><code>Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
+Manifest:    clean: every managed file matches the manifest
+Feed:        fresh: nothing to feed from Sourdough 0.5.0
+OK: the raw app is fed and supported.
+</code></pre>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Line</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Support:</code></td>
+<td>the shape's status and owner and the end of security support of the line the app runs on (the Laravel major, or the PHP floor on the raw shapes), from CREED's policy; left out when it cannot be worked out</td>
+</tr>
+<tr>
+<td><code>Manifest:</code></td>
+<td><code>clean</code>, or <code>&lt;n&gt; changed, &lt;m&gt; missing (the app owns these; feed merges them)</code></td>
+</tr>
+<tr>
+<td><code>Feed:</code></td>
+<td><code>fresh: nothing to feed from Sourdough &lt;version&gt;</code>, or <code>behind: Sourdough &lt;from&gt; to &lt;to&gt;, &lt;n&gt; files would change</code></td>
+</tr>
+<tr>
+<td><code>OK: the &lt;template&gt; app is fed and supported.</code></td>
+<td>nothing needs attention</td>
+</tr>
+<tr>
+<td><code>Needs attention:</code></td>
+<td>one <code> -</code> line per problem, below</td>
+</tr>
+</tbody>
+</table></div>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Problem line starts with</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>behind:</code></td>
+<td>feeding would change files; <code>sourdough feed --dry-run</code> shows the plan</td>
+</tr>
+<tr>
+<td><code>The &lt;shape&gt; shape is deprecated since Sourdough</code></td>
+<td>the shape's sunset notice, with the release that removes it and the shape to move to (<a href="../guides/support.html">Support and sunset</a>)</td>
+</tr>
+<tr>
+<td><code>past support:</code></td>
+<td>the Laravel major or PHP floor the app runs on stopped getting security fixes; <a rel="noopener" href="https://booster.apps.wayne.edu/">Booster</a> plans the upgrade</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="exit-codes-3">Exit <span class="docs-heading-tail"><span>codes</span><a class="docs-heading-link" aria-label="Link to this section" href="#exit-codes-3">#</a></span></h3>
+<p><code>0</code> fed and supported, <code>1</code> needs attention (any problem line above), <code>2</code> tool error: the same errors <code>sourdough feed --dry-run</code> stops on (no manifest, git not on PATH, a manifest from a newer Sourdough, a template this Sourdough does not bake, which is how a removed shape ends, an unsafe path, a failed bake), printed to stderr.</p>
+<h3 id="json-2"><span class="docs-heading-tail"><span>JSON</span><a class="docs-heading-link" aria-label="Link to this section" href="#json-2">#</a></span></h3>
+<p><code>--json</code> prints one object: <code>dir</code>, <code>template</code>, <code>manifest</code> (<code>changed</code> and <code>missing</code>), <code>feed</code> (<code>from</code>, <code>to</code>, <code>changes</code>, <code>fresh</code>), <code>support</code> (the same block <code>sourdough new --dry-run --json</code> prints, or <code>null</code>), <code>problems</code> (the problem lines) and <code>exit</code>.</p>
 <h2 id="related"><span class="docs-heading-tail"><span>Related</span><a class="docs-heading-link" aria-label="Link to this section" href="#related">#</a></span></h2>
 <ul>
 <li><a href="../guides/keeping-current.html">Keeping apps current</a></li>
@@ -779,7 +863,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/wiring-the-stack.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Wiring the stack in</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/plan-format.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Plan format</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#php-floor-and-support-lines">PHP floor and support lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment">Environment</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#sourdough-adopt">sourdough adopt</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#report-lines">Report lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-1">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-1">Environment</a></li><li class="docs-toc__item"><a href="#sourdough-feed">sourdough feed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#plan-lines">Plan lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-2">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json-1">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-2">Environment</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#sourdough-new">sourdough new</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#options">Options</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#playbook-access-check">Playbook access check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#advisor-wiring">ADVISOR wiring</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#app-name-validation">App name validation</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#php-floor-and-support-lines">PHP floor and support lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment">Environment</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#next-steps-printed-after-generation">Next steps printed after generation</a></li><li class="docs-toc__item"><a href="#sourdough-manifest">sourdough manifest</a></li><li class="docs-toc__item"><a href="#sourdough-adopt">sourdough adopt</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#report-lines">Report lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-1">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-1">Environment</a></li><li class="docs-toc__item"><a href="#sourdough-feed">sourdough feed</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#plan-lines">Plan lines</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-2">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json-1">JSON</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#environment-2">Environment</a></li><li class="docs-toc__item"><a href="#sourdough-check">sourdough check</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#exit-codes-3">Exit codes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#json-2">JSON</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Sourdough <span data-docs-version>0.4.2</span></span>

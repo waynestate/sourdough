@@ -682,16 +682,28 @@ composer serve" data-order-next-copy aria-label="Copy the next steps">Copy</butt
               </figure>
             </div>
           </li>
-          <li class="schedule__row" data-reveal>
-            <p class="schedule__when">Any day</p>
+          <!-- Any day: the poke test. The slip is sourdough check's real report on a
+               fed raw app, pasted as printed; it prints in like the adoption papers,
+               and the stamp lands last. -->
+          <li class="schedule__row schedule__row--poke" data-reveal>
+            <p class="schedule__when">Any day <span class="schedule__or">the poke test</span></p>
             <div class="schedule__what">
-              <code class="chalk-cmd">sourdough manifest <span class="opt">--check</span></code>
-              <p>Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app any time; every shape's pipeline runs it too, in the <code>sourdough-feed</code> job, and only lists what drifted.</p>
+              <code class="chalk-cmd">sourdough check</code>
+              <p>Bakers press the dough: if it springs back, it's ready. <code>sourdough check</code> is that poke for an app. In one read-only run it says whether the app is fed, which managed files you've kneaded, and whether its shape, and the Laravel or PHP line under it, still gets security fixes. It writes nothing, so run it any time. Your own edits are listed, never held against you: feed merges them. <code>sourdough manifest <span class="opt">--check</span></code> is the drift half on its own, and every shape's pipeline runs both halves in its <code>sourdough-feed</code> job.</p>
               <dl class="exits">
-                <div><dt>0</dt><dd>clean</dd></div>
-                <div><dt>1</dt><dd>a managed file changed or is missing</dd></div>
-                <div><dt>2</dt><dd>no manifest, or no <code>--check</code></dd></div>
+                <div><dt>0</dt><dd>fed and supported</dd></div>
+                <div><dt>1</dt><dd>behind, deprecated, or past support</dd></div>
+                <div><dt>2</dt><dd>no manifest, or no git</dd></div>
               </dl>
+              <figure class="papers papers--poke">
+                <figcaption class="papers__cap">Poke test <span>a course finder, two weeks after its last feed</span></figcaption>
+<pre class="papers__out"><span class="papers__ln papers__cmd" style="--n:0"><span class="p" aria-hidden="true">$ </span>sourdough check</span>
+<span class="papers__ln papers__row papers__row--first" style="--n:1"><span class="papers__st papers__st--seeded">Support:    </span> <span class="papers__detail">supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31</span></span>
+<span class="papers__ln papers__row" style="--n:2"><span class="papers__st papers__st--seeded">Manifest:   </span> <span class="papers__detail">clean: every managed file matches the manifest</span></span>
+<span class="papers__ln papers__row" style="--n:3"><span class="papers__st papers__st--seeded">Feed:       </span> <span class="papers__detail">fresh: nothing to feed from Sourdough 0.5.0</span></span>
+<span class="papers__ln papers__sum" style="--n:4"><span class="papers__wrote">OK: the raw app is fed and supported.</span></span></pre>
+                <p class="poke__stamp" aria-hidden="true">springs back</p>
+              </figure>
             </div>
           </li>
           <li class="schedule__row" data-reveal>

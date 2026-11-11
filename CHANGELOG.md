@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Added: `sourdough check [dir] [--json]`, the baker's poke test: one read-only run that says whether an app is fed and supported. It prints the `Support:` line (the shape's status and owner and its Laravel major's or PHP floor's end-of-security date from CREED's policy), the manifest drift and whether a feed is due, then `OK` or a `Needs attention:` list. Exit `0` fed and supported, `1` behind the template, a deprecated shape or a line past security support, `2` the tool errors `feed --dry-run` stops on. The app's own edits are listed and never fail it. It writes nothing and needs no clean tree. BEST_PRACTICES 3.2 and backlog item 2 are done; `tests/CheckCommandTest.php` covers it.
 - Changed: Sourdough's own GitLab pipeline gains a blocking `smoke-floor` job that bakes the raw and Inertia shapes on PHP 8.3, the floor every shape pins in `config.platform.php`; the other smoke jobs bake on 8.5, so a template that quietly needed a newer PHP would have passed them. `tests/SmokeFloorTest.php` keeps the job's image on the templates' pin. No change to what a bake writes.
 - Docs: the front page and the README name Preflight 0.8.0, the release every pipeline pins (they still said 0.6.0), and `tests/PreflightPinTest.php` now fails when a sentence that names the pin on the front page, the README, MAINTAINING, BEST_PRACTICES or a docs page (not the changelog or upgrading notes) names another release.
 - CI pins Preflight 0.8.0.

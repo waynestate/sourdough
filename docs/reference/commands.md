@@ -1,6 +1,6 @@
 ---
 title: Commands
-description: Every sourdough command and option, from sourdough new's flags to sourdough manifest --check, sourdough adopt and sourdough feed, with their exit codes.
+description: Every sourdough command and option, from sourdough new's flags to sourdough manifest --check, sourdough adopt, sourdough feed and sourdough check, with their exit codes.
 ---
 
 # Commands
@@ -333,6 +333,50 @@ After the plan lines: how many base copies feed keeps in `.sourdough/base/`, a o
 - `SOURDOUGH_GIT`: the git binary to run (default: `git` on PATH).
 - `SOURDOUGH_COMPOSER`: the Composer binary the Laravel shapes bake their skeleton with (default: `composer` on PATH), as for `sourdough new`.
 - `SOURDOUGH_POLICY`: the CREED policy the new loaf takes its PHP floor from, as for `sourdough new`. Feed with the same policy the app was baked with, or the floor shows up as a template change.
+
+## sourdough check
+
+Check an app in one read-only run: is it fed, and is its shape supported?
+
+```
+sourdough check [dir] [--json]
+```
+
+| Argument or option | Meaning |
+|---|---|
+| `dir` | the app directory to check (default: the current directory) |
+| `--json` | print the result as JSON |
+
+The baker's poke test: it puts together `sourdough manifest --check`, `sourdough feed --dry-run` and the support facts `sourdough new` prints, and writes nothing. It needs no clean tree. The app's own edits to managed files are reported and never fail the check, because the app owns them and a feed merges them.
+
+```
+Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
+Manifest:    clean: every managed file matches the manifest
+Feed:        fresh: nothing to feed from Sourdough 0.5.0
+OK: the raw app is fed and supported.
+```
+
+| Line | Meaning |
+|---|---|
+| `Support:` | the shape's status and owner and the end of security support of the line the app runs on (the Laravel major, or the PHP floor on the raw shapes), from CREED's policy; left out when it cannot be worked out |
+| `Manifest:` | `clean`, or `<n> changed, <m> missing (the app owns these; feed merges them)` |
+| `Feed:` | `fresh: nothing to feed from Sourdough <version>`, or `behind: Sourdough <from> to <to>, <n> files would change` |
+| `OK: the <template> app is fed and supported.` | nothing needs attention |
+| `Needs attention:` | one `  - ` line per problem, below |
+
+| Problem line starts with | Meaning |
+|---|---|
+| `behind:` | feeding would change files; `sourdough feed --dry-run` shows the plan |
+| `The <shape> shape is deprecated since Sourdough` | the shape's sunset notice, with the release that removes it and the shape to move to ([Support and sunset](../guides/support.md)) |
+| `past support:` | the Laravel major or PHP floor the app runs on stopped getting security fixes; [Booster](https://booster.apps.wayne.edu/) plans the upgrade |
+
+### Exit codes
+
+`0` fed and supported, `1` needs attention (any problem line above), `2` tool error: the same errors `sourdough feed --dry-run` stops on (no manifest, git not on PATH, a manifest from a newer Sourdough, a template this Sourdough does not bake, which is how a removed shape ends, an unsafe path, a failed bake), printed to stderr.
+
+### JSON
+
+`--json` prints one object: `dir`, `template`, `manifest` (`changed` and `missing`), `feed` (`from`, `to`, `changes`, `fresh`), `support` (the same block `sourdough new --dry-run --json` prints, or `null`), `problems` (the problem lines) and `exit`.
 
 ## Related
 

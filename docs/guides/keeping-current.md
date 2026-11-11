@@ -16,6 +16,23 @@ Every app carries a `.sourdough/manifest.json` recording the Sourdough version, 
 
 [The manifest](./manifest.md) has the full key list and the managed, seeded and yours split.
 
+## Poke it: one check for the whole story
+
+Bakers poke the dough: if it springs back, it is ready. `sourdough check` is that poke for an app. In one read-only run it says whether the app is fed, which managed files you have changed, and whether its shape and the framework line it runs on are still supported:
+
+```bash
+sourdough check
+```
+
+```
+Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
+Manifest:    clean: every managed file matches the manifest
+Feed:        fresh: nothing to feed from Sourdough 0.5.0
+OK: the raw app is fed and supported.
+```
+
+It writes nothing and needs no clean tree, so run it any time. Exit codes: `0` fed and supported, `1` needs attention (the app is behind its template, its shape is deprecated, or its Laravel major or PHP floor is past security support; each gets a line under `Needs attention:`), `2` tool error. Your own edits to managed files are listed and never fail it, for the reason under [Check for drift](#check-for-drift). `--json` gives machines the same answer. The two commands it puts together are below; [Commands](../reference/commands.md#sourdough-check) has every line it prints.
+
 ## Check for drift
 
 `sourdough manifest --check` lists the managed files that have drifted from the manifest, the ones you (or someone) edited since Sourdough wrote them:

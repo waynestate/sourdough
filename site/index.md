@@ -217,12 +217,20 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.2"
          then sourdough feed --dry-run lists the 2 files the first feed adds.
    ```
-3. Any day
-   `sourdough manifest --check`
-   Is it still alive? Lists every managed file that has drifted from the manifest. Run it in the app any time; every shape's pipeline runs it too, in the `sourdough-feed` job, and only lists what drifted.
-   - **0**: clean
-   - **1**: a managed file changed or is missing
-   - **2**: no manifest, or no `--check`
+3. Any day the poke test
+   `sourdough check`
+   Bakers press the dough: if it springs back, it's ready. `sourdough check` is that poke for an app. In one read-only run it says whether the app is fed, which managed files you've kneaded, and whether its shape, and the Laravel or PHP line under it, still gets security fixes. It writes nothing, so run it any time. Your own edits are listed, never held against you: feed merges them. `sourdough manifest --check` is the drift half on its own, and every shape's pipeline runs both halves in its `sourdough-feed` job.
+   - **0**: fed and supported
+   - **1**: behind, deprecated, or past support
+   - **2**: no manifest, or no git
+   Poke test a course finder, two weeks after its last feed
+   ```
+   $ sourdough check
+   Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
+   Manifest:    clean: every managed file matches the manifest
+   Feed:        fresh: nothing to feed from Sourdough 0.5.0
+   OK: the raw app is fed and supported.
+   ```
 4. Feeding
    `sourdough feed`
    Brings template updates into your app without clobbering what you changed. It bakes your shape again and lets git do a three-way merge, file by file; where you both changed the same lines, it leaves git's conflict markers for you instead of guessing. Run `--dry-run` first; every shape's pipeline runs it too, and warns when a feed is due.
