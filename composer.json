@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.3",
         "justinrainbow/json-schema": "^6.0",
-        "openai-php/client": "^0.21",
+        "openai-php/client": "^0.22",
         "symfony/console": "^7.4",
         "symfony/http-client": "^7.4",
         "symfony/yaml": "^7.4",
