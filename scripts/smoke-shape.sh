@@ -25,7 +25,8 @@
 #                     one copy (default: inside SMOKE_WORK)
 #   SMOKE_PORT        the port the live server listens on (default 8099)
 #
-# Needs php 8.5, composer 2, curl, git and (for every shape but raw) node 22
+# Needs php 8.3 or later (CI bakes on 8.5, and on the 8.3 floor in
+# smoke-floor), composer 2, curl, git and (for every shape but raw) node 22
 # on PATH, plus network access for Composer, npm and the WayneUI release
 # download. No credentials, no Oracle connection.
 set -u

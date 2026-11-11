@@ -118,6 +118,20 @@ smoke-inertia:
   script:
     - sh scripts/smoke-shape.sh inertia
 
+# The floor: the jobs above bake on PHP 8.5, but every shape's composer.json
+# pins config.platform.php to 8.3.0, CREED's oldest supported line, and an app
+# owner may well run that. This job bakes the thinnest shape and the fullest
+# one on the floor itself, so a template that quietly needs a newer PHP fails
+# here, not on a developer's laptop. tests/SmokeFloorTest.php keeps the image
+# on the templates' platform pin. Proofing at room temperature, not just in
+# the warm oven.
+smoke-floor:
+  extends: .smoke-base
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.3-cli-trixie
+  script:
+    - sh scripts/smoke-shape.sh raw
+    - sh scripts/smoke-shape.sh inertia
+
 # The proof: every shape and every Laravel shape in each oven, one after
 # another, with the last release fed forward (scripts/proof.sh, see
 # docs/reference/proof.md). A full proof takes its time, like any good dough,

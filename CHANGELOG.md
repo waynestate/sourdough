@@ -5,6 +5,7 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: Sourdough's own GitLab pipeline gains a blocking `smoke-floor` job that bakes the raw and Inertia shapes on PHP 8.3, the floor every shape pins in `config.platform.php`; the other smoke jobs bake on 8.5, so a template that quietly needed a newer PHP would have passed them. `tests/SmokeFloorTest.php` keeps the job's image on the templates' pin. No change to what a bake writes.
 - Docs: the front page and the README name Preflight 0.8.0, the release every pipeline pins (they still said 0.6.0), and `tests/PreflightPinTest.php` now fails when a sentence that names the pin on the front page, the README, MAINTAINING, BEST_PRACTICES or a docs page (not the changelog or upgrading notes) names another release.
 - CI pins Preflight 0.8.0.
 - Fixed: the front page's "Adopt an existing app" prompt asked the agent to run `sourdough adopt` with the values of `--shape` and `--name` missing: the `<shape>` and `<name>` placeholders sat in the HTML unescaped, so browsers read them as unknown elements and the copied prompt, `index.md` and `llms-full.txt` lost them. They are escaped now, as is a raw `<name>` in an old changelog entry, and `tests/SitePlaceholdersTest.php` fails on any element the page does not really use and on any flag left without its value.
