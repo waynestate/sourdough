@@ -14,6 +14,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Docs: each generated README says how to turn on the nightly run (a GitLab pipeline schedule reruns the full PHP test matrix); a test keeps scheduled pipelines from being skipped.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - Every shape and the GitHub workflow pin Preflight 0.9.0 (commit fb73b53), like Sourdough's own pipeline.
 - Added: `sourdough check [dir] [--json]`, the baker's poke test: one read-only run that says whether an app is fed and supported. It prints the `Support:` line (the shape's status and owner and its Laravel major's or PHP floor's end-of-security date from CREED's policy), the manifest drift and whether a feed is due, then `OK` or a `Needs attention:` list. Exit `0` fed and supported, `1` behind the template, a deprecated shape or a line past security support, `2` the tool errors `feed --dry-run` stops on. The app's own edits are listed and never fail it. It writes nothing and needs no clean tree. BEST_PRACTICES 3.2 and backlog item 2 are done; `tests/CheckCommandTest.php` covers it.
