@@ -139,6 +139,12 @@ credential goes in:
 6. Prefer the deploy target's own secret store (on Citadel, the app's
    environment settings) to a CI variable for anything long-lived.
 
+**Nightly.** Create a pipeline schedule for the default branch (Build >
+Pipeline schedules, for example daily at 02:00). A scheduled run is the
+whole pipeline, the PHP 8.3, 8.4 and 8.5 test matrix included, so a
+deprecation that a new PHP patch brings fails a pipeline before your next
+push does. It costs nothing until you create it.
+
 A starter this well guarded still needs someone to lock the bakery at night.
 
 ## Sign-in

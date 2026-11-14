@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- Docs: each generated README says how to turn on the nightly run (a GitLab pipeline schedule reruns the full PHP test matrix); a test keeps scheduled pipelines from being skipped.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - Every shape and the GitHub workflow pin Preflight 0.9.0 (commit fb73b53), like Sourdough's own pipeline.
 
