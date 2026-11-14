@@ -18,7 +18,7 @@ A starter you feed: `sourdough new` makes a Wayne State app with the stack alrea
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
-Status: 0.4.2 (2026-11-09), MIT license: Pinstripe 0.3 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](https://github.com/waynestate/sourdough/blob/HEAD/CHANGELOG.md); what a feed brings is in [Upgrading](https://github.com/waynestate/sourdough/blob/HEAD/docs/upgrading.md).
+Status: 0.4.2 (2026-11-09), MIT license: Pinstripe 0.4 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](https://github.com/waynestate/sourdough/blob/HEAD/CHANGELOG.md); what a feed brings is in [Upgrading](https://github.com/waynestate/sourdough/blob/HEAD/docs/upgrading.md).
 
 Every loaf gets proofed before it ships.
 
@@ -832,6 +832,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Every generated app requires SESAME `^0.8`, Pinstripe `^0.4` and PROCTOR `^0.16` (was `^0.7`, `^0.3` and `^0.15`, which do not allow the current releases), and Sourdough's own dev dependency is Pinstripe `^0.4`.
 - Docs: each generated README says how to turn on the nightly run (a GitLab pipeline schedule reruns the full PHP test matrix); a test keeps scheduled pipelines from being skipped.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - Every shape and the GitHub workflow pin Preflight 0.9.0 (commit fb73b53), like Sourdough's own pipeline.

@@ -14,6 +14,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Every generated app requires SESAME `^0.8`, Pinstripe `^0.4` and PROCTOR `^0.16` (was `^0.7`, `^0.3` and `^0.15`, which do not allow the current releases), and Sourdough's own dev dependency is Pinstripe `^0.4`.
 - Docs: each generated README says how to turn on the nightly run (a GitLab pipeline schedule reruns the full PHP test matrix); a test keeps scheduled pipelines from being skipped.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - Every shape and the GitHub workflow pin Preflight 0.9.0 (commit fb73b53), like Sourdough's own pipeline.
