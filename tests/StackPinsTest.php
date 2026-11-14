@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * the released HELMET 1.3, SESAME 0.7, PROCTOR 0.11 and CREED 0.1.8 lines in
+ * the released HELMET 1.3, SESAME 0.8, PROCTOR 0.11 and CREED 0.1.8 lines in
  * every composer file that pulls them in, and Inertia 3 on both sides of the
  * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
@@ -43,7 +43,7 @@ final class StackPinsTest extends TestCase
         // asks for; an older PROCTOR falls back to `check`. 0.8 adds
         // crlf-deploy-script, 0.9 case-clash, 0.10 vite-secrets and
         // 0.11 `--record`, the JSON Rollcall reads.
-        self::assertSame('^0.15', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
+        self::assertSame('^0.16', $composer['require-dev']['waynestate/proctor'] ?? null, $file);
     }
 
     #[DataProvider('proctorComposerFiles')]
@@ -52,7 +52,7 @@ final class StackPinsTest extends TestCase
         $composer = $this->readJson($file);
 
         self::assertSame('^1.3', $composer['require']['waynestate/helmet'] ?? null, $file);
-        self::assertSame('^0.7', $composer['require']['waynestate/sesame'] ?? null, $file);
+        self::assertSame('^0.8', $composer['require']['waynestate/sesame'] ?? null, $file);
     }
 
     /**
