@@ -7,6 +7,7 @@ Versioning once 1.0 is out.
 
 ### Changed
 
+- `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
 - Every generated app requires SESAME `^0.8`, Pinstripe `^0.4` and PROCTOR `^0.16` (was `^0.7`, `^0.3` and `^0.15`, which do not allow the current releases), and Sourdough's own dev dependency is Pinstripe `^0.4`.
 - Docs: each generated README says how to turn on the nightly run (a GitLab pipeline schedule reruns the full PHP test matrix); a test keeps scheduled pipelines from being skipped.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
