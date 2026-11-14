@@ -47,7 +47,7 @@ final class PinstripeLaravelTest extends TestCase
         self::assertSame(self::SCRIPT, $composer['scripts']['lint:gitlab'] ?? null);
         self::assertIsArray($composer['scripts-descriptions'] ?? null);
         self::assertArrayHasKey('lint:gitlab', $composer['scripts-descriptions']);
-        self::assertSame('^0.3', $composer['require-dev']['waynestate/pinstripe'] ?? null);
+        self::assertSame('^0.4', $composer['require-dev']['waynestate/pinstripe'] ?? null);
     }
 
     #[DataProvider('overlays')]
