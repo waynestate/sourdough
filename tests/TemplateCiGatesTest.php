@@ -68,6 +68,44 @@ final class TemplateCiGatesTest extends TestCase
     }
 
     /**
+     * A pipeline schedule is the generated app's nightly run: the workflow
+     * ends in `when: always`, so a schedule reruns the whole pipeline, the
+     * PHP 8.3, 8.4 and 8.5 test matrix included (BEST_PRACTICES 4.13).
+     */
+    #[DataProvider('pipelines')]
+    public function testScheduledPipelinesRunTheTestMatrix(string $file): void
+    {
+        $shape = basename(dirname($file));
+        $ci = self::read($file);
+        $message = "$shape: a pipeline schedule is the generated app's nightly run";
+
+        // The php-test component is what a scheduled run carries: the whole
+        // test matrix, not a trimmed job.
+        self::assertStringContainsString('/preflight/php-test@', $ci, $message . ': the pipeline includes Preflight\'s php-test component');
+
+        // The workflow block reads from `workflow:` to the next top-level
+        // key; it must never skip a pipeline, and its last rule runs every
+        // pipeline, scheduled ones included.
+        $workflow = self::workflowBlock($ci);
+        self::assertStringNotContainsString('when: never', $workflow, $message . ': the workflow block must not skip any pipeline');
+        self::assertMatchesRegularExpression(
+            '/-\s+when:\s*always\s*$/',
+            $workflow,
+            $message . ': the workflow\'s last rule must be `- when: always`',
+        );
+
+        // And no rule anywhere in the file may turn a scheduled pipeline off.
+        $lines = explode("\n", $ci);
+        foreach ($lines as $i => $line) {
+            if (preg_match('/\$CI_PIPELINE_SOURCE\s*==\s*"schedule"/', $line)) {
+                foreach ([$lines[$i + 1] ?? '', $lines[$i + 2] ?? ''] as $next) {
+                    self::assertStringNotContainsString('when: never', $next, $message . ': a scheduled pipeline must not be skipped');
+                }
+            }
+        }
+    }
+
+    /**
      * The a11y-pages job's script is one block, the same in every shape;
      * only the lines that boot each shape's server differ.
      */
@@ -202,6 +240,12 @@ final class TemplateCiGatesTest extends TestCase
     private static function includeBlock(string $ci): string
     {
         return self::capture('/^include:\n(?:  [^\n]*\n|\n)*/m', $ci, 'the pipeline has an include block')[0];
+    }
+
+    /** The `workflow:` block, from its key to the next top-level key. */
+    private static function workflowBlock(string $ci): string
+    {
+        return self::capture('/^workflow:\n(?:(?:[ ].*\n|\n)*?)(?=^[A-Za-z0-9_-]+:)/m', $ci, 'the pipeline has a workflow block')[0];
     }
 
     /**
