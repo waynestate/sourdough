@@ -14,6 +14,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Fixed: the Squire copy docs name the `^0.11` dev dependency (they said `^0.10`), and StackPinsTest's comments name PROCTOR 0.16, the line the templates pin. Content only.
 - Changed: the deploy kit is Squire 0.11.1 (was 0.10.7): the release script, parity scripts, HAProxy pin and fallback base follow the new templates, and `waynestate/squire` is `^0.11` (the exported copy in `templates/squire/` moves with it).
 - `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
 - Every generated app requires SESAME `^0.8`, Pinstripe `^0.4` and PROCTOR `^0.16` (was `^0.7`, `^0.3` and `^0.15`, which do not allow the current releases), and Sourdough's own dev dependency is Pinstripe `^0.4`.
