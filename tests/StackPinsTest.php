@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * the released HELMET 1.3, SESAME 0.8, PROCTOR 0.11 and CREED 0.1.8 lines in
+ * the released HELMET 1.3, SESAME 0.8, PROCTOR 0.16 and CREED 0.1.8 lines in
  * every composer file that pulls them in, and Inertia 3 on both sides of the
  * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
@@ -57,7 +57,7 @@ final class StackPinsTest extends TestCase
 
     /**
      * The Laravel overlays and the front page's deploy layer name CREED's
-     * floor: 0.1.8 is the policy PROCTOR 0.11 is graded against.
+     * floor: 0.1.8 is the policy PROCTOR 0.16 is graded against.
      *
      * @return array<string, array{string}>
      */
