@@ -132,7 +132,7 @@ The deploy files in your app come from Squire's exported copy, checked into this
 
 | Command | What it does |
 |---|---|
-| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.10`) |
+| `composer squire-copy:sync` | rewrites the copy from the installed `waynestate/squire` package (dev dependency `^0.11`) |
 | `composer squire-copy:check` | exits 1 when the committed copy has drifted; part of `composer ci` |
 
 When Squire's templates change, regenerate the copy from a Squire checkout, then verify it:
