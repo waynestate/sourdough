@@ -132,6 +132,19 @@ smoke-floor:
     - sh scripts/smoke-shape.sh raw
     - sh scripts/smoke-shape.sh inertia
 
+# The middle shelf: the jobs above bake on PHP 8.5 and the floor job on 8.3,
+# but 8.4 sits between them, the third line CREED supports and the one the
+# generated apps' own matrix already runs. This job bakes the thinnest shape
+# and the fullest one there, so a template that only rises at the ends of the
+# shelf fails here, not on a developer's laptop. tests/SmokeFloorTest.php
+# keeps the image on 8.4. No loaf skips the middle shelf.
+smoke-php84:
+  extends: .smoke-base
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.4-cli-trixie
+  script:
+    - sh scripts/smoke-shape.sh raw
+    - sh scripts/smoke-shape.sh inertia
+
 # The proof: every shape and every Laravel shape in each oven, one after
 # another, with the last release fed forward (scripts/proof.sh, see
 # docs/reference/proof.md). A full proof takes its time, like any good dough,
