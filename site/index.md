@@ -202,7 +202,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    Adoption papers an old course finder, taken in
    ```
    $ sourdough adopt --shape raw
-   Adopting "course-finder" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.4.2.
+   Adopting "course-finder" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.5.0.
    Compared your app with a fresh raw bake: 41 template files.
    
      yours    composer.json     differs from the template: yours, never overwritten
@@ -214,7 +214,7 @@ A starter you never feed goes flat. Every app Sourdough makes carries `.sourdoug
    
    Adopted: 35 match, 2 yours, 2 seeded, 2 missing. Wrote .sourdough/manifest.json.
    Files the template does not ship are not recorded: Sourdough never reads or touches them.
-   Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.4.2"
+   Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.5.0"
          then sourdough feed --dry-run lists the 2 files the first feed adds.
    ```
 3. Any day the poke test

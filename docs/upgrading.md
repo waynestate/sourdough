@@ -26,10 +26,28 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.4.2
+Sourdough 0.5.0
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.5.0 (2026-11-19)
+
+A minor on 0.4.2: `sourdough check [dir] [--json]` joins the CLI, the baker's poke test that says in one read-only run whether an app is fed and still supported (exit `0` fed and supported, `1` needs attention, `2` tool error; it writes nothing and needs no clean tree), and the templates move their pins and their deploy kit. Feed brings those moves into an app you already baked; the seeded files stay yours.
+
+**What `sourdough feed` brings an app baked with 0.4.2** (it merges each file with your edits):
+
+- `composer.json`: SESAME `^0.8` (was `^0.7`), Pinstripe `^0.4` (was `^0.3`) and PROCTOR `^0.16` (was `^0.15`), and the Composer release cooldown (`config.policy.cooldown.period` of `"3 days"`, with `policy.cooldown.ignore` of `["waynestate/*"]` so a fresh app still installs right after a stack release).
+- `.gitlab-ci.yml`: the Preflight 0.9.0 pins, on the components and the a11y checker copy.
+- The Squire 0.11.1 deploy kit (was 0.10.7): the release script, the parity scripts, the HAProxy pin and the fallback base follow the new templates.
+
+It leaves the seeded files alone: `README.md`, `.env.example` and `package-lock.json` are yours, and feed never touches your lock files, so the `composer update` in the steps is yours to run.
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/sesame waynestate/pinstripe waynestate/proctor --with-all-dependencies` (feed never touches your lock files), then `composer ci`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.5.0`, `sourdough check` ends with `OK:` on the fed app, and `composer show waynestate/sesame waynestate/pinstripe waynestate/proctor` names 0.8, 0.4 and 0.16.
 
 ## 0.4.2 (2026-11-09)
 

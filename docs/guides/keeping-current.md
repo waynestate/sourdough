@@ -176,7 +176,7 @@ Feed needs a manifest. An app without one gets exit `2`, with the way in: `sourd
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.4.2"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.5.0"
 sourdough feed --dry-run
 ```
 
