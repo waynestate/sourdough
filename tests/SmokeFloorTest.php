@@ -11,7 +11,9 @@ use PHPUnit\Framework\TestCase;
  * config.platform.php to the floor (CREED's oldest supported line). The
  * smoke-floor job bakes the raw and Inertia shapes on that floor, and this
  * test keeps its image on the templates' pin: when the floor moves, the
- * job moves with it or the suite says so. A starter that only rises in a
+ * job moves with it or the suite says so. The smoke-php84 job bakes the
+ * same two shapes on 8.4, the line between the floor and the newest, and
+ * this test keeps that image on 8.4 too. A starter that only rises in a
  * warm kitchen is not much of a starter.
  */
 final class SmokeFloorTest extends TestCase
@@ -32,6 +34,21 @@ final class SmokeFloorTest extends TestCase
         self::assertStringContainsString('- sh scripts/smoke-shape.sh raw' . "\n", $job, 'the floor bakes the raw shape');
         self::assertStringContainsString('- sh scripts/smoke-shape.sh inertia' . "\n", $job, 'the floor bakes the Inertia shape');
         self::assertStringNotContainsString('allow_failure', $job, 'the floor blocks, like every other smoke job');
+    }
+
+    public function testThePhp84JobBakesTheMiddleVersion(): void
+    {
+        $job = $this->job('smoke-php84');
+
+        self::assertStringContainsString("\n  extends: .smoke-base\n", $job, 'smoke-php84 reuses the smoke tools and cache');
+        self::assertStringContainsString(
+            "\n  image: \${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.4-cli-trixie\n",
+            $job,
+            'smoke-php84 runs on PHP 8.4, the line between the floor and the newest',
+        );
+        self::assertStringContainsString('- sh scripts/smoke-shape.sh raw' . "\n", $job, 'the middle version bakes the raw shape');
+        self::assertStringContainsString('- sh scripts/smoke-shape.sh inertia' . "\n", $job, 'the middle version bakes the Inertia shape');
+        self::assertStringNotContainsString('allow_failure', $job, 'the middle version blocks, like every other smoke job');
     }
 
     public function testTheOtherSmokeJobsStayOnTheNewestPhp(): void
