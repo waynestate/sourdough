@@ -152,6 +152,37 @@ should have it, it lives in WELD. Version rules belong to CREED, checks to PROCT
 4. Tag `X.Y.Z` (no `v`) on git.wayne.edu, with an approver. The push mirror carries the tag to GitHub, and Packagist picks it up from there.
 5. A release needs a maintainer's approval. Never move or delete a published tag.
 
+## Before a minor release: the three-system smoke
+
+The CI runners are Linux only, so the maintainer cutting the release runs this checklist by hand on each of the three systems before the tag goes out, and pastes the result into the release's merge request description.
+
+**Linux:**
+
+- [ ] Install `composer global require waynestate/sourdough` (or run `bin/sourdough` from the checkout).
+- [ ] `sourdough --version` prints the version being released.
+- [ ] `sourdough new` bakes the `raw` shape and the `laravel-inertia` shape, each into a temp folder.
+- [ ] `composer ci` passes in each baked app.
+- [ ] `sourdough check` exits 0 in each.
+- [ ] The live `/ready` request from `scripts/smoke-shape.sh` answers 200 for each shape.
+
+**macOS:**
+
+- [ ] Install `composer global require waynestate/sourdough` (or run `bin/sourdough` from the checkout).
+- [ ] `sourdough --version` prints the version being released.
+- [ ] `sourdough new` bakes the `raw` shape and the `laravel-inertia` shape, each into a temp folder.
+- [ ] `composer ci` passes in each baked app.
+- [ ] `sourdough check` exits 0 in each.
+- [ ] The live `/ready` request from `scripts/smoke-shape.sh` answers 200 for each shape.
+
+**Windows (PowerShell):**
+
+- [ ] Install `composer global require waynestate/sourdough` (or run `bin/sourdough` from the checkout).
+- [ ] `sourdough --version` prints the version being released.
+- [ ] `sourdough new` bakes the `raw` shape and the `laravel-inertia` shape, each into a temp folder.
+- [ ] `composer ci` passes in each baked app.
+- [ ] `sourdough check` exits 0 in each.
+- [ ] The live `/ready` request from `scripts/smoke-shape.ps1` answers 200 for each shape.
+
 ## The front page
 
 `site/` is the static front page, for `https://sourdough.apps.wayne.edu/` on Citadel, served through a small raw-PHP

@@ -259,7 +259,7 @@ Stack: `Checked`. Every shape ships Squire's `scripts/parity.sh` and `scripts/pa
 Whenever Sourdough runs Composer, npm, git or Docker, pass the command as an array of arguments, never as a shell string. Accept paths with spaces and Windows drive letters. Set timeouts. Why: fewer quoting differences between PowerShell and bash, and no shell parsing of a directory name on Linux and macOS.
 Second pass, correction: draft 1 also promised "no escaping bugs" and "no injection". That is too strong on Windows. PHP's array form of `proc_open` had a command injection on Windows (CVE-2024-1874), and its first fix was incomplete (CVE-2024-5585); the fixes are in PHP 8.1.29, 8.2.20 and 8.3.8 [S53]. It belongs to the "BatBadBut" family: when the target is a `.bat` or `.cmd` file, Windows starts `cmd.exe`, which splits arguments by its own rules, and callers must escape for it [S54]. Composer and npm are usually `.bat` or `.cmd` shims on Windows. So: keep the array form; where you can, run `php.exe` with `composer.phar` and `node.exe` with npm's JavaScript entry point instead of the shims; never pass user-chosen text (an app name, a path) to a shim; validate names as in 1.7. The PHP floor already rules out the unpatched builds.
 Sources: [S9], [S53], [S54].
-Stack: `Documented`. The developer-OS rule, second point. No code yet. The shim case was not checked against the developer-OS rule.
+Stack: `Documented`. The developer-OS rule, second point. No code yet. The shim rule is now written at `docs/guides/every-os.md` in "Scripts, shims and user text on Windows".
 
 ### 5.5 Offer more than one local runtime, and be honest about Sail on Windows
 Sail is Laravel's Docker development environment. On Windows it needs WSL2 and its `sail` script is shell. Docker's own advice for WSL2 is to keep source code inside the Linux file system, because bind mounts from the Windows side are slower and do not deliver file-change events. So offer: Docker Compose with a Citadel-parity image as the route that works natively on every OS, Sail as an option where it fits, and plain PHP with Composer. Why: a starter that only works for macOS users is not a starter for WSU.
@@ -281,7 +281,7 @@ Stack: `Enforced`. The generated `Dockerfile` is multi-stage, non-root and diges
 ### 5.8 Test on all three systems
 Run the generator and the generated app's tests on Windows, macOS and Linux, or run a written smoke test before each minor release. Why: path, newline and shell bugs only appear on the system you did not test.
 Sources: [S15], [S11].
-Stack: `Documented`. The smoke gate is written per OS: Linux and macOS run `scripts/smoke-shape.sh` in a Docker build, Windows PowerShell runs `scripts/smoke-shape.ps1` against the same image (`MAINTAINING.md:75-82`), and every shape ships `scripts/parity.{sh,ps1}` (`tests/GeneratorSupportTest.php`). Gap: the CI runners are Linux only, so running all three before a minor release is still manual.
+Stack: `Documented`. The smoke gate is written per OS: Linux and macOS run `scripts/smoke-shape.sh` in a Docker build, Windows PowerShell runs `scripts/smoke-shape.ps1` against the same image (`MAINTAINING.md:75-82`), and every shape ships `scripts/parity.{sh,ps1}` (`tests/GeneratorSupportTest.php`). The written checklist is in `MAINTAINING.md` ("Before a minor release: the three-system smoke"); the CI runners are still Linux only, so a person runs it before each minor release.
 
 ### 5.9 Fetch templates as archives, and keep Git current (second pass)
 CVE-2025-48384 turned a carriage return in a submodule path into code execution during a recursive clone. It was fixed on 2025-07-08 in Git 2.43.7, 2.44.4, 2.45.4, 2.46.4, 2.47.3, 2.48.2, 2.49.1 and 2.50.1, and CISA lists it as exploited [S50]. Sourdough should get templates as Composer dist archives, not with `git clone --recurse-submodules`, and the docs should name the Git floor for developers. Composer 2.10 no longer falls back from dist to source by default, which helps here (see 4.8).
@@ -330,7 +330,7 @@ Stack: `Enforced` for what a pipeline file can hold. Citadel deploys by Quick Up
 7. Ship a tested Vite manifest reader for the raw PHP plus Vue path. (Done, see 4.7.)
 8. Write the Docker image rules (pinning, non-root, multi-stage, architecture) before Squire's image or `--docker` is built. (Done, see 5.7.)
 9. Add a compatibility pipeline that generates, installs and tests all five permutations. (Done, see 3.5: the `smoke-*` jobs and the scheduled proof.)
-10. Get Windows and macOS runners, or write the smoke-test checklist. (Open, see 5.8: the smoke gate is written per OS, but the CI runners are Linux.)
+10. Get Windows and macOS runners, or write the smoke-test checklist. (Done as a written checklist, see 5.8 and MAINTAINING.md; CI runners are still Linux only.)
 11. Say how Boost's generated files are refreshed and whether they are committed. (Answered 2026-11-08, see 2.3: `composer boost-update` refreshes them after `composer update`, what Boost regenerates is ignored, and `.ai/` is committed.)
 12. Decide between pinning Preflight components by tag or by commit. (GitLab prefers a commit SHA.) (Done, see 4.3: by commit SHA, with the tag in a comment.)
 
@@ -347,7 +347,7 @@ Added in the second pass:
 21. Keep `APP_KEY` out of git, generate it per environment, and have the release script check it and `APP_DEBUG` (4.14). (Done 2026-11-09, see 4.14: Squire's kit 0.9.0 release script stops a Laravel release with no `APP_KEY` or with `APP_DEBUG` on in production.)
 22. Add an accessibility check to the generated apps' CI and to the "new app" page, and ask the accessibility office how the Title II rule applies (6.4). (Done for the starters and the front page's order counter, see 6.4. Open: the question to the accessibility office.)
 23. Generate a `.gitlab-ci.yml` that protects deploy credentials (protected variables, job-token allowlist, no secrets in `inputs`) (6.5). (Done, see 6.5.)
-24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into the developer-OS decision or the Sourdough docs (5.4). (Open, see 5.4.)
+24. Write the Windows rule for `.bat` and `.cmd` shims (run the real executables, never pass user text to a shim) into the developer-OS decision or the Sourdough docs (5.4). (Done, see 5.4 and docs/guides/every-os.md.)
 25. Name an owner and a support window per permutation (3.6, 3.7). (Done, see 3.7: `resources/shapes.json` and `docs/guides/support.md`.)
 26. Produce an SBOM in CI (4.15), low priority. (Done, see 4.15.)
 

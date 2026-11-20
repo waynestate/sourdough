@@ -53,6 +53,18 @@ Whenever Sourdough runs Composer, npm, git or Docker, it passes the command as a
 
 Windows has a catch. When the target is a `.bat` or `.cmd` file, Windows starts `cmd.exe`, which splits arguments by its own rules, and callers must escape for it; Composer and npm are usually `.bat` or `.cmd` shims on Windows. PHP's array form of `proc_open` had a command injection on Windows, and its first fix was incomplete; the fixes are in PHP 8.1.29, 8.2.20 and 8.3.8, and the stack's PHP floor already rules out the unpatched builds. So: keep the array form; where you can, run `php.exe` with `composer.phar` and `node.exe` with npm's JavaScript entry point instead of the shims; never pass user-chosen text (an app name, a path) to a shim; and validate names before they reach a command line.
 
+## Scripts, shims and user text on Windows
+
+On Windows, `composer` and `npm` are usually `.bat` or `.cmd` shims, and Windows starts `cmd.exe` to run them, which splits the arguments by its own rules. That is the "BatBadBut" family of bugs, and it reached PHP's `proc_open`: CVE-2024-1874 and CVE-2024-5585, fixed in PHP 8.1.29, 8.2.20 and 8.3.8.
+
+The rule, in three points:
+
+- Run the real executable (`php composer.phar`, `node .../npm-cli.js`, `git.exe`) when you can, not the shim.
+- Never pass text a user typed (an app name, a path, a branch) to a shim.
+- Keep the array form of `proc_open`, which Sourdough already uses (BEST_PRACTICES 5.4), and keep PHP at those patch levels or newer.
+
+Sourdough validates its names and paths before any subprocess starts (BEST_PRACTICES 1.7), so the values that reach a command line have already passed the allow-list.
+
 ## More than one local runtime
 
 Offer more than one local runtime, and be honest about Sail on Windows. Sail is Laravel's Docker development environment; on Windows it needs WSL2 and its `sail` script is shell. Docker's own advice for WSL2 is to keep source code inside the Linux file system, because bind mounts from the Windows side are slower and do not deliver file-change events. So the routes are: Docker Compose on the app's own images (`--docker`) as the route that works natively on every OS, Sail as an option where it fits, and plain PHP with Composer. When "it works here" has to mean "it works on Citadel", add [Parity](https://git.wayne.edu/enterprise-apps/parity): one program for Windows, macOS and Linux, on Podman or Docker, that runs the same folder on Citadel's own PHP image, Apache, `php.ini`, proxy and MySQL 5.6.51. It is a separate install, never a requirement, and every baked README's "Run it like Citadel" says how. Laravel's docs also offer Herd, a native macOS and Windows environment with PHP, Nginx, Node and the `laravel` CLI.
