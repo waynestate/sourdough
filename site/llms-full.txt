@@ -832,6 +832,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 #### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
+- Docs: the Windows rule for .bat and .cmd shims is written (every-OS guide, BEST_PRACTICES 5.4), and MAINTAINING has a three-system smoke checklist to run before a minor release (BEST_PRACTICES 5.8, backlog items 10 and 24).
+- Changed: Sourdough's own GitLab pipeline gains a blocking `smoke-php84` job that bakes the raw and Inertia shapes on PHP 8.4, so the line between the 8.3 floor and 8.5 is baked too (`tests/SmokeFloorTest.php` holds it).
 - Fixed: the Squire copy docs name the `^0.11` dev dependency (they said `^0.10`), and StackPinsTest's comments name PROCTOR 0.16, the line the templates pin. Content only.
 - Changed: the deploy kit is Squire 0.11.1 (was 0.10.7): the release script, parity scripts, HAProxy pin and fallback base follow the new templates, and `waynestate/squire` is `^0.11` (the exported copy in `templates/squire/` moves with it).
 - `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
@@ -1731,6 +1733,18 @@ If `MachinePolicy` or `UserPolicy` shows a value, Group Policy set it and it bea
 Whenever Sourdough runs Composer, npm, git or Docker, it passes the command as an array of arguments, never as a shell string. That accepts paths with spaces and Windows drive letters, keeps quoting differences between PowerShell and bash out of the picture, and skips shell parsing of a directory name on Linux and macOS. Set timeouts on every subprocess.
 
 Windows has a catch. When the target is a `.bat` or `.cmd` file, Windows starts `cmd.exe`, which splits arguments by its own rules, and callers must escape for it; Composer and npm are usually `.bat` or `.cmd` shims on Windows. PHP's array form of `proc_open` had a command injection on Windows, and its first fix was incomplete; the fixes are in PHP 8.1.29, 8.2.20 and 8.3.8, and the stack's PHP floor already rules out the unpatched builds. So: keep the array form; where you can, run `php.exe` with `composer.phar` and `node.exe` with npm's JavaScript entry point instead of the shims; never pass user-chosen text (an app name, a path) to a shim; and validate names before they reach a command line.
+
+### Scripts, shims and user text on Windows [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#scripts-shims-and-user-text-on-windows)
+
+On Windows, `composer` and `npm` are usually `.bat` or `.cmd` shims, and Windows starts `cmd.exe` to run them, which splits the arguments by its own rules. That is the "BatBadBut" family of bugs, and it reached PHP's `proc_open`: CVE-2024-1874 and CVE-2024-5585, fixed in PHP 8.1.29, 8.2.20 and 8.3.8.
+
+The rule, in three points:
+
+- Run the real executable (`php composer.phar`, `node .../npm-cli.js`, `git.exe`) when you can, not the shim.
+- Never pass text a user typed (an app name, a path, a branch) to a shim.
+- Keep the array form of `proc_open`, which Sourdough already uses (BEST_PRACTICES 5.4), and keep PHP at those patch levels or newer.
+
+Sourdough validates its names and paths before any subprocess starts (BEST_PRACTICES 1.7), so the values that reach a command line have already passed the allow-list.
 
 ### More than one local runtime [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#more-than-one-local-runtime)
 

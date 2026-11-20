@@ -47,6 +47,12 @@ Versioning once 1.0 is out.</p>
 <h3 id="changed"><span class="docs-heading-tail"><span>Changed</span><a class="docs-heading-link" aria-label="Link to this section" href="#changed">#</a></span></h3>
 <ul>
 <li>
+<p>Docs: the Windows rule for .bat and .cmd shims is written (every-OS guide, BEST_PRACTICES 5.4), and MAINTAINING has a three-system smoke checklist to run before a minor release (BEST_PRACTICES 5.8, backlog items 10 and 24).</p>
+</li>
+<li>
+<p>Changed: Sourdough's own GitLab pipeline gains a blocking <code>smoke-php84</code> job that bakes the raw and Inertia shapes on PHP 8.4, so the line between the 8.3 floor and 8.5 is baked too (<code>tests/SmokeFloorTest.php</code> holds it).</p>
+</li>
+<li>
 <p>Fixed: the Squire copy docs name the <code>^0.11</code> dev dependency (they said <code>^0.10</code>), and StackPinsTest's comments name PROCTOR 0.16, the line the templates pin. Content only.</p>
 </li>
 <li>
