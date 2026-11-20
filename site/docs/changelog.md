@@ -12,6 +12,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+## 0.5.0 (2026-11-19) [#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-5-0-2026-11-19)
+
 ### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
 
 - Docs: the Windows rule for .bat and .cmd shims is written (every-OS guide, BEST_PRACTICES 5.4), and MAINTAINING has a three-system smoke checklist to run before a minor release (BEST_PRACTICES 5.8, backlog items 10 and 24).

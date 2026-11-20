@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Upgrading | Sourdough docs</title>
 <meta name="description" content="How to upgrade Sourdough itself and bring the apps it baked up to date with the manifest and sourdough feed.">
-<meta name="docs-version" content="0.4.2">
+<meta name="docs-version" content="0.5.0">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.4.2</span>
+    <span class="ticket" title="Sourdough version">No. 0.5.0</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -50,9 +50,21 @@
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre tabindex="0"><code>Sourdough 0.4.2
+<pre tabindex="0"><code>Sourdough 0.5.0
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
+<h2 id="0-5-0-2026-11-19">0.5.0 <span class="docs-heading-tail"><span>(2026-11-19)</span><a class="docs-heading-link" aria-label="Link to this section" href="#0-5-0-2026-11-19">#</a></span></h2>
+<p>A minor on 0.4.2: <code>sourdough check [dir] [--json]</code> joins the CLI, the baker's poke test that says in one read-only run whether an app is fed and still supported (exit <code>0</code> fed and supported, <code>1</code> needs attention, <code>2</code> tool error; it writes nothing and needs no clean tree), and the templates move their pins and their deploy kit. Feed brings those moves into an app you already baked; the seeded files stay yours.</p>
+<p><strong>What <code>sourdough feed</code> brings an app baked with 0.4.2</strong> (it merges each file with your edits):</p>
+<ul>
+<li><code>composer.json</code>: SESAME <code>^0.8</code> (was <code>^0.7</code>), Pinstripe <code>^0.4</code> (was <code>^0.3</code>) and PROCTOR <code>^0.16</code> (was <code>^0.15</code>), and the Composer release cooldown (<code>config.policy.cooldown.period</code> of <code>&quot;3 days&quot;</code>, with <code>policy.cooldown.ignore</code> of <code>[&quot;waynestate/*&quot;]</code> so a fresh app still installs right after a stack release).</li>
+<li><code>.gitlab-ci.yml</code>: the Preflight 0.9.0 pins, on the components and the a11y checker copy.</li>
+<li>The Squire 0.11.1 deploy kit (was 0.10.7): the release script, the parity scripts, the HAProxy pin and the fallback base follow the new templates.</li>
+</ul>
+<p>It leaves the seeded files alone: <code>README.md</code>, <code>.env.example</code> and <code>package-lock.json</code> are yours, and feed never touches your lock files, so the <code>composer update</code> in the steps is yours to run.</p>
+<p><strong>Breaking:</strong> none. <strong>Deprecated:</strong> none.</p>
+<p><strong>Steps:</strong> in each app, on a clean git tree, <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, then <code>composer update waynestate/sesame waynestate/pinstripe waynestate/proctor --with-all-dependencies</code> (feed never touches your lock files), then <code>composer ci</code>.</p>
+<p><strong>How to verify:</strong> <code>sourdough --version</code> prints <code>Sourdough 0.5.0</code>, <code>sourdough check</code> ends with <code>OK:</code> on the fed app, and <code>composer show waynestate/sesame waynestate/pinstripe waynestate/proctor</code> names 0.8, 0.4 and 0.16.</p>
 <h2 id="0-4-2-2026-11-09">0.4.2 <span class="docs-heading-tail"><span>(2026-11-09)</span><a class="docs-heading-link" aria-label="Link to this section" href="#0-4-2-2026-11-09">#</a></span></h2>
 <p>A patch on 0.4.1: new bakes meet <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/parity">Parity</a>, the stack's tool that runs Citadel on your computer. Every shape's README gains &quot;Run it like Citadel&quot; at the end of &quot;Run it locally&quot;, and the docs say when to use it.</p>
 <p><strong>What <code>sourdough feed</code> brings an app baked with 0.4.1:</strong> nothing. The new text lives in <code>README.md</code>, which is a seeded file: Sourdough wrote it once and you own it. Templates, pins and the Squire kit are unchanged.</p>
@@ -202,10 +214,10 @@ php artisan view:clear
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-4-2-2026-11-09">0.4.2 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-1-2026-11-09">0.4.1 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-5-0-2026-11-19">0.5.0 (2026-11-19)</a></li><li class="docs-toc__item"><a href="#0-4-2-2026-11-09">0.4.2 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-1-2026-11-09">0.4.1 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.4.2</span></span>
+  <span>Documents Sourdough <span data-docs-version>0.5.0</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="upgrading.md">Markdown</a></span>
 </footer>
 </body>

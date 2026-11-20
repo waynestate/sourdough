@@ -12,6 +12,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 0.5.0 (2026-11-19)
+
 ### Changed
 
 - Docs: the Windows rule for .bat and .cmd shims is written (every-OS guide, BEST_PRACTICES 5.4), and MAINTAINING has a three-system smoke checklist to run before a minor release (BEST_PRACTICES 5.8, backlog items 10 and 24).
