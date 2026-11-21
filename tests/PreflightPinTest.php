@@ -134,6 +134,20 @@ final class PreflightPinTest extends TestCase
         self::assertNotEmpty($images, 'Sourdough names its component images');
     }
 
+    /**
+     * An org-qualified name is still plain: gitleaks lives under zricethezav
+     * on Docker Hub and rides with its digest pin. A name that carries the
+     * proxy prefix instead still fails both checks, so a prefixed image can
+     * never slip through as plain.
+     */
+    public function testAnOrgQualifiedImageIsStillPlain(): void
+    {
+        self::assertDoesNotMatchRegularExpression('#^\$\{?[A-Za-z_]+\}?/#', 'zricethezav/gitleaks:v8.30.1@sha256:aa');
+        self::assertMatchesRegularExpression('#^[a-z0-9][a-z0-9._/-]*:#', 'zricethezav/gitleaks:v8.30.1@sha256:aa');
+        self::assertMatchesRegularExpression('#^\$\{?[A-Za-z_]+\}?/#', '${IMAGE_PREFIX}/php:8.4');
+        self::assertDoesNotMatchRegularExpression('#^[a-z0-9][a-z0-9._/-]*:#', '${IMAGE_PREFIX}/php:8.4');
+    }
+
     #[DataProvider('pipelines')]
     public function testDockerHubComponentsTakeTheShapesImagePrefix(string $file): void
     {
@@ -162,7 +176,7 @@ final class PreflightPinTest extends TestCase
         foreach ($images[1] as $image) {
             $image = trim($image, '"');
             self::assertDoesNotMatchRegularExpression('#^\$\{?[A-Za-z_]+\}?/#', $image, "$where: $image carries a prefix");
-            self::assertMatchesRegularExpression('#^[a-z0-9][a-z0-9._-]*:#', $image, "$where: $image is a plain Docker Hub name with a tag");
+            self::assertMatchesRegularExpression('#^[a-z0-9][a-z0-9._/-]*:#', $image, "$where: $image is a plain Docker Hub name (org/name allowed) with a tag");
             $plain[] = $image;
         }
 
