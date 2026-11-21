@@ -342,7 +342,7 @@ final class UpdateNoticeTest extends TestCase
         $lines = array_values(array_filter(explode("\n", $stderrOn), static fn(string $line): bool => $line !== ''));
         self::assertCount(1, $lines, "stderr: {$stderrOn}");
         self::assertSame(
-            'sourdough 0.5.0 is out of date: 0.9.9 is the newest release. Update: composer update waynestate/sourdough',
+            'sourdough 0.5.1 is out of date: 0.9.9 is the newest release. Update: composer update waynestate/sourdough',
             $lines[0],
         );
     }
