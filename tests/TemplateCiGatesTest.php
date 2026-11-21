@@ -114,7 +114,21 @@ final class TemplateCiGatesTest extends TestCase
         $blocks = [];
         foreach (self::pipelines() as $shape => [$file]) {
             $job = self::job(self::read($file), 'a11y-pages');
-            $blocks[$shape] = self::capture('/^    - \|\n((?:      .*\n|\n)+)/m', $job, "$shape: the a11y-pages job has its snapshot block")[1];
+            // The Laravel shapes carry an earlier block that sets .env, so
+            // take the block that saves the pages, the one with the origin.
+            preg_match_all('/^    - \|\n((?:      .*\n|\n)+)/m', $job, $matches);
+            $snapshot = null;
+            foreach ($matches[1] ?? [] as $match) {
+                if (str_contains($match, 'origin=http')) {
+                    $snapshot = $match;
+                    break;
+                }
+            }
+            self::assertNotNull($snapshot, "$shape: the a11y-pages job has its snapshot block");
+            $blocks[$shape] = (string) $snapshot;
+            if (in_array($shape, ['laravel-blade', 'laravel-inertia', 'laravel-blade-vue'], true)) {
+                self::assertStringContainsString('setenv SESAME_FAKE_ALLOWED true', $job, "$shape: the a11y-pages job asks for the local sign-in");
+            }
         }
 
         self::assertCount(1, array_unique($blocks), 'the snapshot block differs between shapes');
