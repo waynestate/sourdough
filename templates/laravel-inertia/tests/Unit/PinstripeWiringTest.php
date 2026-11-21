@@ -42,6 +42,8 @@ function pinstripeJson(string $path): array
  * @var array<string, string>
  */
 const PINSTRIPE_EXTRA_EXCLUDES = [
+    // Squire's package cache (release.sh): never lint it.
+    '.cache' => 'Squire package cache',
     // Squire's deploy kit: restyling it turns every kit update into a conflict.
     'deploy' => 'Squire deploy kit',
 ];
