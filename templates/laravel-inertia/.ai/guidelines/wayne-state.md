@@ -2,7 +2,7 @@
 
 This app was baked by Sourdough from the Wayne State app stack (Laravel with Inertia pages rendered by Vue). These conventions hold on top of Laravel's own.
 
-- Sign-in is SESAME. It registers `/login` and `/logout`, and the `auth.sesame` middleware protects a route; locally it runs the fake driver (`SESAME_DRIVER=fake`). Never add Laravel's own auth routes, Fortify or Breeze.
+- Sign-in is SESAME. It registers `/login` and `/logout`, and the `auth.sesame` middleware protects a route; locally it runs the fake driver (`SESAME_DRIVER=fake` and `SESAME_FAKE_ALLOWED=true` with `APP_ENV=local`). Never add Laravel's own auth routes, Fortify or Breeze.
 - WayneUI draws the interface: pages import components by name from `@waynestate/wayne-ui-vue`, and `resources/css/app.css` is written in WayneUI's tokens. There is no Tailwind, and `npm run lint` refuses imports from a `components/ui` path.
 - Routes reach the front end through Ziggy. After changing a route, run `composer ziggy` and commit `resources/js/ziggy.*`; CI fails when they drift.
 - HELMET sets the security headers, the CSP nonce and the trusted proxies (`HELMET_PRESET`, `HELMET_PROXIES`), and answers `/up` without touching the database. Never paste `trustProxies(at: '*')`.
