@@ -5,6 +5,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Docs: SECURITY.md says how to report a vulnerability privately.
+
 ## 0.5.1 (2026-11-21)
 
 ### Changed
