@@ -12,6 +12,13 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 0.5.1 (2026-11-21)
+
+### Changed
+
+- Changed: the deploy kit is Squire 0.12.0 (was 0.11.1): the parity scripts and the parity group leave the kit, so a generated app no longer carries them; the fallback cache fix and the PHP 8.6r1 line come with it, and `waynestate/squire` is `^0.12` as a dev dependency.
+- Docs: the Squire copy docs name the `^0.12` dev dependency.
+
 ## 0.5.0 (2026-11-19)
 
 ### Changed

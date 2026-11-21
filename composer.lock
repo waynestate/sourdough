@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d84eec0c6ebbf7a480446e0b8239b89d",
+    "content-hash": "8a607d7bd5d01b20b01a9f81b2c19708",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -4479,16 +4479,16 @@
         },
         {
             "name": "waynestate/squire",
-            "version": "0.11.1",
+            "version": "0.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "5f86c41f3ff647adf84f38213aee1fb44cb3f3c6"
+                "reference": "84d5fea4220ea2b21adb7a4d3674a71afc5c559d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/5f86c41f3ff647adf84f38213aee1fb44cb3f3c6",
-                "reference": "5f86c41f3ff647adf84f38213aee1fb44cb3f3c6",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/84d5fea4220ea2b21adb7a4d3674a71afc5c559d",
+                "reference": "84d5fea4220ea2b21adb7a4d3674a71afc5c559d",
                 "shasum": ""
             },
             "require": {
@@ -4501,7 +4501,7 @@
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^11.5",
                 "waynestate/advisor": "^0.3",
-                "waynestate/pinstripe": "^0.3"
+                "waynestate/pinstripe": "^0.4"
             },
             "suggest": {
                 "waynestate/advisor": "ADVISOR module: lets your coding agent run squire_doctor and squire_drift read-only."
@@ -4529,14 +4529,14 @@
                     "name": "Wayne State University, Enterprise Applications"
                 }
             ],
-            "description": "The Citadel kit: standard build.sh, release script and health check, and local parity on the Citadel images.",
+            "description": "The Citadel kit: the standard build.sh, release script and health check, from templates, checked by squire doctor.",
             "homepage": "https://squire.apps.wayne.edu/",
             "support": {
                 "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-13T23:50:33+00:00",
-            "published-time": "2026-11-14T00:04:31+00:00"
+            "time": "2026-11-21T06:15:40+00:00",
+            "published-time": "2026-11-21T06:16:57+00:00"
         }
     ],
     "aliases": [],
