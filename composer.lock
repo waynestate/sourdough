@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d84eec0c6ebbf7a480446e0b8239b89d",
+    "content-hash": "8a607d7bd5d01b20b01a9f81b2c19708",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -233,8 +233,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-31T15:12:58+00:00",
-            "published-time": "2026-10-31T15:13:27+00:00"
+            "time": "2026-10-31T15:12:58+00:00"
         },
         {
             "name": "php-http/discovery",
@@ -313,8 +312,7 @@
                 "issues": "https://github.com/php-http/discovery/issues",
                 "source": "https://github.com/php-http/discovery/tree/1.20.0"
             },
-            "time": "2024-10-02T11:20:13+00:00",
-            "published-time": "2024-10-02T11:21:00+00:00"
+            "time": "2024-10-02T11:20:13+00:00"
         },
         {
             "name": "php-http/multipart-stream-builder",
@@ -370,8 +368,7 @@
                 "issues": "https://github.com/php-http/multipart-stream-builder/issues",
                 "source": "https://github.com/php-http/multipart-stream-builder/tree/1.4.2"
             },
-            "time": "2024-09-04T13:22:54+00:00",
-            "published-time": "2024-09-04T13:23:14+00:00"
+            "time": "2024-09-04T13:22:54+00:00"
         },
         {
             "name": "psr/container",
@@ -424,8 +421,7 @@
                 "issues": "https://github.com/php-fig/container/issues",
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
-            "time": "2021-11-05T16:47:00+00:00",
-            "published-time": "2021-11-05T16:53:27+00:00"
+            "time": "2021-11-05T16:47:00+00:00"
         },
         {
             "name": "psr/http-client",
@@ -477,8 +473,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-client"
             },
-            "time": "2023-09-23T14:17:50+00:00",
-            "published-time": "2023-09-23T14:18:12+00:00"
+            "time": "2023-09-23T14:17:50+00:00"
         },
         {
             "name": "psr/http-message",
@@ -531,8 +526,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
-            "time": "2023-04-04T09:54:51+00:00",
-            "published-time": "2023-04-04T09:55:35+00:00"
+            "time": "2023-04-04T09:54:51+00:00"
         },
         {
             "name": "psr/log",
@@ -680,8 +674,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-11-03T21:47:07+00:00",
-            "published-time": "2026-11-04T11:27:31+00:00"
+            "time": "2026-11-03T21:47:07+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -752,8 +745,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-16T14:15:10+00:00",
-            "published-time": "2026-11-04T11:25:34+00:00"
+            "time": "2026-09-16T14:15:10+00:00"
         },
         {
             "name": "symfony/http-client",
@@ -1019,8 +1011,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T16:19:22+00:00",
-            "published-time": "2026-04-26T14:44:50+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
@@ -1102,8 +1093,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-15T09:18:53+00:00",
-            "published-time": "2026-10-28T10:07:44+00:00"
+            "time": "2026-10-15T09:18:53+00:00"
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
@@ -1188,8 +1178,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-23T22:02:09+00:00",
-            "published-time": "2026-09-30T10:23:47+00:00"
+            "time": "2026-09-23T22:02:09+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1274,8 +1263,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-28T09:35:49+00:00",
-            "published-time": "2026-10-28T10:07:45+00:00"
+            "time": "2026-10-28T09:35:49+00:00"
         },
         {
             "name": "symfony/polyfill-php83",
@@ -1442,8 +1430,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-20T17:38:25+00:00",
-            "published-time": "2026-11-04T11:25:33+00:00"
+            "time": "2026-10-20T17:38:25+00:00"
         },
         {
             "name": "symfony/string",
@@ -1534,8 +1521,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-23T16:51:52+00:00",
-            "published-time": "2026-10-28T18:21:18+00:00"
+            "time": "2026-10-23T16:51:52+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -1664,8 +1650,7 @@
                 "issues": "https://git.wayne.edu/enterprise-apps/creed/-/issues",
                 "source": "https://github.com/waynestate/creed"
             },
-            "time": "2026-11-09T07:41:10+00:00",
-            "published-time": "2026-11-09T07:58:31+00:00"
+            "time": "2026-11-09T07:41:10+00:00"
         }
     ],
     "packages-dev": [
@@ -2130,8 +2115,7 @@
                 "issues": "https://github.com/nette/neon/issues",
                 "source": "https://github.com/nette/neon/tree/v3.4.10"
             },
-            "time": "2026-10-25T22:35:03+00:00",
-            "published-time": "2026-10-25T23:02:33+00:00"
+            "time": "2026-10-25T22:35:03+00:00"
         },
         {
             "name": "nette/schema",
@@ -2512,8 +2496,7 @@
                 "issues": "https://github.com/phpstan/extension-installer/issues",
                 "source": "https://github.com/phpstan/extension-installer/tree/1.4.3"
             },
-            "time": "2024-09-04T20:21:43+00:00",
-            "published-time": "2024-09-04T20:22:27+00:00"
+            "time": "2024-09-04T20:21:43+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -2628,8 +2611,7 @@
                 "issues": "https://github.com/phpstan/phpstan-deprecation-rules/issues",
                 "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/2.0.5"
             },
-            "time": "2026-07-22T06:50:43+00:00",
-            "published-time": "2026-07-27T15:18:00+00:00"
+            "time": "2026-07-22T06:50:43+00:00"
         },
         {
             "name": "phpstan/phpstan-strict-rules",
@@ -2681,8 +2663,7 @@
                 "issues": "https://github.com/phpstan/phpstan-strict-rules/issues",
                 "source": "https://github.com/phpstan/phpstan-strict-rules/tree/2.1.1"
             },
-            "time": "2026-11-02T08:16:15+00:00",
-            "published-time": "2026-11-02T10:55:07+00:00"
+            "time": "2026-11-02T08:16:15+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -4226,8 +4207,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-13T00:31:30+00:00",
-            "published-time": "2026-10-13T00:56:49+00:00"
+            "time": "2026-10-13T00:31:30+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
@@ -4474,21 +4454,20 @@
                 "issues": "https://git.wayne.edu/enterprise-apps/pinstripe/-/issues",
                 "source": "https://github.com/waynestate/pinstripe"
             },
-            "time": "2026-11-11T12:38:31+00:00",
-            "published-time": "2026-11-11T23:28:29+00:00"
+            "time": "2026-11-11T12:38:31+00:00"
         },
         {
             "name": "waynestate/squire",
-            "version": "0.11.1",
+            "version": "0.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/squire.git",
-                "reference": "5f86c41f3ff647adf84f38213aee1fb44cb3f3c6"
+                "reference": "84d5fea4220ea2b21adb7a4d3674a71afc5c559d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/squire/zipball/5f86c41f3ff647adf84f38213aee1fb44cb3f3c6",
-                "reference": "5f86c41f3ff647adf84f38213aee1fb44cb3f3c6",
+                "url": "https://api.github.com/repos/waynestate/squire/zipball/84d5fea4220ea2b21adb7a4d3674a71afc5c559d",
+                "reference": "84d5fea4220ea2b21adb7a4d3674a71afc5c559d",
                 "shasum": ""
             },
             "require": {
@@ -4501,7 +4480,7 @@
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^11.5",
                 "waynestate/advisor": "^0.3",
-                "waynestate/pinstripe": "^0.3"
+                "waynestate/pinstripe": "^0.4"
             },
             "suggest": {
                 "waynestate/advisor": "ADVISOR module: lets your coding agent run squire_doctor and squire_drift read-only."
@@ -4529,14 +4508,13 @@
                     "name": "Wayne State University, Enterprise Applications"
                 }
             ],
-            "description": "The Citadel kit: standard build.sh, release script and health check, and local parity on the Citadel images.",
+            "description": "The Citadel kit: the standard build.sh, release script and health check, from templates, checked by squire doctor.",
             "homepage": "https://squire.apps.wayne.edu/",
             "support": {
                 "issues": "https://git.wayne.edu/enterprise-apps/squire/-/issues",
                 "source": "https://github.com/waynestate/squire"
             },
-            "time": "2026-11-13T23:50:33+00:00",
-            "published-time": "2026-11-14T00:04:31+00:00"
+            "time": "2026-11-21T06:15:40+00:00"
         }
     ],
     "aliases": [],
@@ -4551,5 +4529,5 @@
     "platform-overrides": {
         "php": "8.3.0"
     },
-    "plugin-api-version": "2.11.0"
+    "plugin-api-version": "2.9.0"
 }
