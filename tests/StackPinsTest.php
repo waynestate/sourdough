@@ -52,7 +52,7 @@ final class StackPinsTest extends TestCase
         $composer = $this->readJson($file);
 
         self::assertSame('^1.3', $composer['require']['waynestate/helmet'] ?? null, $file);
-        self::assertSame('^0.8', $composer['require']['waynestate/sesame'] ?? null, $file);
+        self::assertSame('^0.11', $composer['require']['waynestate/sesame'] ?? null, $file);
     }
 
     /**

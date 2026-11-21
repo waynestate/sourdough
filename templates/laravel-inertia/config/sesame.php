@@ -51,6 +51,7 @@ return [
     */
 
     'fake' => [
+        'allowed' => env('SESAME_FAKE_ALLOWED', false),
         'username' => env('SESAME_FAKE_USERNAME', 'jane.doe'),
         // A display name, so the imported user reads like a person in the
         // settings page instead of as a bare username.

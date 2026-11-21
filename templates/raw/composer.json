@@ -13,7 +13,7 @@
         "guzzlehttp/guzzle": "^7.9 || ^8.0",
         "nyholm/psr7": "^1.8",
         "waynestate/helmet": "^1.3",
-        "waynestate/sesame": "^0.8"
+        "waynestate/sesame": "^0.11"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",

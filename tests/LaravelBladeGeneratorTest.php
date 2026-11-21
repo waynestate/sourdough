@@ -69,7 +69,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
         // The stack's runtime packages land in require...
-        self::assertSame('^0.8', $composer['require']['waynestate/sesame']);
+        self::assertSame('^0.11', $composer['require']['waynestate/sesame']);
         self::assertSame('^1.3', $composer['require']['waynestate/helmet']);
         // ...the dev tools in require-dev...
         self::assertSame('^3.13', $composer['require-dev']['larastan/larastan']);
@@ -325,6 +325,7 @@ final class LaravelBladeGeneratorTest extends TestCase
         $config = (string) file_get_contents($target . '/config/sesame.php');
 
         self::assertStringContainsString("env('SESAME_FAKE_USERNAME', 'jane.doe')", $config);
+        self::assertStringContainsString("env('SESAME_FAKE_ALLOWED', false)", $config);
     }
 
     public function testInstallsTheSquireLaravelFiles(): void
