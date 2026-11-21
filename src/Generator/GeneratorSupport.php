@@ -97,6 +97,22 @@ final class GeneratorSupport
     }
 
     /**
+     * The kit paths Squire 0.12 no longer ships: Parity runs the app
+     * locally now, so the kit's local-running files left it. They are
+     * skipped here as well, so an older checked copy of the templates
+     * cannot resurrect them in a generated app.
+     *
+     * @var list<string>
+     */
+    public const NO_LONGER_SHIPPED = [
+        'docker-compose.squire.yml',
+        '.squire/haproxy.cfg',
+        'scripts/parity.sh',
+        'scripts/parity.ps1',
+        '.env.squire.example',
+    ];
+
+    /**
      * Install the deploy files for $flavour from the checked copy of
      * Squire's templates into the target dir.
      *
@@ -107,7 +123,8 @@ final class GeneratorSupport
      * contents. A file flagged appMayOwn (the raw flavour's
      * public/index.php and .htaccess) is the app's own when the template
      * already wrote one: it is installed only where the path is free,
-     * never overwritten.
+     * never overwritten. A path in NO_LONGER_SHIPPED is never installed,
+     * whatever the copy's manifest still lists.
      *
      * @throws \RuntimeException when the copy is missing or a file cannot be read or written
      */
@@ -146,6 +163,10 @@ final class GeneratorSupport
         }
 
         foreach ($entries as $path => $mode) {
+            if (in_array($path, self::NO_LONGER_SHIPPED, true)) {
+                continue;
+            }
+
             $source = $this->squireDir . '/' . $flavour . '/' . $path;
             $target = $targetDir . '/' . $path;
 

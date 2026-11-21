@@ -36,9 +36,12 @@ final class GeneratorSupportTest extends TestCase
             if (!is_string($key) || !str_starts_with($key, 'laravel/')) {
                 continue;
             }
+            $path = substr($key, strlen('laravel/'));
+            if (in_array($path, GeneratorSupport::NO_LONGER_SHIPPED, true)) {
+                continue;
+            }
             $installed++;
 
-            $path = substr($key, strlen('laravel/'));
             $file = $target . '/' . $path;
 
             // The file is installed at its flavour path, as-is.
@@ -58,6 +61,12 @@ final class GeneratorSupportTest extends TestCase
             self::assertSame(0 !== ($mode & 0100), 0 !== (fileperms($file) & 0100), $path);
         }
 
+        // Whatever the copy's manifest still lists, the kit's
+        // local-running files never land in a generated app.
+        foreach (GeneratorSupport::NO_LONGER_SHIPPED as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
+        }
+
         self::assertGreaterThan(0, $installed, 'the laravel flavour must install at least one file');
     }
 
@@ -73,7 +82,6 @@ final class GeneratorSupportTest extends TestCase
             'build.sh',
             'deployments/001-first-release.sh',
             'scripts/release.sh',
-            'scripts/parity.sh',
             '.squire/fallback/citadel-apache-entrypoint',
             '.squire/fallback/citadel-deploy',
         ] as $path) {
@@ -82,9 +90,6 @@ final class GeneratorSupportTest extends TestCase
 
         foreach ([
             'health.php',
-            'docker-compose.squire.yml',
-            '.env.squire.example',
-            'scripts/parity.ps1',
             '.squire/Dockerfile',
         ] as $path) {
             self::assertSame(0, fileperms($target . '/' . $path) & 0111, $path . ' should not be executable');

@@ -37,28 +37,20 @@ release script refuses a front end without a lock file:
 
 ```bash
 npm install
-parity check
 parity init --from-squire
 parity up
-parity shell --user citadel php artisan migrate
-parity shell --user citadel php artisan optimize
 parity test
+parity down
 ```
 
-`parity init --from-squire` reads this app's Squire kit
-(`docker-compose.squire.yml` and `.env.squire.example`), never a password,
-and writes `parity.json`, the app's Citadel settings; commit it. The first
-`parity up` runs `scripts/release.sh` inside Citadel's image, as Citadel's
-first deployment does: Composer, the front-end build, the migrations and
-`optimize`. That takes a few minutes; if Parity stops waiting for the
-health check, run `parity up` again. The deployment reads only `.env`, so
-it migrates and caches SQLite. Apache, the cron entry and `parity shell`
-also get Parity's MySQL in Laravel's `DB_*` names, which beat `.env`, so
-the two `parity shell` lines migrate MySQL 5.6.51 and cache it, as the
-`citadel` user, the way Citadel runs a release. `.env` keeps SQLite for
-the bench. No Citadel image here yet? `parity image get` fetches it, or
-`parity up --fallback` runs a labeled stand-in. Same dough, Citadel's
-oven.
+Run `parity init --from-squire` once: it reads this app's Squire kit,
+never a password, and writes `parity.json`, the app's Citadel settings;
+commit it. Then `parity up`, `parity test` and `parity down` repeat as
+often as you like. The first `parity up` runs `scripts/release.sh` inside
+Citadel's image, as Citadel's first deployment does: Composer, the
+front-end build, the migrations and `optimize`. That takes a few minutes;
+if Parity stops waiting for the health check, run `parity up` again. Same
+dough, Citadel's oven.
 
 ## Tests
 

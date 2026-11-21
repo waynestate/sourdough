@@ -185,8 +185,8 @@ final class Manifest
             }
 
             // Line endings are forgiven, as feed forgives them: a checkout
-            // whose .gitattributes turns a file to CRLF (the raw shapes'
-            // *.ps1) has not drifted from the LF bytes Sourdough wrote.
+            // whose .gitattributes turns a file to CRLF has not drifted
+            // from the LF bytes Sourdough wrote.
             $content = file_get_contents($path);
             if (false === $content || !Feed::matches($content, $info['sha256'])) {
                 $changed[] = $relative;

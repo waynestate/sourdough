@@ -44,27 +44,24 @@ Linux; nothing in this app needs it. After `composer install` has written
 `composer.lock` (the release script refuses to run without it):
 
 ```bash
-parity check
-parity init --from-squire --no-cron
+parity init --from-squire
 parity up
 parity test
+parity down
 ```
 
-`parity init --from-squire` reads this app's Squire kit
-(`docker-compose.squire.yml` and `.env.squire.example`), never a password,
-and writes `parity.json`, the app's Citadel settings; commit it.
-`--no-cron` leaves out the Laravel scheduler entry Parity would offer:
-this app has no `artisan`. No Citadel image here yet? `parity image get`
-fetches it, or `parity up --fallback` runs a labeled stand-in.
+Run `parity init --from-squire` once: it reads this app's Squire kit,
+never a password, and writes `parity.json`, the app's Citadel settings;
+commit it. Then `parity up`, `parity test` and `parity down` repeat as
+often as you like.
 
 Citadel sets no `APP_ENV`, so the front controller boots as production
 there and under Parity alike: `/up` answers `ok`, but a page comes back
-empty and `parity logs --apache` says `SESAME_CAS_URL is not set`.
-`parity test` still passes, because an empty page is not an error.
-Parity 0.1.0 cannot set the app's own environment variables yet, so use it
-to prove the build, the deployments, the health check and `/up` on
-Citadel's image, and `composer serve` to click around signed in. The crust
-can look done before the crumb is.
+empty and the Apache log says `SESAME_CAS_URL is not set`. `parity test`
+still passes, because an empty page is not an error. Use Parity to prove
+the build, the deployments, the health check and `/up` on Citadel's image,
+and `composer serve` to click around signed in. The crust can look done
+before the crumb is.
 
 ## Checks
 

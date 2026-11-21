@@ -62,28 +62,27 @@ final class ManifestCommandTest extends TestCase
     }
 
     /**
-     * The raw shapes' .gitattributes checks *.ps1 out with CRLF, so every
-     * clone of a fresh app has scripts/parity.ps1 in CRLF. That is a
-     * checkout, not an edit: the check forgives line endings, as feed does.
+     * Line endings are a checkout detail, not an edit: a managed file that
+     * comes back with CRLF endings still matches the LF bytes Sourdough
+     * wrote, so the check forgives them, as feed does.
      */
     public function testCheckForgivesLineEndings(): void
     {
         $target = $this->generateApp();
-        $file = $target . '/scripts/parity.ps1';
+        $file = $target . '/build.sh';
         $lf = str_replace("\r\n", "\n", (string) file_get_contents($file));
         self::assertStringNotContainsString("\r\n", $lf);
-        // Start from LF in both environments: on a Windows checkout the
-        // template's parity.ps1 arrives in CRLF, and the check forgives the
-        // difference, as feed does.
+        // Start from LF in both environments, then hand the file back with
+        // CRLF endings: the check forgives the difference, as feed does.
         file_put_contents($file, $lf);
         file_put_contents($file, str_replace("\n", "\r\n", $lf));
 
         $tester = $this->tester();
         self::assertSame(0, $tester->execute(['dir' => $target, '--check' => true]), $tester->getDisplay());
 
-        file_put_contents($file, str_replace("\n", "\r\n", $lf) . "Write-Host 'edited'\r\n");
+        file_put_contents($file, str_replace("\n", "\r\n", $lf) . "# edited\r\n");
         self::assertSame(1, $tester->execute(['dir' => $target, '--check' => true]));
-        self::assertStringContainsString('changed  scripts/parity.ps1', $tester->getDisplay());
+        self::assertStringContainsString('changed  build.sh', $tester->getDisplay());
     }
 
     public function testCheckWithoutTheFlagExitsTwo(): void

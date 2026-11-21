@@ -7,6 +7,7 @@ namespace Waynestate\Sourdough\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
+use Waynestate\Sourdough\Generator\GeneratorSupport;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
@@ -19,16 +20,11 @@ use Waynestate\Sourdough\PlaybookMode;
  * with Parity, inside "Run it locally", beside the everyday bench.
  *
  * Parity is a separate install, so Sourdough bakes no parity.json: the
- * README names `parity init --from-squire`, which derives every setting
- * from the Squire kit the app ships (docker-compose.squire.yml and
- * .env.squire.example). This test holds the README to that command and the
- * kit to the files the command reads. The raw shapes add `--no-cron`,
- * because the kit's compose file mentions Laravel's scheduler and a raw app
- * has no artisan to run it. Squire's own scripts/parity.sh and parity.ps1
- * still ship with the kit, but the new section never sends anyone to them.
- *
- * Proofed for real on 2026-11-09 against Parity's main branch: init, check,
- * up and test on a raw and a Blade bake.
+ * README names `parity init --from-squire` once, then `parity up`,
+ * `parity test` and `parity down`. When the kit's local-running files left
+ * Squire (D-095), the section lost the commands that read them; this test
+ * holds the README to the four remaining commands and the bake to the
+ * absence of the five files it no longer ships.
  */
 final class ParityReadmeTest extends TestCase
 {
@@ -46,21 +42,21 @@ final class ParityReadmeTest extends TestCase
     }
 
     /**
-     * @return array<string, array{0: string, 1: bool}>
+     * @return array<string, array{0: string}>
      */
     public static function shapes(): array
     {
         return [
-            'raw' => ['raw', true],
-            'raw-vue' => ['raw-vue', true],
-            'laravel-blade' => ['laravel-blade', false],
-            'laravel-blade-vue' => ['laravel-blade-vue', false],
-            'laravel-inertia' => ['laravel-inertia', false],
+            'raw' => ['raw'],
+            'raw-vue' => ['raw-vue'],
+            'laravel-blade' => ['laravel-blade'],
+            'laravel-blade-vue' => ['laravel-blade-vue'],
+            'laravel-inertia' => ['laravel-inertia'],
         ];
     }
 
     #[DataProvider('shapes')]
-    public function testTheReadmeRunsTheAppLikeCitadelWithParity(string $shape, bool $raw): void
+    public function testTheReadmeRunsTheAppLikeCitadelWithParity(string $shape): void
     {
         $target = $this->bake($shape);
         $readme = (string) file_get_contents($target . '/README.md');
@@ -78,20 +74,18 @@ final class ParityReadmeTest extends TestCase
 
         self::assertSame(1, substr_count($readme, self::HEADING), 'one Parity section');
         self::assertStringContainsString('[Parity](https://git.wayne.edu/enterprise-apps/parity)', $section);
-        foreach (['parity check', 'parity up', 'parity test', 'parity image get', 'parity up --fallback'] as $command) {
+        foreach (['parity init --from-squire', 'parity up', 'parity test', 'parity down'] as $command) {
             self::assertStringContainsString($command, $section, $command);
         }
+        self::assertMatchesRegularExpression('/^parity init --from-squire$/m', $section, 'parity init runs as its own line');
         self::assertStringContainsString('separate install', $section, 'Parity is never a hard dependency');
 
-        $init = $raw ? 'parity init --from-squire --no-cron' : 'parity init --from-squire';
-        self::assertMatchesRegularExpression('/^' . preg_quote($init, '/') . '$/m', $section, $init);
-        if (!$raw) {
-            self::assertStringNotContainsString('--no-cron', $section, 'a Laravel shape keeps its scheduler entry');
+        // The kit's local-running files left Squire 0.12; the bake ships
+        // none of them, and the section never names them.
+        foreach (GeneratorSupport::NO_LONGER_SHIPPED as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
+            self::assertStringNotContainsString($path, $section, $path);
         }
-
-        // --from-squire reads these two files from the app's root.
-        self::assertFileExists($target . '/docker-compose.squire.yml');
-        self::assertFileExists($target . '/.env.squire.example');
         // Parity writes parity.json; Sourdough bakes none.
         self::assertFileDoesNotExist($target . '/parity.json');
 

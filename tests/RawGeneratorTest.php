@@ -6,6 +6,7 @@ namespace Waynestate\Sourdough\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Waynestate\Sourdough\Generator\GeneratorSupport;
 use Waynestate\Sourdough\Generator\RawGenerator;
 use Waynestate\Sourdough\Permutation;
 use Waynestate\Sourdough\PhpFloor;
@@ -347,16 +348,11 @@ final class RawGeneratorTest extends TestCase
             'build.sh',
             'deployments/001-first-release.sh',
             'scripts/release.sh',
-            'scripts/parity.sh',
-            'scripts/parity.ps1',
             'health.php',
             'public/up.php',
-            'docker-compose.squire.yml',
-            '.env.squire.example',
             '.squire/Dockerfile',
             '.squire/Dockerfile.dockerignore',
             '.squire/base-fallback.Dockerfile',
-            '.squire/haproxy.cfg',
             '.squire/php.ini',
             '.squire/vhost.conf',
             '.squire/fallback/citadel-apache-entrypoint',
@@ -390,7 +386,10 @@ final class RawGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/deployments/release.sh');
         self::assertFileDoesNotExist($target . '/deployments/release.ps1');
         self::assertFileExists($target . '/scripts/release.sh');
-        self::assertFileExists($target . '/scripts/parity.ps1');
+        // The kit's local-running files left Squire 0.12; the bake ships none.
+        foreach (GeneratorSupport::NO_LONGER_SHIPPED as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
+        }
     }
 
     public function testManifestListsSquireFilesAsManaged(): void
