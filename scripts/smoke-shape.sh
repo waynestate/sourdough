@@ -68,7 +68,7 @@ fi
 # The gate runs credential-free: drop anything the host leaked in.
 unset ORACLE_USERNAME ORACLE_PASSWORD ORACLE_TNS ORACLE_HOST ORACLE_PORT \
     ORACLE_SERVICE_NAME SESAME_CAS_BASE_URL SESAME_CAS_SERVICE_URL \
-    SESAME_FAKE_USERNAME APP_KEY COMPOSER_AUTH
+    SESAME_FAKE_USERNAME SESAME_FAKE_ALLOWED APP_KEY COMPOSER_AUTH
 
 for tool in php composer tar curl git; do
     if ! command -v "$tool" >/dev/null 2>&1; then
@@ -317,6 +317,9 @@ has() {
 laravel_setup() {
     step "composer install" composer install --no-interaction --no-progress
     step "cp .env.example .env" cp .env.example .env
+    # .env.example ships the fake driver's lines commented out, so write
+    # them in: the checks that follow sign in with the fake driver.
+    step "ask the .env for the fake driver" sh -c 'printf "SESAME_DRIVER=fake\nSESAME_FAKE_ALLOWED=true\n" >> .env'
     step "php artisan key:generate" php artisan key:generate
 }
 
@@ -364,7 +367,7 @@ case "$shape" in
         step "fetch WayneUI" curl -fsSL -o public/wayne-ui.php "$wayne_url"
 
         # Absolute docroot: the gate's own cwd is not the app dir.
-        start_server "raw server" env APP_ENV=local php -S "127.0.0.1:$port" -t "$dir/public"
+        start_server "raw server" env APP_ENV=local SESAME_FAKE_ALLOWED=true php -S "127.0.0.1:$port" -t "$dir/public"
         check_http "raw GET / answers 200 with the app's home page" / 200 'app is running.'
         check_http "raw GET / wears WayneUI's shell" / 200 'wsu-'
         check_http "raw GET /nope answers 404" /nope 404
@@ -382,7 +385,7 @@ case "$shape" in
         # Live check, as for raw: APP_ENV=local so SESAME uses its fake
         # driver. The page must load the built Vue app, and /api/me must
         # answer JSON on the session the page started (401 without one).
-        start_server "raw-vue server" env APP_ENV=local php -S "127.0.0.1:$port" -t "$dir/public"
+        start_server "raw-vue server" env APP_ENV=local SESAME_FAKE_ALLOWED=true php -S "127.0.0.1:$port" -t "$dir/public"
         check_http "raw-vue GET /api/me without a session answers 401" /api/me 401 '"message"'
         check_http "raw-vue GET / answers 200 and loads the built app" / 200 'src="/build/assets/'
         check_http "raw-vue GET / mounts the Vue app" / 200 'id="app"'

@@ -20,8 +20,9 @@ php artisan migrate
 php artisan serve
 ```
 
-Open http://localhost:8000. Locally the app signs in with SESAME's fake
-driver (`SESAME_DRIVER=fake`).
+Open http://localhost:8000. To sign in locally, set three values in `.env`:
+`APP_ENV=local`, `SESAME_DRIVER=fake` and `SESAME_FAKE_ALLOWED=true` (the
+example ships them commented out on purpose).
 
 ### Run it like Citadel
 
@@ -128,9 +129,11 @@ A starter this well guarded still needs someone to lock the bakery at night.
 
 ## Sign-in
 
-The app signs in with SESAME through the Laravel adapter. In development
-it uses the fake driver; in production it uses the cas driver. The cas
-driver needs two variables.
+The app signs in with SESAME through the Laravel adapter. To sign in
+locally, set three values in `.env`: `APP_ENV=local`, `SESAME_DRIVER=fake`
+and `SESAME_FAKE_ALLOWED=true` (the example ships them commented out on
+purpose); in production it uses the cas driver. The cas driver needs two
+variables.
 
 - `SESAME_CAS_BASE_URL`: the CAS server URL.
 - `SESAME_CAS_SERVICE_URL`: this app's public URL. It is the URL the CAS

@@ -104,7 +104,7 @@ sourdough new my-app --inertia
 - Inertia 3 on both sides: `inertiajs/inertia-laravel` `^3.0` and `@inertiajs/vue3` `^3.0`. The root view marks its `<title>` with `data-inertia`, Inertia hands the first page to Vue in a `<script type="application/json">` element (data, not code, so HELMET's CSP has nothing to admit), and no Axios: the pages talk through Inertia's own client. Add `axios` to `package.json` only when your own code imports it. `resources/js/app.ts` hands HELMET's per-request nonce (read from the pre-paint script) to Inertia's `nonce` option, so the progress bar's injected styles pass the CSP.
 - Ships `AppServiceProvider` (string length 191 for Citadel's MySQL 5.6) and a `tests/TestCase.php` that writes a stub Vite manifest, so view tests boot without a build.
 - The `.gitlab-ci.yml` carries the `ziggy` job: it regenerates `resources/js/ziggy.*` and fails on any diff, so the route list that ships inside the Vite bundle always matches the routes.
-- The overlay allows `phpstan/extension-installer`; the appended SESAME and HELMET env keys ship commented out (except `SESAME_DRIVER=fake`) so package defaults hold instead of being overridden by empty values. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe`, so the fake driver has a non-empty username.
+- The overlay allows `phpstan/extension-installer`; the appended SESAME and HELMET env keys all ship commented out so package defaults hold instead of being overridden by empty values. `config/sesame.php` defaults `SESAME_FAKE_USERNAME` to `jane.doe`, so the fake driver has a non-empty username.
 - Next steps: the Laravel + Blade steps plus `npm install` and `npm run build`.
 
 ## Shared wiring in every app

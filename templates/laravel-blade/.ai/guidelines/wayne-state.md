@@ -2,7 +2,7 @@
 
 This app was baked by Sourdough from the Wayne State app stack (Laravel with Blade views). These conventions hold on top of Laravel's own.
 
-- Sign-in is SESAME. It registers `/login` and `/logout`, and the `auth.sesame` middleware protects a route; locally it runs the fake driver (`SESAME_DRIVER=fake`). Never add Laravel's own auth routes, Fortify or Breeze.
+- Sign-in is SESAME. It registers `/login` and `/logout`, and the `auth.sesame` middleware protects a route; locally it runs the fake driver (`SESAME_DRIVER=fake` and `SESAME_FAKE_ALLOWED=true` with `APP_ENV=local`). Never add Laravel's own auth routes, Fortify or Breeze.
 - WayneUI draws the interface: views use its `wsu-` classes, and `resources/views/layouts/app.blade.php` loads its stylesheet and theme script. There is no Tailwind.
 - HELMET sets the security headers, the CSP nonce and the trusted proxies (`HELMET_PRESET`, `HELMET_PROXIES`), and answers `/up` without touching the database. Never paste `trustProxies(at: '*')`.
 - Call `env()` only inside `config/*.php`: after `config:cache` it returns null anywhere else.

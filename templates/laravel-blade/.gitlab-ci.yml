@@ -156,6 +156,17 @@ a11y-pages:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - cp .env.example .env
+    # .env.example ships safe for a server, so ask for the local sign-in
+    # this job needs.
+    - |
+      setenv() {
+        if grep -q "^$1=" .env; then sed -i "s|^$1=.*|$1=$2|" .env
+        elif grep -q "^#[[:space:]]*$1=[^[:space:],]*$" .env; then sed -i "s|^#[[:space:]]*$1=[^[:space:],]*$|$1=$2|" .env
+        else echo "$1=$2" >> .env; fi
+      }
+      setenv APP_ENV local
+      setenv SESAME_DRIVER fake
+      setenv SESAME_FAKE_ALLOWED true
     - php artisan key:generate --no-interaction
     - touch database/database.sqlite
     - php artisan migrate --force --no-interaction
