@@ -232,7 +232,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
             "detail": "yours, as in every Sourdough app"
         },
         {
-            "path": ".env.squire.example",
+            "path": "build.sh",
             "status": "match",
             "detail": "same as the template: Sourdough keeps it current"
         },
@@ -247,7 +247,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
     "shape": "raw",
     "sourdough_version": "0.5.0",
     "summary": {
-        "match": 38,
+        "match": 33,
         "missing": 1,
         "seeded": 2,
         "yours": 0
@@ -255,7 +255,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
 }
 ```
 
-(`files` is cut to three of its 41 entries here: a raw app that lacks `phpstan.neon`, on a dry run.) A refusal with `--json` prints its message to stderr and no JSON, as `feed` does.
+(`files` is cut to three of its 36 entries here: a raw app that lacks `phpstan.neon`, on a dry run.) A refusal with `--json` prints its message to stderr and no JSON, as `feed` does.
 
 ### Environment
 
