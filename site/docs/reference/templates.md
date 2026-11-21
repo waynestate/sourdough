@@ -80,7 +80,7 @@ sourdough new my-app --inertia
 - `phpunit.xml.dist` fails the run on any PHP or PHPUnit deprecation and names the test that raised it (`failOnDeprecation`, `failOnPhpunitDeprecation`), counting the app's own code (`src/`, `public/`, not the fetched `public/wayne-ui.php`) and skipping indirect deprecations, the ones one package raises because of another.
 - Ships `stubs/wayne-ui.php`, a static-analysis stub for the run-time WayneUI functions (`wsu_shell_start`, `wsu_shell_end`) that `phpstan.neon` scans through `scanFiles`, so `composer ci` in a freshly baked raw app no longer fails with function-not-found errors for functions that arrive only with the fetched `public/wayne-ui.php`.
 - The front controller answers `404` for any path but `/` (a short not-found page that keeps WayneUI's layout and links home) instead of rendering the home page for every URL; `/up` stays HELMET's and answers first.
-- Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `scripts/parity.sh`, `scripts/parity.ps1`, `health.php`, `public/up.php`, `docker-compose.squire.yml`, `.env.squire.example`, and the `.squire/` build context.
+- Installs Squire's deploy files from `templates/squire/`: `build.sh`, `deployments/001-first-release.sh`, `scripts/release.sh`, `health.php`, `public/up.php`, and the `.squire/` build context.
 - Oracle: raw PHP apps run queries through the `App\Oracle` helper, which takes values only as binds and answers mistakes with plain sentences.
 
 ### raw-vue/ [#](https://sourdough.apps.wayne.edu/docs/reference/templates.html#raw-vue)

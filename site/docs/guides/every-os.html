@@ -48,7 +48,7 @@
 <h2 id="native-paths-for-each-os">Native paths for each <span class="docs-heading-tail"><span>OS</span><a class="docs-heading-link" aria-label="Link to this section" href="#native-paths-for-each-os">#</a></span></h2>
 <p>Windows gets PowerShell (<code>.ps1</code>), which never needs bash or WSL. Linux and macOS get bash (<code>.sh</code>), written for macOS's stock bash 3.2 and BSD tools. Laravel's own install page gives Windows users <code>Set-ExecutionPolicy Bypass -Scope Process -Force</code> followed by downloading a script and passing it to <code>iex</code>; that is a pattern WSU docs should not copy.</p>
 <h3 id="when-windows-will-not-run-a-script">When Windows will not run a <span class="docs-heading-tail"><span>script</span><a class="docs-heading-link" aria-label="Link to this section" href="#when-windows-will-not-run-a-script">#</a></span></h3>
-<p>PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is <code>Restricted</code>: PowerShell runs commands you type but no script files at all, so <code>scripts\parity.ps1</code> in your own app fails with &quot;running scripts is disabled on this system&quot;. See what is set, scope by scope:</p>
+<p>PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is <code>Restricted</code>: PowerShell runs commands you type but no script files at all, so <code>scripts\your-script.ps1</code> in your own app fails with &quot;running scripts is disabled on this system&quot;. See what is set, scope by scope:</p>
 <pre tabindex="0"><code>Get-ExecutionPolicy -List
 </code></pre>
 <p>If every scope says <code>Undefined</code>, set <code>RemoteSigned</code> for your own account. It needs no administrator and changes nothing for anyone else:</p>
@@ -58,7 +58,7 @@
 <pre tabindex="0"><code>Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
 </code></pre>
 <p>To run one script without changing any setting, start it in a PowerShell of its own, for that run only:</p>
-<pre tabindex="0"><code>powershell -ExecutionPolicy RemoteSigned -File scripts\parity.ps1
+<pre tabindex="0"><code>powershell -ExecutionPolicy RemoteSigned -File scripts\your-script.ps1
 </code></pre>
 <p>If <code>MachinePolicy</code> or <code>UserPolicy</code> shows a value, Group Policy set it and it beats every command above: ask whoever manages the computer. Never answer a blocked script with <code>Bypass</code> for a script you have not read.</p>
 <h2 id="subprocesses-as-argument-arrays">Subprocesses as argument <span class="docs-heading-tail"><span>arrays</span><a class="docs-heading-link" aria-label="Link to this section" href="#subprocesses-as-argument-arrays">#</a></span></h2>

@@ -24,7 +24,7 @@ Windows gets PowerShell (`.ps1`), which never needs bash or WSL. Linux and macOS
 
 ### When Windows will not run a script [#](https://sourdough.apps.wayne.edu/docs/guides/every-os.html#when-windows-will-not-run-a-script)
 
-PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is `Restricted`: PowerShell runs commands you type but no script files at all, so `scripts\parity.ps1` in your own app fails with "running scripts is disabled on this system". See what is set, scope by scope:
+PowerShell's execution policy decides which script files it runs. Microsoft calls it defense in depth, not a security boundary. On a Windows client where nobody has set a policy, the effective policy is `Restricted`: PowerShell runs commands you type but no script files at all, so `scripts\your-script.ps1` in your own app fails with "running scripts is disabled on this system". See what is set, scope by scope:
 
 ```
 Get-ExecutionPolicy -List
@@ -45,7 +45,7 @@ Get-ChildItem -Recurse -Filter *.ps1 | Unblock-File
 To run one script without changing any setting, start it in a PowerShell of its own, for that run only:
 
 ```
-powershell -ExecutionPolicy RemoteSigned -File scripts\parity.ps1
+powershell -ExecutionPolicy RemoteSigned -File scripts\your-script.ps1
 ```
 
 If `MachinePolicy` or `UserPolicy` shows a value, Group Policy set it and it beats every command above: ask whoever manages the computer. Never answer a blocked script with `Bypass` for a script you have not read.

@@ -558,7 +558,7 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
             &quot;detail&quot;: &quot;yours, as in every Sourdough app&quot;
         },
         {
-            &quot;path&quot;: &quot;.env.squire.example&quot;,
+            &quot;path&quot;: &quot;build.sh&quot;,
             &quot;status&quot;: &quot;match&quot;,
             &quot;detail&quot;: &quot;same as the template: Sourdough keeps it current&quot;
         },
@@ -573,14 +573,14 @@ Support:     supported, owned by Sourdough maintainers; Laravel 13 gets security
     &quot;shape&quot;: &quot;raw&quot;,
     &quot;sourdough_version&quot;: &quot;0.5.1&quot;,
     &quot;summary&quot;: {
-        &quot;match&quot;: 38,
+        &quot;match&quot;: 33,
         &quot;missing&quot;: 1,
         &quot;seeded&quot;: 2,
         &quot;yours&quot;: 0
     }
 }
 </code></pre>
-<p>(<code>files</code> is cut to three of its 41 entries here: a raw app that lacks <code>phpstan.neon</code>, on a dry run.) A refusal with <code>--json</code> prints its message to stderr and no JSON, as <code>feed</code> does.</p>
+<p>(<code>files</code> is cut to three of its 36 entries here: a raw app that lacks <code>phpstan.neon</code>, on a dry run.) A refusal with <code>--json</code> prints its message to stderr and no JSON, as <code>feed</code> does.</p>
 <h3 id="environment-1"><span class="docs-heading-tail"><span>Environment</span><a class="docs-heading-link" aria-label="Link to this section" href="#environment-1">#</a></span></h3>
 <ul>
 <li><code>SOURDOUGH_GIT</code>: the git binary to run (default: <code>git</code> on PATH).</li>

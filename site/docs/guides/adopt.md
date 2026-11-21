@@ -88,39 +88,37 @@ Here is a small, older raw PHP app, `parking-permits`, with a hand-built `public
 ```
 $ sourdough adopt --shape raw
 Adopting "parking-permits" as a raw app (Raw PHP with WayneUI's standalone path) with Sourdough 0.5.1.
-Compared your app with a fresh raw bake: 41 template files.
+Compared your app with a fresh raw bake: 36 template files.
 
   yours    composer.json              differs from the template: yours, never overwritten
   yours    public/.htaccess           differs from the template: yours, never overwritten
   yours    public/index.php           differs; the template writes the app name here as "parking-permits", and your file does not have it: if the app goes by another name, delete .sourdough/ and adopt again with --name
   seeded   README.md                  yours, as in every Sourdough app
   missing  .env.example               the next sourdough feed adds it
-  missing  .env.squire.example        the next sourdough feed adds it
   missing  .gitattributes             the next sourdough feed adds it
   missing  .gitignore                 the next sourdough feed adds it
   missing  .gitlab-ci.yml             the next sourdough feed adds it
-  missing  .squire/ (15 files)        the next sourdough feed adds them
+  missing  .squire/ (14 files)        the next sourdough feed adds them
   missing  build.sh                   the next sourdough feed adds it
   missing  deployments/ (1 file)      the next sourdough feed adds it
-  missing  docker-compose.squire.yml  the next sourdough feed adds it
   missing  health.php                 the next sourdough feed adds it
   missing  oracle-check.php           the next sourdough feed adds it
   missing  phpstan.neon               the next sourdough feed adds it
   missing  phpunit.xml.dist           the next sourdough feed adds it
   missing  pint.json                  the next sourdough feed adds it
   missing  public/up.php              the next sourdough feed adds it
-  missing  scripts/ (3 files)         the next sourdough feed adds them
+  missing  scripts/ (1 file)          the next sourdough feed adds it
   missing  src/ (2 files)             the next sourdough feed adds them
   missing  stubs/ (1 file)            the next sourdough feed adds it
   missing  tests/ (2 files)           the next sourdough feed adds them
 
-Adopted: 0 match, 3 yours, 1 seeded, 37 missing. Wrote .sourdough/manifest.json.
+Adopted: 0 match, 3 yours, 1 seeded, 32 missing. Wrote .sourdough/manifest.json.
 Files the template does not ship are not recorded: Sourdough never reads or touches them.
 Next: git add .sourdough && git commit -m "Adopt with Sourdough 0.5.1"
-      then sourdough feed --dry-run lists the 37 files the first feed adds.
+      then sourdough feed --dry-run lists the 32 files the first feed adds.
 ```
 
-Only one file carries the name hint here, and it takes two for the note: a hand-built `index.php` simply never had the name in it. Every template path gets one status. The report lists `yours` first, then `seeded`, then `missing`; `match` lines show only with `-v`. A top-level folder whose every template file is missing folds into one line (`.squire/ (15 files)`); `-v` lists each file.
+Only one file carries the name hint here, and it takes two for the note: a hand-built `index.php` simply never had the name in it. Every template path gets one status. The report lists `yours` first, then `seeded`, then `missing`; `match` lines show only with `-v`. A top-level folder whose every template file is missing folds into one line (`.squire/ (14 files)`); `-v` lists each file.
 
 | Status | When | Recorded as | What feed does with it |
 | --- | --- | --- | --- |
