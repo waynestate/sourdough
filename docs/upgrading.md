@@ -31,6 +31,18 @@ Sourdough 0.5.0
 
 Then read the section for the version you are moving to.
 
+## 0.5.1 (2026-11-21)
+
+A patch on 0.5.0: the Squire deploy kit moves to 0.12.0.
+
+**What `sourdough feed` brings an app baked with 0.5.0:** The Squire 0.12.0 deploy kit (was 0.11.1): the parity scripts and the `parity` group are gone; `feed` removes the files the old kit wrote that the new kit no longer carries only if you have not edited them.
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** `sourdough feed --dry-run`, then `sourdough feed`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.5.1`.
+
 ## 0.5.0 (2026-11-19)
 
 A minor on 0.4.2: `sourdough check [dir] [--json]` joins the CLI, the baker's poke test that says in one read-only run whether an app is fed and still supported (exit `0` fed and supported, `1` needs attention, `2` tool error; it writes nothing and needs no clean tree), and the templates move their pins and their deploy kit. Feed brings those moves into an app you already baked; the seeded files stay yours.

@@ -6,6 +6,15 @@ Versioning once 1.0 is out.
 ## Unreleased
 
 - Removed: the Squire parity kit's local-running files from generated apps and deploy/ (D-095); requires Squire ^0.12.
+## 0.5.1 (2026-11-21)
+
+### Changed
+
+- Changed: the deploy kit is Squire 0.12.0 (was 0.11.1): the parity scripts and the parity group leave the kit, so a generated app no longer carries them; the fallback cache fix and the PHP 8.6r1 line come with it, and `waynestate/squire` is `^0.12` as a dev dependency.
+- Docs: the Squire copy docs name the `^0.12` dev dependency.
+### Added
+
+- Added: an update notice. After any command finishes, Sourdough checks Packagist at most once a day for a newer stable release and, when there is one, prints one line on stderr with the command that updates this install: `git pull` for a source checkout, `composer global update waynestate/sourdough` for a Composer global install (and a PHAR copy; Sourdough ships no PHAR), and `composer update waynestate/sourdough` for a project dependency, or a `composer require waynestate/sourdough:^X.Y` of the newest major.minor when the project's `^` or `~` pin excludes it (`--dev` when the pin sits in `require-dev`). A higher major appends a link to the upgrading notes. The check never writes to stdout, never changes the exit code, and stays silent under CI, with `WAYNE_NO_UPDATE_CHECK=1`, or with `--quiet`; its result is cached in the user cache directory. `tests/Update/UpdateNoticeTest.php` covers it.
 
 ## 0.5.0 (2026-11-19)
 

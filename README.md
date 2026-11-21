@@ -20,7 +20,7 @@ A starter you feed: `sourdough new` makes a Wayne State app with the stack alrea
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
-Status: 0.5.0 (2026-11-19), MIT license: Pinstripe 0.4 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](CHANGELOG.md); what a feed brings is in [Upgrading](docs/upgrading.md).
+Status: 0.5.1 (2026-11-21), MIT license: Pinstripe 0.4 in every shape (an app that joins SQL from strings fails PHPStan until it binds values instead), Pint's findings in the merge request widget on the Laravel shapes, a "Run it like Citadel" README section in every shape for [Parity](https://git.wayne.edu/enterprise-apps/parity), and `sourdough adopt` for apps Sourdough did not make. What changed is in the [changelog](CHANGELOG.md); what a feed brings is in [Upgrading](docs/upgrading.md).
 
 Every loaf gets proofed before it ships.
 
@@ -53,6 +53,8 @@ composer global require waynestate/sourdough
 After `composer global require`, the `sourdough` command lives in `composer global config bin-dir --absolute`; put that directory on your PATH.
 
 Or scaffold without installing, with `composer create-project waynestate/sourdough`.
+
+After a command finishes, Sourdough checks Packagist at most once a day for a newer stable release and, when there is one, prints one line on stderr with the command that updates this install. The check never writes to stdout, never changes the exit code, and stays silent under CI, with `WAYNE_NO_UPDATE_CHECK=1`, or with `--quiet`.
 
 ## Usage
 
@@ -224,7 +226,7 @@ The deploy files in your app (`build.sh`, `scripts/release.sh`, the `.squire/` c
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.5.0"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.5.1"
 sourdough feed --dry-run
 ```
 

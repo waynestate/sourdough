@@ -94,6 +94,18 @@ final class GeneratorSupportTest extends TestCase
         ] as $path) {
             self::assertSame(0, fileperms($target . '/' . $path) & 0111, $path . ' should not be executable');
         }
+
+        // The 0.12.0 kit no longer ships the parity scripts, the compose
+        // file or the env example; Parity reads the app itself now.
+        foreach ([
+            'scripts/parity.sh',
+            'scripts/parity.ps1',
+            'docker-compose.squire.yml',
+            '.env.squire.example',
+            '.squire/haproxy.cfg',
+        ] as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
+        }
     }
 
     public function testInstallsTheVueNpmrcWhenTheTargetHasNone(): void
