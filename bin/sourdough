@@ -9,6 +9,10 @@ use Waynestate\Sourdough\Command\CheckCommand;
 use Waynestate\Sourdough\Command\FeedCommand;
 use Waynestate\Sourdough\Command\ManifestCommand;
 use Waynestate\Sourdough\Command\NewCommand;
+use Waynestate\Sourdough\Update\InstallKind;
+use Waynestate\Sourdough\Update\PackagistFetcher;
+use Waynestate\Sourdough\Update\UpdateCache;
+use Waynestate\Sourdough\Update\UpdateNotice;
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_file($autoload)) {
@@ -23,7 +27,9 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$application = new class ('Sourdough', '0.5.1') extends Application {
+$version = '0.5.1';
+
+$application = new class ('Sourdough', $version) extends Application {
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $name = $this->getCommandName($input);
@@ -42,4 +48,26 @@ $application->addCommand(new AdoptCommand());
 $application->addCommand(new FeedCommand());
 $application->addCommand(new CheckCommand());
 
-exit($application->run());
+// After any command finishes, one line on stderr when a newer stable
+// release exists. The check never throws, never writes to stdout and
+// never changes the exit code; the running version is the one handed to
+// the Application constructor above. Symfony Console 7 ships no event
+// dispatcher with the application (and none is installed), so the check
+// runs right after run() returns instead of on a TERMINATE event: same
+// moment, same line, same exit code.
+$packageRoot = dirname(__DIR__);
+$notice = new UpdateNotice(
+    'sourdough',
+    $packageRoot,
+    InstallKind::detect($packageRoot, getenv() ?: []),
+    new UpdateCache('sourdough'),
+    new PackagistFetcher(),
+    static fn (): int => time(),
+);
+/** @var list<string> $argv */
+$argv = $GLOBALS['argv'] ?? [];
+$application->setAutoExit(false);
+$exit = $application->run();
+$notice->run(getenv() ?: [], $argv, $version, STDERR);
+
+exit($exit);

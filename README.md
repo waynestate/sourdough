@@ -54,6 +54,8 @@ After `composer global require`, the `sourdough` command lives in `composer glob
 
 Or scaffold without installing, with `composer create-project waynestate/sourdough`.
 
+After a command finishes, Sourdough checks Packagist at most once a day for a newer stable release and, when there is one, prints one line on stderr with the command that updates this install. The check never writes to stdout, never changes the exit code, and stays silent under CI, with `WAYNE_NO_UPDATE_CHECK=1`, or with `--quiet`.
+
 ## Usage
 
 ```
