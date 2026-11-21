@@ -14,6 +14,7 @@ Versioning once 1.0 is out.
 
 - Removed: the Squire parity kit's local-running files from generated apps and deploy/ (D-095); requires Squire ^0.12.
 - Docs: the README's deploy-files paragraph names Squire 0.12.0's kit and matches the copy in `templates/squire/`.
+- Docs: SECURITY.md says how to report a vulnerability privately.
 
 ## 0.5.1 (2026-11-21)
 
