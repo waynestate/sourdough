@@ -175,6 +175,7 @@ final class RawGeneratorTest extends TestCase
         self::assertStringContainsString("'driver' => 'fake'", $index);
         self::assertStringContainsString("'environment' => \$appEnv", $index);
         self::assertStringContainsString("'fake' => [", $index);
+        self::assertStringContainsString("'allowed' => 'true' === strtolower((string) getenv('SESAME_FAKE_ALLOWED'))", $index);
         self::assertStringContainsString("'username' => 'jdoe'", $index);
         self::assertStringContainsString("'attributes' => ['cn' => ['John Doe']]", $index);
         self::assertStringContainsString('Config::fromArray(', $index);

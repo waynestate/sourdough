@@ -166,8 +166,10 @@ final class LaravelInertiaGeneratorTest extends TestCase
         // the app name)...
         self::assertStringContainsString('APP_ENV=local', $env);
         // ...and the stack's keys are appended, with the fake driver for
-        // local work...
-        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
+        // local work commented out until a place asks for it on purpose...
+        self::assertStringContainsString('# SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_FAKE_ALLOWED=true', $env);
+        self::assertStringNotContainsString("\nSESAME_DRIVER=fake", $env);
         self::assertStringContainsString('HELMET_PRESET=', $env);
         // ...and Vite gets the app name from the same variable.
         self::assertStringContainsString('VITE_APP_NAME="${APP_NAME}"', $env);

@@ -3,7 +3,13 @@
 # out; uncomment one to override its default.
 #
 # SESAME (config/sesame.php)
-SESAME_DRIVER=fake
+# SESAME owns sign-in. The "fake" driver signs in without an identity
+# provider, for local work only: it needs APP_ENV=local and
+# SESAME_FAKE_ALLOWED=true, and refuses to boot otherwise. A server sets
+# SESAME_DRIVER=cas plus SESAME_CAS_BASE_URL; with no SESAME_DRIVER set,
+# config/sesame.php falls back to cas.
+# SESAME_DRIVER=fake
+# SESAME_FAKE_ALLOWED=true
 # SESAME_CAS_BASE_URL=
 # SESAME_CAS_SERVICE_URL=
 # SESAME_CAS_PROTOCOL=2.0

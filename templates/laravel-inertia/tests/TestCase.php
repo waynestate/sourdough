@@ -36,6 +36,7 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set([
             'app.url' => 'http://localhost',
             'sesame.driver' => 'fake',
+            'sesame.fake.allowed' => true,
             'helmet.proxies' => null,
         ]);
 

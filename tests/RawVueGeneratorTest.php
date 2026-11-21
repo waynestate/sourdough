@@ -67,6 +67,7 @@ final class RawVueGeneratorTest extends TestCase
         self::assertStringContainsString("'driver' => 'fake'", $index);
         self::assertStringContainsString("'driver' => 'cas'", $index);
         self::assertStringContainsString('SESAME_CAS_URL', $index);
+        self::assertStringContainsString("'allowed' => 'true' === strtolower((string) getenv('SESAME_FAKE_ALLOWED'))", $index);
 
         // The Vite dev server joins the CSP only through the helper, and
         // production never asks it.

@@ -101,12 +101,16 @@ if ($appEnv === 'production') {
     ];
 } else {
     // Local development signs in with the fake driver. It refuses to boot
-    // when the environment is production, so this is the only place a dev
-    // identity can exist.
+    // when the environment is production, and it also needs
+    // SESAME_FAKE_ALLOWED=true: it refuses to boot without that too, so a
+    // server that lost its SESAME_CAS_* settings still cannot sign anyone
+    // in as a dev identity. This is the only place a dev identity can
+    // exist.
     $sesameConfig = [
         'driver' => 'fake',
         'environment' => $appEnv,
         'fake' => [
+            'allowed' => 'true' === strtolower((string) getenv('SESAME_FAKE_ALLOWED')),
             'username' => 'jdoe',
             'attributes' => ['cn' => ['John Doe']],
         ],

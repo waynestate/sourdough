@@ -31,6 +31,7 @@ final class InertiaTestEnvIsolationTemplateTest extends TestCase
         foreach ([
             "'app.url' => 'http://localhost'",
             "'sesame.driver' => 'fake'",
+            "'sesame.fake.allowed' => true",
             "'helmet.proxies' => null",
         ] as $pin) {
             $position = strpos($source, $pin, $bootstrap);
