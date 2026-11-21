@@ -276,7 +276,9 @@ final class DockerScaffoldTest extends TestCase
         self::assertStringNotContainsString('# DB_HOST=127.0.0.1', $env);
         // ...the other lines stay untouched...
         self::assertStringContainsString('APP_ENV=local', $env);
-        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_FAKE_ALLOWED=true', $env);
+        self::assertStringNotContainsString("\nSESAME_DRIVER=fake", $env);
         // ...and the remaining keys land with their values.
         foreach ([
             'DB_PORT=3306',
@@ -415,7 +417,8 @@ APP_ENV=local
 APP_NAME="Test App"
 DB_CONNECTION=sqlite
 # DB_HOST=127.0.0.1
-SESAME_DRIVER=fake
+# SESAME_DRIVER=fake
+# SESAME_FAKE_ALLOWED=true
 ENV,
         );
 

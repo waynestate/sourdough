@@ -247,8 +247,10 @@ final class LaravelBladeGeneratorTest extends TestCase
         // the app name)...
         self::assertStringContainsString('APP_ENV=local', $env);
         // ...and the stack's keys are appended, with the fake driver for
-        // local work.
-        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
+        // local work commented out until a place asks for it on purpose.
+        self::assertStringContainsString('# SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_FAKE_ALLOWED=true', $env);
+        self::assertStringNotContainsString("\nSESAME_DRIVER=fake", $env);
         self::assertStringContainsString('# SESAME_CAS_BASE_URL=', $env);
         self::assertStringContainsString('# HELMET_PRESET=', $env);
         self::assertStringContainsString('# HELMET_PROXIES=', $env);
@@ -298,7 +300,8 @@ final class LaravelBladeGeneratorTest extends TestCase
      * An empty KEY= line overrides the package default with an empty string
      * (env() returns "", not null), which is how the smoke run lost its fake
      * user, session limits and login routes. So every SESAME_ and HELMET_
-     * key ships commented out; only the fake driver is set.
+     * key ships commented out, the fake driver lines among them; a place
+     * that wants the fake driver asks for it on purpose.
      */
     public function testShipsNoUncommentedEmptySesameOrHelmetKeys(): void
     {
@@ -311,7 +314,9 @@ final class LaravelBladeGeneratorTest extends TestCase
             }
         }
 
-        self::assertStringContainsString('SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_DRIVER=fake', $env);
+        self::assertStringContainsString('# SESAME_FAKE_ALLOWED=true', $env);
+        self::assertStringNotContainsString("\nSESAME_DRIVER=fake", $env);
     }
 
     /**
