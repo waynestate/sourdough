@@ -55,17 +55,17 @@ refuses to run without it):
 
 ```bash
 parity check
-parity init --from-squire --no-cron
+parity init --no-cron
 parity up
 parity test
 ```
 
-`parity init --from-squire` reads this app's Squire kit
-(`docker-compose.squire.yml` and `.env.squire.example`), never a password,
-and writes `parity.json`, the app's Citadel settings; commit it.
-`--no-cron` leaves out the Laravel scheduler entry Parity would offer:
-this app has no `artisan`. No Citadel image here yet? `parity image get`
-fetches it, or `parity up --fallback` runs a labeled stand-in.
+`parity init` reads the app's folder (its `composer.json`, public
+directory and routes) and writes `parity.json`, the app's Citadel
+settings; commit it. `--no-cron` leaves out the Laravel scheduler entry
+Parity would offer: this app has no `artisan`. No Citadel image here yet?
+`parity image get` fetches it, or `parity up --fallback` runs a labeled
+stand-in.
 
 Citadel sets no `APP_ENV`, so the front controller boots as production
 there and under Parity alike: `/up` answers `ok`, but a page comes back

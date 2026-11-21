@@ -335,11 +335,7 @@ final class LaravelBladeGeneratorTest extends TestCase
             'build.sh',
             'deployments/001-first-release.sh',
             'scripts/release.sh',
-            'scripts/parity.sh',
-            'scripts/parity.ps1',
             'health.php',
-            'docker-compose.squire.yml',
-            '.env.squire.example',
             '.squire/Dockerfile',
             '.squire/php.ini',
             '.squire/vhost.conf',
@@ -350,6 +346,18 @@ final class LaravelBladeGeneratorTest extends TestCase
             '.squire/portable/vhost.conf',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
+        }
+
+        // The 0.12.0 kit no longer ships the parity scripts, the compose
+        // file or the env example; Parity reads the app itself now.
+        foreach ([
+            'scripts/parity.sh',
+            'scripts/parity.ps1',
+            'docker-compose.squire.yml',
+            '.env.squire.example',
+            '.squire/haproxy.cfg',
+        ] as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
         }
     }
 

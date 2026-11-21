@@ -50,16 +50,16 @@ gone and the pages load built assets, as on Citadel. With `.env` and its
 
 ```bash
 parity check
-parity init --from-squire
+parity init
 parity up
 parity shell --user citadel php artisan migrate
 parity shell --user citadel php artisan optimize
 parity test
 ```
 
-`parity init --from-squire` reads this app's Squire kit
-(`docker-compose.squire.yml` and `.env.squire.example`), never a password,
-and writes `parity.json`, the app's Citadel settings; commit it. The first
+`parity init` reads the app's folder (its `composer.json`, public
+directory and routes) and writes `parity.json`, the app's Citadel
+settings; commit it. The first
 `parity up` runs `scripts/release.sh` inside Citadel's image, as Citadel's
 first deployment does: Composer, the front-end build, the migrations and
 `optimize`. That takes a few minutes; if Parity stops waiting for the

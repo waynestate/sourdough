@@ -73,7 +73,6 @@ final class GeneratorSupportTest extends TestCase
             'build.sh',
             'deployments/001-first-release.sh',
             'scripts/release.sh',
-            'scripts/parity.sh',
             '.squire/fallback/citadel-apache-entrypoint',
             '.squire/fallback/citadel-deploy',
         ] as $path) {
@@ -82,12 +81,21 @@ final class GeneratorSupportTest extends TestCase
 
         foreach ([
             'health.php',
-            'docker-compose.squire.yml',
-            '.env.squire.example',
-            'scripts/parity.ps1',
             '.squire/Dockerfile',
         ] as $path) {
             self::assertSame(0, fileperms($target . '/' . $path) & 0111, $path . ' should not be executable');
+        }
+
+        // The 0.12.0 kit no longer ships the parity scripts, the compose
+        // file or the env example; Parity reads the app itself now.
+        foreach ([
+            'scripts/parity.sh',
+            'scripts/parity.ps1',
+            'docker-compose.squire.yml',
+            '.env.squire.example',
+            '.squire/haproxy.cfg',
+        ] as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
         }
     }
 

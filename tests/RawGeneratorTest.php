@@ -347,16 +347,11 @@ final class RawGeneratorTest extends TestCase
             'build.sh',
             'deployments/001-first-release.sh',
             'scripts/release.sh',
-            'scripts/parity.sh',
-            'scripts/parity.ps1',
             'health.php',
             'public/up.php',
-            'docker-compose.squire.yml',
-            '.env.squire.example',
             '.squire/Dockerfile',
             '.squire/Dockerfile.dockerignore',
             '.squire/base-fallback.Dockerfile',
-            '.squire/haproxy.cfg',
             '.squire/php.ini',
             '.squire/vhost.conf',
             '.squire/fallback/citadel-apache-entrypoint',
@@ -368,6 +363,18 @@ final class RawGeneratorTest extends TestCase
             '.squire/portable/vhost.conf',
         ] as $path) {
             self::assertFileExists($target . '/' . $path, $path);
+        }
+
+        // The 0.12.0 kit no longer ships the parity scripts, the compose
+        // file or the env example; Parity reads the app itself now.
+        foreach ([
+            'scripts/parity.sh',
+            'scripts/parity.ps1',
+            'docker-compose.squire.yml',
+            '.env.squire.example',
+            '.squire/haproxy.cfg',
+        ] as $path) {
+            self::assertFileDoesNotExist($target . '/' . $path, $path);
         }
     }
 
@@ -390,7 +397,9 @@ final class RawGeneratorTest extends TestCase
         self::assertFileDoesNotExist($target . '/deployments/release.sh');
         self::assertFileDoesNotExist($target . '/deployments/release.ps1');
         self::assertFileExists($target . '/scripts/release.sh');
-        self::assertFileExists($target . '/scripts/parity.ps1');
+        // The 0.12.0 kit dropped the parity scripts from the app.
+        self::assertFileDoesNotExist($target . '/scripts/parity.sh');
+        self::assertFileDoesNotExist($target . '/scripts/parity.ps1');
     }
 
     public function testManifestListsSquireFilesAsManaged(): void

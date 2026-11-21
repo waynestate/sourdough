@@ -19,13 +19,13 @@ use Waynestate\Sourdough\PlaybookMode;
  * with Parity, inside "Run it locally", beside the everyday bench.
  *
  * Parity is a separate install, so Sourdough bakes no parity.json: the
- * README names `parity init --from-squire`, which derives every setting
- * from the Squire kit the app ships (docker-compose.squire.yml and
- * .env.squire.example). This test holds the README to that command and the
- * kit to the files the command reads. The raw shapes add `--no-cron`,
- * because the kit's compose file mentions Laravel's scheduler and a raw app
- * has no artisan to run it. Squire's own scripts/parity.sh and parity.ps1
- * still ship with the kit, but the new section never sends anyone to them.
+ * README names `parity init`, which reads the app's folder (its
+ * composer.json, public directory and routes) and writes parity.json, the
+ * app's Citadel settings. This test holds the README to that command and
+ * keeps it away from the kit files Squire 0.12.0 stopped shipping
+ * (docker-compose.squire.yml, .env.squire.example and the parity scripts).
+ * The raw shapes add `--no-cron`, because a raw app has no artisan to run
+ * Laravel's scheduler.
  *
  * Proofed for real on 2026-11-09 against Parity's main branch: init, check,
  * up and test on a raw and a Blade bake.
@@ -83,19 +83,22 @@ final class ParityReadmeTest extends TestCase
         }
         self::assertStringContainsString('separate install', $section, 'Parity is never a hard dependency');
 
-        $init = $raw ? 'parity init --from-squire --no-cron' : 'parity init --from-squire';
+        $init = $raw ? 'parity init --no-cron' : 'parity init';
         self::assertMatchesRegularExpression('/^' . preg_quote($init, '/') . '$/m', $section, $init);
         if (!$raw) {
             self::assertStringNotContainsString('--no-cron', $section, 'a Laravel shape keeps its scheduler entry');
         }
 
-        // --from-squire reads these two files from the app's root.
-        self::assertFileExists($target . '/docker-compose.squire.yml');
-        self::assertFileExists($target . '/.env.squire.example');
+        // The kit files Squire 0.12.0 stopped shipping stay out of the app.
+        self::assertFileDoesNotExist($target . '/docker-compose.squire.yml');
+        self::assertFileDoesNotExist($target . '/.env.squire.example');
         // Parity writes parity.json; Sourdough bakes none.
         self::assertFileDoesNotExist($target . '/parity.json');
 
-        // The deprecated parity kit in Squire stays out of the new text.
+        // The old kit-based wording stays out of the new text.
+        self::assertStringNotContainsString('--from-squire', $section);
+        self::assertStringNotContainsString('docker-compose.squire.yml', $section);
+        self::assertStringNotContainsString('.env.squire.example', $section);
         self::assertStringNotContainsString('scripts/parity', $section);
         self::assertStringNotContainsString('--only=parity', $section);
         self::assertStringNotContainsString("\u{2014}", $section, 'no em dashes');
