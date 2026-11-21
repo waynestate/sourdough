@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: every shape that ships SESAME asks for ^0.11 (was ^0.8), and the fake driver is now asked for on purpose. The Laravel shapes' config/sesame.php reads fake.allowed from SESAME_FAKE_ALLOWED (default false); env-additions.txt ships the fake lines commented out; the tests, the a11y CI jobs and the smoke script set APP_ENV=local, the fake driver and SESAME_FAKE_ALLOWED=true. The raw shapes' front controller needs SESAME_FAKE_ALLOWED=true too. A generated app that signed in with the fake driver from its .env.example now sets those three values in its .env.
 - Removed: the Squire parity kit's local-running files from generated apps and deploy/ (D-095); requires Squire ^0.12.
 - Docs: the README's deploy-files paragraph names Squire 0.12.0's kit and matches the copy in `templates/squire/`.
 - Docs: SECURITY.md says how to report a vulnerability privately.
