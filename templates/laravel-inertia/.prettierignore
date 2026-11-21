@@ -2,3 +2,5 @@
 # compares them with a fresh generation byte for byte, so Prettier keeps out.
 resources/js/ziggy.js
 resources/js/ziggy.d.ts
+# Squire's package download cache (scripts/release.sh keeps it in the app folder).
+.cache

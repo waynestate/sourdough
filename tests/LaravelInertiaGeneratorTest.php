@@ -276,6 +276,31 @@ final class LaravelInertiaGeneratorTest extends TestCase
         self::assertContains('oracle-check.php', $pint['notPath']);
     }
 
+    /**
+     * Squire's release kit keeps its package download cache in .cache/squire
+     * inside the app folder (it survives a Citadel Update), so the linters
+     * and git keep .cache out.
+     */
+    public function testTheEslintConfigAndPrettierAndGitIgnoreKeepTheSquireCacheOut(): void
+    {
+        $target = $this->generate();
+
+        $eslint = (string) file_get_contents($target . '/eslint.config.js');
+        self::assertStringContainsString("'.cache'", $eslint);
+
+        $prettierignore = (string) file_get_contents($target . '/.prettierignore');
+        self::assertContains('.cache', array_map('trim', explode("\n", $prettierignore)));
+
+        $pint = json_decode((string) file_get_contents($target . '/pint.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($pint);
+        $exclude = $pint['exclude'];
+        self::assertIsArray($exclude);
+        self::assertContains('.cache', $exclude);
+
+        $gitignore = (string) file_get_contents($target . '/.gitignore');
+        self::assertContains('/.cache/', array_map('trim', explode("\n", $gitignore)));
+    }
+
     public function testGeneratedCiHasTheZiggyJob(): void
     {
         $target = $this->generate();

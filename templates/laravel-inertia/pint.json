@@ -6,7 +6,8 @@
         "public/build",
         "node_modules",
         "vendor",
-        "deploy"
+        "deploy",
+        ".cache"
     ],
     "notPath": [
         "health.php",

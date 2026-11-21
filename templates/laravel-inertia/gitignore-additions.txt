@@ -15,3 +15,5 @@
 /pint-codequality.json
 # Parity's per-app folder holds each developer's local passwords; they never get committed.
 /.parity/
+# Squire's package download cache: it survives an Update, so git never sees it.
+/.cache/
