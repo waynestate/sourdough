@@ -118,7 +118,7 @@ final class TemplateCiGatesTest extends TestCase
             // take the block that saves the pages, the one with the origin.
             preg_match_all('/^    - \|\n((?:      .*\n|\n)+)/m', $job, $matches);
             $snapshot = null;
-            foreach ($matches[1] ?? [] as $match) {
+            foreach ($matches[1] as $match) {
                 if (str_contains($match, 'origin=http')) {
                     $snapshot = $match;
                     break;
