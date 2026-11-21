@@ -342,3 +342,5 @@ README lists the GitLab settings a file cannot hold. See [CI](docs/guides/ci.md#
 <sub>Sourdough is one of the parts. Feed it, and it grows; just do not leave it on the counter over a long weekend.</sub>
 
 </div>
+
+Found a security problem? See [SECURITY.md](SECURITY.md); please do not open a public issue.
