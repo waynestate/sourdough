@@ -92,7 +92,7 @@ final class PackagistFetcher implements LatestReleaseFetcher
      */
     private function readBody(string $url, mixed $context): ?string
     {
-        $previous = set_error_handler(static fn (): bool => true);
+        $previous = set_error_handler(static fn(): bool => true);
         try {
             $body = file_get_contents($url, false, $context);
         } finally {
