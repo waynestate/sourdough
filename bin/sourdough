@@ -2,6 +2,8 @@
 <?php
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Event\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Waynestate\Sourdough\Command\AdoptCommand;
@@ -9,6 +11,10 @@ use Waynestate\Sourdough\Command\CheckCommand;
 use Waynestate\Sourdough\Command\FeedCommand;
 use Waynestate\Sourdough\Command\ManifestCommand;
 use Waynestate\Sourdough\Command\NewCommand;
+use Waynestate\Sourdough\Update\InstallKind;
+use Waynestate\Sourdough\Update\PackagistFetcher;
+use Waynestate\Sourdough\Update\UpdateCache;
+use Waynestate\Sourdough\Update\UpdateNotice;
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_file($autoload)) {
@@ -23,7 +29,9 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$application = new class ('Sourdough', '0.5.1') extends Application {
+$version = '0.5.1';
+
+$application = new class ('Sourdough', $version) extends Application {
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $name = $this->getCommandName($input);
@@ -41,5 +49,28 @@ $application->addCommand(new ManifestCommand());
 $application->addCommand(new AdoptCommand());
 $application->addCommand(new FeedCommand());
 $application->addCommand(new CheckCommand());
+
+// After any command finishes, one line on stderr when a newer stable
+// release exists. The listener never throws, never writes to stdout and
+// never changes the exit code; the running version is the one handed to
+// the Application constructor above.
+$packageRoot = dirname(__DIR__);
+$notice = new UpdateNotice(
+    'sourdough',
+    $packageRoot,
+    InstallKind::detect($packageRoot, getenv() ?: []),
+    new UpdateCache('sourdough'),
+    new PackagistFetcher(),
+    static fn (): int => time(),
+);
+/** @var list<string> $argv */
+$argv = $GLOBALS['argv'] ?? [];
+$application->getDispatcher()->addListener(ConsoleEvents::TERMINATE, static function (ConsoleTerminateEvent $event) use ($notice, $version, $argv): void {
+    if ($event->getOutput()->isQuiet()) {
+        return;
+    }
+
+    $notice->run(getenv() ?: [], $argv, $version, STDERR);
+});
 
 exit($application->run());
