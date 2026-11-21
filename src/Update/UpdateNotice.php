@@ -13,7 +13,7 @@ use Throwable;
  *     sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: git pull
  *
  * The two seams keep tests off the network and the clock: the fetcher
- * (LatestReleaseFetcher) and the clock (a callable returning unix seconds).
+ * (LatestReleaseFetcher) and the clock (a closure returning unix seconds).
  * Everything is wrapped: any Throwable ends the check silently, stdout is
  * never touched, and the exit code never changes.
  */
@@ -28,9 +28,9 @@ final class UpdateNotice
     private const DAY = 86400;
 
     /**
-     * @param string          $tool        the tool's name, as printed in the line
-     * @param string          $packageRoot the folder holding bin/ and src/
-     * @param callable(): int $clock       current unix time, injected so tests need no real clock
+     * @param string             $tool        the tool's name, as printed in the line
+     * @param string             $packageRoot the folder holding bin/ and src/
+     * @param \Closure(): int    $clock       current unix time, injected so tests need no real clock
      */
     public function __construct(
         private readonly string $tool,
@@ -38,19 +38,19 @@ final class UpdateNotice
         private readonly InstallKind $kind,
         private readonly UpdateCache $cache,
         private readonly LatestReleaseFetcher $fetcher,
-        private readonly callable $clock,
+        private readonly \Closure $clock,
     ) {}
 
     /**
      * Run the check and print the line when it is due. Never throws, never
      * writes to stdout, never changes an exit code.
      *
-     * @param array<string, string>            $env     the process environment
-     * @param list<string>                     $argv    the command line, for --quiet/-q
-     * @param string                           $version the running version
-     * @param callable(string): void|resource  $stderr  where the line goes
+     * @param array<string, string>         $env     the process environment
+     * @param list<string>                  $argv    the command line, for --quiet/-q
+     * @param string                        $version the running version
+     * @param callable(string): void|resource $stderr where the line goes
      */
-    public function run(array $env, array $argv, string $version, callable|resource $stderr): void
+    public function run(array $env, array $argv, string $version, mixed $stderr): void
     {
         try {
             $this->check($env, $argv, $version, $stderr);
@@ -60,11 +60,11 @@ final class UpdateNotice
     }
 
     /**
-     * @param array<string, string>         $env
-     * @param list<string>                  $argv
+     * @param array<string, string>           $env
+     * @param list<string>                    $argv
      * @param callable(string): void|resource $stderr
      */
-    private function check(array $env, array $argv, string $version, callable|resource $stderr): void
+    private function check(array $env, array $argv, string $version, mixed $stderr): void
     {
         if (self::ciEnabled($env) || self::optedOut($env) || self::quiet($argv) || !self::plainVersion($version)) {
             return;
@@ -203,13 +203,13 @@ final class UpdateNotice
     /**
      * @param callable(string): void|resource $stderr
      */
-    private function writeLine(callable|resource $stderr, string $message): void
+    private function writeLine(mixed $stderr, string $message): void
     {
         $previous = set_error_handler(static fn (): bool => true);
         try {
             if (is_resource($stderr)) {
                 fwrite($stderr, $message);
-            } else {
+            } elseif (is_callable($stderr)) {
                 $stderr($message);
             }
         } finally {

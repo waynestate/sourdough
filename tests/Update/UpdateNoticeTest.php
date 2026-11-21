@@ -329,8 +329,8 @@ final class UpdateNoticeTest extends TestCase
         file_put_contents($file, json_encode(['checked_at' => time(), 'latest' => '0.9.9']) . "\n");
 
         $env = ['CI' => '', 'WAYNE_NO_UPDATE_CHECK' => '', 'XDG_CACHE_HOME' => $cacheDir];
-        [$stdoutOff, $stderrOff, $exitOff] = $this->runBinary([...$env, 'WAYNE_NO_UPDATE_CHECK' => '1']);
-        [$stdoutOn, $stderrOn, $exitOn] = $this->runBinary($env);
+        [$stdoutOff, $stderrOff, $exitOff] = $this->runBinary($bin . '/sourdough', [...$env, 'WAYNE_NO_UPDATE_CHECK' => '1']);
+        [$stdoutOn, $stderrOn, $exitOn] = $this->runBinary($bin . '/sourdough', $env);
 
         self::assertSame(0, $exitOff, "stderr: {$stderrOff}");
         self::assertSame($exitOff, $exitOn, "stderr: {$stderrOn}");
@@ -465,13 +465,18 @@ final class UpdateNoticeTest extends TestCase
     }
 
     /**
-     * @return array{0: callable(string): void, 1: array{text: string}}
+     * A stderr sink the notice writes into and the test reads from. It is
+     * an object, so the injected closure and the test see the same buffer
+     * (an array returned alongside would be a copy), and it answers to
+     * $sink['text'], so the assertions read it like the old array did.
+     *
+     * @return array{0: callable(string): void, 1: StderrSink}
      */
     private function stderr(): array
     {
-        $sink = ['text' => ''];
-        $write = static function (string $message) use (&$sink): void {
-            $sink['text'] .= $message;
+        $sink = new StderrSink();
+        $write = static function (string $message) use ($sink): void {
+            $sink->append($message);
         };
 
         return [$write, $sink];
@@ -497,18 +502,16 @@ final class UpdateNoticeTest extends TestCase
     }
 
     /**
-     * Run the real bin/sourdough with --version and capture stdout and
+     * Run the copied bin/sourdough with --version and capture stdout and
      * stderr separately, the way BinAutoloadTest does.
      *
      * @param array<string, string> $extraEnv
      * @return array{0: string, 1: string, 2: int}
      */
-    private function runBinary(array $extraEnv): array
+    private function runBinary(string $binary, array $extraEnv): array
     {
+        /** @var array<string, string> $env */
         $env = getenv();
-        if ($env === false) {
-            $env = [];
-        }
         foreach ($extraEnv as $key => $value) {
             $env[$key] = $value;
         }
@@ -519,7 +522,7 @@ final class UpdateNoticeTest extends TestCase
             2 => ['pipe', 'w'],
         ];
         $pipes = [];
-        $process = proc_open([PHP_BINARY, dirname(__DIR__) . '/../bin/sourdough', '--version'], $descriptors, $pipes, null, $env);
+        $process = proc_open([PHP_BINARY, $binary, '--version'], $descriptors, $pipes, null, $env);
         self::assertIsResource($process);
         fclose($pipes[0]);
         $stdout = (string) stream_get_contents($pipes[1]);
@@ -527,9 +530,7 @@ final class UpdateNoticeTest extends TestCase
         fclose($pipes[1]);
         fclose($pipes[2]);
 
-        $exit = proc_close($process);
-
-        return [$stdout, $stderr, $exit === false ? -1 : $exit];
+        return [$stdout, $stderr, proc_close($process)];
     }
 
     private function makeTempDir(): string
@@ -558,6 +559,44 @@ final class UpdateNoticeTest extends TestCase
             }
         }
         rmdir($dir);
+    }
+}
+
+/**
+ * The shared text buffer behind the update notice's stderr seam. An
+ * object, so the injected closure and the test hold the same instance;
+ * ArrayAccess, so the tests keep reading it as $sink['text'].
+ *
+ * @template-implements \ArrayAccess<string, string>
+ */
+final class StderrSink implements \ArrayAccess
+{
+    /** @var array<string, string> */
+    private array $data = ['text' => ''];
+
+    public function append(string $message): void
+    {
+        $this->data['text'] .= $message;
+    }
+
+    public function offsetGet(mixed $offset): string
+    {
+        return $this->data[$offset] ?? '';
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->data[$offset] = (string) $value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->data[$offset]);
     }
 }
 

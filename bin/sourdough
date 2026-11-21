@@ -2,8 +2,6 @@
 <?php
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Event\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Waynestate\Sourdough\Command\AdoptCommand;
@@ -51,9 +49,12 @@ $application->addCommand(new FeedCommand());
 $application->addCommand(new CheckCommand());
 
 // After any command finishes, one line on stderr when a newer stable
-// release exists. The listener never throws, never writes to stdout and
+// release exists. The check never throws, never writes to stdout and
 // never changes the exit code; the running version is the one handed to
-// the Application constructor above.
+// the Application constructor above. Symfony Console 7 ships no event
+// dispatcher with the application (and none is installed), so the check
+// runs right after run() returns instead of on a TERMINATE event: same
+// moment, same line, same exit code.
 $packageRoot = dirname(__DIR__);
 $notice = new UpdateNotice(
     'sourdough',
@@ -65,12 +66,8 @@ $notice = new UpdateNotice(
 );
 /** @var list<string> $argv */
 $argv = $GLOBALS['argv'] ?? [];
-$application->getDispatcher()->addListener(ConsoleEvents::TERMINATE, static function (ConsoleTerminateEvent $event) use ($notice, $version, $argv): void {
-    if ($event->getOutput()->isQuiet()) {
-        return;
-    }
+$application->setAutoExit(false);
+$exit = $application->run();
+$notice->run(getenv() ?: [], $argv, $version, STDERR);
 
-    $notice->run(getenv() ?: [], $argv, $version, STDERR);
-});
-
-exit($application->run());
+exit($exit);
