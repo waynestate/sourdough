@@ -12,6 +12,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: Preflight 0.12.0 (commit b1fa380) in every shape's pipeline, Sourdough's own pipeline and GitHub workflow (was 0.9.0): the php-test component now also runs an advisory PHP 8.6 job, the components gain a tag_pipeline input, and the a11y image digest moves.
+
 ## 0.6.0 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-6-0-2026-11-22)
 
 ### Added [#](https://sourdough.apps.wayne.edu/docs/changelog.html#added)

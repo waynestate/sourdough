@@ -5,6 +5,8 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: Preflight 0.12.0 (commit b1fa380) in every shape's pipeline, Sourdough's own pipeline and GitHub workflow (was 0.9.0): the php-test component now also runs an advisory PHP 8.6 job, the components gain a tag_pipeline input, and the a11y image digest moves.
+
 ## 0.6.0 (2026-11-22)
 
 ### Added
@@ -17,7 +19,6 @@ Versioning once 1.0 is out.
 
 ### Removed
 
-- Changed: Preflight 0.12.0 (commit b1fa380) in every shape's pipeline, Sourdough's own pipeline and GitHub workflow (was 0.9.0): the php-test component now also runs an advisory PHP 8.6 job, the components gain a tag_pipeline input, and the a11y image digest moves.
 - Removed: the Squire parity kit's local-running files from generated apps and deploy/ (D-095); requires Squire ^0.12.
 
 ### Fixed
