@@ -149,6 +149,26 @@ final class TemplateCiGatesTest extends TestCase
     }
 
     /**
+     * The credential rule allows the job-token line and refuses a stored
+     * secret: a glpat token in the value, a bare literal, or a reference to
+     * anything other than the job's own token.
+     */
+    public function testCredentialRuleAllowsOnlyTheJobTokenReference(): void
+    {
+        $jobToken = "  COMPOSER_AUTH: '{\"gitlab-token\":{\"git.wayne.edu\":{\"username\":\"gitlab-ci-token\",\"token\":\"\$CI_JOB_TOKEN\"}}}'";
+        self::assertSame([], self::credentialLines($jobToken), 'the job-token COMPOSER_AUTH line stores no secret');
+
+        $glpat = "  COMPOSER_AUTH: '{\"gitlab-token\":{\"git.wayne.edu\":\"glpat-abc123\"}}'";
+        self::assertSame([$glpat], self::credentialLines($glpat), 'a glpat token in the value is refused');
+
+        $literal = '  DEPLOY_TOKEN: abc123';
+        self::assertSame([$literal], self::credentialLines($literal), 'a literal value on a credential key is refused');
+
+        $otherRef = '  DB_PASSWORD: $DB_PASSWORD_FROM_VARS';
+        self::assertSame([$otherRef], self::credentialLines($otherRef), 'a reference to anything but the job token is refused');
+    }
+
+    /**
      * Assert the gates on one pipeline, template or baked. Public so the
      * per-shape generator tests can hold the baked file to the same rules.
      */
@@ -227,7 +247,7 @@ final class TemplateCiGatesTest extends TestCase
         $includeBlock = self::includeBlock($ci);
         preg_match_all('/\$\{?([A-Za-z_][A-Za-z0-9_]*)/', $includeBlock, $refs);
         self::assertSame([], array_values(array_diff(array_unique($refs[1]), ['CI_SERVER_FQDN', 'IMAGE_PREFIX'])), "$shape: component inputs carry no variables but the host and the prefix");
-        self::assertDoesNotMatchRegularExpression('/^\s+[A-Z0-9_]*(TOKEN|PASSWORD|SECRET|PRIVATE_KEY|API_KEY|AUTH)[A-Z0-9_]*:/m', $ci, "$shape: no credential is set in the file");
+        self::assertSame([], self::credentialLines($ci), "$shape: no credential is set in the file");
     }
 
     /**
@@ -254,6 +274,45 @@ final class TemplateCiGatesTest extends TestCase
     private static function includeBlock(string $ci): string
     {
         return self::capture('/^include:\n(?:  [^\n]*\n|\n)*/m', $ci, 'the pipeline has an include block')[0];
+    }
+
+    /**
+     * The credential-named variable lines whose value holds a stored secret:
+     * a literal value, a reference to anything but the job token, or
+     * credential-looking text such as a glpat token. A value that references
+     * only $CI_JOB_TOKEN carries the job's own token, which dies with the
+     * pipeline, so it is allowed.
+     *
+     * @return list<string>
+     */
+    private static function credentialLines(string $ci): array
+    {
+        $offending = [];
+        foreach (explode("\n", str_replace("\r\n", "\n", $ci)) as $line) {
+            if (1 !== preg_match('/^\s+[A-Z0-9_]*(?:TOKEN|PASSWORD|SECRET|PRIVATE_KEY|API_KEY|AUTH)[A-Z0-9_]*:\s*(.*)$/', $line, $m)) {
+                continue;
+            }
+            $value = trim($m[1]);
+            if ('' === $value) {
+                continue;
+            }
+            if (1 === preg_match('/glpat-|password|secret/i', $value)) {
+                $offending[] = $line;
+                continue;
+            }
+            if (1 !== preg_match_all('/\$\{?([A-Za-z_][A-Za-z0-9_]*)/', $value, $refs)) {
+                $offending[] = $line;
+                continue;
+            }
+            foreach ($refs[1] as $ref) {
+                if ('CI_JOB_TOKEN' !== $ref) {
+                    $offending[] = $line;
+                    break;
+                }
+            }
+        }
+
+        return $offending;
     }
 
     /** The `workflow:` block, from its key to the next top-level key. */
