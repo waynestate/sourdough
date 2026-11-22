@@ -60,6 +60,9 @@ workflow:
 variables:
   IMAGE_PREFIX: docker.io
   COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+  # Playbook is private on git.wayne.edu (D-169): Composer authenticates with this job's own token, sent as
+  # GitLab's JOB-TOKEN header. Top level, so the included Preflight jobs get it too. No stored secret.
+  COMPOSER_AUTH: '{"gitlab-token":{"git.wayne.edu":{"username":"gitlab-ci-token","token":"$CI_JOB_TOKEN"}}}'
 
 # Every dependency download goes through a cache. The key is fixed, not a
 # lock-file hash: Composer's cache is additive, so a lock change
