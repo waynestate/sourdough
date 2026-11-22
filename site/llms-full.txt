@@ -835,6 +835,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 ### Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
 - Changed: Preflight 0.12.0 (commit b1fa380) in every shape's pipeline, Sourdough's own pipeline and GitHub workflow (was 0.9.0): the php-test component now also runs an advisory PHP 8.6 job, the components gain a tag_pipeline input, and the a11y image digest moves.
+- Fixed: every shape's pipeline can install the private Playbook package: COMPOSER_AUTH sends the job's own CI token (GitLab's JOB-TOKEN header), so composer install no longer fails with "Could not authenticate against git.wayne.edu". The project must be in a group Playbook's job-token allowlist admits (enterprise-apps is, D-169).
 
 ### 0.6.0 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-6-0-2026-11-22)
 
@@ -1534,7 +1535,7 @@ Citadel deploys an app with a Quick Update, so a baked pipeline holds no deploy 
 
 A job that extends it never runs for a merge request and runs only on a protected branch or tag, the only refs where GitLab hands a job its protected variables. One deploy runs at a time, and a newer pipeline never cancels one halfway. `tests/TemplateCiGatesTest.php` fails Sourdough's suite when a shape's job deploys (`stage: deploy` or `environment:`) without extending `.deploy`, when a component input references any variable but the GitLab host and `IMAGE_PREFIX`, or when the file sets a variable named like a credential.
 
-The rest are project settings, so each generated README lists them under "Pipeline": protect `main` and the release tags; keep each deploy credential in a protected, masked (or masked and hidden) variable; never put a credential in the file or a component's inputs; keep the job token allowlist on and add other projects by name; read a fork's merge request before running its pipeline in the project; prefer the deploy target's own secret store for anything long-lived. All of it works on GitLab Community Edition. Protected environments, which would add an approval step, are a paid tier feature, so the file does not rely on them.
+The rest are project settings, so each generated README lists them under "Pipeline": protect `main` and the release tags; keep each deploy credential in a protected, masked (or masked and hidden) variable; never put a credential in the file or a component's inputs; keep the job token allowlist on and add other projects by name; read a fork's merge request before running its pipeline in the project; prefer the deploy target's own secret store for anything long-lived. The pipeline also needs the project to sit in a group that Playbook's job-token allowlist admits (enterprise-apps is, D-169): the file's `COMPOSER_AUTH` variable signs Composer in to git.wayne.edu with the job's own CI token, sent as GitLab's JOB-TOKEN header, so `composer install` can fetch the private Playbook package with no stored secret. All of it works on GitLab Community Edition. Protected environments, which would add an approval step, are a paid tier feature, so the file does not rely on them.
 
 ### Is the app still fed? [#](https://sourdough.apps.wayne.edu/docs/guides/ci.html#is-the-app-still-fed)
 
