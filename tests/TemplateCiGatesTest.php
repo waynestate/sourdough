@@ -164,6 +164,9 @@ final class TemplateCiGatesTest extends TestCase
         $literal = '  DEPLOY_TOKEN: abc123';
         self::assertSame([$literal], self::credentialLines($literal), 'a literal value on a credential key is refused');
 
+        $expanded = "  DEPLOY_TOKEN:\n    value: abc123";
+        self::assertSame(['  DEPLOY_TOKEN:'], self::credentialLines($expanded), 'a credential key in the expanded form is refused');
+
         $otherRef = '  DB_PASSWORD: $DB_PASSWORD_FROM_VARS';
         self::assertSame([$otherRef], self::credentialLines($otherRef), 'a reference to anything but the job token is refused');
     }
@@ -293,9 +296,6 @@ final class TemplateCiGatesTest extends TestCase
                 continue;
             }
             $value = trim($m[1]);
-            if ('' === $value) {
-                continue;
-            }
             if (1 === preg_match('/glpat-|password|secret/i', $value)) {
                 $offending[] = $line;
                 continue;
