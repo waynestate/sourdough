@@ -27,7 +27,7 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$version = '0.6.0';
+$version = '0.6.1';
 
 $application = new class ('Sourdough', $version) extends Application {
     public function doRun(InputInterface $input, OutputInterface $output): int

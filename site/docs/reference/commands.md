@@ -249,7 +249,7 @@ A dry run refuses only for the first eight (the shape, the oven, the folder, the
     "name": "course-finder",
     "notes": [],
     "shape": "raw",
-    "sourdough_version": "0.6.0",
+    "sourdough_version": "0.6.1",
     "summary": {
         "match": 33,
         "missing": 1,
@@ -356,7 +356,7 @@ The baker's poke test: it puts together `sourdough manifest --check`, `sourdough
 ```
 Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
 Manifest:    clean: every managed file matches the manifest
-Feed:        fresh: nothing to feed from Sourdough 0.6.0
+Feed:        fresh: nothing to feed from Sourdough 0.6.1
 OK: the raw app is fed and supported.
 ```
 
