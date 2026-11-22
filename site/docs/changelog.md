@@ -12,6 +12,7 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Added: the Laravel templates (`laravel-blade`, `laravel-inertia`) ship a `config/auth.php` with the `web` guard on SESAME's `sesame` driver (D-166), so `$request->user()`, `@can`, policies and `$this->authorize()` see the SESAME user inside `auth.sesame` routes; before, the skeleton's `session` driver applied and those calls saw no user. The `laravel-blade-vue` shape layers `laravel-blade`, so it takes the file too. `tests/SesameWebGuardTemplateTest.php` holds both shapes to it.
 - Changed: every shape that ships SESAME asks for ^0.11 (was ^0.8), and the fake driver is now asked for on purpose. The Laravel shapes' config/sesame.php reads fake.allowed from SESAME_FAKE_ALLOWED (default false); env-additions.txt ships the fake lines commented out; the tests, the a11y CI jobs and the smoke script set APP_ENV=local, the fake driver and SESAME_FAKE_ALLOWED=true. The raw shapes' front controller needs SESAME_FAKE_ALLOWED=true too. A generated app that signed in with the fake driver from its .env.example now sets those three values in its .env.
 - Removed: the Squire parity kit's local-running files from generated apps and deploy/ (D-095); requires Squire ^0.12.
 - Fixed: the Inertia shape's eslint, Prettier and Pint, and the Inertia and Blade shapes' .gitignore, keep `.cache` out: Squire's release kit keeps its package download cache in `.cache/squire`, and eslint failed on the files in it.
