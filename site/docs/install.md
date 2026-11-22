@@ -47,17 +47,17 @@ sourdough --version
 Expected:
 
 ```
-Sourdough 0.6.0
+Sourdough 0.6.1
 ```
 
-The CLI is a Symfony Console application named Sourdough, version 0.6.0 (`bin/sourdough`), so `--version` prints the name and the version.
+The CLI is a Symfony Console application named Sourdough, version 0.6.1 (`bin/sourdough`), so `--version` prints the name and the version.
 
 ## Update notice [#](https://sourdough.apps.wayne.edu/docs/install.html#update-notice)
 
 After a command finishes, Sourdough checks Packagist for a newer stable release of itself and, when there is one, prints one line on stderr:
 
 ```
-sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer global update waynestate/sourdough
+sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer global update waynestate/sourdough
 ```
 
 The command at the end depends on how this copy was installed: `git pull` for a source checkout, `composer global update waynestate/sourdough` for a Composer global install (Sourdough ships no PHAR, so a PHAR copy points there too), and `composer update waynestate/sourdough` for a project dependency. When the project's `^` or `~` pin excludes the newest release, the line offers a `composer require waynestate/sourdough:^X.Y` of the newest major.minor instead (`--dev` when the pin sits in `require-dev`). When the newest release has a higher major, the line ends with a link to the [upgrading notes](https://sourdough.apps.wayne.edu/docs/upgrading.html).

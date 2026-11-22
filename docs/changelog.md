@@ -12,7 +12,14 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 0.6.1 (2026-11-22)
+
+### Changed
+
 - Changed: Preflight 0.12.0 (commit b1fa380) in every shape's pipeline, Sourdough's own pipeline and GitHub workflow (was 0.9.0): the php-test component now also runs an advisory PHP 8.6 job, the components gain a tag_pipeline input, and the a11y image digest moves.
+
+### Fixed
+
 - Fixed: every shape's pipeline can install the private Playbook package: COMPOSER_AUTH sends the job's own CI token (GitLab's JOB-TOKEN header), so composer install no longer fails with "Could not authenticate against git.wayne.edu". The project must be in a group Playbook's job-token allowlist admits (enterprise-apps is, D-169).
 
 ## 0.6.0 (2026-11-22)

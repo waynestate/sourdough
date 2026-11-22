@@ -33,10 +33,26 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.6.0
+Sourdough 0.6.1
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.6.1 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-6-1-2026-11-22)
+
+A patch on 0.6.0: every shape's pipeline pins Preflight 0.12.0 (was 0.9.0), and every shape's pipeline sets `COMPOSER_AUTH` with the job's own CI token so `composer install` can read the private Playbook package (D-169).
+
+**What `sourdough feed` brings an app baked with 0.6.0** (it merges each file with your edits):
+
+- `.gitlab-ci.yml`: the Preflight 0.12.0 pins (was 0.9.0), and the top-level `COMPOSER_AUTH` variable (the job's own CI token as the GitLab JOB-TOKEN header) so `composer install` can read the private Playbook package.
+
+Apps generated before 0.6.1 add the top-level `COMPOSER_AUTH` variable to `.gitlab-ci.yml` by hand (copy the three lines, comment included, from any template's `.gitlab-ci.yml`), and their GitLab project must sit in a group Playbook's job-token allowlist admits (enterprise-apps does).
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer ci`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.6.1`, and the app's pipeline `composer install` step passes.
 
 ## 0.6.0 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-6-0-2026-11-22)
 
