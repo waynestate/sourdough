@@ -33,10 +33,29 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.5.0
+Sourdough 0.6.0
 ```
 
 Then read the section for the version you are moving to.
+
+## 0.6.0 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-6-0-2026-11-22)
+
+A minor on 0.5.1: the Laravel templates ship a `config/auth.php` with the `web` guard on SESAME's `sesame` driver, every shape that ships SESAME asks for `^0.11` (was `^0.8`), and the Squire parity kit's local-running files leave generated apps and `deploy/`.
+
+**What `sourdough feed` brings an app baked with 0.5.1** (it merges each file with your edits):
+
+- `composer.json`: SESAME `^0.11` (was `^0.8`) in every shape that ships it.
+- The Laravel shapes gain `config/auth.php`: the `web` guard reads `'driver' => 'sesame'`, so `$request->user()`, `@can`, policies and `$this->authorize()` see the SESAME user inside `auth.sesame` routes.
+- The fake driver is asked for on purpose: the Laravel shapes' `config/sesame.php` reads `fake.allowed` from `SESAME_FAKE_ALLOWED` (default false), `env-additions.txt` ships the fake lines commented out, and a generated app that signed in with the fake driver from its `.env.example` sets `APP_ENV=local`, the fake driver and `SESAME_FAKE_ALLOWED=true` in its `.env`.
+- The Squire parity kit's local-running files leave the app and `deploy/` (D-095); the deploy kit needs Squire `^0.12`.
+
+Laravel apps generated before 0.6.0 can copy the `config/auth.php` web guard change by hand: set the `web` guard's `'driver'` to `'sesame'`, and require SESAME `^0.11`.
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer update waynestate/sesame --with-all-dependencies` (feed never touches your lock files), then `composer ci`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 0.6.0`, and `composer show waynestate/sesame` names 0.11.
 
 ## 0.5.1 (2026-11-21) [#](https://sourdough.apps.wayne.edu/docs/upgrading.html#0-5-1-2026-11-21)
 
