@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class TemplateCiPlaybookAuthTest extends TestCase
 {
-    private const COMPOSER_AUTH_LINE = "  COMPOSER_AUTH: '{\"gitlab-token\":{\"git.wayne.edu\":{\"username\":\"gitlab-ci-token\",\"token\":\"$CI_JOB_TOKEN\"}}}'";
+    private const COMPOSER_AUTH_LINE = "  COMPOSER_AUTH: '{\"gitlab-token\":{\"git.wayne.edu\":{\"username\":\"gitlab-ci-token\",\"token\":\"\$CI_JOB_TOKEN\"}}}'";
 
     /** @return iterable<string, array{string}> */
     public static function pipelines(): iterable
