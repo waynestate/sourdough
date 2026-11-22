@@ -39,13 +39,13 @@ final class UpdateNoticeTest extends TestCase
         // global command, the only supported install path.
         $env = $this->env();
 
-        [$notice, $fetcher] = $this->notice(InstallKind::Phar, [['version' => '0.6.0']], self::NOW, '');
+        [$notice, $fetcher] = $this->notice(InstallKind::Phar, [['version' => '0.6.1']], self::NOW, '');
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
         self::assertSame(
-            "sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer global update waynestate/sourdough\n",
+            "sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer global update waynestate/sourdough\n",
             $sink['text'],
         );
         self::assertSame(1, $fetcher->calls);
@@ -63,12 +63,12 @@ final class UpdateNoticeTest extends TestCase
 
         self::assertSame(InstallKind::SourceCheckout, InstallKind::detect($root, $env));
 
-        [$notice] = $this->notice(InstallKind::SourceCheckout, [['version' => '0.6.0']], self::NOW, $root);
+        [$notice] = $this->notice(InstallKind::SourceCheckout, [['version' => '0.6.1']], self::NOW, $root);
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
-        self::assertSame("sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: git pull\n", $sink['text']);
+        self::assertSame("sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: git pull\n", $sink['text']);
     }
 
     public function testLineForComposerGlobal(): void
@@ -82,13 +82,13 @@ final class UpdateNoticeTest extends TestCase
 
         self::assertSame(InstallKind::ComposerGlobal, InstallKind::detect($root, $env));
 
-        [$notice] = $this->notice(InstallKind::ComposerGlobal, [['version' => '0.6.0']], self::NOW, $root);
+        [$notice] = $this->notice(InstallKind::ComposerGlobal, [['version' => '0.6.1']], self::NOW, $root);
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
         self::assertSame(
-            "sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer global update waynestate/sourdough\n",
+            "sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer global update waynestate/sourdough\n",
             $sink['text'],
         );
     }
@@ -132,13 +132,13 @@ final class UpdateNoticeTest extends TestCase
         ], JSON_PRETTY_PRINT));
         $env = $this->env();
 
-        [$notice] = $this->notice(InstallKind::ProjectDependency, [['version' => '0.6.0']], self::NOW, $root);
+        [$notice] = $this->notice(InstallKind::ProjectDependency, [['version' => '0.6.1']], self::NOW, $root);
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
         self::assertSame(
-            "sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer require waynestate/sourdough:^0.6\n",
+            "sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer require waynestate/sourdough:^0.6\n",
             $sink['text'],
         );
 
@@ -148,13 +148,13 @@ final class UpdateNoticeTest extends TestCase
         ], JSON_PRETTY_PRINT));
         $env = $this->env();
 
-        [$notice] = $this->notice(InstallKind::ProjectDependency, [['version' => '0.6.0']], self::NOW, $root);
+        [$notice] = $this->notice(InstallKind::ProjectDependency, [['version' => '0.6.1']], self::NOW, $root);
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
         self::assertSame(
-            "sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer require waynestate/sourdough:^0.6 --dev\n",
+            "sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer require waynestate/sourdough:^0.6 --dev\n",
             $sink['text'],
         );
     }
@@ -169,13 +169,13 @@ final class UpdateNoticeTest extends TestCase
 
         self::assertSame(InstallKind::Unknown, InstallKind::detect($root, $env));
 
-        [$notice] = $this->notice(InstallKind::Unknown, [['version' => '0.6.0']], self::NOW, $root);
+        [$notice] = $this->notice(InstallKind::Unknown, [['version' => '0.6.1']], self::NOW, $root);
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
         self::assertSame(
-            "sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: composer global update waynestate/sourdough\n",
+            "sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: composer global update waynestate/sourdough\n",
             $sink['text'],
         );
     }
@@ -185,14 +185,14 @@ final class UpdateNoticeTest extends TestCase
         // A cache checked within the last day is printed from, without a
         // fetch, even when the fetcher would answer differently.
         $env = $this->env();
-        $this->seedCache($env, self::NOW, '0.6.0');
+        $this->seedCache($env, self::NOW, '0.6.1');
 
         [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '9.9.9']], self::NOW, '');
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
-        self::assertSame("sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: git pull\n", $sink['text']);
+        self::assertSame("sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: git pull\n", $sink['text']);
         self::assertSame(0, $fetcher->calls);
     }
 
@@ -202,14 +202,14 @@ final class UpdateNoticeTest extends TestCase
         $env = $this->env();
         $path = $this->seedCache($env, self::NOW - 86401, '0.5.0');
 
-        [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '0.6.0']], self::NOW, '');
+        [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '0.6.1']], self::NOW, '');
         [$write, $sink] = $this->stderr();
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
-        self::assertSame("sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: git pull\n", $sink['text']);
+        self::assertSame("sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: git pull\n", $sink['text']);
         self::assertSame(1, $fetcher->calls);
-        self::assertSame(['checked_at' => self::NOW, 'latest' => '0.6.0'], (new UpdateCache('sourdough'))->read($path));
+        self::assertSame(['checked_at' => self::NOW, 'latest' => '0.6.1'], (new UpdateCache('sourdough'))->read($path));
     }
 
     public function testOfflineIsSilent(): void
@@ -238,8 +238,8 @@ final class UpdateNoticeTest extends TestCase
         self::assertNull(PackagistFetcher::parse('{"packages": {}}'));
         self::assertNull(PackagistFetcher::parse('{"packages": {"waynestate/sourdough": "nope"}}'));
         self::assertSame(
-            [['version' => '0.6.0']],
-            PackagistFetcher::parse('{"packages": {"waynestate/sourdough": [{"version": "0.6.0"}]}}'),
+            [['version' => '0.6.1']],
+            PackagistFetcher::parse('{"packages": {"waynestate/sourdough": [{"version": "0.6.1"}]}}'),
         );
 
         $env = $this->env();
@@ -260,7 +260,7 @@ final class UpdateNoticeTest extends TestCase
         // CI set to anything other than empty, 0 or false stays silent
         // before the cache is even read.
         $env = $this->env(['CI' => '1']);
-        $this->seedCache($env, self::NOW, '0.6.0');
+        $this->seedCache($env, self::NOW, '0.6.1');
 
         [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '9.9.9']], self::NOW, '');
         [$write, $sink] = $this->stderr();
@@ -274,7 +274,7 @@ final class UpdateNoticeTest extends TestCase
     public function testOptOutEnvIsSilent(): void
     {
         $env = $this->env(['WAYNE_NO_UPDATE_CHECK' => '1']);
-        $this->seedCache($env, self::NOW, '0.6.0');
+        $this->seedCache($env, self::NOW, '0.6.1');
 
         [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '9.9.9']], self::NOW, '');
         [$write, $sink] = $this->stderr();
@@ -288,7 +288,7 @@ final class UpdateNoticeTest extends TestCase
     public function testQuietIsSilent(): void
     {
         $env = $this->env();
-        $this->seedCache($env, self::NOW, '0.6.0');
+        $this->seedCache($env, self::NOW, '0.6.1');
 
         [$notice, $fetcher] = $this->notice(InstallKind::SourceCheckout, [['version' => '9.9.9']], self::NOW, '');
         [$write, $sink] = $this->stderr();
@@ -342,7 +342,7 @@ final class UpdateNoticeTest extends TestCase
         $lines = array_values(array_filter(explode("\n", $stderrOn), static fn(string $line): bool => $line !== ''));
         self::assertCount(1, $lines, "stderr: {$stderrOn}");
         self::assertSame(
-            'sourdough 0.6.0 is out of date: 0.9.9 is the newest release. Update: composer update waynestate/sourdough',
+            'sourdough 0.6.1 is out of date: 0.9.9 is the newest release. Update: composer update waynestate/sourdough',
             $lines[0],
         );
     }
@@ -353,7 +353,7 @@ final class UpdateNoticeTest extends TestCase
         // the version without the v.
         $env = $this->env();
         $entries = [
-            ['version' => 'v0.6.0'],
+            ['version' => 'v0.6.1'],
             ['version' => '0.5.9'],
             ['version' => 'v0.5.0'],
         ];
@@ -363,7 +363,7 @@ final class UpdateNoticeTest extends TestCase
 
         $notice->run($env, ['sourdough', 'list'], '0.5.0', $write);
 
-        self::assertSame("sourdough 0.5.0 is out of date: 0.6.0 is the newest release. Update: git pull\n", $sink['text']);
+        self::assertSame("sourdough 0.5.0 is out of date: 0.6.1 is the newest release. Update: git pull\n", $sink['text']);
     }
 
     public function testIgnoresPrereleases(): void
@@ -375,7 +375,7 @@ final class UpdateNoticeTest extends TestCase
             ['version' => '1.0.0-beta1'],
             ['version' => '1.0.0-RC1'],
             ['version' => 'dev-main'],
-            ['version' => '0.6.0-alpha'],
+            ['version' => '0.6.1-alpha'],
             ['version' => '0.5.6-BETA'],
             ['version' => '0.5.5'],
         ];
