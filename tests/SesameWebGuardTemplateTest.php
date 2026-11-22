@@ -63,8 +63,8 @@ final class SesameWebGuardTemplateTest extends TestCase
         // Strip the comments, then read the web guard's own block: a sesame
         // driver anywhere else in the file must not satisfy this check.
         $guards = $this->stripComments($auth);
-        preg_match("/'web'\s*=>\s*\[(.*?)\]/s", $guards, $match);
-        self::assertNotEmpty($match, 'the web guard is defined');
+        $found = preg_match("/'web'\s*=>\s*\[(.*?)\]/s", $guards, $match);
+        self::assertSame(1, $found, 'the web guard is defined');
         self::assertMatchesRegularExpression("/'driver'\s*=>\s*'sesame'/", $match[1]);
     }
 
