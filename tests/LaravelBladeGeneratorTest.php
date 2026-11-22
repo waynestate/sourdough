@@ -37,6 +37,7 @@ final class LaravelBladeGeneratorTest extends TestCase
             'app/Sesame/UserResolver.php',
             'bootstrap/app.php',
             'bootstrap/providers.php',
+            'config/auth.php',
             'config/helmet.php',
             'config/sesame.php',
             'config/worker.php',
