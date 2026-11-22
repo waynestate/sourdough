@@ -27,7 +27,7 @@ sourdough check
 ```
 Support:     supported, owned by Sourdough maintainers; PHP 8.3 gets security fixes until 2027-12-31
 Manifest:    clean: every managed file matches the manifest
-Feed:        fresh: nothing to feed from Sourdough 0.5.1
+Feed:        fresh: nothing to feed from Sourdough 0.6.0
 OK: the raw app is fed and supported.
 ```
 
@@ -176,7 +176,7 @@ Feed needs a manifest. An app without one gets exit `2`, with the way in: `sourd
 ```
 sourdough adopt --shape raw --dry-run
 sourdough adopt --shape raw
-git add .sourdough && git commit -m "Adopt with Sourdough 0.5.1"
+git add .sourdough && git commit -m "Adopt with Sourdough 0.6.0"
 sourdough feed --dry-run
 ```
 
