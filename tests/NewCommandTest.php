@@ -565,7 +565,7 @@ final class NewCommandTest extends TestCase
 
         self::assertSame(0, $exit);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
@@ -660,7 +660,7 @@ final class NewCommandTest extends TestCase
 
         self::assertSame(0, $exit);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
@@ -682,7 +682,7 @@ final class NewCommandTest extends TestCase
         self::assertSame(0, $exit);
         self::assertFileExists($target . '/composer.json');
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
         self::assertStringContainsString('Could not reach git.wayne.edu to check your Playbook access; composer install will need it.', $tester->getDisplay());
     }
 
@@ -698,7 +698,7 @@ final class NewCommandTest extends TestCase
         self::assertSame(0, $exit);
         self::assertSame([], $this->playbookCalls);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
 
         // A CI environment: same skip, same result.
         putenv('CI=1');
@@ -709,7 +709,7 @@ final class NewCommandTest extends TestCase
         self::assertSame(0, $exit);
         self::assertSame([], $this->playbookCalls);
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
     }
 
     public function testNoPlaybookSkipsDetectionAndWiring(): void
@@ -721,7 +721,7 @@ final class NewCommandTest extends TestCase
         $tester = new CommandTester($this->createCommand());
         self::assertSame(0, $tester->execute(['dir' => $defaultTarget]));
         $composer = json_decode((string) file_get_contents($defaultTarget . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
 
         // --no-playbook never detects and leaves no wiring behind.
         $target = $parent . '/demo';
@@ -752,7 +752,7 @@ final class NewCommandTest extends TestCase
         $tester = new CommandTester($this->createCommand(null, null, $this->fakePlaybookAccess('access')));
         self::assertSame(0, $tester->execute(['dir' => $with, '--playbook' => true]));
         $withComposer = json_decode((string) file_get_contents($with . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1', $withComposer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $withComposer['require']['waynestate/playbook']);
 
         // Without it: the very same wiring, so the flag changed nothing.
         $withoutParent = $this->makeTempDir();

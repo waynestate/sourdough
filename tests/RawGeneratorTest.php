@@ -495,7 +495,7 @@ final class RawGeneratorTest extends TestCase
         // Playbook is required by default now: the package, the VCS
         // repository and the gitlab-domains entry that lets composer send
         // the token to git.wayne.edu.
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
@@ -540,7 +540,7 @@ final class RawGeneratorTest extends TestCase
         self::assertSame([
             ['type' => 'vcs', 'url' => 'https://git.wayne.edu/enterprise-apps/playbook.git'],
         ], $composer['repositories']);
-        self::assertSame('^0.1', $composer['require']['waynestate/playbook']);
+        self::assertSame('^0.3', $composer['require']['waynestate/playbook']);
         // The token is only sent to git.wayne.edu, never to Packagist.
         self::assertSame(['git.wayne.edu'], $composer['config']['gitlab-domains']);
         // The template's own config keys survive the merge.
@@ -609,7 +609,7 @@ final class RawGeneratorTest extends TestCase
         $target = $this->generateFromRealTemplate();
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame('^0.3', $composer['require-dev']['waynestate/advisor']);
+        self::assertSame('^0.4', $composer['require-dev']['waynestate/advisor']);
 
         $gitignore = (string) file_get_contents($target . '/.gitignore');
         self::assertStringContainsString('.mcp.json', $gitignore);

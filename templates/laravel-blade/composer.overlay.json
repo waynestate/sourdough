@@ -25,10 +25,10 @@
         "laravel/boost": "^2.10",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
-        "waynestate/advisor": "^0.3",
+        "waynestate/advisor": "^0.4",
         "waynestate/creed": "^0.1.8",
         "waynestate/pinstripe": "^0.4",
-        "waynestate/proctor": "^0.16"
+        "waynestate/proctor": "^0.18"
     },
     "scripts": {
         "boost-update": "@php -r \"exit(is_dir('vendor/laravel/boost') && is_file('boost.json') && ! empty(json_decode(file_get_contents('boost.json'), true)['agents']) ? pclose(popen(escapeshellarg(PHP_BINARY) . ' artisan boost:update --ansi', 'w')) : 0);\"",

@@ -17,9 +17,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^11.5",
-        "waynestate/advisor": "^0.3",
+        "waynestate/advisor": "^0.4",
         "waynestate/pinstripe": "^0.4",
-        "waynestate/proctor": "^0.16"
+        "waynestate/proctor": "^0.18"
     },
     "config": {
         "allow-plugins": {
