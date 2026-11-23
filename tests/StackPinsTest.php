@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The stack lines every shape bakes in, read straight from the templates:
- * the released HELMET 1.3, SESAME 0.8, PROCTOR 0.18 and CREED 0.1.8 lines in
+ * the released HELMET 1.3, SESAME 0.11, PROCTOR 0.18 and CREED 0.1.8 lines in
  * every composer file that pulls them in, and Inertia 3 on both sides of the
  * Inertia shape. A pin that slips back
  * fails here before a bake ever tastes stale.
