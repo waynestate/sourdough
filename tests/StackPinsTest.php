@@ -57,7 +57,7 @@ final class StackPinsTest extends TestCase
 
     /**
      * The Laravel overlays and the front page's deploy layer name CREED's
-     * floor: 0.1.8 is the policy PROCTOR 0.16 is graded against.
+     * floor, 0.1.8.
      *
      * @return array<string, array{string}>
      */
