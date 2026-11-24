@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Upgrading | Sourdough docs</title>
 <meta name="description" content="How to upgrade Sourdough itself and bring the apps it baked up to date with the manifest and sourdough feed.">
-<meta name="docs-version" content="0.6.1">
+<meta name="docs-version" content="1.0.0">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
 <link rel="stylesheet" href="../docs/theme/sourdough.css">
@@ -29,7 +29,7 @@
       <a href="../index.html#start-title">Quick start</a>
       <a href="../index.html#agents-title">Agents</a>
     </nav>
-    <span class="ticket" title="Sourdough version">No. 0.6.1</span>
+    <span class="ticket" title="Sourdough version">No. 1.0.0</span>
   </div>
 </header><div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
@@ -50,9 +50,14 @@
 <pre tabindex="0"><code class="language-bash">sourdough --version
 </code></pre>
 <p>Expected for the current release:</p>
-<pre tabindex="0"><code>Sourdough 0.6.1
+<pre tabindex="0"><code>Sourdough 1.0.0
 </code></pre>
 <p>Then read the section for the version you are moving to.</p>
+<h2 id="1-0-0-2026-11-24">1.0.0 <span class="docs-heading-tail"><span>(2026-11-24)</span><a class="docs-heading-link" aria-label="Link to this section" href="#1-0-0-2026-11-24">#</a></span></h2>
+<p>The first stable release. From here the project follows Semantic Versioning: a breaking change to a bake, a command or a file's contract waits for 2.0. The commands, the shapes and the <code>.sourdough.json</code> file are the same as in 0.6.1 apart from what the changelog lists under 1.0.0 (the raw PHP shape requires PROCTOR <code>^0.18</code> and ADVISOR <code>^0.4</code>, and Playwright is pinned to 1.65.0).</p>
+<p><strong>Breaking:</strong> none. <strong>Deprecated:</strong> none.</p>
+<p><strong>Steps:</strong> in each app, on a clean git tree, <code>sourdough feed --dry-run</code>, then <code>sourdough feed</code>, then <code>composer ci</code>.</p>
+<p><strong>How to verify:</strong> <code>sourdough --version</code> prints <code>Sourdough 1.0.0</code>.</p>
 <h2 id="0-6-1-2026-11-22">0.6.1 <span class="docs-heading-tail"><span>(2026-11-22)</span><a class="docs-heading-link" aria-label="Link to this section" href="#0-6-1-2026-11-22">#</a></span></h2>
 <p>A patch on 0.6.0: every shape's pipeline pins Preflight 0.12.0 (was 0.9.0), and every shape's pipeline sets <code>COMPOSER_AUTH</code> with the job's own CI token so <code>composer install</code> can read the private Playbook package (D-169).</p>
 <p><strong>What <code>sourdough feed</code> brings an app baked with 0.6.0</strong> (it merges each file with your edits):</p>
@@ -243,10 +248,10 @@ php artisan view:clear
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/troubleshooting.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Troubleshooting</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/changelog.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Changelog</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#0-6-1-2026-11-22">0.6.1 (2026-11-22)</a></li><li class="docs-toc__item"><a href="#0-6-0-2026-11-22">0.6.0 (2026-11-22)</a></li><li class="docs-toc__item"><a href="#0-5-1-2026-11-21">0.5.1 (2026-11-21)</a></li><li class="docs-toc__item"><a href="#0-5-0-2026-11-19">0.5.0 (2026-11-19)</a></li><li class="docs-toc__item"><a href="#0-4-2-2026-11-09">0.4.2 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-1-2026-11-09">0.4.1 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#upgrade-the-cli">Upgrade the CLI</a></li><li class="docs-toc__item"><a href="#1-0-0-2026-11-24">1.0.0 (2026-11-24)</a></li><li class="docs-toc__item"><a href="#0-6-1-2026-11-22">0.6.1 (2026-11-22)</a></li><li class="docs-toc__item"><a href="#0-6-0-2026-11-22">0.6.0 (2026-11-22)</a></li><li class="docs-toc__item"><a href="#0-5-1-2026-11-21">0.5.1 (2026-11-21)</a></li><li class="docs-toc__item"><a href="#0-5-0-2026-11-19">0.5.0 (2026-11-19)</a></li><li class="docs-toc__item"><a href="#0-4-2-2026-11-09">0.4.2 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-1-2026-11-09">0.4.1 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-4-0-2026-11-09">0.4.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-3-0-2026-11-09">0.3.0 (2026-11-09)</a></li><li class="docs-toc__item"><a href="#0-2-0-2026-11-08">0.2.0 (2026-11-08)</a></li><li class="docs-toc__item"><a href="#0-1-7-2026-11-07">0.1.7 (2026-11-07)</a></li><li class="docs-toc__item"><a href="#0-1-6-2026-11-06">0.1.6 (2026-11-06)</a></li><li class="docs-toc__item"><a href="#0-1-5-2026-11-03">0.1.5 (2026-11-03)</a></li><li class="docs-toc__item"><a href="#0-1-4-2026-10-29">0.1.4 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-3-2026-10-29">0.1.3 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-2-2026-10-29">0.1.2 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-1-2026-10-29">0.1.1 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#0-1-0-2026-10-29">0.1.0 (2026-10-29)</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
-  <span>Documents Sourdough <span data-docs-version>0.6.1</span></span>
+  <span>Documents Sourdough <span data-docs-version>1.0.0</span></span>
   <span><a rel="noopener" href="https://github.com/waynestate/sourdough">Source</a> <a href="upgrading.md">Markdown</a></span>
 </footer>
 </body>

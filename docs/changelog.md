@@ -12,6 +12,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+## 1.0.0 (2026-11-24)
+
+The first stable release. A bake needs no change; `sourdough feed` carries the template moves below. The questions only an outside owner can answer are in OPEN_QUESTIONS.md under "Known open at 1.0", each with the default Sourdough ships, and none gates 1.0.
+
 - Changed: the raw PHP shape requires PROCTOR `^0.18` and ADVISOR `^0.4` (was `^0.16` and `^0.3`, which do not allow 0.18 and 0.4), and the front page's `deploy/` layer requires PROCTOR `^0.18` (was `^0.16`); PROCTOR 0.18.0 adds the update notice, the fake-driver check and the app-env warning (D-133).
 - Playwright pinned to 1.65.0 to match the image.
 
