@@ -12,6 +12,8 @@ All notable changes to Sourdough are recorded here. The format follows Keep a Ch
 
 ## Unreleased [#](https://sourdough.apps.wayne.edu/docs/changelog.html#unreleased)
 
+- Changed: the raw PHP shape requires PROCTOR `^0.18` and ADVISOR `^0.4` (was `^0.16` and `^0.3`, which do not allow 0.18 and 0.4), and the front page's `deploy/` layer requires PROCTOR `^0.18` (was `^0.16`); PROCTOR 0.18.0 adds the update notice, the fake-driver check and the app-env warning (D-133).
+
 ## 0.6.1 (2026-11-22) [#](https://sourdough.apps.wayne.edu/docs/changelog.html#0-6-1-2026-11-22)
 
 ### Changed [#](https://sourdough.apps.wayne.edu/docs/changelog.html#changed)
