@@ -321,12 +321,12 @@ final class UpdateNoticeTest extends TestCase
         copy(dirname(__DIR__) . '/../bin/sourdough', $bin . '/sourdough');
         file_put_contents($home . '/vendor/autoload.php', "<?php require '" . dirname(__DIR__) . "/../vendor/autoload.php';\n");
 
-        // 0.9.9 stays on the same major as the running 0.5.0, so the line
+        // 1.9.9 stays on the same major as the running 1.0.0, so the line
         // carries no upgrading link.
         $cacheDir = $home . '/cache';
         $file = $cacheDir . '/waynestate/sourdough/update-check.json';
         mkdir(dirname($file), 0777, true);
-        file_put_contents($file, json_encode(['checked_at' => time(), 'latest' => '0.9.9']) . "\n");
+        file_put_contents($file, json_encode(['checked_at' => time(), 'latest' => '1.9.9']) . "\n");
 
         $env = ['CI' => '', 'WAYNE_NO_UPDATE_CHECK' => '', 'XDG_CACHE_HOME' => $cacheDir];
         [$stdoutOff, $stderrOff, $exitOff] = $this->runBinary($bin . '/sourdough', [...$env, 'WAYNE_NO_UPDATE_CHECK' => '1']);
@@ -342,7 +342,7 @@ final class UpdateNoticeTest extends TestCase
         $lines = array_values(array_filter(explode("\n", $stderrOn), static fn(string $line): bool => $line !== ''));
         self::assertCount(1, $lines, "stderr: {$stderrOn}");
         self::assertSame(
-            'sourdough 0.6.1 is out of date: 0.9.9 is the newest release. Update: composer update waynestate/sourdough',
+            'sourdough 1.0.0 is out of date: 1.9.9 is the newest release. Update: composer update waynestate/sourdough',
             $lines[0],
         );
     }
