@@ -820,6 +820,12 @@ final class GeneratorSupport
      * php_versions matrix and the "requires PHP" comment in .gitlab-ci.yml,
      * and the "test suite on PHP ..." line in the README.
      *
+     * A floor with an advisory list (supported lines above the matrix cap)
+     * also puts php_advisory_version on the Preflight php-test component's
+     * inputs, directly after the php_versions line: Preflight runs that
+     * line allowed to fail. An empty list writes nothing, so a floor that
+     * matches the fallback leaves the template byte for byte.
+     *
      * The templates carry the pinned fallback (PhpFloor::FALLBACK_*) as
      * plain literals, so they stay valid JSON and YAML; this step swaps in
      * the policy's answer. A file is only rewritten when its text changes,
@@ -837,12 +843,25 @@ final class GeneratorSupport
 
         $ciPath = $targetDir . '/.gitlab-ci.yml';
         if (is_file($ciPath)) {
-            $this->rewrite($ciPath, static function (string $content) use ($floor): string {
+            $advisoryLine = [] === $floor->advisory ? null : sprintf('php_advisory_version: "%s"', $floor->advisory[0]);
+            $this->rewrite($ciPath, static function (string $content) use ($floor, $advisoryLine): string {
                 $content = (string) preg_replace(
                     '/^(\s*php_versions:\s*)\[[^\]\n]*\]/m',
                     '${1}' . $floor->yamlList(),
                     $content,
                 );
+
+                if (null !== $advisoryLine) {
+                    // Drop any advisory line a previous bake left behind,
+                    // then put ours directly after the php_versions line,
+                    // at its indentation.
+                    $content = (string) preg_replace('/^[ \t]*php_advisory_version:[^\r\n]*\r?\n?/m', '', $content);
+                    $content = (string) preg_replace(
+                        '/^([ \t]*)(php_versions:[^\r\n]*)\r?\n/m',
+                        '$1$2' . "\n" . '$1' . $advisoryLine . "\n",
+                        $content,
+                    );
+                }
 
                 return (string) preg_replace(
                     '/requires PHP \^\d+\.\d+, so the test matrix starts at \d+\.\d+\./',
