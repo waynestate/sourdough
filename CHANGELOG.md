@@ -6,6 +6,7 @@ Versioning once 1.0 is out.
 ## Unreleased
 
 - Changed: the raw PHP shape requires PROCTOR `^0.18` and ADVISOR `^0.4` (was `^0.16` and `^0.3`, which do not allow 0.18 and 0.4), and the front page's `deploy/` layer requires PROCTOR `^0.18` (was `^0.16`); PROCTOR 0.18.0 adds the update notice, the fake-driver check and the app-env warning (D-133).
+- Playwright pinned to 1.65.0 to match the image.
 
 ## 0.6.1 (2026-11-22)
 
