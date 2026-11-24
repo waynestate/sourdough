@@ -85,7 +85,7 @@ final class RawGenerator
      */
     public const PLAYBOOK_PACKAGE = 'waynestate/playbook';
 
-    public const PLAYBOOK_VERSION = '^0.1';
+    public const PLAYBOOK_VERSION = '^0.3';
 
     public const PLAYBOOK_REPO_URL = 'https://git.wayne.edu/enterprise-apps/playbook.git';
 
@@ -98,7 +98,7 @@ final class RawGenerator
      */
     public const ADVISOR_PACKAGE = 'waynestate/advisor';
 
-    public const ADVISOR_VERSION = '^0.3';
+    public const ADVISOR_VERSION = '^0.4';
 
     /**
      * The seven setting names Playbook holds, listed in .env.example.
