@@ -12,6 +12,10 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+### Fixed
+
+- Fixed: raw bakes no longer put a PHP line newer than 8.5 in the required test matrix; newer supported lines go to Preflight php-test's `php_advisory_version` (allowed to fail).
+
 ## 1.0.0 (2026-11-24)
 
 The first stable release. A bake needs no change; `sourdough feed` carries the template moves below. The questions only an outside owner can answer are in OPEN_QUESTIONS.md under "Known open at 1.0", each with the default Sourdough ships, and none gates 1.0.
