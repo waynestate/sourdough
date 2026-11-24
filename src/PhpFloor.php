@@ -29,7 +29,9 @@ use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
  * 3. The test matrix is every line from the floor up that is supported on
  *    the as-of date and has a Docker image in the policy (the image
  *    Preflight's php-test job pulls), capped at the Laravel major's maximum
- *    PHP for a Laravel shape.
+ *    PHP for a Laravel shape and at DEFAULT_MAX (8.5) for the raw shapes.
+ *    A supported line above the cap is not required: it goes to the
+ *    advisory list, which Preflight's php-test runs allowed to fail.
  *
  * When the policy cannot be read or does not answer (no CREED, a bad file,
  * no refreshed_on, no line qualifies), the bake does not fail: it uses the
@@ -50,6 +52,14 @@ final class PhpFloor
     public const FALLBACK_VERSIONS = ['8.3', '8.4', '8.5'];
 
     /**
+     * The highest PHP line the required test matrix carries for the raw
+     * shapes, which have no framework range to cap them: a newer supported
+     * line goes to the advisory list instead, where Preflight's php-test
+     * runs it allowed to fail.
+     */
+    public const DEFAULT_MAX = '8.5';
+
+    /**
      * How far past the policy's refreshed_on date the floor must still be
      * supported: a new app gets at least a year on its floor. A proposal
      * (see docs/guides/support.md); CREED is the better home for it.
@@ -68,6 +78,7 @@ final class PhpFloor
      * @param string|null  $floorSecurityUntil   the floor line's security_until in the policy; null on the fallback
      * @param string|null  $laravelMajor         the Laravel major a Laravel shape generates; null for the raw shapes
      * @param string|null  $laravelSecurityUntil that major's security_until in the policy; null on the fallback or a raw shape
+     * @param list<string> $advisory             supported lines above the matrix cap; Preflight's php-test runs them allowed to fail
      */
     private function __construct(
         public readonly string $floor,
@@ -79,6 +90,7 @@ final class PhpFloor
         public readonly ?string $floorSecurityUntil = null,
         public readonly ?string $laravelMajor = null,
         public readonly ?string $laravelSecurityUntil = null,
+        public readonly array $advisory = [],
     ) {}
 
     /**
@@ -176,15 +188,24 @@ final class PhpFloor
             $floor = $range['min'];
         }
 
+        // The required matrix stops at a cap: the Laravel major's maximum
+        // PHP for a Laravel shape, DEFAULT_MAX for the raw shapes. A
+        // supported line above it is not required of the app: it goes to
+        // the advisory list, where Preflight's php-test runs it allowed to
+        // fail.
+        $cap = null === $range ? self::DEFAULT_MAX : $range['max'];
+
         $versions = [];
+        $advisory = [];
         foreach ($current as $version) {
             if (version_compare($version, $floor, '<')) {
                 continue;
             }
-            if (null !== $range && version_compare($version, $range['max'], '>')) {
+            if (!self::hasDockerImage($data, $version)) {
                 continue;
             }
-            if (!self::hasDockerImage($data, $version)) {
+            if (version_compare($version, $cap, '>')) {
+                $advisory[] = $version;
                 continue;
             }
             $versions[] = $version;
@@ -204,6 +225,7 @@ final class PhpFloor
             $policy->securityUntil('php', $floor)?->format('Y-m-d'),
             $laravelMajor,
             null === $laravelMajor ? null : $policy->securityUntil('laravel', $laravelMajor)?->format('Y-m-d'),
+            $advisory,
         );
     }
 
@@ -277,7 +299,7 @@ final class PhpFloor
     /**
      * The same facts for --json.
      *
-     * @return array{constraint: string, platform: string, versions: list<string>, floor_security_until: string|null, source: string, origin: string, refreshed_on: string|null, horizon_days: int, reason: string|null}
+     * @return array{constraint: string, platform: string, versions: list<string>, advisory: list<string>, floor_security_until: string|null, source: string, origin: string, refreshed_on: string|null, horizon_days: int, reason: string|null}
      */
     public function toArray(): array
     {
@@ -285,6 +307,7 @@ final class PhpFloor
             'constraint' => $this->constraint(),
             'platform' => $this->platform(),
             'versions' => $this->versions,
+            'advisory' => $this->advisory,
             'floor_security_until' => $this->floorSecurityUntil,
             'source' => $this->source,
             'origin' => $this->origin,

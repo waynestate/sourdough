@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Waynestate\Creed\Policy;
 use Waynestate\Sourdough\Generator\ComposerSkeletonSource;
 use Waynestate\Sourdough\Generator\FixtureSkeletonSource;
+use Waynestate\Sourdough\Generator\GeneratorSupport;
 use Waynestate\Sourdough\Generator\LaravelBladeGenerator;
 use Waynestate\Sourdough\Generator\LaravelBladeVueGenerator;
 use Waynestate\Sourdough\Generator\LaravelInertiaGenerator;
@@ -137,9 +138,11 @@ final class PhpFloorTest extends TestCase
         $laravel = PhpFloor::fromData($data, 'test', $major);
 
         self::assertSame('8.3', $raw->floor);
-        self::assertSame(['8.3', '8.4', '8.5', '8.6'], $raw->versions);
+        self::assertSame(['8.3', '8.4', '8.5'], $raw->versions, 'the raw shapes cap at 8.5');
+        self::assertSame(['8.6'], $raw->advisory, 'a newer line is advisory only');
         self::assertSame('8.4', $laravel->floor, 'raised to the Laravel major\'s minimum');
         self::assertSame(['8.4', '8.5'], $laravel->versions, 'capped at the Laravel major\'s maximum');
+        self::assertSame(['8.6'], $laravel->advisory, 'above the major\'s maximum 8.5');
         self::assertSame($major, $laravel->laravelMajor);
         self::assertNotNull($laravel->laravelSecurityUntil);
     }
@@ -150,6 +153,89 @@ final class PhpFloorTest extends TestCase
         unset($data['components']['php']['versions']['8.5']['images']);
 
         self::assertSame(['8.3', '8.4'], PhpFloor::fromData($data, 'test')->versions);
+    }
+
+    /**
+     * Only a supported line with a Docker image joins the advisory list:
+     * a newer line the policy has no image for is neither required nor
+     * advisory, and the fallback carries no advisory at all.
+     */
+    public function testALineAboveTheCapWithoutAnImageIsNotAdvisory(): void
+    {
+        $data = $this->bundled();
+        $data['components']['php']['versions']['8.6'] = [
+            'active_until' => '2028-12-31',
+            'security_until' => '2030-12-31',
+        ];
+
+        $floor = PhpFloor::fromData($data, 'test');
+
+        self::assertSame(['8.3', '8.4', '8.5'], $floor->versions);
+        self::assertSame([], $floor->advisory);
+    }
+
+    /**
+     * The advisory list is part of the floor's facts: empty on the
+     * fallback, carried by --json as advisory.
+     */
+    public function testTheAdvisoryListIsEmptyOnTheFallbackAndInToArray(): void
+    {
+        $fallback = PhpFloor::fallback('a test reason');
+        self::assertSame([], $fallback->advisory);
+        self::assertSame([], $fallback->toArray()['advisory']);
+
+        $data = $this->bundled();
+        $data['components']['php']['versions']['8.6'] = [
+            'active_until' => '2028-12-31',
+            'security_until' => '2030-12-31',
+            'images' => ['docker' => 'php:8.6-cli-trixie'],
+        ];
+
+        self::assertSame(['8.6'], PhpFloor::fromData($data, 'test')->toArray()['advisory']);
+    }
+
+    /**
+     * applyPhpFloor puts the advisory line on the php-test inputs directly
+     * after php_versions, with the same indentation, replacing a line that
+     * is already there; an empty advisory list leaves the file byte for
+     * byte.
+     */
+    public function testApplyPhpFloorReplacesAnExistingAdvisoryLineAndWritesNothingWhenEmpty(): void
+    {
+        $data = $this->bundled();
+        $data['components']['php']['versions']['8.6'] = [
+            'active_until' => '2028-12-31',
+            'security_until' => '2030-12-31',
+            'images' => ['docker' => 'php:8.6-cli-trixie'],
+        ];
+        $floor = PhpFloor::fromData($data, 'test');
+        self::assertSame(['8.6'], $floor->advisory);
+
+        $dir = $this->makeTempDir();
+        $ci = implode("\n", [
+            'include:',
+            '  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@fb73b538f3980292119b5b306ff64383d760a214 # 0.9.0',
+            '    inputs:',
+            '      php_versions: ["8.3", "8.4", "8.5"]',
+            '      php_advisory_version: "8.9"',
+            '      test_command: vendor/bin/phpunit',
+            '',
+        ]);
+        $path = $dir . '/.gitlab-ci.yml';
+        file_put_contents($path, $ci);
+
+        (new GeneratorSupport())->applyPhpFloor($dir, $floor);
+        $updated = (string) file_get_contents($path);
+        self::assertStringContainsString(
+            "      php_versions: [\"8.3\", \"8.4\", \"8.5\"]\n      php_advisory_version: \"8.6\"\n      test_command: vendor/bin/phpunit",
+            $updated,
+        );
+        self::assertStringNotContainsString('8.9', $updated);
+
+        // An empty advisory list writes nothing: the file stays as written.
+        file_put_contents($path, $ci);
+        (new GeneratorSupport())->applyPhpFloor($dir, PhpFloor::fallback('a test reason'));
+        self::assertSame($ci, (string) file_get_contents($path));
     }
 
     /**
@@ -214,6 +300,41 @@ final class PhpFloorTest extends TestCase
         }
     }
 
+    /**
+     * A supported line above the cap (CREED 0.1.14's 8.6) is not required
+     * of the app: the matrix stops at 8.5 and the line goes to Preflight
+     * php-test's php_advisory_version input, allowed to fail (D-2).
+     */
+    public function testARawBakeKeepsANewerLineOutOfTheRequiredMatrix(): void
+    {
+        $data = $this->bundled();
+        // A newer PHP line with an image: supported, so it is tested, but
+        // above every cap, so it is advisory only.
+        $data['components']['php']['versions']['8.6'] = [
+            'active_until' => '2028-12-31',
+            'security_until' => '2030-12-31',
+            'images' => ['docker' => 'php:8.6-cli-trixie'],
+        ];
+        putenv(PhpFloor::ENV_POLICY . '=' . $this->writePolicy($data));
+
+        $rawTarget = $this->makeTempDir();
+        (new RawGenerator())->generate($rawTarget, 'My Cool App', [], PlaybookMode::Suggest);
+        $ci = (string) file_get_contents($rawTarget . '/.gitlab-ci.yml');
+        self::assertStringContainsString('php_versions: ["8.3", "8.4", "8.5"]', $ci);
+        self::assertStringContainsString('php_advisory_version: "8.6"', $ci);
+        // The whole php_versions line is the capped list: no newer line in it.
+        self::assertMatchesRegularExpression('/^ *php_versions: \["8\.3", "8\.4", "8\.5"\]$/m', $ci, 'no newer line inside the php_versions list');
+
+        $skeleton = new FixtureSkeletonSource(__DIR__ . '/fixtures/laravel-skeleton');
+        $laravelTarget = $this->makeTempDir();
+        (new LaravelBladeGenerator($skeleton))->generate($laravelTarget, 'My Cool App', [], PlaybookMode::Suggest);
+        $ci = (string) file_get_contents($laravelTarget . '/.gitlab-ci.yml');
+        self::assertStringContainsString('php_versions: ["8.3", "8.4", "8.5"]', $ci);
+        self::assertStringContainsString('php_advisory_version: "8.6"', $ci);
+        // The whole php_versions line is the capped list: no newer line in it.
+        self::assertMatchesRegularExpression('/^ *php_versions: \["8\.3", "8\.4", "8\.5"\]$/m', $ci, 'no newer line inside the php_versions list');
+    }
+
     public function testTheBundledPolicyBakesTheTemplateAsWritten(): void
     {
         foreach ($this->shapes() as [$shape, $generator]) {
@@ -223,7 +344,9 @@ final class PhpFloorTest extends TestCase
             $composer = json_decode((string) file_get_contents($target . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
             self::assertSame('^8.3', $composer['require']['php'], $shape);
             self::assertSame('8.3.0', $composer['config']['platform']['php'], $shape);
-            self::assertStringContainsString('php_versions: ["8.3", "8.4", "8.5"]', (string) file_get_contents($target . '/.gitlab-ci.yml'), $shape);
+            $ci = (string) file_get_contents($target . '/.gitlab-ci.yml');
+            self::assertStringContainsString('php_versions: ["8.3", "8.4", "8.5"]', $ci, $shape);
+            self::assertStringNotContainsString('php_advisory_version', $ci, $shape);
         }
     }
 
