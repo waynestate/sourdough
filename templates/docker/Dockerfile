@@ -31,7 +31,7 @@ WORKDIR /app
 EXPOSE 8000
 CMD ["sh", "-c", "[ -f vendor/autoload.php ] || composer install --no-interaction; [ -f .env ] || cp .env.example .env; grep -q '^APP_KEY=base64:' .env || php artisan key:generate --force; php artisan migrate --force; exec php artisan serve --host=0.0.0.0 --port=8000"]
 
-FROM php:8.5-apache-trixie@sha256:08af36df144462d84c7f16190557eec06cb9f656882685610b712a15eec54d46 AS prod
+FROM php:8.5-apache-trixie@sha256:d24a308e0ef159f2abec5fcaf4a5bb7c71c1d5ccc0b92f3c77e69c52173e4e4c AS prod
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates git unzip libicu-dev libzip-dev \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql intl zip bcmath \
