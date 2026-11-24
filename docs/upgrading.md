@@ -26,10 +26,20 @@ sourdough --version
 Expected for the current release:
 
 ```
-Sourdough 0.6.1
+Sourdough 1.0.0
 ```
 
 Then read the section for the version you are moving to.
+
+## 1.0.0 (2026-11-24)
+
+The first stable release. From here the project follows Semantic Versioning: a breaking change to a bake, a command or a file's contract waits for 2.0. The commands, the shapes and the `.sourdough.json` file are the same as in 0.6.1 apart from what the changelog lists under 1.0.0 (the raw PHP shape requires PROCTOR `^0.18` and ADVISOR `^0.4`, and Playwright is pinned to 1.65.0).
+
+**Breaking:** none. **Deprecated:** none.
+
+**Steps:** in each app, on a clean git tree, `sourdough feed --dry-run`, then `sourdough feed`, then `composer ci`.
+
+**How to verify:** `sourdough --version` prints `Sourdough 1.0.0`.
 
 ## 0.6.1 (2026-11-22)
 
