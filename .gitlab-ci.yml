@@ -1,5 +1,5 @@
 # Sourdough's pipeline, built from the Preflight components on this GitLab.
-# Every include is pinned to one Preflight release, 0.12.0. Never use ~latest.
+# Every include is pinned to one Preflight release, 0.13.0. Never use ~latest.
 # composer ci is the contract: the same checks run on GitLab and GitHub.
 # Sourdough requires PHP ^8.3, so the test matrix starts at 8.3. A starter
 # that can't pass its own tests is just flour and wishful thinking.
@@ -7,20 +7,40 @@
 # from Preflight 0.3.0 each component pulls image_prefix/image, and image_prefix defaults to
 # the group's proxy, so the image inputs below are plain image names. Put the prefix in the
 # image as well and the dough is proofed twice: the pull fails.
+# D-176 pipeline shape: branch pipelines only, a new commit cancels the old pipeline,
+# pushes run the fast tier, nightly schedules, tags and manual runs the full tier.
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_TAG
+      variables: { PREFLIGHT_TIER: full }
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $PREFLIGHT_TIER == "full"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      variables: { PREFLIGHT_TIER: fast }
+    - if: $CI_PIPELINE_SOURCE == "web"
+      variables: { PREFLIGHT_TIER: full }
+    - if: $CI_COMMIT_BRANCH
+      variables: { PREFLIGHT_TIER: fast }
+default:
+  interruptible: true
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.12.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.13.0
     inputs:
+      tier: full
       php_versions: ["8.3", "8.4", "8.5"]
       image: "php:${PHP_VERSION}-cli-trixie"
   # No image input: from 0.5.0 composer-audit's default is composer 2.11.1, pinned by its list digest.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.12.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.13.0
   # Committed secrets fail the pipeline before they ride along in a release; this repo mirrors to public GitHub.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@0.12.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/secret-detection@0.13.0
     inputs:
       image: "zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f"
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy, and a finding
   # fails the pipeline.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.12.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.13.0
     inputs:
       working_dir: deploy
       proctor_command: vendor/bin/proctor check --format=codequality
@@ -28,8 +48,9 @@ include:
   # Accessibility: Preflight's a11y component serves site/ and checks every page with axe-core 4.14.0, light and
   # dark, at 320 and 1280 px, plus WCAG 1.4.10 reflow, at WCAG 2.2 AA. Its Playwright image comes from
   # mcr.microsoft.com, which the Dependency Proxy does not front, so it takes no image_prefix.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.12.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.13.0
     inputs:
+      tier: full
       site_dir: site
       pages: ["**/*.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
@@ -99,26 +120,36 @@ composer-ci:
 
 smoke-raw:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   script:
     - sh scripts/smoke-shape.sh raw
 
 smoke-raw-vue:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   script:
     - sh scripts/smoke-shape.sh raw-vue
 
 smoke-blade:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   script:
     - sh scripts/smoke-shape.sh blade
 
 smoke-blade-vue:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   script:
     - sh scripts/smoke-shape.sh blade-vue
 
 smoke-inertia:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   script:
     - sh scripts/smoke-shape.sh inertia
 
@@ -131,6 +162,8 @@ smoke-inertia:
 # the warm oven.
 smoke-floor:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.3-cli-trixie
   script:
     - sh scripts/smoke-shape.sh raw
@@ -144,6 +177,8 @@ smoke-floor:
 # keeps the image on 8.4. No loaf skips the middle shelf.
 smoke-php84:
   extends: .smoke-base
+  rules:
+    - if: '$PREFLIGHT_TIER == "full"'
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/php:8.4-cli-trixie
   script:
     - sh scripts/smoke-shape.sh raw

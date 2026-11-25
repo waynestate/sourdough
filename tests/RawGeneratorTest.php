@@ -447,7 +447,7 @@ final class RawGeneratorTest extends TestCase
         // tag in a trailing comment. From 0.3.0 the components add the
         // registry prefix themselves (image_prefix, here the shape's IMAGE_PREFIX),
         // and the baked includes keep the components' default images.
-        self::assertStringContainsString('b1fa3809495794e98475e9d2c20877a331cd6975 # 0.12.0', $ci);
+        self::assertStringContainsString('80ff4e366d6d7af1b95c29c7d4303b4cb90a863c # 0.13.0', $ci);
         self::assertStringNotContainsString('7d4f6dad9c90c4f2b2aaf50fdde2a43dbdc5def1', $ci);
         self::assertStringNotContainsString('79029cc2300702d0d450c42cc699e12af1b731f8', $ci);
         self::assertStringContainsString('      image_prefix: "${IMAGE_PREFIX}"', $ci);
