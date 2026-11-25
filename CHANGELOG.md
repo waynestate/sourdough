@@ -5,6 +5,9 @@ Versioning once 1.0 is out.
 
 ## Unreleased
 
+- Changed: Sourdough's own CI follows D-176 and pins Preflight 0.13.0 (axe-core 4.14.1 in the a11y checker copy). A push runs the fast tier (composer ci, the audits, PROCTOR, secret detection, the WayneUI copies check); the full tier (PHP matrix and advisory PHP, browser a11y, the smoke bakes) runs nightly, on tags and on manual runs. Branch pipelines only, so an open MR no longer doubles a push, and a new commit cancels the pipeline it replaces.
+- Changed: the five templates pin Preflight 0.13.0 (axe-core 4.14.1). They keep the app pipeline shape: a schedule stays the app's full nightly run, since D-176's fast and full tiers are for the stack's own repos.
+
 ## 1.0.0 (2026-11-24)
 
 The first stable release. A bake needs no change; `sourdough feed` carries the template moves below. The questions only an outside owner can answer are in OPEN_QUESTIONS.md under "Known open at 1.0", each with the default Sourdough ships, and none gates 1.0.
