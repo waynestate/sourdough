@@ -12,7 +12,7 @@ Sourdough's pipelines run one gate, `composer ci`, on both forges: the same comm
 
 ## On GitLab
 
-Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). On the Laravel shapes, `composer-ci` also runs `composer lint:gitlab` in `after_script`, pass or fail, and keeps Pint's findings as a Code Quality report (`pint-codequality.json`, seven days), so a merge request shows them in its widget. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. The Laravel shapes also include `mysql56-migrate`: their tests run on SQLite, which accepts DDL that MySQL 5.6 rejects at deploy, so the job runs `php artisan migrate` against a real MySQL 5.6.51 service instead; the official 5.6 images are amd64 only, so it runs on an `amd64`-tagged runner. Every include is pinned to the Preflight 0.12.0 release commit (`b1fa3809495794e98475e9d2c20877a331cd6975`), with the tag in a trailing comment.
+Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job. The raw shapes add the `proctor` component; the Laravel shapes run PROCTOR in a `proctor-root` job (`composer proctor`, which is `proctor check`). On the Laravel shapes, `composer-ci` also runs `composer lint:gitlab` in `after_script`, pass or fail, and keeps Pint's findings as a Code Quality report (`pint-codequality.json`, seven days), so a merge request shows them in its widget. Every shape also includes three gates, `sbom`, `secret-detection` and `a11y`, and ships a `.deploy` template for deploy jobs; they are described below. The Laravel shapes also include `mysql56-migrate`: their tests run on SQLite, which accepts DDL that MySQL 5.6 rejects at deploy, so the job runs `php artisan migrate` against a real MySQL 5.6.51 service instead; the official 5.6 images are amd64 only, so it runs on an `amd64`-tagged runner. Every include is pinned to the Preflight 0.13.0 release commit (`80ff4e366d6d7af1b95c29c7d4303b4cb90a863c`), with the tag in a trailing comment. The templates keep a schedule as the app's full nightly run: they pin Preflight 0.13.0 but do not take the stack's fast and full tiers (D-176), which are for the stack's own repos.
 
 ## The accessibility gate
 
@@ -103,7 +103,7 @@ The `a11y` component pulls Microsoft's Playwright image from mcr.microsoft.com, 
 
 ## On GitHub
 
-`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.12.0's release commit, the same release as the GitLab pipeline.
+`.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`, pinned to Preflight 0.13.0's release commit, the same release as the GitLab pipeline.
 
 ## What green means
 

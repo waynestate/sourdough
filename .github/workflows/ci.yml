@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   ci:
-    uses: waynestate/preflight/.github/workflows/php-package.yml@b1fa3809495794e98475e9d2c20877a331cd6975 # 0.12.0
+    uses: waynestate/preflight/.github/workflows/php-package.yml@80ff4e366d6d7af1b95c29c7d4303b4cb90a863c # 0.13.0
     with:
       php-versions: '["8.3","8.4","8.5"]'
       ci-command: composer ci
